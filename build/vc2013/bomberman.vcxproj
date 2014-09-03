@@ -15,6 +15,9 @@
     <ClCompile Include="..\..\src\game.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\base\interfaces.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7A327356-55D7-4A85-98A6-460F60D42534}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

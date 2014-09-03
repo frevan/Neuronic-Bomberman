@@ -9,7 +9,7 @@
 class TGame :	public TGameApplication
 {
 protected:
-	sf::Window* createWindow() override;
+	sf::RenderWindow* createWindow() override;
 
 public:
 	TGame();

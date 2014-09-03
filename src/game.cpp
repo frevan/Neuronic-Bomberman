@@ -9,7 +9,7 @@ TGame::TGame()
 {
 }
 
-sf::Window* TGame::createWindow()
+sf::RenderWindow* TGame::createWindow()
 {
 	return new sf::RenderWindow{sf::VideoMode{800, 600, 32}, "Bomberman"};
 }
