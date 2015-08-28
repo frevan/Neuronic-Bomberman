@@ -36,8 +36,8 @@ protected:
 	virtual void AfterSceneAttached(IScenePtr scene);
 	virtual void BeforeSceneDetached(IScenePtr scene);
 
-	virtual sf::RenderWindow* createWindow() = 0;
-	virtual IGameState* createInitialGameState() = 0;
+	virtual sf::RenderWindow* CreateWindow() = 0;
+	virtual IGameState* CreateInitialGameState() = 0;
 
 public:
 	std::string AppPath;
@@ -46,9 +46,9 @@ public:
 	TApplication();
 	~TApplication() override;
 
-	bool initialize(const std::string& filename);
-	void finalize();
-	virtual void execute();	
+	bool Initialize(const std::string& filename);
+	void Finalize();
+	virtual void Execute();	
 
 	// from IApplication
 	void RequestQuit() override;

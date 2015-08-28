@@ -9,7 +9,7 @@ namespace nel {
 class TScene	: public IScene
 {
 protected:
-	TViewType fType;
+	TViewType ViewType;
 	IApplication* Application;
 public:
 	TScene(TViewType setType = VT_HUMANVIEW);

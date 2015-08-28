@@ -12,17 +12,17 @@ int main(int argc, char *argv[])
 	TGame game{};
 
 	// initialize game
-	if (!game.initialize(argv[0]))
+	if (!game.Initialize(argv[0]))
 	{
 		std::cout << "There was an initialization error" << std::endl;
 		return 1;
 	}
 
 	// game loop
-	game.execute();
+	game.Execute();
 
 	// clean up before exit
-	game.finalize();
+	game.Finalize();
 
 	return 0;
 }

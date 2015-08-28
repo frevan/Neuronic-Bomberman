@@ -6,8 +6,6 @@
 
 namespace nel {
 
-
-
 TInputMapper::TInputMapper()
 {
 }
@@ -16,41 +14,39 @@ TInputMapper::~TInputMapper()
 {
 }
 
-bool TInputMapper::processEvent(const sf::Event& event)
+bool TInputMapper::ProcessEvent(const sf::Event& event)
 {
 	return false;
 }
 
-void TInputMapper::defineInput(TGameID setID)
+void TInputMapper::DefineInput(TGameID setID)
 {
 }
 
-void TInputMapper::bindControlToInput(TGameID inputID, const TInputControl& setControl, float setScale)
+void TInputMapper::BindControlToInput(TGameID inputID, const TInputControl& setControl, float setScale)
 {
 }
 
-void TInputMapper::unbindControl(TGameID inputID, const TInputControl& control)
+void TInputMapper::UnbindControl(TGameID inputID, const TInputControl& control)
 {
 }
 
-float TInputMapper::getValueOfInput(TGameID id)
-{
-	return 0;
-}
-
-void TInputMapper::addInputHandler(TGameID inputID, const TInputEventHandler& setHandler)
-{
-}
-
-void TInputMapper::removeInputHandler(TGameID inputID, const TInputEventHandler& setHandler)
-{
-}
-
-TGameID TInputMapper::findGameIDForControl(const TInputControl& control)
+float TInputMapper::GetValueOfInput(TGameID id)
 {
 	return 0;
 }
 
+void TInputMapper::AddInputHandler(TGameID inputID, const TInputEventHandler& setHandler)
+{
+}
 
+void TInputMapper::RemoveInputHandler(TGameID inputID, const TInputEventHandler& setHandler)
+{
+}
+
+TGameID TInputMapper::FindGameIDForControl(const TInputControl& control)
+{
+	return 0;
+}
 
 };	// namespace nel

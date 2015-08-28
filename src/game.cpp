@@ -16,7 +16,7 @@ TGame::TGame()
 {
 }
 
-sf::RenderWindow* TGame::createWindow()
+sf::RenderWindow* TGame::CreateWindow()
 {
 	#ifdef FULLSCREEN
 	sf::Uint32 windowstyle = sf::Style::Fullscreen;
@@ -27,7 +27,7 @@ sf::RenderWindow* TGame::createWindow()
 	return new sf::RenderWindow{sf::VideoMode{800, 600, 32}, "Bomberman", windowstyle};
 }
 
-nel::IGameState* TGame::createInitialGameState()
+nel::IGameState* TGame::CreateInitialGameState()
 {
 	return new TMenuState(GUI);
 }

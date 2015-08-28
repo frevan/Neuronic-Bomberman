@@ -35,7 +35,7 @@ TApplication::~TApplication()
 {
 }
 
-bool TApplication::initialize(const std::string& filename)
+bool TApplication::Initialize(const std::string& filename)
 {
 	// let descendants register factory functions etc
 	BeforeInitialization();
@@ -49,7 +49,7 @@ bool TApplication::initialize(const std::string& filename)
 	AppPath = AppPath.substr(0, found+1);
 
 	// create window
-	sf::RenderWindow* w = createWindow();
+	sf::RenderWindow* w = CreateWindow();
 	if (!w)
 		return false;
 	Window.reset(w);	// set our smart pointer to the newly created window
@@ -61,7 +61,7 @@ bool TApplication::initialize(const std::string& filename)
 	return true;
 }
 
-void TApplication::finalize()
+void TApplication::Finalize()
 {
 	// let descendants do stuff
 	BeforeFinalization();
@@ -75,7 +75,7 @@ void TApplication::finalize()
 	Window.reset();	
 }
 
-void TApplication::execute()
+void TApplication::Execute()
 {
 	sf::Clock clock;
 
@@ -93,7 +93,7 @@ void TApplication::execute()
 
 	// one more thing left to create:
 	// the initial game state
-	IGameState* initialState = createInitialGameState();
+	IGameState* initialState = CreateInitialGameState();
 	if (!initialState)
 		return;
 	State.reset(initialState);

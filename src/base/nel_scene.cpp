@@ -6,7 +6,7 @@ namespace nel {
 
 TScene::TScene(TViewType setType)
 :	IScene(),
-	fType(setType)
+	ViewType(setType)
 {
 }
 
@@ -29,7 +29,7 @@ void TScene::Draw(sf::RenderTarget* target)
 
 IScene::TViewType TScene::GetType()
 {
-	return fType;
+	return ViewType;
 }
 
 };	// namespace nel
