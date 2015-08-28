@@ -16,9 +16,10 @@ public:
 	~TScene() override;
 
 	// from IScene
-	void onAttach(IApplication* setApplication) override;
-	void onDetach() override;
-	TViewType getType() override;
+	void OnAttach(IApplication* setApplication) override;
+	void OnDetach() override;
+	void Draw(sf::RenderTarget* target) override;
+	TViewType GetType() override;
 };
 
 };

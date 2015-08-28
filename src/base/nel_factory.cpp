@@ -10,23 +10,23 @@ namespace nel {
 
 TObjectFactory::TObjectFactory()
 :	IObjectFactory(),
-	delegates()
+	Delegates()
 {
 }
 
-void TObjectFactory::registerObjectType(uint64_t objectType, const TObjectFactoryDelegate& setDelegate)
+void TObjectFactory::RegisterObjectType(uint64_t objectType, const TObjectFactoryDelegate& setDelegate)
 {
-	delegates[objectType] = setDelegate;
+	Delegates[objectType] = setDelegate;
 }
 
-void TObjectFactory::unregisterObjectType(uint64_t objectType)
+void TObjectFactory::UnregisterObjectType(uint64_t objectType)
 {
-	delegates.erase(objectType);
+	Delegates.erase(objectType);
 }
 
-void* TObjectFactory::createObject(uint64_t objectType)
+void* TObjectFactory::CreateObject(uint64_t objectType)
 {
-	return delegates[objectType]();
+	return Delegates[objectType]();
 }
 
 

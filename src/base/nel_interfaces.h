@@ -30,9 +30,9 @@ class IEventHandler;
 
 
 
-typedef std::shared_ptr<IScene> IScenePtr;
-typedef std::shared_ptr<ILogic> ILogicPtr;
-typedef std::shared_ptr<IGameState> IGameStatePtr;
+typedef std::weak_ptr<IScene> IScenePtr;
+typedef std::weak_ptr<ILogic> ILogicPtr;
+typedef std::weak_ptr<IGameState> IGameStatePtr;
 
 
 
@@ -41,18 +41,18 @@ class IApplication
 public:
 	virtual ~IApplication() {};
 
-	virtual void requestQuit() = 0;
+	virtual void RequestQuit() = 0;
 
-	virtual void setNextState(IGameState* nextState) = 0;
+	virtual void SetNextState(IGameState* nextState) = 0;
 
-	virtual void attachScene(IScenePtr scene) = 0;
-	virtual void detachScene(IScenePtr scene) = 0;
+	virtual void AttachScene(IScenePtr scene) = 0;
+	virtual void DetachScene(IScenePtr scene) = 0;
 
-	virtual void addLogic(ILogicPtr logic) = 0;
-	virtual void removeLogic(ILogicPtr logic) = 0;	
+	virtual void AddLogic(ILogicPtr logic) = 0;
+	virtual void RemoveLogic(ILogicPtr logic) = 0;	
 
-	virtual void addEventHandler(IEventHandler* handler) = 0;
-	virtual void removeEventHandler(IEventHandler* handler) = 0;
+	virtual void AddEventHandler(IEventHandler* handler) = 0;
+	virtual void RemoveEventHandler(IEventHandler* handler) = 0;
 };
 
 
@@ -63,10 +63,10 @@ typedef std::function<void*()> TObjectFactoryDelegate;
 class IObjectFactory
 {
 public:
-	virtual void registerObjectType(uint64_t objectType, const TObjectFactoryDelegate& setDelegate) = 0;
-	virtual void unregisterObjectType(uint64_t objectType) = 0;
+	virtual void RegisterObjectType(uint64_t objectType, const TObjectFactoryDelegate& setDelegate) = 0;
+	virtual void UnregisterObjectType(uint64_t objectType) = 0;
 
-	virtual void* createObject(uint64_t objectType) = 0;
+	virtual void* CreateObject(uint64_t objectType) = 0;
 };
 
 
@@ -76,10 +76,10 @@ class IGameState
 public:
 	virtual ~IGameState() {};
 
-	virtual void initialize(IApplication* setApplication) = 0;
-	virtual void finalize() = 0;
-	virtual bool processEvent(const sf::Event& event) = 0;
-	virtual void update(TGameTime deltaTime) = 0;
+	virtual void Initialize(IApplication* setApplication) = 0;
+	virtual void Finalize() = 0;
+	virtual bool ProcessEvent(const sf::Event& event) = 0;
+	virtual void Update(TGameTime deltaTime) = 0;
 };
 
 
@@ -98,12 +98,10 @@ public:
 
 	virtual ~IScene() {};
 
-	virtual void onAttach(IApplication* setApplication) = 0;
-	virtual void onDetach() = 0;
-
-	virtual void draw(sf::RenderTarget* target) = 0;
-
-	virtual TViewType getType() = 0;
+	virtual void OnAttach(IApplication* setApplication) = 0;
+	virtual void OnDetach() = 0;
+	virtual void Draw(sf::RenderTarget* target) = 0;
+	virtual TViewType GetType() = 0;
 };
 
 
@@ -111,8 +109,8 @@ public:
 class IActor
 {
 public:
-	virtual IComponent* getComponent(int id) = 0;
-	virtual void setComponent(int id, IComponent* value) = 0;
+	virtual IComponent* GetComponent(int id) = 0;
+	virtual void SetComponent(int id, IComponent* value) = 0;
 };
 
 
@@ -120,8 +118,8 @@ public:
 class IComponent
 {
 public:
-	virtual std::string getName() = 0;
-	virtual int getID() = 0;
+	virtual std::string GetName() = 0;
+	virtual int GetID() = 0;
 };
 
 
@@ -129,7 +127,7 @@ public:
 class IRenderable :	public IComponent
 {
 public:
-	virtual void draw(sf::RenderTarget* target) = 0;
+	virtual void Draw(sf::RenderTarget* target) = 0;
 };
 
 
@@ -137,7 +135,7 @@ public:
 class ILogic :	public IComponent
 {
 public:
-	virtual void update(const TGameTime& deltaTime) = 0;
+	virtual void Update(const TGameTime& deltaTime) = 0;
 };
 
 
@@ -145,7 +143,7 @@ public:
 class IEventHandler
 {
 public:
-	virtual bool processEvent(const sf::Event& event) = 0;
+	virtual bool ProcessEvent(const sf::Event& event) = 0;
 };
 
 

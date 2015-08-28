@@ -1,9 +1,11 @@
 #include "menuscene.h"
 
+#include "TGUI/TGUI.hpp"
 
 
-TMenuScene::TMenuScene()
-:	TSFGUIScene()
+
+TMenuScene::TMenuScene(std::shared_ptr<tgui::Gui> setGUI)
+:	TTGUIScene(setGUI)
 {
 }
 
@@ -11,39 +13,55 @@ TMenuScene::~TMenuScene()
 {
 }
 
-void TMenuScene::onAttach(nel::IApplication* setApplication)
+void TMenuScene::OnAttach(nel::IApplication* setApplication)
 {
-	TSFGUIScene::onAttach(setApplication);
-	Application->addEventHandler(this);
+	TTGUIScene::OnAttach(setApplication);	
 
 	createControls();	
 }
 
-void TMenuScene::onDetach()
+void TMenuScene::OnDetach()
 {
-	Application->removeEventHandler(this);
-	TSFGUIScene::onDetach();
+	GUI->removeAllWidgets();
+
+	TTGUIScene::OnDetach();
+}
+
+void TMenuScene::Draw(sf::RenderTarget* target)
+{
+	TTGUIScene::Draw(target);
+
+	sf::CircleShape shape(75);
+	shape.setPosition(sf::Vector2f(300, 100));
+	shape.setFillColor(sf::Color::Red);
+	target->draw(shape);
 }
 
 void TMenuScene::createControls()
 {
-	// create the label.
-	auto label = sfg::Label::Create("Hello world!");
+	GUI->removeAllWidgets();
 
-	// create a simple button and connect the click signal.
-	auto button = sfg::Button::Create("Quit");
-	button->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&TMenuScene::onButtonClick, this));
-
-	// create a vertical box layouter with 5 pixels spacing and add the label and button to it.
-	auto box = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.0f);
-	box->Pack(label);
-	box->Pack(button, false);
-
-	// add the box to the desktop
-	Desktop->Add(box);	
+	tgui::Button::Ptr quitbtn = std::make_shared<tgui::Button>();
+	GUI->add(quitbtn);
+	quitbtn->setText("Quit");
+	quitbtn->setPosition(tgui::Layout2d(25, 25));
+	quitbtn->setSize(tgui::Layout2d(100, 50));
+	quitbtn->connect("pressed", std::bind(&TMenuScene::OnQuitBtnClick, this));
 }
 
-void TMenuScene::onButtonClick()
+void TMenuScene::OnNewGameBtnClick()
 {
-	Application->requestQuit();
+}
+
+void TMenuScene::OnJoinGameBtnClick()
+{
+}
+
+void TMenuScene::OnOptionsBtnClick()
+{
+}
+
+void TMenuScene::OnQuitBtnClick()
+{
+	Application->RequestQuit();
 }

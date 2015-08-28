@@ -17,16 +17,17 @@ namespace nel {
 
 TApplication::TApplication()
 :	IApplication(),
-	appPath(),
-	scenes(),
-	scenesMutex(),
-	logics(),
-	logicsMutex(),
-	factory(),
-	state(),
-	shouldQuit(false),
-	eventHandlersMutex(),
-	eventHandlers()
+	AppPath(),
+	Scenes(),
+	ScenesMutex(),
+	Logics(),
+	LogicsMutex(),
+	Factory(),
+	State(),
+	ShouldQuit(false),
+	EventHandlersMutex(),
+	EventHandlers(),
+	Window()
 {
 }
 
@@ -37,31 +38,24 @@ TApplication::~TApplication()
 bool TApplication::initialize(const std::string& filename)
 {
 	// let descendants register factory functions etc
-	beforeInitialization();
+	BeforeInitialization();
 
 	// set application path
-	appPath = filename;
+	AppPath = filename;
 	#ifdef WIN32
-	std::replace(appPath.begin(), appPath.end(), '\\', '/');
+	std::replace(AppPath.begin(), AppPath.end(), '\\', '/');
 	#endif
-	size_t found = appPath.find_last_of('/');
-	appPath = appPath.substr(0, found+1);
+	size_t found = AppPath.find_last_of('/');
+	AppPath = AppPath.substr(0, found+1);
 
 	// create window
 	sf::RenderWindow* w = createWindow();
 	if (!w)
 		return false;
-	window.reset(w);	// set our smart pointer to the newly created window
-
-	// the initial game state
-	IGameState* initialState = createInitialGameState();
-	if (!initialState)
-		return false;
-	state.reset(initialState);
-	state->initialize(this);
+	Window.reset(w);	// set our smart pointer to the newly created window
 
 	// let descendants do stuff as well
-	afterInitialization();
+	AfterInitialization();
 
 	// done
 	return true;
@@ -70,15 +64,15 @@ bool TApplication::initialize(const std::string& filename)
 void TApplication::finalize()
 {
 	// let descendants do stuff
-	beforeFinalization();
+	BeforeFinalization();
 
 	// finalize state
-	if (state)
-		state->finalize();
+	if (State)
+		State->Finalize();
 
 	// destroy state, window
-	state.reset();
-	window.reset();	
+	State.reset();
+	Window.reset();	
 }
 
 void TApplication::execute()
@@ -97,21 +91,29 @@ void TApplication::execute()
 	uint32_t prevTickTime = clock.getElapsedTime().asMilliseconds();
 	uint32_t nowTime;
 
-	while (window->isOpen())
+	// one more thing left to create:
+	// the initial game state
+	IGameState* initialState = createInitialGameState();
+	if (!initialState)
+		return;
+	State.reset(initialState);
+	State->Initialize(this);
+
+	while (Window->isOpen())
 	{
 		// handle events
 		sf::Event event;
-		while (window->pollEvent(event))
+		while (Window->pollEvent(event))
 		{
 			// let the state handle the event first
-			bool handled = state->processEvent(event);	
+			bool handled = State->ProcessEvent(event);	
 			// then all registered event handlers
 			if (!handled)
 			{
-				std::lock_guard<std::mutex> g(eventHandlersMutex);
-				for (auto it = eventHandlers.begin(); it != eventHandlers.end(); it++)
+				std::lock_guard<std::mutex> g(EventHandlersMutex);
+				for (auto it = EventHandlers.begin(); it != EventHandlers.end(); it++)
 				{
-					if ((*it)->processEvent(event))
+					if ((*it)->ProcessEvent(event))
 						break;
 				}
 			}
@@ -123,11 +125,15 @@ void TApplication::execute()
         while (nowTime > nextGameTick && loops < MAX_FRAMESKIP) 
 		{	
 			TGameTime delta = nowTime-prevTickTime;
-			state->update(delta);
+			State->Update(delta);
 			{				
-				std::lock_guard<std::mutex> g(logicsMutex);
-				for (auto it = logics.begin(); it != logics.end(); it++)
-					(*it)->update(delta);
+				std::lock_guard<std::mutex> g(LogicsMutex);
+				for (auto it = Logics.begin(); it != Logics.end(); it++)
+				{
+					auto lockedlogic = (*it).lock();
+					if (lockedlogic)
+						lockedlogic->Update(delta);
+				}
 			}
 			// get new time
             nextGameTick += SKIP_TICKS;
@@ -137,135 +143,146 @@ void TApplication::execute()
         }
 
 		// draw scenes
-		sf::RenderTarget* target = window.get();
+		sf::RenderTarget* target = Window.get();
 		target->clear();	// fixed to black, for now
 		{
-			std::lock_guard<std::mutex> g(scenesMutex);
-			for (auto it = scenes.begin(); it != scenes.end(); it++)
-				(*it)->draw(target);
+			std::lock_guard<std::mutex> g(ScenesMutex);
+			for (auto it = Scenes.begin(); it != Scenes.end(); it++)
+			{
+				auto lockedscene = (*it).lock();
+				if (lockedscene)
+					lockedscene->Draw(target);
+			}
 		}
 
 		// paint
-		beforeDisplay();
-        window->display();
-		afterDisplay();
+		BeforeDisplay();
+        Window->display();
+		AfterDisplay();
 
 		// this will most likely be set in reaction to some event, i.e. by the game state
-		if (shouldQuit)
-			window->close();
+		if (ShouldQuit)
+			Window->close();
 	}
 }
 
-void TApplication::setNextState(IGameState* nextState)
+void TApplication::SetNextState(IGameState* nextState)
 {
-	if (state)
-		state->finalize();
+	if (State)
+		State->Finalize();
 
-	state.reset(nextState);
+	State.reset(nextState);
 
-	state->initialize(this);
+	State->Initialize(this);
 }
 
-void TApplication::attachScene(IScenePtr scene)
+void TApplication::AttachScene(IScenePtr scene)
 {
-	std::lock_guard<std::mutex> g(scenesMutex);
+	std::lock_guard<std::mutex> g(ScenesMutex);
 
-	scene->onAttach(this);
-	scenes.push_back(scene);
+	auto lockedscene = scene.lock();
+	if (lockedscene)
+		lockedscene->OnAttach(this);
 
-	afterSceneAttached(scene);
+	Scenes.push_back(scene);
+
+	AfterSceneAttached(scene);
 }
 
-void TApplication::detachScene(IScenePtr scene)
+void TApplication::DetachScene(IScenePtr scene)
 {
-	beforeSceneDetached(scene);
+	BeforeSceneDetached(scene);
 
-	std::lock_guard<std::mutex> g(scenesMutex);
+	std::lock_guard<std::mutex> g(ScenesMutex);
 
-	for (auto it = scenes.begin(); it != scenes.end(); it++)
+	for (auto it = Scenes.begin(); it != Scenes.end(); it++)
 	{
-		if (*(it) == scene)
+		auto lockeditem = (*it).lock();
+		auto lockedscene = scene.lock();
+		if (lockeditem == lockedscene)
 		{
-			scenes.erase(it);
-			scene->onDetach();
+			Scenes.erase(it);
+			lockedscene->OnDetach();
 			break;
 		}
 	}
 }
 
-void TApplication::addLogic(ILogicPtr logic)
+void TApplication::AddLogic(ILogicPtr logic)
 {
-	std::lock_guard<std::mutex> g(logicsMutex);
+	std::lock_guard<std::mutex> g(LogicsMutex);
 
-	logics.push_back(logic);
+	Logics.push_back(logic);
 }
 
-void TApplication::removeLogic(ILogicPtr logic)
+void TApplication::RemoveLogic(ILogicPtr logic)
 {
-	std::lock_guard<std::mutex> g(logicsMutex);
+	std::lock_guard<std::mutex> g(LogicsMutex);
 
-	for (auto it = logics.begin(); it != logics.end(); it++)
+	for (auto it = Logics.begin(); it != Logics.end(); it++)
 	{
-		if (*(it) == logic)
+		auto lockeditem = (*it).lock();
+		auto lockedlogic = logic.lock();
+		if (lockeditem == lockedlogic)
 		{
-			logics.erase(it);
+			Logics.erase(it);
 			break;
 		}
 	}
 }
 
-void TApplication::addEventHandler(IEventHandler* handler)
+void TApplication::AddEventHandler(IEventHandler* handler)
 {
-	std::lock_guard<std::mutex> g(eventHandlersMutex);
+	std::lock_guard<std::mutex> g(EventHandlersMutex);
 
-	eventHandlers.push_back(handler);
+	EventHandlers.push_back(handler);
 }
 
-void TApplication::removeEventHandler(IEventHandler* handler)
+void TApplication::RemoveEventHandler(IEventHandler* handler)
 {
-	std::lock_guard<std::mutex> g(eventHandlersMutex);
+	std::lock_guard<std::mutex> g(EventHandlersMutex);
 
-	for (auto it = eventHandlers.begin(); it != eventHandlers.end(); it++)
+	for (auto it = EventHandlers.begin(); it != EventHandlers.end(); it++)
 	{
 		if (*(it) == handler)
 		{
-			eventHandlers.erase(it);
+			EventHandlers.erase(it);
 			break;
 		}
 	}	
 }
 
-void TApplication::beforeInitialization()
+void TApplication::BeforeInitialization()
 {
 }
 
-void TApplication::afterInitialization()
+void TApplication::AfterInitialization()
 {
 }
 
-void TApplication::beforeFinalization()
+void TApplication::BeforeFinalization()
 {
 }
 
-void TApplication::beforeDisplay()
+void TApplication::BeforeDisplay()
 {
 }
 
-void TApplication::afterDisplay()
+void TApplication::AfterDisplay()
 {
 }
 
-void TApplication::afterSceneAttached(IScenePtr scene)
+void TApplication::AfterSceneAttached(IScenePtr scene)
 {
 }
 
-void TApplication::beforeSceneDetached(IScenePtr scene)
+void TApplication::BeforeSceneDetached(IScenePtr scene)
 {
 }
 
-void TApplication::requestQuit()
+void TApplication::RequestQuit()
 {
-	shouldQuit = true;
+	ShouldQuit = true;
 }
 
 };	// namespace nel

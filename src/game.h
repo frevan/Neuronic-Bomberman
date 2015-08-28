@@ -1,18 +1,20 @@
 #pragma once
 
-#include "base/sfgui/nel_game_sfgui.h"
+#include "base/tgui/nel_game_tgui.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFGUI/SFGUI.hpp>
 
 
 
-class TGame :	public nel::TSFGUIApplication
+class TGame :	public nel::TTGUIApplication
 {
 protected:
 	sf::RenderWindow* createWindow() override;
 	nel::IGameState* createInitialGameState() override;
-	void afterInitialization() override;
+	void AfterInitialization() override;
+
+	std::string GetDefaultFontName() override;
 
 public:
 	TGame();

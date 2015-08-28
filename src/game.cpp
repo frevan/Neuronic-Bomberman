@@ -5,25 +5,40 @@
 
 
 
+//#define FULLSCREEN
+
+
+
 // --- TGame ---
 
 TGame::TGame()
-:	nel::TSFGUIApplication()
+:	nel::TTGUIApplication()
 {
 }
 
 sf::RenderWindow* TGame::createWindow()
 {
-	return new sf::RenderWindow{sf::VideoMode{800, 600, 32}, "Bomberman"};
+	#ifdef FULLSCREEN
+	sf::Uint32 windowstyle = sf::Style::Fullscreen;
+	#else
+	sf::Uint32 windowstyle = sf::Style::Titlebar | sf::Style::Close;
+	#endif
+
+	return new sf::RenderWindow{sf::VideoMode{800, 600, 32}, "Bomberman", windowstyle};
 }
 
 nel::IGameState* TGame::createInitialGameState()
 {
-	return new TMenuState();
+	return new TMenuState(GUI);
 }
 
-void TGame::afterInitialization()
+void TGame::AfterInitialization()
 {
-	nel::TApplication::afterInitialization();
+	nel::TTGUIApplication::AfterInitialization();
+}
+
+std::string TGame::GetDefaultFontName()
+{
+	return "OpenSans-Regular.ttf";
 }
 

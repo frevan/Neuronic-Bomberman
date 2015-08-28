@@ -14,16 +14,20 @@ TScene::~TScene()
 {
 }
 
-void TScene::onAttach(IApplication* setApplication)
+void TScene::OnAttach(IApplication* setApplication)
 {
 	Application = setApplication;
 }
 
-void TScene::onDetach()
+void TScene::OnDetach()
 {
 }
 
-IScene::TViewType TScene::getType()
+void TScene::Draw(sf::RenderTarget* target)
+{
+}
+
+IScene::TViewType TScene::GetType()
 {
 	return fType;
 }

@@ -9,7 +9,7 @@ namespace nel {
 
 TSFGUIScene::TSFGUIScene(TViewType setType)
 :	TScene(setType),
-	Desktop(nullptr),
+	Desktop(),
 	GUIClock()
 {
 }
@@ -22,7 +22,7 @@ void TSFGUIScene::onAttach(IApplication* setApplication)
 {
 	TScene::onAttach(setApplication);
 
-	Desktop.reset(new sfg::Desktop());
+	Desktop = std::make_unique<sfg::Desktop>();
 	GUIClock.restart();
 }
 

@@ -2,11 +2,10 @@
 
 
 
-TMenuState::TMenuState()
-:	TGameState(),
-	scene(nullptr)
+TMenuState::TMenuState(std::shared_ptr<tgui::Gui> setGUI)
+:	TGameState()
 {
-	scene.reset(new TMenuScene());
+	scene = std::make_shared<TMenuScene>(setGUI);
 }
 
 TMenuState::~TMenuState()
@@ -14,24 +13,24 @@ TMenuState::~TMenuState()
 	scene.reset();
 }
 
-void TMenuState::initialize(nel::IApplication* setApplication)
+void TMenuState::Initialize(nel::IApplication* setApplication)
 {
-	TGameState::initialize(setApplication);
+	TGameState::Initialize(setApplication);
 
-	Application->attachScene(scene);
+	Application->AttachScene(scene);
 }
 
-void TMenuState::finalize()
+void TMenuState::Finalize()
 {
-	Application->detachScene(scene);
+	Application->DetachScene(scene);
 }
 
-bool TMenuState::processEvent(const sf::Event& event)
+bool TMenuState::ProcessEvent(const sf::Event& event)
 {
-	return TGameState::processEvent(event);
+	return TGameState::ProcessEvent(event);
 }
 
-void TMenuState::update(nel::TGameTime deltaTime)
+void TMenuState::Update(nel::TGameTime deltaTime)
 {
-	TGameState::update(deltaTime);
+	TGameState::Update(deltaTime);
 }

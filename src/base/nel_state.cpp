@@ -14,24 +14,24 @@ TGameState::~TGameState()
 {
 }
 
-void TGameState::initialize(IApplication* setApplication)
+void TGameState::Initialize(IApplication* setApplication)
 {
 	Application = setApplication;
 }
 
-void TGameState::finalize()
+void TGameState::Finalize()
 {
 	Application = nullptr;
 }
 
-bool TGameState::processEvent(const sf::Event& event)
+bool TGameState::ProcessEvent(const sf::Event& event)
 {
 	bool handled = false;
 
 	// window closed or escape key pressed: exit
 	if ((event.type == sf::Event::Closed) || ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape)))
 	{
-		Application->requestQuit();
+		Application->RequestQuit();
 		handled = true;
 	}
 	else
@@ -49,7 +49,7 @@ bool TGameState::processEvent(const sf::Event& event)
 	return handled;
 }
 
-void TGameState::update(TGameTime deltaTime)
+void TGameState::Update(TGameTime deltaTime)
 {
 }
 
