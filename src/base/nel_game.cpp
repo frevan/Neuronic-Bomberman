@@ -1,4 +1,4 @@
-#include "basegame.h"
+#include "nel_game.h"
 
 #include <algorithm>
 #include <cstdint>
@@ -9,34 +9,13 @@
 
 
 
-// --- TGameFactory ---
-
-TGameFactory::TGameFactory()
-:	IObjectFactory(),
-	delegates()
-{
-}
-
-void TGameFactory::registerObjectType(uint64_t objectType, const TObjectFactoryDelegate& setDelegate)
-{
-	delegates[objectType] = setDelegate;
-}
-
-void TGameFactory::unregisterObjectType(uint64_t objectType)
-{
-	delegates.erase(objectType);
-}
-
-void* TGameFactory::createObject(uint64_t objectType)
-{
-	return delegates[objectType]();
-}
+namespace nel {
 
 
 
-// --- TGameApplication ---
+// --- TApplication ---
 
-TGameApplication::TGameApplication()
+TApplication::TApplication()
 :	IApplication(),
 	appPath(),
 	scenes(),
@@ -44,15 +23,18 @@ TGameApplication::TGameApplication()
 	logics(),
 	logicsMutex(),
 	factory(),
-	state()
+	state(),
+	shouldQuit(false),
+	eventHandlersMutex(),
+	eventHandlers()
 {
 }
 
-TGameApplication::~TGameApplication()
+TApplication::~TApplication()
 {
 }
 
-bool TGameApplication::initialize(const std::string& filename)
+bool TApplication::initialize(const std::string& filename)
 {
 	// let descendants register factory functions etc
 	beforeInitialization();
@@ -71,8 +53,12 @@ bool TGameApplication::initialize(const std::string& filename)
 		return false;
 	window.reset(w);	// set our smart pointer to the newly created window
 
-	// the first game state
-	state.reset((IGameState*)factory.createObject(guid_DefaultGameState));
+	// the initial game state
+	IGameState* initialState = createInitialGameState();
+	if (!initialState)
+		return false;
+	state.reset(initialState);
+	state->initialize(this);
 
 	// let descendants do stuff as well
 	afterInitialization();
@@ -81,17 +67,21 @@ bool TGameApplication::initialize(const std::string& filename)
 	return true;
 }
 
-void TGameApplication::finalize()
+void TApplication::finalize()
 {
 	// let descendants do stuff
 	beforeFinalization();
+
+	// finalize state
+	if (state)
+		state->finalize();
 
 	// destroy state, window
 	state.reset();
 	window.reset();	
 }
 
-void TGameApplication::execute()
+void TApplication::execute()
 {
 	sf::Clock clock;
 
@@ -113,29 +103,19 @@ void TGameApplication::execute()
 		sf::Event event;
 		while (window->pollEvent(event))
 		{
-			// window closed or escape key pressed: exit
-			if ((event.type == sf::Event::Closed) || ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape)))
+			// let the state handle the event first
+			bool handled = state->processEvent(event);	
+			// then all registered event handlers
+			if (!handled)
 			{
-				window->close();
-				break;
+				std::lock_guard<std::mutex> g(eventHandlersMutex);
+				for (auto it = eventHandlers.begin(); it != eventHandlers.end(); it++)
+				{
+					if ((*it)->processEvent(event))
+						break;
+				}
 			}
 		}
-
-		/*
-		// check for messages
-		while (processOneEvent())
-		{
-		}
-
-		if (shouldQuit())	if (processQuitRequest())
-			break;
-
-		// process events
-		TBaseEventManager::get()->process(20);	// process events for up to 20 milliseconds
-
-		if (shouldQuit())	if (processQuitRequest())
-			break;
-		*/
 
 		// let the logic objects process a tick
         loops = 0;
@@ -143,8 +123,7 @@ void TGameApplication::execute()
         while (nowTime > nextGameTick && loops < MAX_FRAMESKIP) 
 		{	
 			TGameTime delta = nowTime-prevTickTime;
-			if (state)	
-				state->update(delta);
+			state->update(delta);
 			{				
 				std::lock_guard<std::mutex> g(logicsMutex);
 				for (auto it = logics.begin(); it != logics.end(); it++)
@@ -157,51 +136,50 @@ void TGameApplication::execute()
 			nowTime = clock.getElapsedTime().asMilliseconds();
         }
 
-		//int curTicks = clock.getElapsedTime().asMilliseconds();
-
-		// calculate fps
-		//fpsCalculator->newFrame();
-
-		// calculate interpolation
-        //interpolation = float(curTicks + SKIP_TICKS - nextGameTick) / float(SKIP_TICKS);
-
-		// draw views
+		// draw scenes
+		sf::RenderTarget* target = window.get();
+		target->clear();	// fixed to black, for now
 		{
-			sf::RenderTarget* target = window.get();
-
-			target->clear();	// fixed to black, for now
-
 			std::lock_guard<std::mutex> g(scenesMutex);
 			for (auto it = scenes.begin(); it != scenes.end(); it++)
 				(*it)->draw(target);
 		}
 
-		// paint		
+		// paint
+		beforeDisplay();
         window->display();
+		afterDisplay();
+
+		// this will most likely be set in reaction to some event, i.e. by the game state
+		if (shouldQuit)
+			window->close();
 	}
 }
 
-IGameState* TGameApplication::getState()
+void TApplication::setNextState(IGameState* nextState)
 {
-	// TODO
-	return nullptr;
+	if (state)
+		state->finalize();
+
+	state.reset(nextState);
+
+	state->initialize(this);
 }
 
-void TGameApplication::setState(IGameState* state)
-{
-	// TODO
-}
-
-void TGameApplication::attachScene(IScenePtr scene)
+void TApplication::attachScene(IScenePtr scene)
 {
 	std::lock_guard<std::mutex> g(scenesMutex);
 
-	scene->onAttach();
+	scene->onAttach(this);
 	scenes.push_back(scene);
+
+	afterSceneAttached(scene);
 }
 
-void TGameApplication::detachScene(IScenePtr scene)
+void TApplication::detachScene(IScenePtr scene)
 {
+	beforeSceneDetached(scene);
+
 	std::lock_guard<std::mutex> g(scenesMutex);
 
 	for (auto it = scenes.begin(); it != scenes.end(); it++)
@@ -215,14 +193,14 @@ void TGameApplication::detachScene(IScenePtr scene)
 	}
 }
 
-void TGameApplication::addLogic(ILogicPtr logic)
+void TApplication::addLogic(ILogicPtr logic)
 {
 	std::lock_guard<std::mutex> g(logicsMutex);
 
 	logics.push_back(logic);
 }
 
-void TGameApplication::removeLogic(ILogicPtr logic)
+void TApplication::removeLogic(ILogicPtr logic)
 {
 	std::lock_guard<std::mutex> g(logicsMutex);
 
@@ -236,44 +214,58 @@ void TGameApplication::removeLogic(ILogicPtr logic)
 	}
 }
 
-void TGameApplication::beforeInitialization()
+void TApplication::addEventHandler(IEventHandler* handler)
 {
-	factory.registerObjectType(guid_DefaultGameState, std::bind(&TGameApplication::createDummyGameState, this));
+	std::lock_guard<std::mutex> g(eventHandlersMutex);
+
+	eventHandlers.push_back(handler);
 }
 
-void TGameApplication::afterInitialization()
+void TApplication::removeEventHandler(IEventHandler* handler)
 {
+	std::lock_guard<std::mutex> g(eventHandlersMutex);
+
+	for (auto it = eventHandlers.begin(); it != eventHandlers.end(); it++)
+	{
+		if (*(it) == handler)
+		{
+			eventHandlers.erase(it);
+			break;
+		}
+	}	
 }
 
-void TGameApplication::beforeFinalization()
-{
-}
-
-void* TGameApplication::createDummyGameState()
-{
-	return new TDummyGameState();
-}
-
-
-
-// --- TDummyGameState ---
-
-TDummyGameState::TDummyGameState()
-:	IGameState(),
-	application(nullptr)
+void TApplication::beforeInitialization()
 {
 }
 
-void TDummyGameState::initialize(IApplication* setApplication)
+void TApplication::afterInitialization()
 {
-	application = setApplication;
 }
 
-void TDummyGameState::finalize()
+void TApplication::beforeFinalization()
 {
-	application = nullptr;
 }
 
-void TDummyGameState::update(TGameTime deltaTime)
+void TApplication::beforeDisplay()
 {
 }
+
+void TApplication::afterDisplay()
+{
+}
+
+void TApplication::afterSceneAttached(IScenePtr scene)
+{
+}
+
+void TApplication::beforeSceneDetached(IScenePtr scene)
+{
+}
+
+void TApplication::requestQuit()
+{
+	shouldQuit = true;
+}
+
+};	// namespace nel

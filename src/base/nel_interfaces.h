@@ -3,12 +3,19 @@
 #include <string>
 #include <memory>
 #include <cstdint>
+#include <functional>
 
+#include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
 
 
-typedef uint32_t TGameTime;
+namespace nel {
+
+
+
+typedef uint32_t TGameTime;		// in milliseconds
+typedef uint64_t TGameID;		// used for any type of unique id
 
 
 
@@ -19,12 +26,13 @@ class IActor;
 class IComponent;
 class IRenderable;
 class ILogic;
-class IInputHandler;
+class IEventHandler;
 
 
 
 typedef std::shared_ptr<IScene> IScenePtr;
 typedef std::shared_ptr<ILogic> ILogicPtr;
+typedef std::shared_ptr<IGameState> IGameStatePtr;
 
 
 
@@ -33,20 +41,23 @@ class IApplication
 public:
 	virtual ~IApplication() {};
 
-	virtual IGameState* getState() = 0;
-	virtual void setState(IGameState* state) = 0;
+	virtual void requestQuit() = 0;
+
+	virtual void setNextState(IGameState* nextState) = 0;
 
 	virtual void attachScene(IScenePtr scene) = 0;
 	virtual void detachScene(IScenePtr scene) = 0;
+
 	virtual void addLogic(ILogicPtr logic) = 0;
-	virtual void removeLogic(ILogicPtr logic) = 0;
+	virtual void removeLogic(ILogicPtr logic) = 0;	
+
+	virtual void addEventHandler(IEventHandler* handler) = 0;
+	virtual void removeEventHandler(IEventHandler* handler) = 0;
 };
 
 
-// --- IObjectFactory ---
-
 // !! delegate functions should follow this signature: 
-// void Delegate(void** object);
+// void* delegate();
 typedef std::function<void*()> TObjectFactoryDelegate;
 
 class IObjectFactory
@@ -67,6 +78,7 @@ public:
 
 	virtual void initialize(IApplication* setApplication) = 0;
 	virtual void finalize() = 0;
+	virtual bool processEvent(const sf::Event& event) = 0;
 	virtual void update(TGameTime deltaTime) = 0;
 };
 
@@ -86,7 +98,7 @@ public:
 
 	virtual ~IScene() {};
 
-	virtual void onAttach() = 0;
+	virtual void onAttach(IApplication* setApplication) = 0;
 	virtual void onDetach() = 0;
 
 	virtual void draw(sf::RenderTarget* target) = 0;
@@ -130,7 +142,12 @@ public:
 
 
 
-class IInputHandler :	public IComponent
+class IEventHandler
 {
 public:
+	virtual bool processEvent(const sf::Event& event) = 0;
 };
+
+
+
+};	// namespace nel

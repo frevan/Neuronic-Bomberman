@@ -3,7 +3,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
-#include "base/basegame.h"
 #include "game.h"
 
 

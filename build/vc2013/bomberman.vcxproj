@@ -11,12 +11,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\base\basegame.cpp" />
+    <ClCompile Include="..\..\src\base\nel_factory.cpp" />
+    <ClCompile Include="..\..\src\base\nel_game.cpp" />
+    <ClCompile Include="..\..\src\base\nel_inputmap.cpp" />
+    <ClCompile Include="..\..\src\base\nel_scene.cpp" />
+    <ClCompile Include="..\..\src\base\nel_state.cpp" />
+    <ClCompile Include="..\..\src\base\sfgui\nel_game_sfgui.cpp" />
+    <ClCompile Include="..\..\src\base\sfgui\nel_scene_sfgui.cpp" />
     <ClCompile Include="..\..\src\game.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\scenes\MenuScene.cpp" />
+    <ClCompile Include="..\..\src\states\menustate.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\base\interfaces.h" />
+    <ClInclude Include="..\..\src\base\nel_interfaces.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7A327356-55D7-4A85-98A6-460F60D42534}</ProjectGuid>
@@ -63,13 +71,13 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>SFML_STATIC;_USE_MATH_DEFINES;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SFML_STATIC;SFGUI_STATIC;_USE_MATH_DEFINES;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-main-d.lib;sfml-network-s-d.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;glew32s_d.lib;opengl32.lib;sndfile.lib;openal32.lib;freetype_d.lib;jpeg.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sfgui-s-d.lib;sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-main-d.lib;sfml-network-s-d.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;glew32s_d.lib;opengl32.lib;sndfile.lib;openal32.lib;freetype_d.lib;jpeg.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
     </Link>

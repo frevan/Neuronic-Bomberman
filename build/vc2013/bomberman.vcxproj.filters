@@ -7,20 +7,53 @@
     <Filter Include="source\base">
       <UniqueIdentifier>{70cc80c7-769b-4de6-b4bb-77cac63c96d6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\base\sfgui">
+      <UniqueIdentifier>{5e003e15-0dd2-420a-a7d4-e9528a220091}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\scenes">
+      <UniqueIdentifier>{ccf6dac8-ff89-4e10-aa93-f37c255086f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\states">
+      <UniqueIdentifier>{3a649887-5468-453a-9e20-f6dd4131f379}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\basegame.cpp">
-      <Filter>source\base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\game.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\base\nel_game.cpp">
+      <Filter>source\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\nel_state.cpp">
+      <Filter>source\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\nel_factory.cpp">
+      <Filter>source\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\nel_inputmap.cpp">
+      <Filter>source\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\nel_scene.cpp">
+      <Filter>source\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\sfgui\nel_game_sfgui.cpp">
+      <Filter>source\base\sfgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\sfgui\nel_scene_sfgui.cpp">
+      <Filter>source\base\sfgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\states\menustate.cpp">
+      <Filter>source\states</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\scenes\MenuScene.cpp">
+      <Filter>source\scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\base\interfaces.h">
+    <ClInclude Include="..\..\src\base\nel_interfaces.h">
       <Filter>source\base</Filter>
     </ClInclude>
   </ItemGroup>
