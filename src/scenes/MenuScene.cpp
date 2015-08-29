@@ -1,5 +1,6 @@
 #include "menuscene.h"
 
+#include <iomanip> 
 #include "TGUI/TGUI.hpp"
 
 #include "../base/nel_objecttypes.h"
@@ -7,15 +8,12 @@
 
 
 TMenuScene::TMenuScene(std::shared_ptr<tgui::Gui> setGUI)
-:	TTGUIScene(setGUI),
-	FPSCalculator(nullptr)
+:	TTGUIScene(setGUI)
 {
 }
 
 TMenuScene::~TMenuScene()
 {
-	if (FPSCalculator)
-		delete FPSCalculator;
 }
 
 void TMenuScene::OnAttach(nel::IApplication* setApplication)
@@ -23,7 +21,6 @@ void TMenuScene::OnAttach(nel::IApplication* setApplication)
 	TTGUIScene::OnAttach(setApplication);	
 
 	createControls();
-	FPSCalculator = (nel::IFpsCalculator*)Application->GetFactory().CreateObject(nel::OT_FPSCalculator);
 }
 
 void TMenuScene::OnDetach()
@@ -38,8 +35,9 @@ void TMenuScene::Draw(sf::RenderTarget* target)
 	tgui::Label::Ptr fpslbl = GUI->get<tgui::Label>("FPSLabel");
 	if (fpslbl)
 	{
-		std::string fps_string = std::to_string(FPSCalculator->fps) + " FPS"; 
-		fpslbl->setText(fps_string);
+		std::stringstream ss;
+		ss << std::fixed << std::setprecision(2) << Application->GetCurrentFps();
+		fpslbl->setText(ss.str() + " FPS");
 		fpslbl->setPosition(800-fpslbl->getSize().x-25, 25);	
 	}
 

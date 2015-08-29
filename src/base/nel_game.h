@@ -17,6 +17,7 @@ class TApplication :	public IApplication
 {
 private:	
 	bool ShouldQuit;
+	IFpsCalculator* FpsCalculator;
 	std::vector<IScenePtr> Scenes;
 	std::mutex ScenesMutex;
 	std::vector<ILogicPtr> Logics;
@@ -66,6 +67,7 @@ public:
 	void RemoveLogic(ILogicPtr logic) override;
 	void AddEventHandler(IEventHandler* handler) override;
 	void RemoveEventHandler(IEventHandler* handler) override;
+	double GetCurrentFps() override;
 };
 
 };	// namespace nel

@@ -8,8 +8,6 @@
 class TMenuScene :	public nel::TTGUIScene
 {
 private:	
-	nel::IFpsCalculator* FPSCalculator;
-
 	void createControls();
 
 	void OnNewGameBtnClick();

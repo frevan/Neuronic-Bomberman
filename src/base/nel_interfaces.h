@@ -57,6 +57,8 @@ public:
 
 	virtual void AddEventHandler(IEventHandler* handler) = 0;
 	virtual void RemoveEventHandler(IEventHandler* handler) = 0;
+
+	virtual double GetCurrentFps() = 0;
 };
 
 
@@ -155,11 +157,11 @@ public:
 class IFpsCalculator
 {
 public:
-	double fps;
+	double Value;
 
 	virtual ~IFpsCalculator() {};
 
-	virtual void newFrame() = 0;
+	virtual void NewFrame() = 0;
 };
 
 

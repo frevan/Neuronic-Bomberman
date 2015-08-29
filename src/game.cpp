@@ -7,6 +7,7 @@
 
 
 //#define FULLSCREEN
+#define FRAMERATE_60FPS
 
 
 
@@ -25,7 +26,13 @@ sf::RenderWindow* TGame::CreateWindow()
 	sf::Uint32 windowstyle = sf::Style::Titlebar | sf::Style::Close;
 	#endif
 
-	return new sf::RenderWindow{sf::VideoMode{800, 600, 32}, "Bomberman", windowstyle};
+	auto w = new sf::RenderWindow{sf::VideoMode{800, 600, 32}, "Bomberman", windowstyle};
+
+	#ifdef FRAMERATE_60FPS
+	w->setFramerateLimit(60);
+	#endif
+
+	return w;
 }
 
 nel::TGameID TGame::GetInitialGameStateID()

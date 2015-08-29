@@ -27,7 +27,8 @@ TApplication::TApplication()
 	ShouldQuit(false),
 	EventHandlersMutex(),
 	EventHandlers(),
-	Window()
+	Window(),
+	FpsCalculator(nullptr)
 {
 }
 
@@ -48,6 +49,8 @@ bool TApplication::Initialize(const std::string& filename)
 		return false;
 	Window.reset(w);
 
+	FpsCalculator = (IFpsCalculator*)Factory.CreateObject(OT_FPSCalculator);
+
 	AfterInitialization();
 
 	return true;
@@ -58,10 +61,12 @@ void TApplication::Finalize()
 	BeforeFinalization();
 
 	if (State)
-		State->Finalize();
+		State->Finalize();	
 
 	State.reset();
 	Window.reset();	
+
+	delete FpsCalculator;
 }
 
 void TApplication::Execute()
@@ -141,6 +146,9 @@ void TApplication::Execute()
 					lockedscene->Draw(target);
 			}
 		}
+
+		if (FpsCalculator)
+			FpsCalculator->NewFrame();
 
 		// paint
 		BeforeDisplay();
@@ -293,6 +301,14 @@ std::string TApplication::DetermineAppPath(const std::string& filename)
 	path = path.substr(0, found+1);
 
 	return path;
+}
+
+double TApplication::GetCurrentFps()
+{
+	if (FpsCalculator)
+		return FpsCalculator->Value;
+	else 
+		return 0.f;
 }
 
 };	// namespace nel
