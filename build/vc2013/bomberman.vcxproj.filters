@@ -16,6 +16,9 @@
     <Filter Include="source\base\tgui">
       <UniqueIdentifier>{3095c594-9ac6-4df1-81ad-6ed79cc59c1c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\base\utility">
+      <UniqueIdentifier>{edd71975-8424-46bc-9b10-585533755fb6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -42,19 +45,28 @@
     <ClCompile Include="..\..\src\states\menustate.cpp">
       <Filter>source\states</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\scenes\MenuScene.cpp">
-      <Filter>source\scenes</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\base\tgui\nel_scene_tgui.cpp">
       <Filter>source\base\tgui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\base\tgui\nel_game_tgui.cpp">
       <Filter>source\base\tgui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\scenes\menuscene.cpp">
+      <Filter>source\scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\utility\nel_fps.cpp">
+      <Filter>source\base\utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\nel_interfaces.h">
       <Filter>source\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\nel_objecttypes.h">
+      <Filter>source\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\states\states.h">
+      <Filter>source\states</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

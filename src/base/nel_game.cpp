@@ -2,18 +2,18 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <cassert>
 
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
+#include "nel_objecttypes.h"
+#include "utility/nel_fps.h"
+
 
 
 namespace nel {
-
-
-
-// --- TApplication ---
 
 TApplication::TApplication()
 :	IApplication(),
@@ -37,40 +37,29 @@ TApplication::~TApplication()
 
 bool TApplication::Initialize(const std::string& filename)
 {
-	// let descendants register factory functions etc
+	Factory.RegisterObjectType(OT_FPSCalculator, std::bind(&TApplication::CreateFpsCalculator, this));
+
 	BeforeInitialization();
 
-	// set application path
-	AppPath = filename;
-	#ifdef WIN32
-	std::replace(AppPath.begin(), AppPath.end(), '\\', '/');
-	#endif
-	size_t found = AppPath.find_last_of('/');
-	AppPath = AppPath.substr(0, found+1);
+	AppPath = DetermineAppPath(filename);
 
-	// create window
 	sf::RenderWindow* w = CreateWindow();
 	if (!w)
 		return false;
-	Window.reset(w);	// set our smart pointer to the newly created window
+	Window.reset(w);
 
-	// let descendants do stuff as well
 	AfterInitialization();
 
-	// done
 	return true;
 }
 
 void TApplication::Finalize()
 {
-	// let descendants do stuff
 	BeforeFinalization();
 
-	// finalize state
 	if (State)
 		State->Finalize();
 
-	// destroy state, window
 	State.reset();
 	Window.reset();	
 }
@@ -86,16 +75,14 @@ void TApplication::Execute()
 	uint32_t startTickForFPS = clock.getElapsedTime().asMilliseconds();
 	uint32_t nextGameTick = startTickForFPS;
     int loops = 0;
-    //float interpolation;
 
 	uint32_t prevTickTime = clock.getElapsedTime().asMilliseconds();
 	uint32_t nowTime;
 
 	// one more thing left to create:
 	// the initial game state
-	IGameState* initialState = CreateInitialGameState();
-	if (!initialState)
-		return;
+	IGameState* initialState = CreateGameState(GetInitialGameStateID());
+	assert(initialState);
 	State.reset(initialState);
 	State->Initialize(this);
 
@@ -166,12 +153,18 @@ void TApplication::Execute()
 	}
 }
 
-void TApplication::SetNextState(IGameState* nextState)
+IObjectFactory& TApplication::GetFactory()
+{
+	return Factory;
+}
+
+void TApplication::SetNextState(TGameID nextState)
 {
 	if (State)
 		State->Finalize();
 
-	State.reset(nextState);
+	State.reset(CreateGameState(nextState));
+	assert(State);
 
 	State->Initialize(this);
 }
@@ -283,6 +276,23 @@ void TApplication::BeforeSceneDetached(IScenePtr scene)
 void TApplication::RequestQuit()
 {
 	ShouldQuit = true;
+}
+
+void* TApplication::CreateFpsCalculator() 
+{	
+	return new TFpsCalculator(); 
+}
+
+std::string TApplication::DetermineAppPath(const std::string& filename)
+{
+	std::string path = filename;
+	#ifdef WIN32
+	std::replace(path.begin(), path.end(), '\\', '/');
+	#endif
+	size_t found = path.find_last_of('/');
+	path = path.substr(0, found+1);
+
+	return path;
 }
 
 };	// namespace nel

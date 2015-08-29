@@ -16,10 +16,12 @@ namespace nel {
 
 typedef uint32_t TGameTime;		// in milliseconds
 typedef uint64_t TGameID;		// used for any type of unique id
+typedef uint64_t TObjectType;	// object types for IObjectFactory
 
 
 
 class IApplication;
+class IObjectFactory;
 class IGameState;
 class IScene;
 class IActor;
@@ -41,9 +43,11 @@ class IApplication
 public:
 	virtual ~IApplication() {};
 
+	virtual IObjectFactory& GetFactory() = 0;
+
 	virtual void RequestQuit() = 0;
 
-	virtual void SetNextState(IGameState* nextState) = 0;
+	virtual void SetNextState(TGameID nextState) = 0;
 
 	virtual void AttachScene(IScenePtr scene) = 0;
 	virtual void DetachScene(IScenePtr scene) = 0;
@@ -58,15 +62,15 @@ public:
 
 // !! delegate functions should follow this signature: 
 // void* delegate();
-typedef std::function<void*()> TObjectFactoryDelegate;
+typedef std::function<void*()> IObjectFactoryDelegate;
 
 class IObjectFactory
 {
 public:
-	virtual void RegisterObjectType(uint64_t objectType, const TObjectFactoryDelegate& setDelegate) = 0;
-	virtual void UnregisterObjectType(uint64_t objectType) = 0;
+	virtual void RegisterObjectType(TObjectType objectType, IObjectFactoryDelegate setDelegate) = 0;
+	virtual void UnregisterObjectType(TObjectType objectType) = 0;
 
-	virtual void* CreateObject(uint64_t objectType) = 0;
+	virtual void* CreateObject(TObjectType objectType) = 0;
 };
 
 
@@ -144,6 +148,18 @@ class IEventHandler
 {
 public:
 	virtual bool ProcessEvent(const sf::Event& event) = 0;
+};
+
+
+
+class IFpsCalculator
+{
+public:
+	double fps;
+
+	virtual ~IFpsCalculator() {};
+
+	virtual void newFrame() = 0;
 };
 
 

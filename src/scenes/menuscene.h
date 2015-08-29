@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../base/nel_interfaces.h"
 #include "../base/tgui/nel_scene_tgui.h"
 
 
@@ -7,6 +8,8 @@
 class TMenuScene :	public nel::TTGUIScene
 {
 private:	
+	nel::IFpsCalculator* FPSCalculator;
+
 	void createControls();
 
 	void OnNewGameBtnClick();

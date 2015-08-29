@@ -25,6 +25,11 @@ private:
 	std::mutex EventHandlersMutex;
 	std::vector<IEventHandler*> EventHandlers;
 
+	std::string DetermineAppPath(const std::string& filename);
+
+	// factory function(s)
+	void* CreateFpsCalculator();
+
 protected:
 	std::unique_ptr<sf::RenderWindow> Window;
 
@@ -37,7 +42,8 @@ protected:
 	virtual void BeforeSceneDetached(IScenePtr scene);
 
 	virtual sf::RenderWindow* CreateWindow() = 0;
-	virtual IGameState* CreateInitialGameState() = 0;
+	virtual TGameID GetInitialGameStateID() = 0;
+	virtual IGameState* CreateGameState(TGameID id) = 0;
 
 public:
 	std::string AppPath;
@@ -51,8 +57,9 @@ public:
 	virtual void Execute();	
 
 	// from IApplication
+	IObjectFactory& GetFactory() override;
 	void RequestQuit() override;
-	void SetNextState(IGameState* nextState) override;
+	void SetNextState(TGameID nextState) override;
 	void AttachScene(IScenePtr scene) override;
 	void DetachScene(IScenePtr scene) override;
 	void AddLogic(ILogicPtr logic) override;

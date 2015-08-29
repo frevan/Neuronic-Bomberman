@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include "base/nel_state.h"
+#include "states/states.h"
 #include "states/menustate.h"
 
 
@@ -27,9 +28,18 @@ sf::RenderWindow* TGame::CreateWindow()
 	return new sf::RenderWindow{sf::VideoMode{800, 600, 32}, "Bomberman", windowstyle};
 }
 
-nel::IGameState* TGame::CreateInitialGameState()
+nel::TGameID TGame::GetInitialGameStateID()
 {
-	return new TMenuState(GUI);
+	return SID_Menu;
+}
+
+nel::IGameState* TGame::CreateGameState(nel::TGameID id)
+{
+	nel::IGameState* state = nullptr;
+
+	if (id == SID_Menu)	state = new TMenuState(GUI);
+
+	return state;
 }
 
 void TGame::AfterInitialization()
@@ -41,4 +51,3 @@ std::string TGame::GetDefaultFontName()
 {
 	return "OpenSans-Regular.ttf";
 }
-

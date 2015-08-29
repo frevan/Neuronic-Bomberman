@@ -11,14 +11,14 @@ namespace nel {
 class TObjectFactory :	public IObjectFactory
 {
 private:
-	std::map<uint64_t, TObjectFactoryDelegate> Delegates;
+	std::map<TObjectType, IObjectFactoryDelegate> Delegates;
 public:
 	TObjectFactory();
 
 	// from IObjectFactory
-	void RegisterObjectType(uint64_t objectType, const TObjectFactoryDelegate& setDelegate) override;
-	void UnregisterObjectType(uint64_t objectType) override;
-	void* CreateObject(uint64_t objectType) override;
+	void RegisterObjectType(TObjectType objectType, IObjectFactoryDelegate setDelegate) override;
+	void UnregisterObjectType(TObjectType objectType) override;
+	void* CreateObject(TObjectType objectType) override;
 };
 
 

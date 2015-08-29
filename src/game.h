@@ -11,7 +11,8 @@ class TGame :	public nel::TTGUIApplication
 {
 protected:
 	sf::RenderWindow* CreateWindow() override;
-	nel::IGameState* CreateInitialGameState() override;
+	nel::TGameID GetInitialGameStateID() override;
+	nel::IGameState* CreateGameState(nel::TGameID id) override;
 	void AfterInitialization() override;
 
 	std::string GetDefaultFontName() override;

@@ -1,9 +1,11 @@
 #include "menustate.h"
 
+#include "states.h"
+
 
 
 TMenuState::TMenuState(std::shared_ptr<tgui::Gui> setGUI)
-:	TGameState()
+:	TGameState(SID_Menu)
 {
 	scene = std::make_shared<TMenuScene>(setGUI);
 }

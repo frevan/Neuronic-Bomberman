@@ -18,13 +18,16 @@
     <ClCompile Include="..\..\src\base\nel_state.cpp" />
     <ClCompile Include="..\..\src\base\tgui\nel_game_tgui.cpp" />
     <ClCompile Include="..\..\src\base\tgui\nel_scene_tgui.cpp" />
+    <ClCompile Include="..\..\src\base\utility\nel_fps.cpp" />
     <ClCompile Include="..\..\src\game.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
-    <ClCompile Include="..\..\src\scenes\MenuScene.cpp" />
+    <ClCompile Include="..\..\src\scenes\menuscene.cpp" />
     <ClCompile Include="..\..\src\states\menustate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\nel_interfaces.h" />
+    <ClInclude Include="..\..\src\base\nel_objecttypes.h" />
+    <ClInclude Include="..\..\src\states\states.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7A327356-55D7-4A85-98A6-460F60D42534}</ProjectGuid>

@@ -15,8 +15,9 @@ class TGameState :	public IGameState
 {
 public:
 	IApplication* Application;
+	TGameID StateID;
 
-	TGameState();
+	TGameState(TGameID setStateID);
 	~TGameState() override;
 
 	// from IGameState

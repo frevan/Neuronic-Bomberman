@@ -4,9 +4,10 @@
 
 namespace nel {
 
-TGameState::TGameState()
+TGameState::TGameState(TGameID setStateID)
 :	IGameState(),
-	Application(nullptr)
+	Application(nullptr),
+	StateID(setStateID)
 {
 }
 
