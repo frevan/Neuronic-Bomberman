@@ -57,6 +57,15 @@
     <ClCompile Include="..\..\src\base\utility\nel_fps.cpp">
       <Filter>source\base\utility</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\states\lobbystate.cpp">
+      <Filter>source\states</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\scenes\overlayscene.cpp">
+      <Filter>source\scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\scenes\lobbyscene.cpp">
+      <Filter>source\scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\nel_interfaces.h">

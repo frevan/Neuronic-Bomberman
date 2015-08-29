@@ -16,6 +16,5 @@ public:
 	// from TGameState
 	void Initialize(nel::IApplication* setApplication) override;
 	void Finalize() override;
-	bool ProcessEvent(const sf::Event& event) override;
 	void Update(nel::TGameTime deltaTime) override;
 };

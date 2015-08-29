@@ -21,12 +21,14 @@ private:
 	std::vector<IScenePtr> Scenes;
 	std::mutex ScenesMutex;
 	std::vector<ILogicPtr> Logics;
-	std::mutex LogicsMutex;
-	std::unique_ptr<IGameState> State;
+	std::mutex LogicsMutex;	
 	std::mutex EventHandlersMutex;
 	std::vector<IEventHandler*> EventHandlers;
+	std::unique_ptr<IGameState> CurrentState;
+	TGameID NextStateID;
 
 	std::string DetermineAppPath(const std::string& filename);
+	void SwitchToNextState();
 
 	// factory function(s)
 	void* CreateFpsCalculator();
@@ -60,7 +62,7 @@ public:
 	// from IApplication
 	IObjectFactory& GetFactory() override;
 	void RequestQuit() override;
-	void SetNextState(TGameID nextState) override;
+	void SetNextState(TGameID id) override;
 	void AttachScene(IScenePtr scene) override;
 	void DetachScene(IScenePtr scene) override;
 	void AddLogic(ILogicPtr logic) override;

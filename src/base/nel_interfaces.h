@@ -20,6 +20,10 @@ typedef uint64_t TObjectType;	// object types for IObjectFactory
 
 
 
+const TGameID NO_STATE_CONST	= 0;
+
+
+
 class IApplication;
 class IObjectFactory;
 class IGameState;
@@ -47,7 +51,7 @@ public:
 
 	virtual void RequestQuit() = 0;
 
-	virtual void SetNextState(TGameID nextState) = 0;
+	virtual void SetNextState(TGameID id) = 0;
 
 	virtual void AttachScene(IScenePtr scene) = 0;
 	virtual void DetachScene(IScenePtr scene) = 0;

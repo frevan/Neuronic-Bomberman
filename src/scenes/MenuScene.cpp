@@ -1,9 +1,11 @@
 #include "menuscene.h"
 
 #include <iomanip> 
-#include "TGUI/TGUI.hpp"
+#include <TGUI/TGUI.hpp>
 
 #include "../base/nel_objecttypes.h"
+
+#include "../states/states.h"
 
 
 
@@ -16,54 +18,19 @@ TMenuScene::~TMenuScene()
 {
 }
 
-void TMenuScene::OnAttach(nel::IApplication* setApplication)
+void TMenuScene::CreateWidgets()
 {
-	TTGUIScene::OnAttach(setApplication);	
-
-	createControls();
-}
-
-void TMenuScene::OnDetach()
-{
-	GUI->removeAllWidgets();
-
-	TTGUIScene::OnDetach();
-}
-
-void TMenuScene::Draw(sf::RenderTarget* target)
-{	
-	tgui::Label::Ptr fpslbl = GUI->get<tgui::Label>("FPSLabel");
-	if (fpslbl)
-	{
-		std::stringstream ss;
-		ss << std::fixed << std::setprecision(2) << Application->GetCurrentFps();
-		fpslbl->setText(ss.str() + " FPS");
-		fpslbl->setPosition(800-fpslbl->getSize().x-25, 25);	
-	}
-
-	TTGUIScene::Draw(target);
-}
-
-void TMenuScene::createControls()
-{
-	GUI->removeAllWidgets();
-
 	// game name label
 	tgui::Label::Ptr namelbl = std::make_shared<tgui::Label>();
-	GUI->add(namelbl);
+	AddWidgetToGUI(namelbl);
 	namelbl->setText("Neuronic Bomberman");
 	namelbl->setPosition(25, 25);
 	namelbl->setTextColor(sf::Color::Red);
-
-	// FPS label
-	tgui::Label::Ptr fpslbl = std::make_shared<tgui::Label>();
-	GUI->add(fpslbl, "FPSLabel");
-	fpslbl->setText("");
-	fpslbl->setTextColor(sf::Color::Red);
+	namelbl->setTextSize(35);
 
 	// new game
 	tgui::Button::Ptr newgamebtn = std::make_shared<tgui::Button>();
-	GUI->add(newgamebtn);
+	AddWidgetToGUI(newgamebtn);
 	newgamebtn->setText("New game");
 	newgamebtn->setPosition(300, 200);
 	newgamebtn->setSize(200, 60);
@@ -71,7 +38,7 @@ void TMenuScene::createControls()
 
 	// join game
 	tgui::Button::Ptr joingamebtn = std::make_shared<tgui::Button>();
-	GUI->add(joingamebtn);
+	AddWidgetToGUI(joingamebtn);
 	joingamebtn->setText("Join game");
 	joingamebtn->setPosition(300, 300);
 	joingamebtn->setSize(200, 60);
@@ -79,7 +46,7 @@ void TMenuScene::createControls()
 
 	// options
 	tgui::Button::Ptr optionsbtn = std::make_shared<tgui::Button>();
-	GUI->add(optionsbtn);
+	AddWidgetToGUI(optionsbtn);
 	optionsbtn->setText("Options");
 	optionsbtn->setPosition(25, 535);
 	optionsbtn->setSize(100, 40);
@@ -87,7 +54,7 @@ void TMenuScene::createControls()
 
 	// quit
 	tgui::Button::Ptr quitbtn = std::make_shared<tgui::Button>();
-	GUI->add(quitbtn);
+	AddWidgetToGUI(quitbtn);
 	quitbtn->setText("Quit");
 	quitbtn->setPosition(675, 535);
 	quitbtn->setSize(100, 40);
@@ -96,14 +63,17 @@ void TMenuScene::createControls()
 
 void TMenuScene::OnNewGameBtnClick()
 {
+	Application->SetNextState(SID_Lobby);
 }
 
 void TMenuScene::OnJoinGameBtnClick()
 {
+	//Application->SetNextState(SID_ServerSelect);
 }
 
 void TMenuScene::OnOptionsBtnClick()
 {
+	//Application->SetNextState(SID_Options);
 }
 
 void TMenuScene::OnQuitBtnClick()

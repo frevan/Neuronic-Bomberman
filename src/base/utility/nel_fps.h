@@ -13,7 +13,7 @@ namespace nel {
 class TFpsCalculator :	public IFpsCalculator
 {
 private:
-	enum { CACHESIZECONST = 1024 };
+	enum { CACHESIZECONST = 256 };
 
 	sf::Clock Clock;
 	std::array<int64_t, CACHESIZECONST> FrameTimeCache;

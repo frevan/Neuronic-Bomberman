@@ -21,7 +21,10 @@
     <ClCompile Include="..\..\src\base\utility\nel_fps.cpp" />
     <ClCompile Include="..\..\src\game.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\scenes\lobbyscene.cpp" />
     <ClCompile Include="..\..\src\scenes\menuscene.cpp" />
+    <ClCompile Include="..\..\src\scenes\overlayscene.cpp" />
+    <ClCompile Include="..\..\src\states\lobbystate.cpp" />
     <ClCompile Include="..\..\src\states\menustate.cpp" />
   </ItemGroup>
   <ItemGroup>

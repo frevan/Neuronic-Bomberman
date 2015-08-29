@@ -25,11 +25,8 @@ void TMenuState::Initialize(nel::IApplication* setApplication)
 void TMenuState::Finalize()
 {
 	Application->DetachScene(scene);
-}
 
-bool TMenuState::ProcessEvent(const sf::Event& event)
-{
-	return TGameState::ProcessEvent(event);
+	TGameState::Finalize();
 }
 
 void TMenuState::Update(nel::TGameTime deltaTime)
