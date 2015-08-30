@@ -1,4 +1,4 @@
-# Neuronic-Bomberman
+# Neuronic Bomberman
 
 This is an attempt to create an Atomic Bomberman clone. 
 
