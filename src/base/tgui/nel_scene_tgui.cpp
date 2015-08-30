@@ -1,8 +1,5 @@
 #include "nel_scene_tgui.h"
 
-#include <SFGUI/SFGUI.hpp>
-#include <SFGUI/Widgets.hpp>
-
 
 
 namespace nel {

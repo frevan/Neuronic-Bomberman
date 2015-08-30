@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SFGUI/SFGUI.hpp>
-
 #include "base/tgui/nel_game_tgui.h"
 
 #include "scenes/overlayscene.h"
