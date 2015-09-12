@@ -68,11 +68,23 @@ void TMenuScene::OnNewGameBtnClick()
 
 void TMenuScene::OnJoinGameBtnClick()
 {
+	tgui::MessageBox::Ptr msgbox = std::make_shared<tgui::MessageBox>();
+	AddWidgetToGUI(msgbox);
+	msgbox->setText("Not implemented yet");
+	msgbox->setPosition(350, 275);
+	msgbox->show();
+
 	//Application->SetNextState(SID_ServerSelect);
 }
 
 void TMenuScene::OnOptionsBtnClick()
 {
+	tgui::MessageBox::Ptr msgbox = std::make_shared<tgui::MessageBox>();
+	AddWidgetToGUI(msgbox);
+	msgbox->setText("Not implemented yet");
+	msgbox->setPosition(350, 275);
+	msgbox->show();
+
 	//Application->SetNextState(SID_Options);
 }
 
