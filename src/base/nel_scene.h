@@ -11,6 +11,7 @@ class TScene	: public IScene
 protected:
 	TViewType ViewType;
 	IApplication* Application;
+	bool Visible;
 public:
 	TScene(TViewType setType = VT_HUMANVIEW);
 	~TScene() override;
@@ -20,6 +21,8 @@ public:
 	void OnDetach() override;
 	void Draw(sf::RenderTarget* target) override;
 	TViewType GetType() override;
+	bool IsVisible() override;
+	void SetVisible(bool newValue) override;
 };
 
 };

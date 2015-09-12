@@ -6,7 +6,8 @@ namespace nel {
 
 TScene::TScene(TViewType setType)
 :	IScene(),
-	ViewType(setType)
+	ViewType(setType),
+	Visible(true)
 {
 }
 
@@ -30,6 +31,16 @@ void TScene::Draw(sf::RenderTarget* target)
 IScene::TViewType TScene::GetType()
 {
 	return ViewType;
+}
+
+bool TScene::IsVisible()
+{
+	return Visible;
+}
+
+void TScene::SetVisible(bool newValue)
+{
+	Visible = newValue;
 }
 
 };	// namespace nel

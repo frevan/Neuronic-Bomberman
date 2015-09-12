@@ -141,7 +141,7 @@ void TApplication::Execute()
 			for (auto it = Scenes.rbegin(); it != Scenes.rend(); it++)
 			{
 				auto lockedscene = (*it).lock();
-				if (lockedscene)
+				if (lockedscene) if (lockedscene->IsVisible())
 					lockedscene->Draw(target);
 			}
 		}

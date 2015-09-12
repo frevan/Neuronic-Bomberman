@@ -112,6 +112,8 @@ public:
 	virtual void OnDetach() = 0;
 	virtual void Draw(sf::RenderTarget* target) = 0;
 	virtual TViewType GetType() = 0;
+	virtual bool IsVisible() = 0;
+	virtual void SetVisible(bool newValue) = 0;
 };
 
 
