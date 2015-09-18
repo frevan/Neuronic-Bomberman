@@ -87,8 +87,6 @@ public:
 
 	virtual void Initialize(IStateMachine* setStateMachine, IApplication* setApplication) = 0;
 	virtual void Finalize() = 0;
-	virtual bool ProcessEvent(const sf::Event& event) = 0;
-	virtual void Update(TGameTime deltaTime) = 0;
 };
 
 
@@ -148,7 +146,7 @@ public:
 
 
 
-class IRenderable :	public IComponent
+class IRenderable
 {
 public:
 	virtual void Draw(sf::RenderTarget* target) = 0;
@@ -156,10 +154,10 @@ public:
 
 
 
-class ILogic :	public IComponent
+class ILogic
 {
 public:
-	virtual void Update(const TGameTime& deltaTime) = 0;
+	virtual void Update(TGameTime deltaTime) = 0;
 };
 
 

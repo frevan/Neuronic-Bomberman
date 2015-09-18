@@ -4,26 +4,47 @@
 
 namespace nel {
 
+class TGameStateLogic :	public ILogic
+{
+private:
+	TGameState* State;
+public:
+	TGameStateLogic(TGameState* setState):	ILogic(), State(setState) {};
+
+	// from ILogic
+	void Update(TGameTime deltaTime) override { State->Update(deltaTime); };
+};
+
+
+
 TGameState::TGameState(TGameID setStateID)
 :	IGameState(),
 	Application(nullptr),
 	StateMachine(nullptr),
 	StateID(setStateID)
 {
+	Logic = std::make_shared<TGameStateLogic>(this);
 }
 
 TGameState::~TGameState()
 {
+	Logic.reset();
 }
 
 void TGameState::Initialize(IStateMachine* setStateMachine, IApplication* setApplication)
 {
 	Application = setApplication;
 	StateMachine = setStateMachine;
+
+	Application->AddEventHandler(this);
+	Application->AddLogic(Logic);
 }
 
 void TGameState::Finalize()
 {
+	Application->RemoveEventHandler(this);
+	Application->RemoveLogic(Logic);
+
 	Application = nullptr;
 }
 
