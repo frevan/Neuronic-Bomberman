@@ -17,8 +17,8 @@ protected:
 	void AfterInitialization() override;
 	void BeforeFinalization() override;
 	void BeforeDisplay() override;
-	void AfterSceneAttached(IScenePtr scene) override;
-	void BeforeSceneDetached(IScenePtr scene) override;
+	void AfterSceneAttached(IViewPtr scene) override;
+	void BeforeSceneDetached(IViewPtr scene) override;
 
 	virtual std::string GetResourceSubPath() { return "Artwork/"; };
 	virtual std::string GetFontSubPath() { return "Fonts/"; };

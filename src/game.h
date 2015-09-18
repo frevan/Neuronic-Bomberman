@@ -2,18 +2,24 @@
 
 #include "base/tgui/nel_game_tgui.h"
 
-#include "scenes/overlayscene.h"
+#include "views/overlayview.h"
 
 
 
 class TGame :	public nel::TTGUIApplication
 {
 private:
-	std::shared_ptr<TOverlayScene> Overlay;
+	std::shared_ptr<TOverlayView> Overlay;
+
+	// factory functions
+	void* CreateState_Splash();
+	void* CreateState_Menu();
+	void* CreateState_Options();
+	void* CreateState_Session();
+
 protected:
 	sf::RenderWindow* CreateWindow() override;
 	nel::TGameID GetInitialGameStateID() override;
-	nel::IGameState* CreateGameState(nel::TGameID id) override;
 	void AfterInitialization() override;
 	void BeforeFinalization() override;
 

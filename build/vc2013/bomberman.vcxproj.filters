@@ -7,9 +7,6 @@
     <Filter Include="source\base">
       <UniqueIdentifier>{70cc80c7-769b-4de6-b4bb-77cac63c96d6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\scenes">
-      <UniqueIdentifier>{ccf6dac8-ff89-4e10-aa93-f37c255086f0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\states">
       <UniqueIdentifier>{3a649887-5468-453a-9e20-f6dd4131f379}</UniqueIdentifier>
     </Filter>
@@ -18,6 +15,12 @@
     </Filter>
     <Filter Include="source\base\utility">
       <UniqueIdentifier>{edd71975-8424-46bc-9b10-585533755fb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\views">
+      <UniqueIdentifier>{ccf6dac8-ff89-4e10-aa93-f37c255086f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\base\views">
+      <UniqueIdentifier>{74f8c25c-4ed1-4975-9ed7-dce66e514b8e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -39,20 +42,11 @@
     <ClCompile Include="..\..\src\base\nel_inputmap.cpp">
       <Filter>source\base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\nel_scene.cpp">
-      <Filter>source\base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\states\menustate.cpp">
       <Filter>source\states</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\tgui\nel_scene_tgui.cpp">
-      <Filter>source\base\tgui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\base\tgui\nel_game_tgui.cpp">
       <Filter>source\base\tgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\scenes\menuscene.cpp">
-      <Filter>source\scenes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\base\utility\nel_fps.cpp">
       <Filter>source\base\utility</Filter>
@@ -60,11 +54,26 @@
     <ClCompile Include="..\..\src\states\lobbystate.cpp">
       <Filter>source\states</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\scenes\overlayscene.cpp">
-      <Filter>source\scenes</Filter>
+    <ClCompile Include="..\..\src\base\utility\nel_statemachine.cpp">
+      <Filter>source\base\utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\scenes\lobbyscene.cpp">
-      <Filter>source\scenes</Filter>
+    <ClCompile Include="..\..\src\states\sessionstate.cpp">
+      <Filter>source\states</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\views\lobbyview.cpp">
+      <Filter>source\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\views\menuview.cpp">
+      <Filter>source\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\views\overlayview.cpp">
+      <Filter>source\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\nel_view.cpp">
+      <Filter>source\base\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\tgui\nel_view_tgui.cpp">
+      <Filter>source\base\views</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

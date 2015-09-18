@@ -3,17 +3,16 @@
 #include <TGUI/TGUI.hpp>
 
 #include "../base/nel_state.h"
-#include "../views/lobbyview.h"
+//#include "../scenes/lobbyscene.h"
 
 
-class TLobbyState :	public nel::TGameState
+class TSessionState :	public nel::TGameState
 {
 private:
-	std::shared_ptr<TLobbyView> View;
-	std::shared_ptr<tgui::Gui> GUI;
+	//std::shared_ptr<TSessionScene> scene;
 public:
-	TLobbyState(std::shared_ptr<tgui::Gui> setGUI);
-	~TLobbyState() override;
+	TSessionState(std::shared_ptr<tgui::Gui> setGUI);
+	~TSessionState() override;
 
 	// from TGameState
 	void Initialize(nel::IStateMachine* setStateMachine, nel::IApplication* setApplication) override;

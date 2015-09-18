@@ -3,13 +3,13 @@
 #include <vector>
 #include <TGUI/TGUI.hpp>
 
-#include "../nel_scene.h"
+#include "../nel_view.h"
 
 
 
 namespace nel {
 
-class TTGUIScene :	public TScene					
+class TTGUIView :	public TView
 {
 private:
 	std::vector<tgui::Widget::Ptr> Widgets;
@@ -23,8 +23,8 @@ protected:
 	virtual void CreateWidgets() {};
 
 public:
-	TTGUIScene(std::shared_ptr<tgui::Gui> setGUI, TViewType setType = VT_HUMANVIEW);
-	~TTGUIScene() override;
+	TTGUIView(std::shared_ptr<tgui::Gui> setGUI, IStateMachine* setStateMachine, TViewType setType = VT_HUMANVIEW);
+	~TTGUIView() override;
 
 	// from IScene
 	void OnAttach(IApplication* setApplication) override;

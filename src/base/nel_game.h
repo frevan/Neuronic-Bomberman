@@ -8,6 +8,7 @@
 
 #include "nel_interfaces.h"
 #include "nel_factory.h"
+#include "utility/nel_statemachine.h"
 
 
 
@@ -18,35 +19,33 @@ class TApplication :	public IApplication
 private:	
 	bool ShouldQuit;
 	IFpsCalculator* FpsCalculator;
-	std::vector<IScenePtr> Scenes;
+	std::vector<IViewPtr> Scenes;
 	std::mutex ScenesMutex;
 	std::vector<ILogicPtr> Logics;
 	std::mutex LogicsMutex;	
 	std::mutex EventHandlersMutex;
-	std::vector<IEventHandler*> EventHandlers;
-	std::unique_ptr<IGameState> CurrentState;
-	TGameID NextStateID;
+	std::vector<IEventHandler*> EventHandlers;	
 
 	std::string DetermineAppPath(const std::string& filename);
-	void SwitchToNextState();
 
 	// factory function(s)
 	void* CreateFpsCalculator();
+	void* CreateStateMachine();
 
 protected:
 	std::unique_ptr<sf::RenderWindow> Window;
+	TStateMachine* StateMachine;
 
 	virtual void BeforeInitialization();
 	virtual void AfterInitialization();
 	virtual void BeforeFinalization();
 	virtual void BeforeDisplay();
 	virtual void AfterDisplay();
-	virtual void AfterSceneAttached(IScenePtr scene);
-	virtual void BeforeSceneDetached(IScenePtr scene);
+	virtual void AfterSceneAttached(IViewPtr scene);
+	virtual void BeforeSceneDetached(IViewPtr scene);
 
 	virtual sf::RenderWindow* CreateWindow() = 0;
 	virtual TGameID GetInitialGameStateID() = 0;
-	virtual IGameState* CreateGameState(TGameID id) = 0;
 
 public:
 	std::string AppPath;
@@ -62,9 +61,8 @@ public:
 	// from IApplication
 	IObjectFactory& GetFactory() override;
 	void RequestQuit() override;
-	void SetNextState(TGameID id) override;
-	void AttachScene(IScenePtr scene) override;
-	void DetachScene(IScenePtr scene) override;
+	void AttachScene(IViewPtr scene) override;
+	void DetachScene(IViewPtr scene) override;
 	void AddLogic(ILogicPtr logic) override;
 	void RemoveLogic(ILogicPtr logic) override;
 	void AddEventHandler(IEventHandler* handler) override;

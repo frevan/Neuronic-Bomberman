@@ -5,26 +5,28 @@
 
 
 TMenuState::TMenuState(std::shared_ptr<tgui::Gui> setGUI)
-:	TGameState(SID_Menu)
-{
-	scene = std::make_shared<TMenuScene>(setGUI);
+:	TGameState(SID_Menu),
+	View(),
+	GUI(setGUI)
+{	
 }
 
 TMenuState::~TMenuState()
 {
-	scene.reset();
 }
 
-void TMenuState::Initialize(nel::IApplication* setApplication)
+void TMenuState::Initialize(nel::IStateMachine* setStateMachine, nel::IApplication* setApplication)
 {
-	TGameState::Initialize(setApplication);
+	TGameState::Initialize(setStateMachine, setApplication);
 
-	Application->AttachScene(scene);
+	View = std::make_shared<TMenuView>(GUI, StateMachine);
+	Application->AttachScene(View);
 }
 
 void TMenuState::Finalize()
 {
-	Application->DetachScene(scene);
+	Application->DetachScene(View);
+	View.reset();
 
 	TGameState::Finalize();
 }

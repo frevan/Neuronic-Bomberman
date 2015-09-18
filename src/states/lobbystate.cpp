@@ -5,25 +5,29 @@
 
 
 TLobbyState::TLobbyState(std::shared_ptr<tgui::Gui> setGUI)
-:	TGameState(SID_Lobby)
-{
-	scene = std::make_shared<TLobbyScene>(setGUI);
+:	TGameState(SID_Lobby),
+	View(),
+	GUI(setGUI)
+{	
 }
 
 TLobbyState::~TLobbyState()
 {
-	scene.reset();
 }
 
-void TLobbyState::Initialize(nel::IApplication* setApplication)
+void TLobbyState::Initialize(nel::IStateMachine* setStateMachine, nel::IApplication* setApplication)
 {
-	TGameState::Initialize(setApplication);
-	Application->AttachScene(scene);
+	TGameState::Initialize(setStateMachine, setApplication);
+
+	View = std::make_shared<TLobbyView>(GUI, StateMachine);
+	Application->AttachScene(View);
 }
 
 void TLobbyState::Finalize()
 {
-	Application->DetachScene(scene);
+	Application->DetachScene(View);
+	View.reset();
+
 	TGameState::Finalize();
 }
 
@@ -33,7 +37,7 @@ bool TLobbyState::ProcessEvent(const sf::Event& event)
 
 	if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
 	{
-		Application->SetNextState(SID_Menu);
+		StateMachine->SetNextState(SID_Menu);
 		handled = true;
 	};
 

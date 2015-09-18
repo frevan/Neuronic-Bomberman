@@ -1,11 +1,11 @@
 #pragma once
 
 #include "../base/nel_interfaces.h"
-#include "../base/tgui/nel_scene_tgui.h"
+#include "../base/tgui/nel_view_tgui.h"
 
 
 
-class TMenuScene :	public nel::TTGUIScene
+class TMenuView :	public nel::TTGUIView
 {
 private:	
 	void CreateWidgets() override;
@@ -16,6 +16,6 @@ private:
 	void OnQuitBtnClick();
 
 public:
-	TMenuScene(std::shared_ptr<tgui::Gui> setGUI);
-	~TMenuScene() override;
+	TMenuView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine* setStateMachine);
+	~TMenuView() override;
 };

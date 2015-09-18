@@ -1,42 +1,42 @@
-#include "nel_scene_tgui.h"
+#include "nel_view_tgui.h"
 
 
 
 namespace nel {
 
-TTGUIScene::TTGUIScene(std::shared_ptr<tgui::Gui> setGUI, TViewType setType)
-:	TScene(setType),
+TTGUIView::TTGUIView(std::shared_ptr<tgui::Gui> setGUI, IStateMachine* setStateMachine, TViewType setType)
+:	TView(setStateMachine, setType),	
 	GUI(setGUI),
 	Widgets()
 {
 }
 
-TTGUIScene::~TTGUIScene()
+TTGUIView::~TTGUIView()
 {
 	RemoveAllWidgetsFromGUI();
 }
 
-void TTGUIScene::OnAttach(IApplication* setApplication)
+void TTGUIView::OnAttach(IApplication* setApplication)
 {
-	TScene::OnAttach(setApplication);
+	TView::OnAttach(setApplication);
 
 	RemoveAllWidgetsFromGUI();
 	CreateWidgets();
 }
 
-void TTGUIScene::OnDetach()
+void TTGUIView::OnDetach()
 {
 	RemoveAllWidgetsFromGUI();
-	TScene::OnDetach();
+	TView::OnDetach();
 }
 
-void TTGUIScene::AddWidgetToGUI(tgui::Widget::Ptr widget, const std::string& widgetName)
+void TTGUIView::AddWidgetToGUI(tgui::Widget::Ptr widget, const std::string& widgetName)
 {
 	Widgets.push_back(widget);
 	GUI->add(widget, widgetName);
 }
 
-void TTGUIScene::RemoveWidgetFromGUI(tgui::Widget::Ptr widget)
+void TTGUIView::RemoveWidgetFromGUI(tgui::Widget::Ptr widget)
 {
 	GUI->remove(widget);
 	for (auto it = Widgets.begin(); it != Widgets.end(); it++)
@@ -49,7 +49,7 @@ void TTGUIScene::RemoveWidgetFromGUI(tgui::Widget::Ptr widget)
 	}
 }
 
-void TTGUIScene::RemoveAllWidgetsFromGUI()
+void TTGUIView::RemoveAllWidgetsFromGUI()
 {
 	for (auto it = Widgets.begin(); it != Widgets.end(); it++)
 		GUI->remove(*it);

@@ -1,4 +1,4 @@
-#include "overlayscene.h"
+#include "overlayview.h"
 
 #include <iomanip> 
 #include <TGUI/TGUI.hpp>
@@ -9,16 +9,16 @@
 
 
 
-TOverlayScene::TOverlayScene(std::shared_ptr<tgui::Gui> setGUI)
-:	TTGUIScene(setGUI, nel::IScene::VT_SYSTEMVIEW)
+TOverlayView::TOverlayView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine* setStateMachine)
+:	TTGUIView(setGUI, setStateMachine, nel::IView::VT_SYSTEMVIEW)
 {
 }
 
-TOverlayScene::~TOverlayScene()
+TOverlayView::~TOverlayView()
 {
 }
 
-void TOverlayScene::Draw(sf::RenderTarget* target)
+void TOverlayView::Draw(sf::RenderTarget* target)
 {	
 	tgui::Label::Ptr fpslbl = GUI->get<tgui::Label>("FPSLabel");
 	if (fpslbl)
@@ -29,10 +29,10 @@ void TOverlayScene::Draw(sf::RenderTarget* target)
 		fpslbl->setPosition(800-fpslbl->getSize().x-25, 25);	
 	}
 
-	TTGUIScene::Draw(target);
+	TTGUIView::Draw(target);
 }
 
-void TOverlayScene::CreateWidgets()
+void TOverlayView::CreateWidgets()
 {
 	// FPS label
 	tgui::Label::Ptr fpslbl = std::make_shared<tgui::Label>();

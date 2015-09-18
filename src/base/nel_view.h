@@ -6,15 +6,16 @@
 
 namespace nel {
 
-class TScene	: public IScene
+class TView	: public IView
 {
 protected:
 	TViewType ViewType;
 	IApplication* Application;
+	IStateMachine* StateMachine;
 	bool Visible;
 public:
-	TScene(TViewType setType = VT_HUMANVIEW);
-	~TScene() override;
+	TView(IStateMachine* setStateMachine, TViewType setType = VT_HUMANVIEW);
+	~TView() override;
 
 	// from IScene
 	void OnAttach(IApplication* setApplication) override;

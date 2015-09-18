@@ -14,18 +14,20 @@
     <ClCompile Include="..\..\src\base\nel_factory.cpp" />
     <ClCompile Include="..\..\src\base\nel_game.cpp" />
     <ClCompile Include="..\..\src\base\nel_inputmap.cpp" />
-    <ClCompile Include="..\..\src\base\nel_scene.cpp" />
+    <ClCompile Include="..\..\src\base\nel_view.cpp" />
     <ClCompile Include="..\..\src\base\nel_state.cpp" />
     <ClCompile Include="..\..\src\base\tgui\nel_game_tgui.cpp" />
-    <ClCompile Include="..\..\src\base\tgui\nel_scene_tgui.cpp" />
+    <ClCompile Include="..\..\src\base\tgui\nel_view_tgui.cpp" />
     <ClCompile Include="..\..\src\base\utility\nel_fps.cpp" />
+    <ClCompile Include="..\..\src\base\utility\nel_statemachine.cpp" />
     <ClCompile Include="..\..\src\game.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
-    <ClCompile Include="..\..\src\scenes\lobbyscene.cpp" />
-    <ClCompile Include="..\..\src\scenes\menuscene.cpp" />
-    <ClCompile Include="..\..\src\scenes\overlayscene.cpp" />
+    <ClCompile Include="..\..\src\views\lobbyview.cpp" />
+    <ClCompile Include="..\..\src\views\menuview.cpp" />
+    <ClCompile Include="..\..\src\views\overlayview.cpp" />
     <ClCompile Include="..\..\src\states\lobbystate.cpp" />
     <ClCompile Include="..\..\src\states\menustate.cpp" />
+    <ClCompile Include="..\..\src\states\sessionstate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\nel_interfaces.h" />

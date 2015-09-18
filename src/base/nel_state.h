@@ -15,13 +15,14 @@ class TGameState :	public IGameState
 {
 public:
 	IApplication* Application;
+	IStateMachine* StateMachine;
 	TGameID StateID;
 
 	TGameState(TGameID setStateID);
 	~TGameState() override;
 
 	// from IGameState
-	void Initialize(IApplication* setApplication) override;
+	void Initialize(IStateMachine* setStateMachine, IApplication* setApplication) override;
 	void Finalize() override;
 	bool ProcessEvent(const sf::Event& event) override;
 	void Update(TGameTime deltaTime) override;

@@ -27,7 +27,8 @@ const TGameID NO_STATE_CONST	= 0;
 class IApplication;
 class IObjectFactory;
 class IGameState;
-class IScene;
+class IStateMachine;
+class IView;
 class IActor;
 class IComponent;
 class IRenderable;
@@ -36,7 +37,7 @@ class IEventHandler;
 
 
 
-typedef std::weak_ptr<IScene> IScenePtr;
+typedef std::weak_ptr<IView> IViewPtr;
 typedef std::weak_ptr<ILogic> ILogicPtr;
 typedef std::weak_ptr<IGameState> IGameStatePtr;
 
@@ -51,10 +52,8 @@ public:
 
 	virtual void RequestQuit() = 0;
 
-	virtual void SetNextState(TGameID id) = 0;
-
-	virtual void AttachScene(IScenePtr scene) = 0;
-	virtual void DetachScene(IScenePtr scene) = 0;
+	virtual void AttachScene(IViewPtr scene) = 0;
+	virtual void DetachScene(IViewPtr scene) = 0;
 
 	virtual void AddLogic(ILogicPtr logic) = 0;
 	virtual void RemoveLogic(ILogicPtr logic) = 0;	
@@ -86,7 +85,7 @@ class IGameState
 public:
 	virtual ~IGameState() {};
 
-	virtual void Initialize(IApplication* setApplication) = 0;
+	virtual void Initialize(IStateMachine* setStateMachine, IApplication* setApplication) = 0;
 	virtual void Finalize() = 0;
 	virtual bool ProcessEvent(const sf::Event& event) = 0;
 	virtual void Update(TGameTime deltaTime) = 0;
@@ -94,7 +93,20 @@ public:
 
 
 
-class IScene
+class IStateMachine
+{
+public:
+	virtual ~IStateMachine() {};
+
+	virtual void Initialize() = 0;
+	virtual void Finalize() = 0;
+	virtual void SetNextState(TGameID id) = 0;
+	virtual void SwitchToNextState() = 0;
+};
+
+
+
+class IView
 {
 private:
 public:
@@ -106,7 +118,7 @@ public:
 		VT_AIVIEW				// (local) AI player
 	} TViewType;
 
-	virtual ~IScene() {};
+	virtual ~IView() {};
 
 	virtual void OnAttach(IApplication* setApplication) = 0;
 	virtual void OnDetach() = 0;

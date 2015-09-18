@@ -7,6 +7,7 @@ namespace nel {
 TGameState::TGameState(TGameID setStateID)
 :	IGameState(),
 	Application(nullptr),
+	StateMachine(nullptr),
 	StateID(setStateID)
 {
 }
@@ -15,9 +16,10 @@ TGameState::~TGameState()
 {
 }
 
-void TGameState::Initialize(IApplication* setApplication)
+void TGameState::Initialize(IStateMachine* setStateMachine, IApplication* setApplication)
 {
 	Application = setApplication;
+	StateMachine = setStateMachine;
 }
 
 void TGameState::Finalize()

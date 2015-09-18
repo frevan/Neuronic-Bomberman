@@ -28,8 +28,7 @@ TApplication::TApplication()
 	EventHandlers(),
 	Window(),
 	FpsCalculator(nullptr),
-	CurrentState(nullptr),
-	NextStateID(NO_STATE_CONST)
+	StateMachine(nullptr)
 {
 }
 
@@ -40,6 +39,7 @@ TApplication::~TApplication()
 bool TApplication::Initialize(const std::string& filename)
 {
 	Factory.RegisterObjectType(OT_FPSCalculator, std::bind(&TApplication::CreateFpsCalculator, this));
+	Factory.RegisterObjectType(OT_StateMachine, std::bind(&TApplication::CreateStateMachine, this));
 
 	BeforeInitialization();
 
@@ -51,6 +51,7 @@ bool TApplication::Initialize(const std::string& filename)
 	Window.reset(w);
 
 	FpsCalculator = (IFpsCalculator*)Factory.CreateObject(OT_FPSCalculator);
+	StateMachine = (TStateMachine*)Factory.CreateObject(OT_StateMachine);
 
 	AfterInitialization();
 
@@ -61,10 +62,7 @@ void TApplication::Finalize()
 {
 	BeforeFinalization();
 
-	if (CurrentState)
-		CurrentState->Finalize();	
-
-	CurrentState.reset();
+	StateMachine->Finalize();
 	Window.reset();	
 
 	delete FpsCalculator;
@@ -86,27 +84,22 @@ void TApplication::Execute()
 	uint32_t nowTime;
 
 	// get the initial state id ... switch to it in the loop
-	NextStateID = GetInitialGameStateID();
+	StateMachine->SetNextState(GetInitialGameStateID());
 
 	while (Window->isOpen())
 	{
-		SwitchToNextState();
+		StateMachine->SwitchToNextState();
 
 		// handle events
 		sf::Event event;
 		while (Window->pollEvent(event))
 		{
-			// let the state handle the event first
-			bool handled = CurrentState->ProcessEvent(event);	
-			// then all registered event handlers
-			if (!handled)
+			// all registered event handlers
+			std::lock_guard<std::mutex> g(EventHandlersMutex);
+			for (auto it = EventHandlers.rbegin(); it != EventHandlers.rend(); it++)
 			{
-				std::lock_guard<std::mutex> g(EventHandlersMutex);
-				for (auto it = EventHandlers.rbegin(); it != EventHandlers.rend(); it++)
-				{
-					if ((*it)->ProcessEvent(event))
-						break;
-				}
+				if ((*it)->ProcessEvent(event))
+					break;
 			}
 		}
 
@@ -116,15 +109,12 @@ void TApplication::Execute()
         while (nowTime > nextGameTick && loops < MAX_FRAMESKIP) 
 		{	
 			TGameTime delta = nowTime-prevTickTime;
-			CurrentState->Update(delta);
-			{				
-				std::lock_guard<std::mutex> g(LogicsMutex);
-				for (auto it = Logics.rbegin(); it != Logics.rend(); it++)
-				{
-					auto lockedlogic = (*it).lock();
-					if (lockedlogic)
-						lockedlogic->Update(delta);
-				}
+			std::lock_guard<std::mutex> g(LogicsMutex);
+			for (auto it = Logics.rbegin(); it != Logics.rend(); it++)
+			{
+				auto lockedlogic = (*it).lock();
+				if (lockedlogic)
+					lockedlogic->Update(delta);
 			}
 			// get new time
             nextGameTick += SKIP_TICKS;
@@ -165,12 +155,7 @@ IObjectFactory& TApplication::GetFactory()
 	return Factory;
 }
 
-void TApplication::SetNextState(TGameID id)
-{
-	NextStateID = id;
-}
-
-void TApplication::AttachScene(IScenePtr scene)
+void TApplication::AttachScene(IViewPtr scene)
 {
 	std::lock_guard<std::mutex> g(ScenesMutex);
 
@@ -183,7 +168,7 @@ void TApplication::AttachScene(IScenePtr scene)
 	AfterSceneAttached(scene);
 }
 
-void TApplication::DetachScene(IScenePtr scene)
+void TApplication::DetachScene(IViewPtr scene)
 {
 	BeforeSceneDetached(scene);
 
@@ -266,11 +251,11 @@ void TApplication::AfterDisplay()
 {
 }
 
-void TApplication::AfterSceneAttached(IScenePtr scene)
+void TApplication::AfterSceneAttached(IViewPtr scene)
 {
 }
 
-void TApplication::BeforeSceneDetached(IScenePtr scene)
+void TApplication::BeforeSceneDetached(IViewPtr scene)
 {
 }
 
@@ -282,6 +267,11 @@ void TApplication::RequestQuit()
 void* TApplication::CreateFpsCalculator() 
 {	
 	return new TFpsCalculator(); 
+}
+
+void* TApplication::CreateStateMachine() 
+{	
+	return new TStateMachine(this); 
 }
 
 std::string TApplication::DetermineAppPath(const std::string& filename)
@@ -302,30 +292,6 @@ double TApplication::GetCurrentFps()
 		return FpsCalculator->Value;
 	else 
 		return 0.f;
-}
-
-void TApplication::SwitchToNextState()
-{
-	if (NextStateID == NO_STATE_CONST)
-		return;
-
-	TGameID newid = NextStateID;
-	NextStateID = NO_STATE_CONST;
-
-	if (CurrentState)
-	{
-		CurrentState->Finalize();
-		CurrentState.reset();
-	}
-
-	if (newid == NO_STATE_CONST)
-		return;
-
-	IGameState* newstate = CreateGameState(newid);
-	CurrentState.reset(newstate);
-	assert(CurrentState);
-
-	CurrentState->Initialize(this);
 }
 
 };	// namespace nel

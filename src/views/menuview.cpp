@@ -1,4 +1,4 @@
-#include "menuscene.h"
+#include "menuview.h"
 
 #include <iomanip> 
 #include <TGUI/TGUI.hpp>
@@ -9,16 +9,16 @@
 
 
 
-TMenuScene::TMenuScene(std::shared_ptr<tgui::Gui> setGUI)
-:	TTGUIScene(setGUI)
+TMenuView::TMenuView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine* setStateMachine)
+:	TTGUIView(setGUI, setStateMachine)
 {
 }
 
-TMenuScene::~TMenuScene()
+TMenuView::~TMenuView()
 {
 }
 
-void TMenuScene::CreateWidgets()
+void TMenuView::CreateWidgets()
 {
 	// game name label
 	tgui::Label::Ptr namelbl = std::make_shared<tgui::Label>();
@@ -34,7 +34,7 @@ void TMenuScene::CreateWidgets()
 	newgamebtn->setText("New game");
 	newgamebtn->setPosition(300, 200);
 	newgamebtn->setSize(200, 60);
-	newgamebtn->connect("pressed", std::bind(&TMenuScene::OnNewGameBtnClick, this));
+	newgamebtn->connect("pressed", std::bind(&TMenuView::OnNewGameBtnClick, this));
 
 	// join game
 	tgui::Button::Ptr joingamebtn = std::make_shared<tgui::Button>();
@@ -42,7 +42,7 @@ void TMenuScene::CreateWidgets()
 	joingamebtn->setText("Join game");
 	joingamebtn->setPosition(300, 300);
 	joingamebtn->setSize(200, 60);
-	joingamebtn->connect("pressed", std::bind(&TMenuScene::OnJoinGameBtnClick, this));
+	joingamebtn->connect("pressed", std::bind(&TMenuView::OnJoinGameBtnClick, this));
 
 	// options
 	tgui::Button::Ptr optionsbtn = std::make_shared<tgui::Button>();
@@ -50,7 +50,7 @@ void TMenuScene::CreateWidgets()
 	optionsbtn->setText("Options");
 	optionsbtn->setPosition(25, 535);
 	optionsbtn->setSize(100, 40);
-	optionsbtn->connect("pressed", std::bind(&TMenuScene::OnOptionsBtnClick, this));
+	optionsbtn->connect("pressed", std::bind(&TMenuView::OnOptionsBtnClick, this));
 
 	// quit
 	tgui::Button::Ptr quitbtn = std::make_shared<tgui::Button>();
@@ -58,15 +58,15 @@ void TMenuScene::CreateWidgets()
 	quitbtn->setText("Quit");
 	quitbtn->setPosition(675, 535);
 	quitbtn->setSize(100, 40);
-	quitbtn->connect("pressed", std::bind(&TMenuScene::OnQuitBtnClick, this));
+	quitbtn->connect("pressed", std::bind(&TMenuView::OnQuitBtnClick, this));
 }
 
-void TMenuScene::OnNewGameBtnClick()
+void TMenuView::OnNewGameBtnClick()
 {
-	Application->SetNextState(SID_Lobby);
+	StateMachine->SetNextState(SID_Session);
 }
 
-void TMenuScene::OnJoinGameBtnClick()
+void TMenuView::OnJoinGameBtnClick()
 {
 	tgui::MessageBox::Ptr msgbox = std::make_shared<tgui::MessageBox>();
 	AddWidgetToGUI(msgbox);
@@ -77,7 +77,7 @@ void TMenuScene::OnJoinGameBtnClick()
 	//Application->SetNextState(SID_ServerSelect);
 }
 
-void TMenuScene::OnOptionsBtnClick()
+void TMenuView::OnOptionsBtnClick()
 {
 	tgui::MessageBox::Ptr msgbox = std::make_shared<tgui::MessageBox>();
 	AddWidgetToGUI(msgbox);
@@ -88,7 +88,7 @@ void TMenuScene::OnOptionsBtnClick()
 	//Application->SetNextState(SID_Options);
 }
 
-void TMenuScene::OnQuitBtnClick()
+void TMenuView::OnQuitBtnClick()
 {
 	Application->RequestQuit();
 }

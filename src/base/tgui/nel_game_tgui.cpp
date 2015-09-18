@@ -34,12 +34,12 @@ void TTGUIApplication::BeforeDisplay()
 	GUI->draw();
 }
 
-void TTGUIApplication::AfterSceneAttached(IScenePtr scene)
+void TTGUIApplication::AfterSceneAttached(IViewPtr scene)
 {
 	TApplication::AfterSceneAttached(scene);
 }
 
-void TTGUIApplication::BeforeSceneDetached(IScenePtr scene)
+void TTGUIApplication::BeforeSceneDetached(IViewPtr scene)
 {
 	TApplication::BeforeSceneDetached(scene);
 }

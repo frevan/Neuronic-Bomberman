@@ -1,4 +1,4 @@
-#include "lobbyscene.h"
+#include "lobbyview.h"
 
 #include <iomanip> 
 #include <TGUI/TGUI.hpp>
@@ -9,16 +9,16 @@
 
 
 
-TLobbyScene::TLobbyScene(std::shared_ptr<tgui::Gui> setGUI)
-:	TTGUIScene(setGUI)
+TLobbyView::TLobbyView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine* setStateMachine)
+:	TTGUIView(setGUI, setStateMachine)
 {
 }
 
-TLobbyScene::~TLobbyScene()
+TLobbyView::~TLobbyView()
 {
 }
 
-void TLobbyScene::CreateWidgets()
+void TLobbyView::CreateWidgets()
 {
 	// server name
 	tgui::Label::Ptr servernamelbl = std::make_shared<tgui::Label>();
@@ -41,7 +41,7 @@ void TLobbyScene::CreateWidgets()
 	backbtn->setText("Leave lobby");
 	backbtn->setPosition(25, 535);
 	backbtn->setSize(100, 40);
-	backbtn->connect("pressed", std::bind(&TLobbyScene::OnBackBtnClick, this));
+	backbtn->connect("pressed", std::bind(&TLobbyView::OnBackBtnClick, this));
 
 	// players
 	tgui::Label::Ptr playerslbl = std::make_shared<tgui::Label>();
@@ -58,7 +58,7 @@ void TLobbyScene::CreateWidgets()
 	playerspanel->setBackgroundColor(sf::Color(40,0,0));
 }
 
-void TLobbyScene::OnBackBtnClick()
+void TLobbyView::OnBackBtnClick()
 {
-	Application->SetNextState(SID_Menu);
+	StateMachine->SetNextState(SID_Menu);
 }
