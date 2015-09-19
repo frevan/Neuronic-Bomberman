@@ -69,11 +69,14 @@
     <ClCompile Include="..\..\src\views\overlayview.cpp">
       <Filter>source\views</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\nel_view.cpp">
-      <Filter>source\base\views</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\base\tgui\nel_view_tgui.cpp">
       <Filter>source\base\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\views\matchview.cpp">
+      <Filter>source\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\nel_view.cpp">
+      <Filter>source\base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

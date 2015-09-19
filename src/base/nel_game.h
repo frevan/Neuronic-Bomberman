@@ -34,7 +34,7 @@ private:
 
 protected:
 	std::unique_ptr<sf::RenderWindow> Window;
-	TStateMachine* StateMachine;
+	IStateMachine* GameState;
 
 	virtual void BeforeInitialization();
 	virtual void AfterInitialization();

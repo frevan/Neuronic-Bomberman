@@ -20,7 +20,7 @@ public:
 TGameState::TGameState(TGameID setStateID)
 :	IGameState(),
 	Application(nullptr),
-	StateMachine(nullptr),
+	Owner(nullptr),
 	StateID(setStateID)
 {
 	Logic = std::make_shared<TGameStateLogic>(this);
@@ -31,10 +31,10 @@ TGameState::~TGameState()
 	Logic.reset();
 }
 
-void TGameState::Initialize(IStateMachine* setStateMachine, IApplication* setApplication)
+void TGameState::Initialize(IStateMachine* setOwner, IApplication* setApplication)
 {
 	Application = setApplication;
-	StateMachine = setStateMachine;
+	Owner = setOwner;
 
 	Application->AddEventHandler(this);
 	Application->AddLogic(Logic);

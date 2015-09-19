@@ -28,7 +28,7 @@ TApplication::TApplication()
 	EventHandlers(),
 	Window(),
 	FpsCalculator(nullptr),
-	StateMachine(nullptr)
+	GameState()
 {
 }
 
@@ -51,7 +51,7 @@ bool TApplication::Initialize(const std::string& filename)
 	Window.reset(w);
 
 	FpsCalculator = (IFpsCalculator*)Factory.CreateObject(OT_FPSCalculator);
-	StateMachine = (TStateMachine*)Factory.CreateObject(OT_StateMachine);
+	GameState = (IStateMachine*)Factory.CreateObject(OT_StateMachine);
 
 	AfterInitialization();
 
@@ -62,10 +62,14 @@ void TApplication::Finalize()
 {
 	BeforeFinalization();
 
-	StateMachine->Finalize();
+	GameState->Finalize();
+
 	Window.reset();	
 
+	delete GameState;
+	GameState = nullptr;
 	delete FpsCalculator;
+	FpsCalculator = nullptr;
 }
 
 void TApplication::Execute()
@@ -84,11 +88,11 @@ void TApplication::Execute()
 	uint32_t nowTime;
 
 	// get the initial state id ... switch to it in the loop
-	StateMachine->SetNextState(GetInitialGameStateID());
+	GameState->SetNextState(GetInitialGameStateID());
 
 	while (Window->isOpen())
 	{
-		StateMachine->SwitchToNextState();
+		GameState->SwitchToNextState();
 
 		// handle events
 		sf::Event event;

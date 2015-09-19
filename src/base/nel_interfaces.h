@@ -85,7 +85,7 @@ class IGameState
 public:
 	virtual ~IGameState() {};
 
-	virtual void Initialize(IStateMachine* setStateMachine, IApplication* setApplication) = 0;
+	virtual void Initialize(IStateMachine* setOwner, IApplication* setApplication) = 0;
 	virtual void Finalize() = 0;
 };
 

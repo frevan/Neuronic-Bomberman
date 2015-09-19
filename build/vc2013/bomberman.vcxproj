@@ -23,6 +23,7 @@
     <ClCompile Include="..\..\src\game.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\views\lobbyview.cpp" />
+    <ClCompile Include="..\..\src\views\matchview.cpp" />
     <ClCompile Include="..\..\src\views\menuview.cpp" />
     <ClCompile Include="..\..\src\views\overlayview.cpp" />
     <ClCompile Include="..\..\src\states\lobbystate.cpp" />

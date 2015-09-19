@@ -15,7 +15,7 @@ public:
 	~TMenuState() override;
 
 	// from TGameState
-	void Initialize(nel::IStateMachine* setStateMachine, nel::IApplication* setApplication) override;
+	void Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication) override;
 	void Finalize() override;
 	void Update(nel::TGameTime deltaTime) override;
 };

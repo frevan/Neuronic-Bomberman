@@ -18,7 +18,7 @@ private:
 	ILogicPtr Logic;
 public:
 	IApplication* Application;
-	IStateMachine* StateMachine;
+	IStateMachine* Owner;
 	TGameID StateID;
 
 	TGameState(TGameID setStateID);
@@ -27,7 +27,7 @@ public:
 	virtual void Update(TGameTime deltaTime);
 
 	// from IGameState
-	void Initialize(IStateMachine* setStateMachine, IApplication* setApplication) override;
+	void Initialize(IStateMachine* setOwner, IApplication* setApplication) override;
 	void Finalize() override;
 
 	// from IEventHandler

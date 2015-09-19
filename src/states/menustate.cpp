@@ -15,11 +15,11 @@ TMenuState::~TMenuState()
 {
 }
 
-void TMenuState::Initialize(nel::IStateMachine* setStateMachine, nel::IApplication* setApplication)
+void TMenuState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication)
 {
-	TGameState::Initialize(setStateMachine, setApplication);
+	TGameState::Initialize(setOwner, setApplication);
 
-	View = std::make_shared<TMenuView>(GUI, StateMachine);
+	View = std::make_shared<TMenuView>(GUI, Owner);
 	Application->AttachScene(View);
 }
 

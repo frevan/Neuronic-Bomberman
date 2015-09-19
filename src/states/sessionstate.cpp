@@ -1,29 +1,31 @@
 #include "sessionstate.h"
 
 #include "states.h"
+#include "../base/nel_objecttypes.h"
 
 
 
 TSessionState::TSessionState(std::shared_ptr<tgui::Gui> setGUI)
-:	TGameState(SID_Lobby)
+:	TGameState(SID_Lobby),
+	SessionState()
 {
-	//scene = std::make_shared<TLobbyScene>(setGUI);
 }
 
 TSessionState::~TSessionState()
 {
-	//scene.reset();
 }
 
-void TSessionState::Initialize(nel::IStateMachine* setStateMachine, nel::IApplication* setApplication)
+void TSessionState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication)
 {
-	TGameState::Initialize(setStateMachine, setApplication);
-	//Application->AttachScene(scene);
+	TGameState::Initialize(setOwner, setApplication);
+
+	SessionState.reset((nel::IStateMachine*)Application->GetFactory().CreateObject(nel::OT_StateMachine));
 }
 
 void TSessionState::Finalize()
 {
-	//Application->DetachScene(scene);
+	SessionState.reset();
+
 	TGameState::Finalize();
 }
 
@@ -33,7 +35,7 @@ bool TSessionState::ProcessEvent(const sf::Event& event)
 
 	if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
 	{
-		StateMachine->SetNextState(SID_Menu);
+		Owner->SetNextState(SID_Menu);
 		handled = true;
 	};
 
