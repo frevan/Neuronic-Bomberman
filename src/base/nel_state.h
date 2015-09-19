@@ -11,11 +11,11 @@ namespace nel {
 
 
 
-class TGameState :	public IGameState,
-					public IEventHandler
+class TGameState :	public IGameState
 {
 private:
-	ILogicPtr Logic;
+	std::shared_ptr<ILogic> Logic;
+	std::shared_ptr<IEventHandler> EventHandler;
 public:
 	IApplication* Application;
 	IStateMachine* Owner;
@@ -25,13 +25,11 @@ public:
 	~TGameState() override;
 
 	virtual void Update(TGameTime deltaTime);
+	virtual bool ProcessEvent(const sf::Event& event);
 
 	// from IGameState
 	void Initialize(IStateMachine* setOwner, IApplication* setApplication) override;
 	void Finalize() override;
-
-	// from IEventHandler
-	bool ProcessEvent(const sf::Event& event) override;
 };
 
 

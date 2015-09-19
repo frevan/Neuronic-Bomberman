@@ -24,7 +24,7 @@ private:
 	std::vector<ILogicPtr> Logics;
 	std::mutex LogicsMutex;	
 	std::mutex EventHandlersMutex;
-	std::vector<IEventHandler*> EventHandlers;	
+	std::vector<IEventHandlerPtr> EventHandlers;	
 
 	std::string DetermineAppPath(const std::string& filename);
 
@@ -65,8 +65,8 @@ public:
 	void DetachScene(IViewPtr scene) override;
 	void AddLogic(ILogicPtr logic) override;
 	void RemoveLogic(ILogicPtr logic) override;
-	void AddEventHandler(IEventHandler* handler) override;
-	void RemoveEventHandler(IEventHandler* handler) override;
+	void AddEventHandler(IEventHandlerPtr handler) override;
+	void RemoveEventHandler(IEventHandlerPtr handler) override;
 	double GetCurrentFps() override;
 };
 

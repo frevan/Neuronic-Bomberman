@@ -1,5 +1,7 @@
 #include "nel_state.h"
 
+#include "utility/nel_eventhandler.h"
+
 
 
 namespace nel {
@@ -24,11 +26,13 @@ TGameState::TGameState(TGameID setStateID)
 	StateID(setStateID)
 {
 	Logic = std::make_shared<TGameStateLogic>(this);
+	EventHandler = std::make_shared<TEventHandler>(IEventHandler::STATE, std::bind(&TGameState::ProcessEvent, this, std::placeholders::_1));
 }
 
 TGameState::~TGameState()
 {
 	Logic.reset();
+	EventHandler.reset();
 }
 
 void TGameState::Initialize(IStateMachine* setOwner, IApplication* setApplication)
@@ -36,13 +40,13 @@ void TGameState::Initialize(IStateMachine* setOwner, IApplication* setApplicatio
 	Application = setApplication;
 	Owner = setOwner;
 
-	Application->AddEventHandler(this);
+	Application->AddEventHandler(EventHandler);
 	Application->AddLogic(Logic);
 }
 
 void TGameState::Finalize()
 {
-	Application->RemoveEventHandler(this);
+	Application->RemoveEventHandler(EventHandler);
 	Application->RemoveLogic(Logic);
 
 	Application = nullptr;
@@ -57,17 +61,6 @@ bool TGameState::ProcessEvent(const sf::Event& event)
 	{
 		Application->RequestQuit();
 		handled = true;
-	}
-	else
-	{
-		/*
-		std::lock_guard<std::mutex> g(inputHandlersMutex);
-		for (auto it = inputHandlers.begin(); it != inputHandlers.end(); it++)
-		{
-		if ((*it)->processEvent(event))
-		break;
-		}
-		*/
 	}
 
 	return handled;

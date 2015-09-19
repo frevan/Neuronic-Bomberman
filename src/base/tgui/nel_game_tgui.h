@@ -8,9 +8,10 @@
 
 namespace nel {
 
-class TTGUIApplication :	public TApplication,
-							public nel::IEventHandler
+class TTGUIApplication :	public TApplication
 {
+private:
+	std::shared_ptr<nel::IEventHandler> EventHandler;
 protected:
 	std::shared_ptr<tgui::Gui> GUI;
 
@@ -27,8 +28,7 @@ protected:
 public:
 	TTGUIApplication();
 
-	// from IEventHandler
-	bool ProcessEvent(const sf::Event& event) override;
+	virtual bool ProcessEvent(const sf::Event& event);
 };
 
 };	// namespace nel

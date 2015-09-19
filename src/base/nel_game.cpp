@@ -102,7 +102,8 @@ void TApplication::Execute()
 			std::lock_guard<std::mutex> g(EventHandlersMutex);
 			for (auto it = EventHandlers.rbegin(); it != EventHandlers.rend(); it++)
 			{
-				if ((*it)->ProcessEvent(event))
+				auto eh = it->lock();
+				if (eh)	if (eh->ProcessEvent(event))
 					break;
 			}
 		}
@@ -214,20 +215,26 @@ void TApplication::RemoveLogic(ILogicPtr logic)
 	}
 }
 
-void TApplication::AddEventHandler(IEventHandler* handler)
+void TApplication::AddEventHandler(IEventHandlerPtr handler)
 {
 	std::lock_guard<std::mutex> g(EventHandlersMutex);
 
 	EventHandlers.push_back(handler);
 }
 
-void TApplication::RemoveEventHandler(IEventHandler* handler)
+void TApplication::RemoveEventHandler(IEventHandlerPtr handler)
 {
 	std::lock_guard<std::mutex> g(EventHandlersMutex);
 
 	for (auto it = EventHandlers.begin(); it != EventHandlers.end(); it++)
 	{
-		if (*(it) == handler)
+		auto eh = handler.lock();
+		auto eh2 = (it)->lock();
+
+		auto ehp = eh.get();
+		auto ehp2 = eh2.get();
+
+		if (ehp == ehp2)
 		{
 			EventHandlers.erase(it);
 			break;

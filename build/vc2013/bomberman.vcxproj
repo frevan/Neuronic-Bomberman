@@ -18,6 +18,7 @@
     <ClCompile Include="..\..\src\base\nel_state.cpp" />
     <ClCompile Include="..\..\src\base\tgui\nel_game_tgui.cpp" />
     <ClCompile Include="..\..\src\base\tgui\nel_view_tgui.cpp" />
+    <ClCompile Include="..\..\src\base\utility\nel_eventhandler.cpp" />
     <ClCompile Include="..\..\src\base\utility\nel_fps.cpp" />
     <ClCompile Include="..\..\src\base\utility\nel_statemachine.cpp" />
     <ClCompile Include="..\..\src\game.cpp" />

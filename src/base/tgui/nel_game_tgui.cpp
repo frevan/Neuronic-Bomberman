@@ -1,5 +1,7 @@
 #include "nel_game_tgui.h"
 
+#include "../utility/nel_eventhandler.h"
+
 
 
 namespace nel {
@@ -8,6 +10,7 @@ TTGUIApplication::TTGUIApplication()
 :	TApplication(),
 	GUI(nullptr)
 {
+	EventHandler = std::make_shared<TEventHandler>(IEventHandler::APPLICATION, std::bind(&TTGUIApplication::ProcessEvent, this, std::placeholders::_1));
 }
 
 void TTGUIApplication::AfterInitialization()
@@ -19,12 +22,13 @@ void TTGUIApplication::AfterInitialization()
 	tgui::setResourcePath(AppPath + GetResourceSubPath());
 	GUI->setGlobalFont(GetFontSubPath() + GetDefaultFontName());
 
-	AddEventHandler(this);
+	AddEventHandler(EventHandler);
 }
 
 void TTGUIApplication::BeforeFinalization()
 {
-	RemoveEventHandler(this);
+	RemoveEventHandler(EventHandler);
+	EventHandler.reset();
 
 	GUI.reset();
 }

@@ -8,12 +8,19 @@
 class TOverlayView :	public nel::TTGUIView
 {
 private:
+	std::shared_ptr<nel::IEventHandler> EventHandler;
+
+protected:
 	void CreateWidgets() override;
 
 public:
 	TOverlayView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine* setStateMachine);
 	~TOverlayView() override;
 
+	bool ProcessEvent(const sf::Event& event);
+
 	// from IScene
+	void OnAttach(nel::IApplication* setApplication) override;
+	void OnDetach() override;
 	void Draw(sf::RenderTarget* target) override;
 };

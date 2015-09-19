@@ -40,6 +40,7 @@ class IEventHandler;
 typedef std::weak_ptr<IView> IViewPtr;
 typedef std::weak_ptr<ILogic> ILogicPtr;
 typedef std::weak_ptr<IGameState> IGameStatePtr;
+typedef std::weak_ptr<IEventHandler> IEventHandlerPtr;
 
 
 
@@ -58,8 +59,8 @@ public:
 	virtual void AddLogic(ILogicPtr logic) = 0;
 	virtual void RemoveLogic(ILogicPtr logic) = 0;	
 
-	virtual void AddEventHandler(IEventHandler* handler) = 0;
-	virtual void RemoveEventHandler(IEventHandler* handler) = 0;
+	virtual void AddEventHandler(IEventHandlerPtr handler) = 0;
+	virtual void RemoveEventHandler(IEventHandlerPtr handler) = 0;
 
 	virtual double GetCurrentFps() = 0;
 };
@@ -165,6 +166,14 @@ public:
 class IEventHandler
 {
 public:
+	enum Type {
+		APPLICATION = 0,
+		STATE,
+		OVERLAY,
+		REGULAR
+	};
+
+	virtual Type GetType() = 0;
 	virtual bool ProcessEvent(const sf::Event& event) = 0;
 };
 
