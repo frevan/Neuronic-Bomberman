@@ -26,7 +26,7 @@ TGameState::TGameState(TGameID setStateID)
 	StateID(setStateID)
 {
 	Logic = std::make_shared<TGameStateLogic>(this);
-	EventHandler = std::make_shared<TEventHandler>(IEventHandler::STATE, std::bind(&TGameState::ProcessEvent, this, std::placeholders::_1));
+	EventHandler = std::make_shared<TEventHandler>(IEventHandler::STATE, std::bind(&TGameState::ProcessEvent, this, std::placeholders::_1), nullptr);
 }
 
 TGameState::~TGameState()

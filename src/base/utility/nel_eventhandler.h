@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../nel_interfaces.h"
+#include "nel_inputmap.h"
 
 
 
@@ -8,15 +9,19 @@ namespace nel {
 
 // !! delegate functions should follow this signature: 
 // bool delegate(const sf::Event& event);
-typedef std::function<bool(const sf::Event&)> TEventHandlerProcessFunc;
+typedef std::function<bool(const sf::Event&)> TProcessEventFunc;
+typedef std::function<void(TGameID inputID, float value)> TProcessInputProc;
 
 class TEventHandler :	public nel::IEventHandler
 {
 private:
-	nel::IEventHandler::Type Type;
-	TEventHandlerProcessFunc Handler;
+	IEventHandler::Type Type;
+	TProcessEventFunc ProcessEventFunc;
+	TProcessInputProc ProcessInputProc;
 public:
-	TEventHandler(IEventHandler::Type setType, TEventHandlerProcessFunc setHandler);
+	TInputMap InputMap;
+
+	TEventHandler(IEventHandler::Type setType, TProcessEventFunc setProcessEventFunc, TProcessInputProc setProcessInputProc);
 
 	// from IEventHandler
 	IEventHandler::Type GetType() override;

@@ -17,7 +17,7 @@ public:
 	TOverlayView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine* setStateMachine);
 	~TOverlayView() override;
 
-	bool ProcessEvent(const sf::Event& event);
+	void ProcessInput(nel::TGameID inputID, float value);
 
 	// from IScene
 	void OnAttach(nel::IApplication* setApplication) override;

@@ -21,6 +21,7 @@ typedef uint64_t TObjectType;	// object types for IObjectFactory
 
 
 const TGameID NO_STATE_CONST	= 0;
+const TGameID INVALID_GAME_ID	= 0;
 
 
 

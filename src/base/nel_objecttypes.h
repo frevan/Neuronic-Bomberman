@@ -3,12 +3,13 @@
 #include <string>
 
 #include "nel_interfaces.h"
+#include "utility/nel_macros.h"
 
 
 
 namespace nel {
 
-const TObjectType OT_FPSCalculator = std::hash<std::string>()(std::string("nel::IFPSCalculator"));
-const TObjectType OT_StateMachine = std::hash<std::string>()(std::string("nel::IStateMachine"));
+DEFINE_OBJECTTYPE(OT_FPSCalculator, "nel::IFPSCalculator");
+DEFINE_OBJECTTYPE(OT_StateMachine, "nel::IStateMachine");
 
 };	// namespace nel

@@ -13,13 +13,13 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\base\nel_factory.cpp" />
     <ClCompile Include="..\..\src\base\nel_game.cpp" />
-    <ClCompile Include="..\..\src\base\nel_inputmap.cpp" />
     <ClCompile Include="..\..\src\base\nel_view.cpp" />
     <ClCompile Include="..\..\src\base\nel_state.cpp" />
     <ClCompile Include="..\..\src\base\tgui\nel_game_tgui.cpp" />
     <ClCompile Include="..\..\src\base\tgui\nel_view_tgui.cpp" />
     <ClCompile Include="..\..\src\base\utility\nel_eventhandler.cpp" />
     <ClCompile Include="..\..\src\base\utility\nel_fps.cpp" />
+    <ClCompile Include="..\..\src\base\utility\nel_inputmap.cpp" />
     <ClCompile Include="..\..\src\base\utility\nel_statemachine.cpp" />
     <ClCompile Include="..\..\src\game.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
@@ -34,6 +34,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\base\nel_interfaces.h" />
     <ClInclude Include="..\..\src\base\nel_objecttypes.h" />
+    <ClInclude Include="..\..\src\base\utility\nel_macros.h" />
     <ClInclude Include="..\..\src\states\states.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

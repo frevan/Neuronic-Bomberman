@@ -4,16 +4,28 @@
 #include <TGUI/TGUI.hpp>
 
 #include "../base/nel_objecttypes.h"
-#include "../base/utility//nel_eventhandler.h"
+#include "../base/utility/nel_eventhandler.h"
+#include "../base/utility/nel_macros.h"
 
 #include "../states/states.h"
+
+
+
+const std::string FPSLabelNameConst	= "FPSLabel";
+
+
+
+DEFINE_GAMEID(actionToggleFPSLabel, "OverlayView::actionToggleFPSLabel")
 
 
 
 TOverlayView::TOverlayView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine* setStateMachine)
 :	TTGUIView(setGUI, setStateMachine, nel::IView::VT_SYSTEMVIEW)
 {
-	EventHandler = std::make_shared<nel::TEventHandler>(nel::IEventHandler::OVERLAY, std::bind(&TOverlayView::ProcessEvent, this, std::placeholders::_1));
+	EventHandler = std::make_shared<nel::TEventHandler>(nel::IEventHandler::OVERLAY, nullptr, std::bind(&TOverlayView::ProcessInput, this, std::placeholders::_1, std::placeholders::_2));
+
+	nel::TEventHandler* eh = (nel::TEventHandler*)EventHandler.get();
+	eh->InputMap.DefineInput(actionToggleFPSLabel, nel::TInputControl::Pack(nel::TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Tab, 0));
 }
 
 TOverlayView::~TOverlayView()
@@ -34,7 +46,7 @@ void TOverlayView::OnDetach()
 
 void TOverlayView::Draw(sf::RenderTarget* target)
 {	
-	tgui::Label::Ptr fpslbl = GUI->get<tgui::Label>("FPSLabel");
+	tgui::Label::Ptr fpslbl = GUI->get<tgui::Label>(FPSLabelNameConst);
 	if (fpslbl)
 	{
 		std::stringstream ss;
@@ -50,20 +62,18 @@ void TOverlayView::CreateWidgets()
 {
 	// FPS label
 	tgui::Label::Ptr fpslbl = std::make_shared<tgui::Label>();
-	AddWidgetToGUI(fpslbl, "FPSLabel");
+	AddWidgetToGUI(fpslbl, FPSLabelNameConst);
 	fpslbl->setText("");
 	fpslbl->setTextColor(sf::Color::Red);
 	fpslbl->setTextSize(12);
 }
 
-bool TOverlayView::ProcessEvent(const sf::Event& event)
+void TOverlayView::ProcessInput(nel::TGameID inputID, float value)
 {
-	if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Tab))
+	if (inputID == actionToggleFPSLabel && value > 0)
 	{
-		tgui::Label::Ptr fpslbl = GUI->get<tgui::Label>("FPSLabel");
+		tgui::Label::Ptr fpslbl = GUI->get<tgui::Label>(FPSLabelNameConst);
 		if (fpslbl->isVisible())	fpslbl->hide();
 		else						fpslbl->show();
 	};
-
-	return false;
 }

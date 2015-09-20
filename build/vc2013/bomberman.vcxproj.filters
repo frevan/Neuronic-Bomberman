@@ -39,9 +39,6 @@
     <ClCompile Include="..\..\src\base\nel_factory.cpp">
       <Filter>source\base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\nel_inputmap.cpp">
-      <Filter>source\base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\states\menustate.cpp">
       <Filter>source\states</Filter>
     </ClCompile>
@@ -81,6 +78,9 @@
     <ClCompile Include="..\..\src\base\utility\nel_eventhandler.cpp">
       <Filter>source\base\utility</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\base\utility\nel_inputmap.cpp">
+      <Filter>source\base\utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\nel_interfaces.h">
@@ -91,6 +91,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\states\states.h">
       <Filter>source\states</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\utility\nel_macros.h">
+      <Filter>source\base\utility</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
