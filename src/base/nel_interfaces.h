@@ -45,7 +45,17 @@ typedef std::weak_ptr<IEventHandler> IEventHandlerPtr;
 
 
 
-class IApplication
+class Interface
+{
+public:
+	virtual ~Interface() {};
+
+	virtual Interface* RetrieveInterface(TGameID id) { return nullptr; };
+};
+
+
+
+class IApplication :	public Interface
 {
 public:
 	virtual ~IApplication() {};
@@ -74,6 +84,8 @@ typedef std::function<void*()> IObjectFactoryDelegate;
 class IObjectFactory
 {
 public:
+	virtual ~IObjectFactory() {};
+
 	virtual void RegisterObjectType(TObjectType objectType, IObjectFactoryDelegate setDelegate) = 0;
 	virtual void UnregisterObjectType(TObjectType objectType) = 0;
 
@@ -82,7 +94,7 @@ public:
 
 
 
-class IGameState
+class IGameState :	public Interface
 {
 public:
 	virtual ~IGameState() {};
@@ -93,7 +105,7 @@ public:
 
 
 
-class IStateMachine
+class IStateMachine :	public Interface
 {
 public:
 	virtual ~IStateMachine() {};
@@ -106,7 +118,7 @@ public:
 
 
 
-class IView
+class IView :	public Interface
 {
 private:
 public:
