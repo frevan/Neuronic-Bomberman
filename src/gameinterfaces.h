@@ -7,7 +7,7 @@
 
 DEFINE_GAMEID(IID_GameSession,	"IGameSession");
 
-class IGameSession
+class IGameSession :	public nel::Interface
 {
 public:	
 	virtual void SessionGotoState(nel::TGameID stateID) = 0;

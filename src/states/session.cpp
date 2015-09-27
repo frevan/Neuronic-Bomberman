@@ -28,7 +28,7 @@ TSessionState::~TSessionState()
 nel::Interface* TSessionState::RetrieveInterface(nel::TGameID id)
 {
 	if (id == IID_GameSession)
-		return this;
+		return (IGameSession*)this;
 	else
 		return TGameState::RetrieveInterface(id);
 }
@@ -47,7 +47,7 @@ void TSessionState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* 
 
 	// create state machine
 	States.reset((nel::IStateMachine*)Application->GetFactory().CreateObject(nel::OT_StateMachine));
-	States->Initialize(this);
+	States->Initialize((IGameState*)this);
 
 	// set initial state
 	//States->SetNextState(SID_Lobby);
