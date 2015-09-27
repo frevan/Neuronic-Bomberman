@@ -26,7 +26,12 @@ TGameState::TGameState(TGameID setStateID)
 	StateID(setStateID)
 {
 	Logic = std::make_shared<TGameStateLogic>(this);
-	EventHandler = std::make_shared<TEventHandler>(IEventHandler::STATE, std::bind(&TGameState::ProcessEvent, this, std::placeholders::_1), nullptr);
+	EventHandler = std::make_shared<TEventHandler>(IEventHandler::STATE, 
+													std::bind(&TGameState::ProcessEvent, this, std::placeholders::_1), 
+													std::bind(&TGameState::ProcessInput, this, std::placeholders::_1, std::placeholders::_2));
+
+	nel::TEventHandler* eh = (nel::TEventHandler*)EventHandler.get();
+	eh->InputMap.DefineInput(actionToPreviousScreen, nel::TInputControl::Pack(nel::TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Escape, 0));
 }
 
 TGameState::~TGameState()
@@ -56,14 +61,18 @@ bool TGameState::ProcessEvent(const sf::Event& event)
 {
 	bool handled = false;
 
-	// window closed or escape key pressed: exit
-	if ((event.type == sf::Event::Closed) || ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape)))
+	// window closed: exit
+	if ((event.type == sf::Event::Closed))
 	{
 		Application->RequestQuit();
 		handled = true;
 	}
 
 	return handled;
+}
+
+void TGameState::ProcessInput(nel::TGameID inputID, float value)
+{
 }
 
 void TGameState::Update(TGameTime deltaTime)

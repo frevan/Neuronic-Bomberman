@@ -113,9 +113,16 @@ void TApplication::Execute()
 		nowTime = clock.getElapsedTime().asMilliseconds();
         while (nowTime > nextGameTick && loops < MAX_FRAMESKIP) 
 		{	
-			TGameTime delta = nowTime-prevTickTime;
-			std::lock_guard<std::mutex> g(LogicsMutex);
-			for (auto it = Logics.rbegin(); it != Logics.rend(); it++)
+			TGameTime delta = nowTime-prevTickTime;			
+			// create tempo copy (so we can add new logics from inside the loop)  ---  better solution might be to create jobs for adding and removing logics?
+			std::vector<ILogicPtr> tempLogics;
+			{
+				std::lock_guard<std::mutex> g(LogicsMutex);
+				for (auto it = Logics.begin(); it != Logics.end(); it++)
+					tempLogics.push_back(*it);
+			}
+			// process all (old) logics
+			for (auto it = tempLogics.rbegin(); it != tempLogics.rend(); it++)
 			{
 				auto lockedlogic = (*it).lock();
 				if (lockedlogic)

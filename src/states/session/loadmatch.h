@@ -2,16 +2,16 @@
 
 #include <TGUI/TGUI.hpp>
 
-#include "../base/nel_state.h"
+#include "../../base/nel_state.h"
 
 
-class TSessionState :	public nel::TGameState
+class TLoadMatchState :	public nel::TGameState
 {
 private:
-	std::shared_ptr<nel::IStateMachine> SessionState;
+	std::shared_ptr<tgui::Gui> GUI;
 public:
-	TSessionState(std::shared_ptr<tgui::Gui> setGUI);
-	~TSessionState() override;
+	TLoadMatchState(std::shared_ptr<tgui::Gui> setGUI);
+	~TLoadMatchState() override;
 
 	// from TGameState
 	void Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication) override;

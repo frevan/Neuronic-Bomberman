@@ -2,18 +2,15 @@
 
 #include <TGUI/TGUI.hpp>
 
-#include "../base/nel_state.h"
-#include "../views/lobbyview.h"
+#include "../../base/nel_state.h"
 
 
-class TLobbyState :	public nel::TGameState
+class TServerSelectState :	public nel::TGameState
 {
 private:
-	std::shared_ptr<TLobbyView> View;
 	std::shared_ptr<tgui::Gui> GUI;
 public:
-	TLobbyState(std::shared_ptr<tgui::Gui> setGUI);
-	~TLobbyState() override;
+	TServerSelectState(std::shared_ptr<tgui::Gui> setGUI);
 
 	// from TGameState
 	void Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication) override;

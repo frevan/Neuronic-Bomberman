@@ -1,4 +1,4 @@
-#include "menustate.h"
+#include "menu.h"
 
 #include "states.h"
 
@@ -34,4 +34,10 @@ void TMenuState::Finalize()
 void TMenuState::Update(nel::TGameTime deltaTime)
 {
 	TGameState::Update(deltaTime);
+}
+
+void TMenuState::ProcessInput(nel::TGameID inputID, float value)
+{
+	if (inputID == nel::actionToPreviousScreen && value != 0)
+		Application->RequestQuit();
 }

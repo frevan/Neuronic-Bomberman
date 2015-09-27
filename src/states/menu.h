@@ -18,4 +18,5 @@ public:
 	void Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication) override;
 	void Finalize() override;
 	void Update(nel::TGameTime deltaTime) override;
+	void ProcessInput(nel::TGameID inputID, float value) override;
 };

@@ -3,8 +3,8 @@
 #include "base/nel_state.h"
 
 #include "states/states.h"
-#include "states/menustate.h"
-#include "states/sessionstate.h"
+#include "states/menu.h"
+#include "states/session.h"
 #include "views/overlayview.h"
 
 

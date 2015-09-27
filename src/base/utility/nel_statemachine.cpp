@@ -7,9 +7,11 @@
 namespace nel {
 
 TStateMachine::TStateMachine(IApplication* setApplication)
-:	Application(setApplication),
+:	IStateMachine(),
+	Application(setApplication),
 	CurrentState(),
-	NextStateID(NO_STATE_CONST)
+	NextStateID(NO_STATE_CONST),
+	Owner(nullptr)
 {
 }
 
@@ -18,8 +20,17 @@ TStateMachine::~TStateMachine()
 	assert(!CurrentState);
 }
 
-void TStateMachine::Initialize()
+nel::Interface* TStateMachine::RetrieveInterface(nel::TGameID id)
 {
+	if (Owner)
+		return Owner->RetrieveInterface(id);
+	else
+		return nel::Interface::RetrieveInterface(id);
+}
+
+void TStateMachine::Initialize(Interface* setOwner)
+{
+	Owner = setOwner;
 }
 
 void TStateMachine::Finalize()
@@ -29,6 +40,7 @@ void TStateMachine::Finalize()
 		CurrentState->Finalize();
 		CurrentState.reset();
 	}
+	Owner = nullptr;
 }
 
 void TStateMachine::SetNextState(TGameID id)

@@ -1,6 +1,6 @@
-#include "lobbystate.h"
+#include "lobby.h"
 
-#include "states.h"
+#include "../states.h"
 
 
 

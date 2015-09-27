@@ -22,6 +22,9 @@
     <Filter Include="source\base\views">
       <UniqueIdentifier>{74f8c25c-4ed1-4975-9ed7-dce66e514b8e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\states\session">
+      <UniqueIdentifier>{d33badcf-935e-49f3-bd02-ab11508a35ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -39,26 +42,14 @@
     <ClCompile Include="..\..\src\base\nel_factory.cpp">
       <Filter>source\base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\states\menustate.cpp">
-      <Filter>source\states</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\base\tgui\nel_game_tgui.cpp">
       <Filter>source\base\tgui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\base\utility\nel_fps.cpp">
       <Filter>source\base\utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\states\lobbystate.cpp">
-      <Filter>source\states</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\base\utility\nel_statemachine.cpp">
       <Filter>source\base\utility</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\states\sessionstate.cpp">
-      <Filter>source\states</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\views\lobbyview.cpp">
-      <Filter>source\views</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\views\menuview.cpp">
       <Filter>source\views</Filter>
@@ -81,6 +72,33 @@
     <ClCompile Include="..\..\src\base\utility\nel_inputmap.cpp">
       <Filter>source\base\utility</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\states\session\loadmatch.cpp">
+      <Filter>source\states\session</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\states\session\lobby.cpp">
+      <Filter>source\states\session</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\states\session\matchend.cpp">
+      <Filter>source\states\session</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\states\session\play.cpp">
+      <Filter>source\states\session</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\states\session\roundend.cpp">
+      <Filter>source\states\session</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\states\session\serverselect.cpp">
+      <Filter>source\states\session</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\states\session.cpp">
+      <Filter>source\states</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\states\menu.cpp">
+      <Filter>source\states</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\views\lobbyview.cpp">
+      <Filter>source\views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\nel_interfaces.h">
@@ -94,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\base\utility\nel_macros.h">
       <Filter>source\base\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gameinterfaces.h">
+      <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

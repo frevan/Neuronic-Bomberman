@@ -58,6 +58,7 @@ public:
 class IApplication :	public Interface
 {
 public:
+	IApplication(): Interface() {};
 	virtual ~IApplication() {};
 
 	virtual IObjectFactory& GetFactory() = 0;
@@ -97,6 +98,7 @@ public:
 class IGameState :	public Interface
 {
 public:
+	IGameState(): Interface() {};
 	virtual ~IGameState() {};
 
 	virtual void Initialize(IStateMachine* setOwner, IApplication* setApplication) = 0;
@@ -108,9 +110,10 @@ public:
 class IStateMachine :	public Interface
 {
 public:
+	IStateMachine(): Interface() {};
 	virtual ~IStateMachine() {};
 
-	virtual void Initialize() = 0;
+	virtual void Initialize(Interface* setOwner) = 0;
 	virtual void Finalize() = 0;
 	virtual void SetNextState(TGameID id) = 0;
 	virtual void SwitchToNextState() = 0;
@@ -130,6 +133,7 @@ public:
 		VT_AIVIEW				// (local) AI player
 	} TViewType;
 
+	IView(): Interface() {};
 	virtual ~IView() {};
 
 	virtual void OnAttach(IApplication* setApplication) = 0;
