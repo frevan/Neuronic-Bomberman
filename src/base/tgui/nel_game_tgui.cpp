@@ -20,7 +20,8 @@ void TTGUIApplication::AfterInitialization()
 	GUI = std::make_shared<tgui::Gui>(*Window);
 
 	tgui::setResourcePath(AppPath + GetResourceSubPath());
-	GUI->setGlobalFont(GetFontSubPath() + GetDefaultFontName());
+	std::string defaultFontFileName = AppPath + GetResourceSubPath() + GetFontSubPath() + GetDefaultFontName();
+	GUI->setFont(defaultFontFileName);
 
 	AddEventHandler(EventHandler);
 }
