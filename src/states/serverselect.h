@@ -1,22 +1,20 @@
 #pragma once
 
+#include <TGUI/TGUI.hpp>
+
 #include "../base/nel_state.h"
-#include "../views/menuview.h"
 
 
-
-class TMenuState :	public nel::TGameState
+class TServerSelectState :	public nel::TGameState
 {
 private:
-	std::shared_ptr<TMenuView> View;
 	std::shared_ptr<tgui::Gui> GUI;
 public:
-	TMenuState(std::shared_ptr<tgui::Gui> setGUI);
-	~TMenuState() override;
+	TServerSelectState(std::shared_ptr<tgui::Gui> setGUI);
 
 	// from TGameState
 	void Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication, nel::IGameStateParamsPtr params) override;
 	void Finalize() override;
+	bool ProcessEvent(const sf::Event& event) override;
 	void Update(nel::TGameTime deltaTime) override;
-	void ProcessInput(nel::TGameID inputID, float value) override;
 };

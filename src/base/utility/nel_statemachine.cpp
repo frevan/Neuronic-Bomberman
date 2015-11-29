@@ -43,9 +43,10 @@ void TStateMachine::Finalize()
 	Owner = nullptr;
 }
 
-void TStateMachine::SetNextState(TGameID id)
+void TStateMachine::SetNextState(TGameID id, IGameStateParamsPtr params)
 {
 	NextStateID = id;
+	NextStateParams = params;
 }
 
 void TStateMachine::SwitchToNextState()
@@ -66,7 +67,8 @@ void TStateMachine::SwitchToNextState()
 	CurrentState.reset(newstate);
 	assert(CurrentState);
 
-	CurrentState->Initialize(this, Application);
+	CurrentState->Initialize(this, Application, NextStateParams);
+	NextStateParams = nullptr;	// dec refcount on shared pointer
 }
 
 }	// namespace nel

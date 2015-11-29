@@ -1,6 +1,6 @@
 #include "loadmatch.h"
 
-#include "../states.h"
+#include "states.h"
 
 
 
@@ -14,9 +14,9 @@ TLoadMatchState::~TLoadMatchState()
 {
 }
 
-void TLoadMatchState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication)
+void TLoadMatchState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication, nel::IGameStateParamsPtr params)
 {
-	TGameState::Initialize(setOwner, setApplication);
+	TGameState::Initialize(setOwner, setApplication, params);
 }
 
 void TLoadMatchState::Finalize()

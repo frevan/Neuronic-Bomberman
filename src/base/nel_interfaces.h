@@ -27,6 +27,7 @@ const TGameID INVALID_GAME_ID	= 0;
 
 class IApplication;
 class IObjectFactory;
+class IGameStateParams;
 class IGameState;
 class IStateMachine;
 class IView;
@@ -40,6 +41,7 @@ class IEventHandler;
 
 typedef std::weak_ptr<IView> IViewPtr;
 typedef std::weak_ptr<ILogic> ILogicPtr;
+typedef std::shared_ptr<IGameStateParams> IGameStateParamsPtr;
 typedef std::weak_ptr<IGameState> IGameStatePtr;
 typedef std::weak_ptr<IEventHandler> IEventHandlerPtr;
 
@@ -95,13 +97,28 @@ public:
 
 
 
+class IGameStateParams
+{
+public:
+	virtual ~IGameStateParams() {};
+
+	virtual int getInt(const std::string& name) = 0;
+	virtual void setInt(const std::string& name, int value) = 0;
+	virtual float getFloat(const std::string& name) = 0;
+	virtual void setFloat(const std::string& name, float value) = 0;
+	virtual std::string getString(const std::string& name) = 0;
+	virtual void setString(const std::string& name, const std::string& value) = 0;
+};
+
+
+
 class IGameState :	public Interface
 {
 public:
 	IGameState(): Interface() {};
 	virtual ~IGameState() {};
 
-	virtual void Initialize(IStateMachine* setOwner, IApplication* setApplication) = 0;
+	virtual void Initialize(IStateMachine* setOwner, IApplication* setApplication, IGameStateParamsPtr params) = 0;
 	virtual void Finalize() = 0;
 };
 
@@ -115,7 +132,7 @@ public:
 
 	virtual void Initialize(Interface* setOwner) = 0;
 	virtual void Finalize() = 0;
-	virtual void SetNextState(TGameID id) = 0;
+	virtual void SetNextState(TGameID id, IGameStateParamsPtr params = nullptr) = 0;
 	virtual void SwitchToNextState() = 0;
 };
 

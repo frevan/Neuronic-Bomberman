@@ -1,6 +1,6 @@
 #include "serverselect.h"
 
-#include "../states.h"
+#include "states.h"
 
 
 
@@ -10,9 +10,9 @@ TServerSelectState::TServerSelectState(std::shared_ptr<tgui::Gui> setGUI)
 {	
 }
 
-void TServerSelectState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication)
+void TServerSelectState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication, nel::IGameStateParamsPtr params)
 {
-	TGameState::Initialize(setOwner, setApplication);
+	TGameState::Initialize(setOwner, setApplication, params);
 }
 
 void TServerSelectState::Finalize()

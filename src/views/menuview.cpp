@@ -63,7 +63,7 @@ void TMenuView::CreateWidgets()
 
 void TMenuView::OnNewGameBtnClick()
 {
-	StateMachine->SetNextState(SID_Session);
+	StateMachine->SetNextState(SID_ServerConnect, nullptr);
 }
 
 void TMenuView::OnJoinGameBtnClick()
@@ -74,7 +74,7 @@ void TMenuView::OnJoinGameBtnClick()
 	msgbox->setPosition(350, 275);
 	msgbox->show();
 
-	//Application->SetNextState(SID_ServerSelect);
+	//StateMachine->SetNextState(SID_ServerSelect);
 }
 
 void TMenuView::OnOptionsBtnClick()
@@ -85,7 +85,7 @@ void TMenuView::OnOptionsBtnClick()
 	msgbox->setPosition(350, 275);
 	msgbox->show();
 
-	//Application->SetNextState(SID_Options);
+	//StateMachine->SetNextState(SID_Options);
 }
 
 void TMenuView::OnQuitBtnClick()

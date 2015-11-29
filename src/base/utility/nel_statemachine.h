@@ -12,6 +12,7 @@ private:
 	IApplication* Application;
 	std::unique_ptr<IGameState> CurrentState;
 	TGameID NextStateID;
+	IGameStateParamsPtr NextStateParams;
 	Interface* Owner;
 
 public:
@@ -24,7 +25,7 @@ public:
 	// from IStateMachine
 	void Initialize(Interface* setOwner) override;
 	void Finalize() override;
-	void SetNextState(TGameID id) override;
+	void SetNextState(TGameID id, IGameStateParamsPtr params) override;
 	void SwitchToNextState() override;
 };
 

@@ -12,7 +12,7 @@ namespace nel {
 
 
 
-DEFINE_GAMEID(actionToPreviousScreen, "OverlayView::actionToggleFPSLabel")
+DEFINE_GAMEID(actionToPreviousScreen, "State::actionToPreviousScreen")
 
 
 
@@ -36,7 +36,7 @@ public:
 	virtual void ProcessInput(nel::TGameID inputID, float value);
 
 	// from IGameState
-	void Initialize(IStateMachine* setOwner, IApplication* setApplication) override;
+	void Initialize(IStateMachine* setOwner, IApplication* setApplication, IGameStateParamsPtr params) override;
 	void Finalize() override;
 };
 

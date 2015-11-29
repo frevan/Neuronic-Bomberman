@@ -1,6 +1,6 @@
 #include "roundend.h"
 
-#include "../states.h"
+#include "states.h"
 
 
 
@@ -10,9 +10,9 @@ TRoundEndState::TRoundEndState(std::shared_ptr<tgui::Gui> setGUI)
 {	
 }
 
-void TRoundEndState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication)
+void TRoundEndState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication, nel::IGameStateParamsPtr params)
 {
-	TGameState::Initialize(setOwner, setApplication);
+	TGameState::Initialize(setOwner, setApplication, params);
 }
 
 void TRoundEndState::Finalize()

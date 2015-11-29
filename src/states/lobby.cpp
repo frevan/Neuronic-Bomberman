@@ -1,6 +1,6 @@
 #include "lobby.h"
 
-#include "../states.h"
+#include "states.h"
 
 
 
@@ -15,9 +15,9 @@ TLobbyState::~TLobbyState()
 {
 }
 
-void TLobbyState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication)
+void TLobbyState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication, nel::IGameStateParamsPtr params)
 {
-	TGameState::Initialize(setOwner, setApplication);
+	TGameState::Initialize(setOwner, setApplication, params);
 
 	View = std::make_shared<TLobbyView>(GUI, Owner);
 	Application->AttachScene(View);

@@ -1,27 +1,26 @@
 #include "play.h"
 
-#include "../states.h"
+#include "states.h"
 
 
 
 TPlayState::TPlayState(std::shared_ptr<tgui::Gui> setGUI)
 :	TGameState(SID_Play),
-	GUI(setGUI),
-	Session(nullptr)
+	GUI(setGUI)
 {	
 }
 
-void TPlayState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication)
+void TPlayState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication, nel::IGameStateParamsPtr params)
 {
-	TGameState::Initialize(setOwner, setApplication);
+	TGameState::Initialize(setOwner, setApplication, params);
 
-	Session = (IGameSession*)Owner->RetrieveInterface(IID_GameSession);
+	// TODO: 
+	// - create server (temporary - should be in different state)
+	// - open arena/match view
 }
 
 void TPlayState::Finalize()
 {
-	Session = nullptr;
-
 	TGameState::Finalize();
 }
 
@@ -33,5 +32,5 @@ void TPlayState::Update(nel::TGameTime deltaTime)
 void TPlayState::ProcessInput(nel::TGameID inputID, float value)
 {
 	if (inputID == nel::actionToPreviousScreen && value != 0)
-		Session->SessionGotoState(SID_Menu);
+		Owner->SetNextState(SID_Menu);
 }

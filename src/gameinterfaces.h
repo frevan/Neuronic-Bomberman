@@ -14,14 +14,6 @@ struct TPlayer
 	nel::TGameID ClientID;
 	int Slot;
 	int Score;
+	int Kills;
 };
 
-
-
-DEFINE_GAMEID(IID_GameSession,	"IGameSession");
-
-class IGameSession :	public nel::Interface
-{
-public:	
-	virtual void SessionGotoState(nel::TGameID stateID) = 0;
-};

@@ -40,7 +40,7 @@ TGameState::~TGameState()
 	EventHandler.reset();
 }
 
-void TGameState::Initialize(IStateMachine* setOwner, IApplication* setApplication)
+void TGameState::Initialize(IStateMachine* setOwner, IApplication* setApplication, IGameStateParamsPtr params)
 {
 	Application = setApplication;
 	Owner = setOwner;

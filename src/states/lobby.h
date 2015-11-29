@@ -2,8 +2,8 @@
 
 #include <TGUI/TGUI.hpp>
 
-#include "../../base/nel_state.h"
-#include "../../views/lobbyview.h"
+#include "../base/nel_state.h"
+#include "../views/lobbyview.h"
 
 
 class TLobbyState :	public nel::TGameState
@@ -16,7 +16,7 @@ public:
 	~TLobbyState() override;
 
 	// from TGameState
-	void Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication) override;
+	void Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication, nel::IGameStateParamsPtr params) override;
 	void Finalize() override;
 	bool ProcessEvent(const sf::Event& event) override;
 	void Update(nel::TGameTime deltaTime) override;

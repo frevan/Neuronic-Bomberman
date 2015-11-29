@@ -1,6 +1,6 @@
 #include "matchend.h"
 
-#include "../states.h"
+#include "states.h"
 
 
 
@@ -10,9 +10,9 @@ TMatchEndState::TMatchEndState(std::shared_ptr<tgui::Gui> setGUI)
 {	
 }
 
-void TMatchEndState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication)
+void TMatchEndState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication, nel::IGameStateParamsPtr params)
 {
-	TGameState::Initialize(setOwner, setApplication);
+	TGameState::Initialize(setOwner, setApplication, params);
 }
 
 void TMatchEndState::Finalize()
