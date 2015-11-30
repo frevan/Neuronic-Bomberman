@@ -10,6 +10,8 @@ class TServerConnectState :	public nel::TGameState
 {
 private:
 	std::shared_ptr<tgui::Gui> GUI;
+	bool CanConnectToServer;
+	void ConnectToServer();
 public:
 	TServerConnectState(std::shared_ptr<tgui::Gui> setGUI);
 

@@ -19,6 +19,9 @@
     <Filter Include="source\views">
       <UniqueIdentifier>{ccf6dac8-ff89-4e10-aa93-f37c255086f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\server">
+      <UniqueIdentifier>{f7473625-202c-4f63-993e-a2e707ee8536}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -95,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\base\utility\nel_stateparams.cpp">
       <Filter>source\base\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\server\server.cpp">
+      <Filter>source\server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -11,8 +11,9 @@
 #include "states/play.h"
 #include "states/roundend.h"
 #include "states/matchend.h"
-
 #include "views/overlayview.h"
+
+#include "gameinterfaces.h"
 
 
 
@@ -26,7 +27,8 @@
 
 TGame::TGame()
 :	nel::TTGUIApplication(),
-	Overlay()
+	Overlay(),
+	Server()
 {
 }
 
@@ -81,6 +83,8 @@ void TGame::BeforeFinalization()
 	DetachScene(Overlay);
 	Overlay.reset();
 	#endif
+
+	Server.Stop();
 }
 
 std::string TGame::GetDefaultFontName()
@@ -138,4 +142,16 @@ void* TGame::CreateState_RoundEnd()
 void* TGame::CreateState_MatchEnd()
 {
 	return new TMatchEndState(GUI);
+}
+
+nel::Interface* TGame::RetrieveInterface(nel::TGameID id)
+{
+	nel::Interface* result = nullptr;
+
+	if (id == IID_IServer)
+		result = (Interface*)(&Server);
+	else
+		result = TTGUIApplication::RetrieveInterface(id);
+
+	return result;
 }
