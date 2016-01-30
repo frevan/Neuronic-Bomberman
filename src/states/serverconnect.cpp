@@ -45,6 +45,5 @@ void TServerConnectState::ProcessInput(nel::TGameID inputID, float value)
 
 void TServerConnectState::ConnectToServer()
 {
-	TODO: create server communications
-
+	// TODO
 }
