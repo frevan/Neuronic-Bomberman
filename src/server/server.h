@@ -5,7 +5,7 @@
 #include <mutex>
 #include <SFML/Network.hpp>
 
-#include "../gameinterfaces.h";
+#include "../gameinterfaces.h"
 
 
 

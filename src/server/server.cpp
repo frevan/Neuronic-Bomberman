@@ -1,5 +1,7 @@
 #include "server.h"
 
+#include <assert.h>
+
 
 
 // --- TServer ---
@@ -30,7 +32,7 @@ bool TServer::Start(unsigned int port)
 	ThreadsShouldStop = false;
 
 	ListenerThread = new std::thread(std::bind(&TServer::ListenFunc, this));
-	ListenerThread->detach();
+	//ListenerThread->detach();
 
 	return true;
 }
@@ -65,7 +67,7 @@ void TServer::ListenFunc()
 	while (!ThreadsShouldStop)
 	{
 		// wait for a socket to receive something
-		if (!SocketSelector.wait())
+		if (!SocketSelector.wait(sf::milliseconds(250)))
 			continue;
 
 		// check the listener for a new connection
@@ -100,6 +102,8 @@ void TServer::ListenFunc()
 			}
 		}
 	}
+
+	assert(true);
 }
 
 void TServer::InitializeNewConnection(sf::TcpSocket* socket)

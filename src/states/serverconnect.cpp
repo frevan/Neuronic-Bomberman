@@ -26,6 +26,10 @@ void TServerConnectState::Initialize(nel::IStateMachine* setOwner, nel::IApplica
 
 void TServerConnectState::Finalize()
 {
+	IServer* server = (IServer*)Application->RetrieveInterface(IID_IServer);
+	assert(server);
+	server->Stop();
+
 	TGameState::Finalize();
 }
 

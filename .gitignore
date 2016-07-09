@@ -5,3 +5,6 @@ temp/
 *.ipch
 game/
 *.opensdf
+build/vc2015/bomberman.VC.db
+build/vc2015/bomberman.VC.VC.opendb
+build/vc2015/.vs/bomberman/v14/.suo
