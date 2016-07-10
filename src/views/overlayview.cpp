@@ -24,8 +24,8 @@ DEFINE_GAMEID(actionToggleHelpOverlay, "OverlayView::actionToggleHelpOverlay")
 
 
 
-TOverlayView::TOverlayView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine* setStateMachine)
-:	TTGUIView(setGUI, setStateMachine, nel::IView::VT_OVERLAY),
+TOverlayView::TOverlayView(nel::IStateMachine* setStateMachine)
+:	TView(setStateMachine, nel::IView::VT_OVERLAY),
 	CommonFont(),
 	EventHandler(),
 	ShowOverlay(false),
@@ -50,7 +50,7 @@ TOverlayView::~TOverlayView()
 
 void TOverlayView::OnAttach(nel::IApplication* setApplication)
 {
-	TTGUIView::OnAttach(setApplication);
+	TView::OnAttach(setApplication);
 	Application->AddEventHandler(EventHandler);
 
 	CommonFont.loadFromFile(Application->GetFontFileName());
@@ -80,12 +80,12 @@ void TOverlayView::OnDetach()
 {
 	Application->RemoveEventHandler(EventHandler);
 
-	TTGUIView::OnDetach();
+	TView::OnDetach();
 }
 
 void TOverlayView::Draw(sf::RenderTarget* target)
 {
-	TTGUIView::Draw(target);
+	TView::Draw(target);
 
 	if (ShowOverlay)
 		target->draw(BackgroundShape);

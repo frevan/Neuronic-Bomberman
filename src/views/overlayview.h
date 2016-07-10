@@ -5,7 +5,7 @@
 
 
 
-class TOverlayView :	public nel::TTGUIView
+class TOverlayView :	public nel::TView
 {
 private:
 	std::shared_ptr<nel::IEventHandler> EventHandler;
@@ -16,7 +16,7 @@ private:
 	sf::RectangleShape BackgroundShape;
 
 public:
-	TOverlayView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine* setStateMachine);
+	TOverlayView(nel::IStateMachine* setStateMachine);
 	~TOverlayView() override;
 
 	void ProcessInput(nel::TGameID inputID, float value);
