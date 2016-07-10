@@ -9,6 +9,10 @@ class TOverlayView :	public nel::TTGUIView
 {
 private:
 	std::shared_ptr<nel::IEventHandler> EventHandler;
+	sf::Font CommonFont;
+	bool ShowOverlay, ShowFPS;
+
+	void CreateHelpLabels();
 
 protected:
 	void CreateWidgets() override;

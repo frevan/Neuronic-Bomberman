@@ -123,7 +123,7 @@ bool TInputMap::FindBindingForControl(const TInputControl& control, TInputBindin
 {
 	for (auto it = Bindings.begin(); it != Bindings.end(); it++)
 	{		
-		if (it->second.Control.Type == control.Type && it->second.Control.ControllerIndex == control.ControllerIndex && it->second.Control.Button == control.Button)
+		if (it->second.Control.Type == control.Type && it->second.Control.ControllerIndex == control.ControllerIndex && it->second.Control.Button == control.Button && it->second.Control.Flags == control.Flags)
 		{
 			binding = it->second;
 			return true;

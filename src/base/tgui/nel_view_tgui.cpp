@@ -4,6 +4,19 @@
 
 namespace nel {
 
+TTGUISystemView::TTGUISystemView(std::shared_ptr<tgui::Gui> setGUI, IStateMachine* setStateMachine)
+:	TView(setStateMachine, nel::IView::VT_SYSTEMVIEW),
+	GUI(setGUI)
+{
+}
+
+void TTGUISystemView::Draw(sf::RenderTarget* target) 
+{ 
+	GUI->draw(); 
+};
+
+
+
 TTGUIView::TTGUIView(std::shared_ptr<tgui::Gui> setGUI, IStateMachine* setStateMachine, TViewType setType)
 :	TView(setStateMachine, setType),	
 	GUI(setGUI),

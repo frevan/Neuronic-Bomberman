@@ -20,12 +20,12 @@ void TMenuState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* set
 	TGameState::Initialize(setOwner, setApplication, params);
 
 	View = std::make_shared<TMenuView>(GUI, Owner);
-	Application->AttachScene(View);
+	Application->AttachView(View);
 }
 
 void TMenuState::Finalize()
 {
-	Application->DetachScene(View);
+	Application->DetachView(View);
 	View.reset();
 
 	TGameState::Finalize();

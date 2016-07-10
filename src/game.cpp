@@ -61,7 +61,7 @@ void TGame::AfterInitialization()
 	#ifdef USE_OVERLAY
 	// add the overlay scene
 	Overlay = std::make_shared<TOverlayView>(GUI, GameState);
-	AttachScene(Overlay);
+	AttachView(Overlay);
 	#endif
 
 	// register our game states
@@ -80,7 +80,7 @@ void TGame::AfterInitialization()
 void TGame::BeforeFinalization()
 {
 	#ifdef USE_OVERLAY
-	DetachScene(Overlay);
+	DetachView(Overlay);
 	Overlay.reset();
 	#endif
 

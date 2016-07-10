@@ -26,9 +26,25 @@ public:
 	TTGUIView(std::shared_ptr<tgui::Gui> setGUI, IStateMachine* setStateMachine, TViewType setType = VT_HUMANVIEW);
 	~TTGUIView() override;
 
+	std::shared_ptr<tgui::Gui> GetGUIPtr() { return GUI; };
+
 	// from IScene
 	void OnAttach(IApplication* setApplication) override;
 	void OnDetach() override;
+};
+
+
+
+class TTGUISystemView : public TView
+{
+private:
+	std::shared_ptr<tgui::Gui> GUI;
+
+public:
+	TTGUISystemView(std::shared_ptr<tgui::Gui> setGUI, IStateMachine* setStateMachine);
+
+	// from IScene
+	void Draw(sf::RenderTarget* target);
 };
 
 };	// namespace nel

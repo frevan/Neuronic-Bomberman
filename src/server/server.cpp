@@ -102,8 +102,6 @@ void TServer::ListenFunc()
 			}
 		}
 	}
-
-	assert(true);
 }
 
 void TServer::InitializeNewConnection(sf::TcpSocket* socket)

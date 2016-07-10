@@ -19,8 +19,8 @@ class TApplication :	public IApplication
 private:	
 	bool ShouldQuit;
 	IFpsCalculator* FpsCalculator;
-	std::vector<IViewPtr> Scenes;
-	std::mutex ScenesMutex;
+	std::vector<IViewPtr> Views;
+	std::mutex ViewsMutex;
 	std::vector<ILogicPtr> Logics;
 	std::mutex LogicsMutex;	
 	std::mutex EventHandlersMutex;
@@ -39,6 +39,8 @@ protected:
 	virtual void BeforeInitialization();
 	virtual void AfterInitialization();
 	virtual void BeforeFinalization();
+	virtual void BeforeDraw(sf::RenderTarget* target);
+	virtual void AfterDraw(sf::RenderTarget* target);
 	virtual void BeforeDisplay();
 	virtual void AfterDisplay();
 	virtual void AfterSceneAttached(IViewPtr scene);
@@ -61,13 +63,14 @@ public:
 	// from IApplication
 	IObjectFactory& GetFactory() override;
 	void RequestQuit() override;
-	void AttachScene(IViewPtr scene) override;
-	void DetachScene(IViewPtr scene) override;
+	void AttachView(IViewPtr view) override;
+	void DetachView(IViewPtr view) override;
 	void AddLogic(ILogicPtr logic) override;
 	void RemoveLogic(ILogicPtr logic) override;
 	void AddEventHandler(IEventHandlerPtr handler) override;
 	void RemoveEventHandler(IEventHandlerPtr handler) override;
 	double GetCurrentFps() override;
+	std::string GetFontFileName(const std::string& FontIdentifier = "") override;
 };
 
 };	// namespace nel

@@ -18,8 +18,8 @@ namespace nel {
 TApplication::TApplication()
 :	IApplication(),
 	AppPath(),
-	Scenes(),
-	ScenesMutex(),
+	Views(),
+	ViewsMutex(),
 	Logics(),
 	LogicsMutex(),
 	Factory(),	
@@ -133,25 +133,27 @@ void TApplication::Execute()
             loops++;
 			prevTickTime = nowTime;
 			nowTime = clock.getElapsedTime().asMilliseconds();
-        }
+        }		
 
-		// draw scenes
-		sf::RenderTarget* target = Window.get();
+		// draw views
+		sf::RenderTarget* target = Window.get();		
 		target->clear();	// fixed to black, for now
+		BeforeDraw(target);
 		{
-			std::lock_guard<std::mutex> g(ScenesMutex);
-			for (auto it = Scenes.rbegin(); it != Scenes.rend(); it++)
+			std::lock_guard<std::mutex> g(ViewsMutex);
+			for (auto it = Views.rbegin(); it != Views.rend(); it++)
 			{
-				auto lockedscene = (*it).lock();
-				if (lockedscene) if (lockedscene->IsVisible())
-					lockedscene->Draw(target);
+				auto lockedview = (*it).lock();
+				if (lockedview) if (lockedview->IsVisible())
+					lockedview->Draw(target);
 			}
 		}
+		AfterDraw(target);
 
 		if (FpsCalculator)
 			FpsCalculator->NewFrame();
 
-		// paint
+		// paint	
 		BeforeDisplay();
         Window->display();
 		AfterDisplay();
@@ -167,33 +169,52 @@ IObjectFactory& TApplication::GetFactory()
 	return Factory;
 }
 
-void TApplication::AttachScene(IViewPtr scene)
+void TApplication::AttachView(IViewPtr view)
 {
-	std::lock_guard<std::mutex> g(ScenesMutex);
+	std::lock_guard<std::mutex> g(ViewsMutex);
 
-	auto lockedscene = scene.lock();
-	if (lockedscene)
-		lockedscene->OnAttach(this);
+	IView::TViewType viewtype = IView::VT_SYSTEMVIEW;
 
-	Scenes.push_back(scene);
+	auto lockedview = view.lock();
+	if (lockedview)
+	{
+		viewtype = lockedview->GetType();
+		lockedview->OnAttach(this);
+	}
 
-	AfterSceneAttached(scene);
+	auto insertat = Views.end();
+	if (viewtype == IView::VT_OVERLAY || viewtype == IView::VT_SYSTEMVIEW)
+	{
+		for (auto it = Views.begin(); it != Views.end(); it++)
+		{
+			auto lockeditem = (*it).lock();
+			if (lockeditem->GetType() > viewtype)
+			{
+				insertat = it;
+				break;
+			}
+		}
+	}
+
+	Views.insert(insertat, view);
+
+	AfterSceneAttached(view);
 }
 
-void TApplication::DetachScene(IViewPtr scene)
+void TApplication::DetachView(IViewPtr view)
 {
-	BeforeSceneDetached(scene);
+	BeforeSceneDetached(view);
 
-	std::lock_guard<std::mutex> g(ScenesMutex);
+	std::lock_guard<std::mutex> g(ViewsMutex);
 
-	for (auto it = Scenes.begin(); it != Scenes.end(); it++)
+	for (auto it = Views.begin(); it != Views.end(); it++)
 	{
 		auto lockeditem = (*it).lock();
-		auto lockedscene = scene.lock();
-		if (lockeditem == lockedscene)
+		auto lockedview = view.lock();
+		if (lockeditem == lockedview)
 		{
-			Scenes.erase(it);
-			lockedscene->OnDetach();
+			Views.erase(it);
+			lockedview->OnDetach();
 			break;
 		}
 	}
@@ -261,6 +282,14 @@ void TApplication::BeforeFinalization()
 {
 }
 
+void TApplication::BeforeDraw(sf::RenderTarget* target)
+{
+}
+
+void TApplication::AfterDraw(sf::RenderTarget* target)
+{
+}
+
 void TApplication::BeforeDisplay()
 {
 }
@@ -310,6 +339,11 @@ double TApplication::GetCurrentFps()
 		return FpsCalculator->Value;
 	else 
 		return 0.f;
+}
+
+std::string TApplication::GetFontFileName(const std::string& FontIdentifier)
+{
+	return "";
 }
 
 };	// namespace nel

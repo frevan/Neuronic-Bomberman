@@ -8,7 +8,8 @@ namespace nel {
 
 TTGUIApplication::TTGUIApplication()
 :	TApplication(),
-	GUI(nullptr)
+	GUI(nullptr),
+	GUIView(nullptr)
 {
 	EventHandler = std::make_shared<TEventHandler>(IEventHandler::APPLICATION, std::bind(&TTGUIApplication::ProcessEvent, this, std::placeholders::_1), nullptr);
 }
@@ -20,23 +21,26 @@ void TTGUIApplication::AfterInitialization()
 	GUI = std::make_shared<tgui::Gui>(*Window);
 
 	tgui::setResourcePath(AppPath + GetResourceSubPath());
-	std::string defaultFontFileName = AppPath + GetResourceSubPath() + GetFontSubPath() + GetDefaultFontName();
-	GUI->setFont(defaultFontFileName);
+	GUI->setFont(GetFontFileName());
+
+	GUIView = std::make_shared<TTGUISystemView>(GUI, GameState);
+	AttachView(GUIView);
 
 	AddEventHandler(EventHandler);
 }
 
 void TTGUIApplication::BeforeFinalization()
 {
+	DetachView(GUIView);
+
 	RemoveEventHandler(EventHandler);
 	EventHandler.reset();
 
 	GUI.reset();
 }
 
-void TTGUIApplication::BeforeDisplay()
+void TTGUIApplication::AfterDraw(sf::RenderTarget* target)
 {
-	GUI->draw();
 }
 
 void TTGUIApplication::AfterSceneAttached(IViewPtr scene)
@@ -53,6 +57,14 @@ bool TTGUIApplication::ProcessEvent(const sf::Event& event)
 {
 	GUI->handleEvent(event);
 	return true;
+}
+
+std::string TTGUIApplication::GetFontFileName(const std::string& FontIdentifier)
+{
+	std::string name = FontIdentifier;
+	if (FontIdentifier == "")	name = GetDefaultFontName();
+
+	return AppPath + GetResourceSubPath() + GetFontSubPath() + name;
 }
 
 };	// namespace nel

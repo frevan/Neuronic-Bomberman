@@ -67,8 +67,8 @@ public:
 
 	virtual void RequestQuit() = 0;
 
-	virtual void AttachScene(IViewPtr scene) = 0;
-	virtual void DetachScene(IViewPtr scene) = 0;
+	virtual void AttachView(IViewPtr scene) = 0;
+	virtual void DetachView(IViewPtr scene) = 0;
 
 	virtual void AddLogic(ILogicPtr logic) = 0;
 	virtual void RemoveLogic(ILogicPtr logic) = 0;	
@@ -77,6 +77,8 @@ public:
 	virtual void RemoveEventHandler(IEventHandlerPtr handler) = 0;
 
 	virtual double GetCurrentFps() = 0;
+
+	virtual std::string GetFontFileName(const std::string& FontIdentifier = "") = 0;
 };
 
 
@@ -144,10 +146,11 @@ private:
 public:
 	typedef enum 
 	{
+		VT_OVERLAY		= -1,	// drawn on top of everything
 		VT_SYSTEMVIEW	= 0,	// any other view
 		VT_HUMANVIEW,			// local human player
 		VT_NETWORKVIEW,			// remote human player
-		VT_AIVIEW				// (local) AI player
+		VT_AIVIEW,				// (local) AI player
 	} TViewType;
 
 	IView(): Interface() {};

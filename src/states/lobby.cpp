@@ -20,12 +20,12 @@ void TLobbyState::Initialize(nel::IStateMachine* setOwner, nel::IApplication* se
 	TGameState::Initialize(setOwner, setApplication, params);
 
 	View = std::make_shared<TLobbyView>(GUI, Owner);
-	Application->AttachScene(View);
+	Application->AttachView(View);
 }
 
 void TLobbyState::Finalize()
 {
-	Application->DetachScene(View);
+	Application->DetachView(View);
 	View.reset();
 
 	TGameState::Finalize();
