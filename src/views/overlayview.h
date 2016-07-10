@@ -10,12 +10,10 @@ class TOverlayView :	public nel::TTGUIView
 private:
 	std::shared_ptr<nel::IEventHandler> EventHandler;
 	sf::Font CommonFont;
-	bool ShowOverlay, ShowFPS;
-
-	void CreateHelpLabels();
-
-protected:
-	void CreateWidgets() override;
+	bool ShowOverlay, ShowFPS, ShowHelp;
+	sf::Text HelpLine1, HelpLine2;
+	sf::Text FPSText;
+	sf::RectangleShape BackgroundShape;
 
 public:
 	TOverlayView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine* setStateMachine);

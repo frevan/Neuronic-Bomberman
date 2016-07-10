@@ -21,7 +21,6 @@ const std::string HelpExitLabelNameConst	= "HelpExitLabel";
 
 DEFINE_GAMEID(actionToggleFPSLabel, "OverlayView::actionToggleFPSLabel")
 DEFINE_GAMEID(actionToggleHelpOverlay, "OverlayView::actionToggleHelpOverlay")
-DEFINE_GAMEID(actionToggleOverlay, "OverlayView::actionToggleOverlay")
 
 
 
@@ -30,14 +29,18 @@ TOverlayView::TOverlayView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine
 	CommonFont(),
 	EventHandler(),
 	ShowOverlay(false),
-	ShowFPS(true)
+	ShowFPS(true),
+	ShowHelp(false),
+	HelpLine1(),
+	HelpLine2(),
+	FPSText(),
+	BackgroundShape()
 {
 	EventHandler = std::make_shared<nel::TEventHandler>(nel::IEventHandler::OVERLAY, nullptr, std::bind(&TOverlayView::ProcessInput, this, std::placeholders::_1, std::placeholders::_2));
 
 	nel::TEventHandler* eh = (nel::TEventHandler*)EventHandler.get();
-	eh->InputMap.DefineInput(actionToggleFPSLabel, nel::TInputControl::Pack(nel::TInputControl::KEYBOARD, 0, sf::Keyboard::Key::Tab, nel::TInputControl::SHIFT));
+	eh->InputMap.DefineInput(actionToggleFPSLabel, nel::TInputControl::Pack(nel::TInputControl::KEYBOARD, 0, sf::Keyboard::Key::Tab, 0));
 	eh->InputMap.DefineInput(actionToggleHelpOverlay, nel::TInputControl::Pack(nel::TInputControl::KEYBOARD, 0, sf::Keyboard::Key::F1, 0));
-	eh->InputMap.DefineInput(actionToggleOverlay, nel::TInputControl::Pack(nel::TInputControl::KEYBOARD, 0, sf::Keyboard::Key::Tab, 0));
 }
 
 TOverlayView::~TOverlayView()
@@ -51,6 +54,26 @@ void TOverlayView::OnAttach(nel::IApplication* setApplication)
 	Application->AddEventHandler(EventHandler);
 
 	CommonFont.loadFromFile(Application->GetFontFileName());
+
+	BackgroundShape.setFillColor(sf::Color(16, 16, 16, 200));
+	BackgroundShape.setPosition(sf::Vector2f(0, 0));
+	BackgroundShape.setSize(sf::Vector2f(800, 600));
+
+	FPSText.setFont(CommonFont);
+	FPSText.setColor(sf::Color::Red);
+	FPSText.setCharacterSize(12);
+
+	HelpLine1.setFont(CommonFont);
+	HelpLine1.setString("F1 - toggle help display");
+	HelpLine1.setCharacterSize(24);
+	HelpLine1.setColor(sf::Color::White);
+	HelpLine1.setPosition(sf::Vector2f(25, 25));
+
+	HelpLine2.setFont(CommonFont);
+	HelpLine2.setString("TAB - toggle FPS counter");
+	HelpLine2.setCharacterSize(24);
+	HelpLine2.setColor(sf::Color::White);
+	HelpLine2.setPosition(sf::Vector2f(25, 60));
 }
 
 void TOverlayView::OnDetach()
@@ -65,60 +88,23 @@ void TOverlayView::Draw(sf::RenderTarget* target)
 	TTGUIView::Draw(target);
 
 	if (ShowOverlay)
-	{
-		sf::RectangleShape r;
-		r.setFillColor(sf::Color(0, 0, 0, 150));
-		r.setPosition(sf::Vector2f(0, 0));
-		r.setSize(sf::Vector2f(800, 600));
-		target->draw(r);
-	}
+		target->draw(BackgroundShape);
 
-	if (ShowFPS | ShowOverlay)
+	if (ShowFPS || ShowOverlay)
 	{
-		sf::Text fpstext;
-		fpstext.setFont(CommonFont);
 		std::stringstream ss;
 		ss << std::fixed << std::setprecision(2) << Application->GetCurrentFps();
-		fpstext.setString(ss.str() + " FPS");
-		fpstext.setCharacterSize(12);
-		fpstext.setColor(sf::Color::Red);
-		sf::FloatRect bounds = fpstext.getLocalBounds();
-		fpstext.setPosition(sf::Vector2f(800 - bounds.width - 25, 25));
-		target->draw(fpstext);
+		FPSText.setString(ss.str() + " FPS");		
+		sf::FloatRect bounds = FPSText.getLocalBounds();
+		FPSText.setPosition(sf::Vector2f(800 - bounds.width - 25, 25));
+		target->draw(FPSText);
 	}
-}
 
-void TOverlayView::CreateWidgets()
-{
-	// help labels
-	CreateHelpLabels();
-}
-
-void TOverlayView::CreateHelpLabels()
-{
-	tgui::Label::Ptr lbl = std::make_shared<tgui::Label>();
-	AddWidgetToGUI(lbl, HelpHelpLabelNameConst);
-	lbl->setText("F1 - show this help");
-	lbl->setTextColor(sf::Color::Blue);
-	lbl->setTextSize(12);
-	lbl->setPosition(25, 25);
-	lbl->hide();
-
-	lbl = std::make_shared<tgui::Label>();
-	AddWidgetToGUI(lbl, HelpFPSLabelNameConst);
-	lbl->setText("Tab - show FPS label");
-	lbl->setTextColor(sf::Color::Blue);
-	lbl->setTextSize(12);
-	lbl->setPosition(25, 50);
-	lbl->hide();
-
-	lbl = std::make_shared<tgui::Label>();
-	AddWidgetToGUI(lbl, HelpExitLabelNameConst);
-	lbl->setText("Esc - exit this screen");
-	lbl->setTextColor(sf::Color::Blue);
-	lbl->setTextSize(12);
-	lbl->setPosition(25, 75);
-	lbl->hide();
+	if (ShowHelp && ShowOverlay)
+	{
+		target->draw(HelpLine1);
+		target->draw(HelpLine2);
+	}
 }
 
 void TOverlayView::ProcessInput(nel::TGameID inputID, float value)
@@ -127,23 +113,7 @@ void TOverlayView::ProcessInput(nel::TGameID inputID, float value)
 		ShowFPS = !ShowFPS;
 	else if (inputID == actionToggleHelpOverlay && value > 0)
 	{
-		tgui::Label::Ptr helplbl = GUI->get<tgui::Label>(HelpHelpLabelNameConst);
-		tgui::Label::Ptr fpslbl = GUI->get<tgui::Label>(HelpFPSLabelNameConst);
-		tgui::Label::Ptr exitlbl = GUI->get<tgui::Label>(HelpExitLabelNameConst);
-		bool shouldhide = helplbl->isVisible();		
-		if (shouldhide)
-		{
-			helplbl->hide();
-			fpslbl->hide();
-			exitlbl->hide();
-		}
-		else
-		{
-			helplbl->show();
-			fpslbl->show();
-			exitlbl->show();
-		}
+		ShowHelp = !ShowHelp;
+		ShowOverlay = ShowHelp;
 	}
-	else if (inputID == actionToggleOverlay && value > 0)
-		ShowOverlay = !ShowOverlay;
 }
