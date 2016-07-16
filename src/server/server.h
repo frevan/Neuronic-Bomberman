@@ -5,11 +5,14 @@
 #include <mutex>
 #include <SFML/Network.hpp>
 
+#include "../base/nel_interfaces.h"
+
 #include "../gameinterfaces.h"
 
 
 
-class TServer :	public IServer
+class TServer :	public IServer,
+				public nel::ILogic
 {
 private:
 	std::thread* ListenerThread;
@@ -29,6 +32,10 @@ public:
 	TServer();
 	~TServer() override;
 
+	// from IServer
 	bool Start(unsigned int port) override;
 	void Stop() override;
+
+	// from ILogic
+	void Update(nel::TGameTime deltaTime) override;
 };

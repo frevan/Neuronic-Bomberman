@@ -4,6 +4,7 @@
 
 #include "views/overlayview.h"
 #include "server/server.h"
+#include "client/client.h"
 
 
 
@@ -11,7 +12,8 @@ class TGame :	public nel::TTGUIApplication
 {
 private:
 	std::shared_ptr<TOverlayView> Overlay;
-	TServer Server;
+	std::shared_ptr<TServer> Server;
+	std::shared_ptr<TClient> Client;
 
 	// factory functions
 	void* CreateState_Splash();
@@ -35,6 +37,7 @@ protected:
 
 public:
 	TGame();
+	~TGame();
 
 	nel::Interface* RetrieveInterface(nel::TGameID id) override;
 };

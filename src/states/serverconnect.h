@@ -6,6 +6,7 @@
 #include "../gameinterfaces.h"
 
 
+
 class TServerConnectState :	public nel::TGameState
 {
 private:

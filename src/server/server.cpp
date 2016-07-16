@@ -8,6 +8,7 @@
 
 TServer::TServer()
 :	IServer(),
+	ILogic(),
 	ListenerThread(nullptr),
 	Listener(),
 	SocketSelector(),
@@ -106,13 +107,34 @@ void TServer::ListenFunc()
 
 void TServer::InitializeNewConnection(sf::TcpSocket* socket)
 {
+	// TODO: send "hello" packet
 }
 
 void TServer::FinalizeConnection(sf::TcpSocket* socket)
 {
+	// TODO: send "goodbye" packet
+
 	socket->disconnect();
 }
 
 void TServer::ProcessPacketFromClient(sf::Packet& packet)
 {
+	// TODO: process packets
+}
+
+void TServer::Update(nel::TGameTime deltaTime)
+{
+	std::lock_guard<std::mutex> g(ClientSocketsMutex);
+
+	for (auto it = ClientSockets.begin(); it != ClientSockets.end(); it++)
+	{
+		sf::TcpSocket* client = *it;
+		if (client->getRemoteAddress() == sf::IpAddress::None)
+		{
+			// UNTESTED!
+			FinalizeConnection(client);
+			ClientSockets.remove(client);
+			delete client;
+		}
+	}
 }

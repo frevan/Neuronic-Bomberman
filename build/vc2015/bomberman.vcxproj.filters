@@ -22,6 +22,9 @@
     <Filter Include="source\server">
       <UniqueIdentifier>{f7473625-202c-4f63-993e-a2e707ee8536}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\client">
+      <UniqueIdentifier>{f91642d8-666e-4158-82ba-c43febb69774}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -101,6 +104,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\server\server.cpp">
       <Filter>source\server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\client.cpp">
+      <Filter>source\client</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

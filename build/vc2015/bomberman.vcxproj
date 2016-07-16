@@ -22,6 +22,7 @@
     <ClCompile Include="..\..\src\base\utility\nel_inputmap.cpp" />
     <ClCompile Include="..\..\src\base\utility\nel_statemachine.cpp" />
     <ClCompile Include="..\..\src\base\utility\nel_stateparams.cpp" />
+    <ClCompile Include="..\..\src\client\client.cpp" />
     <ClCompile Include="..\..\src\game.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\server\server.cpp" />

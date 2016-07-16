@@ -4,6 +4,10 @@
 
 
 
+const int ServerPortConst = 41852;
+
+
+
 TServerConnectState::TServerConnectState(std::shared_ptr<tgui::Gui> setGUI)
 :	TGameState(SID_Play),
 	GUI(setGUI),
@@ -18,7 +22,7 @@ void TServerConnectState::Initialize(nel::IStateMachine* setOwner, nel::IApplica
 	// start local server
 	IServer* server = (IServer*)Application->RetrieveInterface(IID_IServer);
 	assert(server);
-	assert(server->Start(41852));
+	assert(server->Start(ServerPortConst));
 
 	// connect to local server on next update
 	CanConnectToServer = true;
@@ -26,6 +30,10 @@ void TServerConnectState::Initialize(nel::IStateMachine* setOwner, nel::IApplica
 
 void TServerConnectState::Finalize()
 {
+	IClient* client = (IClient*)Application->RetrieveInterface(IID_IClient);
+	assert(client);
+	client->Disconnect();
+
 	IServer* server = (IServer*)Application->RetrieveInterface(IID_IServer);
 	assert(server);
 	server->Stop();
@@ -39,6 +47,10 @@ void TServerConnectState::Update(nel::TGameTime deltaTime)
 
 	if (CanConnectToServer)
 		ConnectToServer();
+
+	IClient* client = (IClient*)Application->RetrieveInterface(IID_IClient);
+	assert(client);	
+	client->Process();
 }
 
 void TServerConnectState::ProcessInput(nel::TGameID inputID, float value)
@@ -48,6 +60,10 @@ void TServerConnectState::ProcessInput(nel::TGameID inputID, float value)
 }
 
 void TServerConnectState::ConnectToServer()
-{
-	// TODO
+{	
+	IClient* client = (IClient*)Application->RetrieveInterface(IID_IClient);
+	assert(client);
+	client->Connect("127.0.0.1", ServerPortConst);
+
+	CanConnectToServer = false;
 }

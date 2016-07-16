@@ -28,8 +28,17 @@
 TGame::TGame()
 :	nel::TTGUIApplication(),
 	Overlay(),
-	Server()
+	Server(nullptr),
+	Client(nullptr)
 {
+	Server = std::make_shared<TServer>();
+	Client = std::make_shared<TClient>();
+}
+
+TGame::~TGame()
+{
+	Server.reset();
+	Client.reset();
 }
 
 sf::RenderWindow* TGame::CreateWindow()
@@ -75,6 +84,9 @@ void TGame::AfterInitialization()
 	Factory.RegisterObjectType(SID_Play, std::bind(&TGame::CreateState_Play, this));
 	Factory.RegisterObjectType(SID_RoundEnd, std::bind(&TGame::CreateState_RoundEnd, this));
 	Factory.RegisterObjectType(SID_MatchEnd, std::bind(&TGame::CreateState_MatchEnd, this));
+
+	AddLogic(Server);
+	AddLogic(Client);
 }
 
 void TGame::BeforeFinalization()
@@ -83,8 +95,12 @@ void TGame::BeforeFinalization()
 	DetachView(Overlay);
 	Overlay.reset();
 	#endif
+	
+	Client->Disconnect();
+	Server->Stop();
 
-	Server.Stop();
+	RemoveLogic(Client);
+	RemoveLogic(Server);
 }
 
 std::string TGame::GetDefaultFontName()
@@ -149,7 +165,9 @@ nel::Interface* TGame::RetrieveInterface(nel::TGameID id)
 	nel::Interface* result = nullptr;
 
 	if (id == IID_IServer)
-		result = (Interface*)(&Server);
+		result = (Interface*)(Server.get());
+	else if (id == IID_IClient)
+		result = (Interface*)(Client.get());
 	else
 		result = TTGUIApplication::RetrieveInterface(id);
 
