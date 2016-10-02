@@ -10,9 +10,18 @@
 class TServerConnectState :	public nel::TGameState
 {
 private:
+	typedef enum {
+		SHOULDCONNECT,
+		CONNECTING,
+		CONNECTED,
+		INLOBBY
+	} TConnectionProgress;
+
 	std::shared_ptr<tgui::Gui> GUI;
-	bool CanConnectToServer;
+	TConnectionProgress progress;
+
 	void ConnectToServer();
+
 public:
 	TServerConnectState(std::shared_ptr<tgui::Gui> setGUI);
 

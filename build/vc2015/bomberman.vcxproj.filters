@@ -108,6 +108,12 @@
     <ClCompile Include="..\..\src\client\client.cpp">
       <Filter>source\client</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\server\serverlogic.cpp">
+      <Filter>source\server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\server\servercomms.cpp">
+      <Filter>source\server</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\nel_interfaces.h">

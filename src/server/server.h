@@ -7,6 +7,8 @@
 
 #include "../base/nel_interfaces.h"
 
+#include "servercomms.h"
+#include "serverlogic.h"
 #include "../gameinterfaces.h"
 
 
@@ -15,19 +17,8 @@ class TServer :	public IServer,
 				public nel::ILogic
 {
 private:
-	std::thread* ListenerThread;
-	sf::TcpListener Listener;
-	sf::SocketSelector SocketSelector;
-	std::list<sf::TcpSocket*> ClientSockets;
-	std::mutex ClientSocketsMutex;
-
-	bool ThreadsShouldStop;
-
-	void ListenFunc();
-	void InitializeNewConnection(sf::TcpSocket* socket);
-	void FinalizeConnection(sf::TcpSocket* socket);
-	void ProcessPacketFromClient(sf::Packet& packet);
-
+	TServerComms Communications;
+	std::list<TPlayer> Players;
 public:
 	TServer();
 	~TServer() override;

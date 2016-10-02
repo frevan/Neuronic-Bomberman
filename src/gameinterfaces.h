@@ -30,10 +30,14 @@ public:
 	IClient() : nel::Interface() {};
 	virtual ~IClient() {};
 
+	virtual void Process() = 0;
+
 	virtual void Connect(const std::string& address, unsigned int port) = 0;
 	virtual void Disconnect() = 0;
-	virtual void Process() = 0;
 	virtual bool IsConnected() = 0;
+
+	virtual void LeaveLobby() = 0;
+	virtual bool IsInLobby() = 0;
 };
 
 

@@ -23,10 +23,12 @@ public:
 	~TClient() override;
 
 	// from IClient
-	void Connect(const std::string& address, unsigned int port) override;
-	void Disconnect() override;
 	void Process() override;
+	void Connect(const std::string& address, unsigned int port) override;
+	void Disconnect() override;	
 	bool IsConnected() override;
+	void LeaveLobby() override;
+	bool IsInLobby() override;
 
 	// from ILogic
 	void Update(nel::TGameTime deltaTime) override;

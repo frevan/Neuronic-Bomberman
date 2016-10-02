@@ -26,6 +26,8 @@
     <ClCompile Include="..\..\src\game.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\server\server.cpp" />
+    <ClCompile Include="..\..\src\server\servercomms.cpp" />
+    <ClCompile Include="..\..\src\server\serverlogic.cpp" />
     <ClCompile Include="..\..\src\states\loadmatch.cpp" />
     <ClCompile Include="..\..\src\states\lobby.cpp" />
     <ClCompile Include="..\..\src\states\matchend.cpp" />

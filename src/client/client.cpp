@@ -78,3 +78,12 @@ void TClient::HandleServerDisconnect()
 
 	Connected = false;
 }
+
+void TClient::LeaveLobby()
+{
+}
+
+bool TClient::IsInLobby()
+{
+	return false;
+}
