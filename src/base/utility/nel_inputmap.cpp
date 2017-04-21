@@ -25,10 +25,10 @@ TInputControl::TPacked TInputControl::Pack(TType setType, uint8_t setControllerI
 
 void TInputControl::Unpack(TPacked value, TType& type, uint8_t& controllerIndex, uint32_t& button, uint8_t& flags)
 {
-	type = TType(     (value & 0x00FF000000000000) >> 48);
-	controllerIndex = (value & 0x0000FF0000000000) >> 40;
-	button =          (value & 0x000000FFFFFFFF00) >> 8;
-	flags =	          (value & 0x00000000000000FF);
+	type = TType((value & 0x00FF000000000000) >> 48);
+	controllerIndex = static_cast<uint8_t>((value & 0x0000FF0000000000) >> 40);
+	button = static_cast<uint8_t>((value & 0x000000FFFFFFFF00) >> 8);
+	flags =	 (value & 0x00000000000000FF);
 }
 
 

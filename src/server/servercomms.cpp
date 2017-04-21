@@ -31,7 +31,6 @@ bool TServerComms::Start(unsigned int port)
 	ThreadsShouldStop = false;
 
 	ListenerThread = new std::thread(std::bind(&TServerComms::ListenFunc, this));
-	//ListenerThread->detach();
 
 	return true;
 }
@@ -65,14 +64,13 @@ void TServerComms::ListenFunc()
 {
 	while (!ThreadsShouldStop)
 	{
-		// wait for a socket to receive something
-		if (!SocketSelector.wait(sf::milliseconds(250)))
+		// wait to receive something
+		if (!SocketSelector.wait(sf::milliseconds(100)))
 			continue;
 
-		// check the listener for a new connection
+		// check for a new connection
 		if (SocketSelector.isReady(Listener))
 		{
-			// The listener is ready: there is a pending connection
 			TClientSocket* newclient = new TClientSocket;
 			if (Listener.accept(*newclient) == sf::Socket::Done)
 			{
