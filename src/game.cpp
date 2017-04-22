@@ -6,7 +6,7 @@
 #include "states/menu.h"
 #include "states/lobby.h"
 #include "states/serverselect.h"
-#include "states/serverconnect.h"
+#include "states/servercreate.h"
 #include "states/loadmatch.h"
 #include "states/play.h"
 #include "states/roundend.h"
@@ -78,7 +78,7 @@ void TGame::AfterInitialization()
 	Factory.RegisterObjectType(SID_Menu, std::bind(&TGame::CreateState_Menu, this));
 	Factory.RegisterObjectType(SID_Options, std::bind(&TGame::CreateState_Options, this));	
 	Factory.RegisterObjectType(SID_ServerSelect, std::bind(&TGame::CreateState_ServerSelect, this));
-	Factory.RegisterObjectType(SID_ServerConnect, std::bind(&TGame::CreateState_ServerConnect, this));
+	Factory.RegisterObjectType(SID_ServerCreate, std::bind(&TGame::CreateState_ServerCreate, this));
 	Factory.RegisterObjectType(SID_Lobby, std::bind(&TGame::CreateState_Lobby, this));
 	Factory.RegisterObjectType(SID_LoadMatch, std::bind(&TGame::CreateState_LoadMatch, this));
 	Factory.RegisterObjectType(SID_Play, std::bind(&TGame::CreateState_Play, this));
@@ -135,9 +135,9 @@ void* TGame::CreateState_ServerSelect()
 	return new TServerSelectState(GUI);
 }
 
-void* TGame::CreateState_ServerConnect()
+void* TGame::CreateState_ServerCreate()
 {
-	return new TServerConnectState(GUI);
+	return new TServerCreateState(GUI);
 }
 
 void* TGame::CreateState_LoadMatch()

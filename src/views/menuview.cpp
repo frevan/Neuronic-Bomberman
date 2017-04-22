@@ -63,7 +63,7 @@ void TMenuView::CreateWidgets()
 
 void TMenuView::OnNewGameBtnClick()
 {
-	StateMachine->SetNextState(SID_ServerConnect, nullptr);
+	StateMachine->SetNextState(SID_ServerCreate, nullptr);
 }
 
 void TMenuView::OnJoinGameBtnClick()

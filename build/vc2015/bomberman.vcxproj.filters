@@ -25,6 +25,9 @@
     <Filter Include="source\client">
       <UniqueIdentifier>{f91642d8-666e-4158-82ba-c43febb69774}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\util">
+      <UniqueIdentifier>{71c699c4-e279-40ae-9381-75f5bebdd6a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -96,9 +99,6 @@
     <ClCompile Include="..\..\src\states\serverselect.cpp">
       <Filter>source\states</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\states\serverconnect.cpp">
-      <Filter>source\states</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\base\utility\nel_stateparams.cpp">
       <Filter>source\base\utility</Filter>
     </ClCompile>
@@ -113,6 +113,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\server\servercomms.cpp">
       <Filter>source\server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\states\servercreate.cpp">
+      <Filter>source\states</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\util\networkprotocol.cpp">
+      <Filter>source\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\gameinterfaces.h">
       <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\util\networkprotocol.h">
+      <Filter>source\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

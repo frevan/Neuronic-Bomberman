@@ -20,7 +20,7 @@ private:
 	void* CreateState_Menu();
 	void* CreateState_Options();
 	void* CreateState_ServerSelect();
-	void* CreateState_ServerConnect();
+	void* CreateState_ServerCreate();
 	void* CreateState_Lobby();
 	void* CreateState_LoadMatch();
 	void* CreateState_Play();

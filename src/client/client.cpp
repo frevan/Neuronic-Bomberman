@@ -8,7 +8,9 @@ TClient::TClient()
 :	IClient(),
 	ILogic(),
 	Socket(),
-	Connected(false)
+	Connected(false),
+	SocketConnected(false),
+	Protocol()
 {
 }
 
@@ -28,8 +30,13 @@ void TClient::Connect(const std::string& address, unsigned int port)
 
 void TClient::Disconnect()
 {
-	Socket.disconnect();
+	sf::Packet packet;
+	Protocol.Disconnect(packet, "no reason");
+	Socket.send(packet);
 	Connected = false;
+
+	Socket.disconnect();
+	SocketConnected = false;
 }
 
 void TClient::Process()
@@ -41,18 +48,13 @@ void TClient::Process()
 		if (r != sf::Socket::Done && r != sf::Socket::Partial)
 			break;
 
-		ProcessPacketFromServer(packet);
+		Protocol.ProcessReceivedPacket(Socket, packet, this);
 	}
 }
 
 bool TClient::IsConnected()
 {
 	return Connected;
-}
-
-void TClient::ProcessPacketFromServer(sf::Packet& packet)
-{
-	// TODO: process packets
 }
 
 void TClient::Update(nel::TGameTime deltaTime)
@@ -63,20 +65,30 @@ void TClient::Update(nel::TGameTime deltaTime)
 	if (!Connected)
 	{
 		if (addr != sf::IpAddress::None && port != 0)
-			Connected = true;
+			HandleSocketConnect();
 	}
 	else if (Connected)
 	{
 		if (addr == sf::IpAddress::None || port == 0)
-			HandleServerDisconnect();
+			HandleSocketDisconnect();
 	}
 }
 
-void TClient::HandleServerDisconnect()
+void TClient::HandleSocketConnect()
+{
+	SocketConnected = true;
+
+	sf::Packet packet;
+	Protocol.Connect(packet, "TEST", "TESTV1");
+	Socket.send(packet);
+}
+
+void TClient::HandleSocketDisconnect()
 {
 	// TODO
 
 	Connected = false;
+	SocketConnected = false;
 }
 
 void TClient::LeaveLobby()
@@ -86,4 +98,45 @@ void TClient::LeaveLobby()
 bool TClient::IsInLobby()
 {
 	return false;
+}
+
+bool TClient::OnInfoRequest()
+{
+	return false;
+}
+
+bool TClient::OnConnect(int Version, const std::string& NodeName, const std::string& ClientVersion)
+{
+	return false;
+}
+
+bool TClient::OnRCon(const std::string& Password, const std::string& Command)
+{
+	return false;
+}
+
+bool TClient::OnInfoResponse(unsigned int Protocol, unsigned int Flags, const std::string& HostName)
+{
+	return false;
+}
+
+bool TClient::OnConnectResponse(unsigned int Protocol, unsigned int ServerID, unsigned int ClientID)
+{
+	return false;
+}
+
+bool TClient::OnPrint(unsigned int Type, const std::string& Text)
+{
+	return false;
+}
+
+bool TClient::OnError(unsigned int Code, const std::string& Reason)
+{
+	return false;
+}
+
+bool TClient::OnDisconnect(const std::string& Reason)
+{
+	Socket.disconnect();
+	return true;
 }

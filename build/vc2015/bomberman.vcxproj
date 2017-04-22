@@ -34,8 +34,9 @@
     <ClCompile Include="..\..\src\states\menu.cpp" />
     <ClCompile Include="..\..\src\states\play.cpp" />
     <ClCompile Include="..\..\src\states\roundend.cpp" />
-    <ClCompile Include="..\..\src\states\serverconnect.cpp" />
+    <ClCompile Include="..\..\src\states\servercreate.cpp" />
     <ClCompile Include="..\..\src\states\serverselect.cpp" />
+    <ClCompile Include="..\..\src\util\networkprotocol.cpp" />
     <ClCompile Include="..\..\src\views\lobbyview.cpp" />
     <ClCompile Include="..\..\src\views\matchview.cpp" />
     <ClCompile Include="..\..\src\views\menuview.cpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="..\..\src\base\utility\nel_macros.h" />
     <ClInclude Include="..\..\src\gameinterfaces.h" />
     <ClInclude Include="..\..\src\states\states.h" />
+    <ClInclude Include="..\..\src\util\networkprotocol.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7A327356-55D7-4A85-98A6-460F60D42534}</ProjectGuid>
