@@ -18,10 +18,18 @@ private:
 	bool Connected, SocketConnected;
 	TBombermanProtocol Protocol;
 
+	uint8_t ServerProtocol;
+	unsigned int ServerFlags;
+	std::string ServerName;
+	uint16_t ServerID;
+	uint16_t ClientID;
+
 	void HandleSocketConnect();
 	void HandleSocketDisconnect();
 
 public:
+	nel::IApplication* Application;
+
 	TClient();
 	~TClient() override;
 
@@ -37,12 +45,12 @@ public:
 	void Update(nel::TGameTime deltaTime) override;
 
 	// from IBombermanProtocolReceiver
-	bool OnInfoRequest() override;
-	bool OnConnect(int Version, const std::string& NodeName, const std::string& ClientVersion) override;
-	bool OnRCon(const std::string& Password, const std::string& Command) override;
-	bool OnInfoResponse(unsigned int Protocol, unsigned int Flags, const std::string& HostName) override;
-	bool OnConnectResponse(unsigned int Protocol, unsigned int ServerID, unsigned int ClientID) override;
-	bool OnPrint(unsigned int Type, const std::string& Text) override;
-	bool OnError(unsigned int Code, const std::string& Reason) override;
-	bool OnDisconnect(const std::string& Reason) override;
+	bool OnInfoRequest(sf::Socket* Source) override;
+	bool OnConnect(sf::Socket* Source, int Version, const std::string& NodeName, const std::string& ClientVersion) override;
+	bool OnRCon(sf::Socket* Source, const std::string& Password, const std::string& Command) override;
+	bool OnInfoResponse(sf::Socket* Source, unsigned int ProtocolVersion, unsigned int Flags, const std::string& HostName) override;
+	bool OnConnectResponse(sf::Socket* Source, unsigned int ProtocolVersion, unsigned int ServerID, unsigned int ClientID) override;
+	bool OnPrint(sf::Socket* Source, unsigned int Type, const std::string& Text) override;
+	bool OnError(sf::Socket* Source, unsigned int Code, const std::string& Reason) override;
+	bool OnDisconnect(sf::Socket* Source, const std::string& Reason) override;
 };

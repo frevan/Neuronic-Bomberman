@@ -12,7 +12,8 @@ TServerComms::TServerComms()
 	SocketSelector(),
 	ClientSockets(),
 	ClientSocketsMutex(),
-	ThreadsShouldStop(false)
+	ThreadsShouldStop(false),
+	Protocol()
 {
 }
 
@@ -94,7 +95,7 @@ void TServerComms::ListenFunc()
 				{
 					sf::Packet packet;
 					if (client->receive(packet) == sf::Socket::Done)
-						ProcessPacketFromClient(packet);
+						Protocol.ProcessReceivedPacket(client, packet, this);
 				}
 			}
 		}
@@ -113,11 +114,6 @@ void TServerComms::FinalizeConnection(TClientSocket* socket)
 	socket->disconnect();
 }
 
-void TServerComms::ProcessPacketFromClient(sf::Packet& packet)
-{
-	// TODO: process packets
-}
-
 void TServerComms::Update(nel::TGameTime deltaTime)
 {
 	std::lock_guard<std::mutex> g(ClientSocketsMutex);
@@ -133,4 +129,48 @@ void TServerComms::Update(nel::TGameTime deltaTime)
 			delete client;
 		}
 	}
+}
+
+bool TServerComms::OnInfoRequest(sf::Socket* Source)
+{
+	sf::Packet packet;
+	Protocol.InfoResponse(packet, 0, "TestServer");
+	Protocol.SendToSocket(Source, packet);
+
+	return false;
+}
+
+bool TServerComms::OnConnect(sf::Socket* Source, int Version, const std::string& NodeName, const std::string& ClientVersion)
+{
+	return false;
+}
+
+bool TServerComms::OnRCon(sf::Socket* Source, const std::string& Password, const std::string& Command)
+{
+	return false;
+}
+
+bool TServerComms::OnInfoResponse(sf::Socket* Source, unsigned int ProtocolVersion, unsigned int Flags, const std::string& HostName)
+{
+	return false;
+}
+
+bool TServerComms::OnConnectResponse(sf::Socket* Source, unsigned int ProtocolVersion, unsigned int ServerID, unsigned int ClientID)
+{
+	return false;
+}
+
+bool TServerComms::OnPrint(sf::Socket* Source, unsigned int Type, const std::string& Text)
+{
+	return false;
+}
+
+bool TServerComms::OnError(sf::Socket* Source, unsigned int Code, const std::string& Reason)
+{
+	return false;
+}
+
+bool TServerComms::OnDisconnect(sf::Socket* Source, const std::string& Reason)
+{
+	return false;
 }

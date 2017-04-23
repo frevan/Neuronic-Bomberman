@@ -32,7 +32,7 @@ TGame::TGame()
 	Client(nullptr)
 {
 	Server = std::make_shared<TServer>();
-	Client = std::make_shared<TClient>();
+	Client = std::make_shared<TClient>();	
 }
 
 TGame::~TGame()
@@ -84,6 +84,9 @@ void TGame::AfterInitialization()
 	Factory.RegisterObjectType(SID_Play, std::bind(&TGame::CreateState_Play, this));
 	Factory.RegisterObjectType(SID_RoundEnd, std::bind(&TGame::CreateState_RoundEnd, this));
 	Factory.RegisterObjectType(SID_MatchEnd, std::bind(&TGame::CreateState_MatchEnd, this));
+
+	Server->Application = this;
+	Client->Application = this;
 
 	AddLogic(Server);
 	AddLogic(Client);

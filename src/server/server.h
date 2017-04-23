@@ -18,8 +18,11 @@ class TServer :	public IServer,
 {
 private:
 	TServerComms Communications;
-	std::list<TPlayer> Players;
+	std::list<TPlayer> Players;	
+
 public:
+	nel::IApplication* Application;
+
 	TServer();
 	~TServer() override;
 

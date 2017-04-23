@@ -9,7 +9,8 @@
 TServer::TServer()
 :	IServer(),
 	ILogic(),
-	Communications()
+	Communications(),
+	Application(nullptr)
 {
 }
 

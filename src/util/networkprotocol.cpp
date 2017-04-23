@@ -40,7 +40,7 @@ const std::string CMD_Disconnect		= "disconnect";
 
 // TBombermanProtocol
 
-bool TBombermanProtocol::ProcessReceivedPacket(sf::Packet& Packet, IBombermanProtocolReceiver* Receiver)
+bool TBombermanProtocol::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet, IBombermanProtocolReceiver* Receiver)
 {
 	uint16_t id;
 	if (!(Packet >> id))
@@ -57,46 +57,55 @@ bool TBombermanProtocol::ProcessReceivedPacket(sf::Packet& Packet, IBombermanPro
 		if (Packet >> command)
 		{
 			if (command == CMD_InfoRequest)
-				return Receiver->OnInfoRequest();
+				return Receiver->OnInfoRequest(Source);
 			else if (command == CMD_Connect)
 			{
 				if (Packet >> u8_1 >> s_1 >> s_2)
-					return Receiver->OnConnect(u8_1, s_1, s_2);
+					return Receiver->OnConnect(Source, u8_1, s_1, s_2);
 			}
 			else if (command == CMD_RCon)
 			{
 				if (Packet >> s_1 >> s_2)
-					return Receiver->OnRCon(s_1, s_2);
+					return Receiver->OnRCon(Source, s_1, s_2);
 			}
 			else if (command == CMD_ConnectResponse)
 			{
 				if (Packet >> u8_1 >> u16_1 >> u16_2)
-					return Receiver->OnConnectResponse(u8_1, u16_1, u16_2);
+					return Receiver->OnConnectResponse(Source, u8_1, u16_1, u16_2);
 			}
 			else if (command == CMD_InfoResponse)
 			{
 				if (Packet >> u8_1 >> u8_2 >> s_1)
-					return Receiver->OnInfoResponse(u8_1, u8_2, s_1);
+					return Receiver->OnInfoResponse(Source, u8_1, u8_2, s_1);
 			}
 			else if (command == CMD_Print)
 			{
 				if (Packet >> u8_1 >> s_1)
-					return Receiver->OnPrint(u8_1, s_1);
+					return Receiver->OnPrint(Source, u8_1, s_1);
 			}
 			else if (command == CMD_Error)
 			{
 				if (Packet >> u8_1 >> s_1)
-					return Receiver->OnError(u8_1, s_1);
+					return Receiver->OnError(Source, u8_1, s_1);
 			}
 			else if (command == CMD_Disconnect)
 			{
 				if (Packet >> s_1)
-					return Receiver->OnDisconnect(s_1);
+					return Receiver->OnDisconnect(Source, s_1);
 			}
 		}
 	}
 
 	return false;
+}
+
+bool TBombermanProtocol::SendToSocket(sf::Socket* Socket, sf::Packet& Packet)
+{
+	// change if we ever switch to UDP!!!
+	sf::TcpSocket* sck = static_cast<sf::TcpSocket*>(Socket);
+	sf::Socket::Status status = sck->send(Packet);
+
+	return (status == sf::Socket::Status::Done);
 }
 
 void TBombermanProtocol::InitPacket(sf::Packet& Packet, uint16_t ID)
@@ -132,22 +141,23 @@ void TBombermanProtocol::RCon(sf::Packet& Packet, const std::string& Password, c
 	Packet << Command;
 }
 
-void TBombermanProtocol::InfoResponse(sf::Packet& Packet, unsigned int Protocol, unsigned int Flags, const std::string& HostName)
+void TBombermanProtocol::InfoResponse(sf::Packet& Packet, unsigned int Flags, const std::string& HostName)
 {
 	InitPacket(Packet, ID_Connectionless);
 
 	Packet << CMD_InfoResponse;
-	Packet << static_cast<uint8_t>(Protocol);
+	uint8_t protocolVersion = 0;
+	Packet << protocolVersion;
 	Packet << static_cast<uint8_t>(Flags);
 	Packet << HostName;
 }
 
-void TBombermanProtocol::ConnectResponse(sf::Packet& Packet, unsigned int Protocol, unsigned int ServerID, unsigned int ClientID)
+void TBombermanProtocol::ConnectResponse(sf::Packet& Packet, unsigned int ProtocolVersion, unsigned int ServerID, unsigned int ClientID)
 {
 	InitPacket(Packet, ID_Connectionless);
 
 	Packet << CMD_ConnectResponse;
-	Packet << static_cast<uint8_t>(Protocol);
+	Packet << static_cast<uint8_t>(ProtocolVersion);
 	Packet << static_cast<uint16_t>(ServerID);
 	Packet << static_cast<uint16_t>(ClientID);
 }
