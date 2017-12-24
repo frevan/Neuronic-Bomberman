@@ -66,8 +66,11 @@ void TServerComms::ListenFunc()
 	while (!ThreadsShouldStop)
 	{
 		// wait to receive something
-		if (!SocketSelector.wait(sf::milliseconds(100)))
+		if (!SocketSelector.wait(sf::milliseconds(50)))
 			continue;
+
+		if (ThreadsShouldStop)
+			break;
 
 		// check for a new connection
 		if (SocketSelector.isReady(Listener))
@@ -81,13 +84,11 @@ void TServerComms::ListenFunc()
 			}
 			else
 				delete newclient;
-		}
+		};
 
-		// otherwise the client sockets
-		else
+		// check the connected clients
 		{
 			std::lock_guard<std::mutex> g(ClientSocketsMutex);
-
 			for (auto it = ClientSockets.begin(); it != ClientSockets.end(); it++)
 			{
 				TClientSocket* client = *it;
@@ -104,7 +105,7 @@ void TServerComms::ListenFunc()
 
 void TServerComms::InitializeNewConnection(TClientSocket* socket)
 {
-	// TODO: send "hello" packet
+	// TODO: send "hello" packet?
 }
 
 void TServerComms::FinalizeConnection(TClientSocket* socket)
