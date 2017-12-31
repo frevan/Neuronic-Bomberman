@@ -137,7 +137,7 @@ bool TClient::OnInfoResponse(sf::Socket* Source, unsigned int ProtocolVersion, u
 	ServerName = HostName;
 
 	sf::Packet packet;
-	Protocol.Connect(packet, "local", "TestVersion");
+	Protocol.Connect(packet, "LocalUser", "TestVersion");
 	Socket.send(packet);
 
 	return true;

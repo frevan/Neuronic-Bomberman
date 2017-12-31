@@ -9,10 +9,15 @@
 
 #include "../base/nel_interfaces.h"
 #include "../util/networkprotocol.h"
+#include "../gameinterfaces.h"
 
 
 
-#define TClientSocket sf::TcpSocket
+class TClientSocket : public sf::TcpSocket
+{
+public:
+	nel::TGameID ID;
+};
 
 
 
@@ -31,18 +36,21 @@ private:
 	std::list<TClientSocket*> ClientSockets;
 	std::mutex ClientSocketsMutex;
 	TBombermanProtocol Protocol;
+	IServerSideGame* Game;
 
 	bool ThreadsShouldStop;
 
 	void ListenFunc();
 	void InitializeNewConnection(TClientSocket* socket);
 	void FinalizeConnection(TClientSocket* socket);
+	void RemoveSocketFromList(TClientSocket* socket, std::list<TClientSocket*>& removedSockets);
+	void DeleteRemovedSockets(std::list<TClientSocket*>& removedSockets);
 
 public:
 	TServerComms();
 	~TServerComms();
 
-	bool Start(unsigned int port);
+	bool Start(unsigned int port, IServerSideGame* game);
 	void Stop();
 
 	void Update(nel::TGameTime deltaTime);

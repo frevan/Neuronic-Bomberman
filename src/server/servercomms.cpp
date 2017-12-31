@@ -22,9 +22,11 @@ TServerComms::~TServerComms()
 	Stop();
 }
 
-bool TServerComms::Start(unsigned int port)
+bool TServerComms::Start(unsigned int port, IServerSideGame* game)
 {
 	Stop();	// just in case
+
+	Game = game;
 
 	Listener.listen(port);
 	SocketSelector.add(Listener);
@@ -38,6 +40,8 @@ bool TServerComms::Start(unsigned int port)
 
 void TServerComms::Stop()
 {
+	Game = nullptr;
+
 	ThreadsShouldStop = true;
 	if (ListenerThread)
 	{
@@ -49,16 +53,18 @@ void TServerComms::Stop()
 	SocketSelector.clear();
 	Listener.close();
 
+
+	std::list<TClientSocket*> removedSockets;
 	{
 		std::lock_guard<std::mutex> g(ClientSocketsMutex);
-		for (auto it = ClientSockets.begin(); it != ClientSockets.end(); it++)
+		for (auto it = ClientSockets.begin(); it != ClientSockets.end(); )
 		{
-			TClientSocket* client = *it;
-			FinalizeConnection(client);
-			delete client;
+			TClientSocket* client = *it++;	// increment here because otherwise there will be a runtime error when it's incremented in the for loop
+			RemoveSocketFromList(client, removedSockets);
 		}
 		ClientSockets.clear();
 	}
+	DeleteRemovedSockets(removedSockets);
 }
 
 void TServerComms::ListenFunc()
@@ -78,9 +84,13 @@ void TServerComms::ListenFunc()
 			TClientSocket* newclient = new TClientSocket;
 			if (Listener.accept(*newclient) == sf::Socket::Done)
 			{
-				std::lock_guard<std::mutex> g(ClientSocketsMutex);
-				ClientSockets.push_back(newclient);
-				InitializeNewConnection(newclient);
+				newclient->ID = reinterpret_cast<std::uintptr_t>(newclient);
+				{					
+					std::lock_guard<std::mutex> g(ClientSocketsMutex);
+					SocketSelector.add(*newclient);
+					ClientSockets.push_back(newclient);
+				}
+				InitializeNewConnection(newclient);				
 			}
 			else
 				delete newclient;
@@ -96,7 +106,7 @@ void TServerComms::ListenFunc()
 				{
 					sf::Packet packet;
 					if (client->receive(packet) == sf::Socket::Done)
-						Protocol.ProcessReceivedPacket(client, packet, this);
+						Protocol.ProcessReceivedPacket(client, packet, this);	// should try to do this outside of the mutex?
 				}
 			}
 		}
@@ -117,19 +127,18 @@ void TServerComms::FinalizeConnection(TClientSocket* socket)
 
 void TServerComms::Update(nel::TGameTime deltaTime)
 {
-	std::lock_guard<std::mutex> g(ClientSocketsMutex);
-
-	for (auto it = ClientSockets.begin(); it != ClientSockets.end(); it++)
+	// look for sockets to remove
+	std::list<TClientSocket*> removedSockets;
 	{
-		TClientSocket* client = *it;
-		if (client->getRemoteAddress() == sf::IpAddress::None)
+		std::lock_guard<std::mutex> g(ClientSocketsMutex);
+		for (auto it = ClientSockets.begin(); it != ClientSockets.end(); )
 		{
-			// UNTESTED!
-			FinalizeConnection(client);
-			ClientSockets.remove(client);
-			delete client;
+			TClientSocket* client = *it++;	// increment here because otherwise there will be a runtime error when it's incremented in the for loop
+			if (client->getRemoteAddress() == sf::IpAddress::None)
+				RemoveSocketFromList(client, removedSockets);
 		}
 	}
+	DeleteRemovedSockets(removedSockets);
 }
 
 bool TServerComms::OnInfoRequest(sf::Socket* Source)
@@ -174,4 +183,23 @@ bool TServerComms::OnError(sf::Socket* Source, unsigned int Code, const std::str
 bool TServerComms::OnDisconnect(sf::Socket* Source, const std::string& Reason)
 {
 	return false;
+}
+
+void TServerComms::RemoveSocketFromList(TClientSocket* socket, std::list<TClientSocket*>& removedSockets)
+{
+	SocketSelector.remove(*socket);
+	ClientSockets.remove(socket);
+	removedSockets.push_back(socket);
+}
+
+void TServerComms::DeleteRemovedSockets(std::list<TClientSocket*>& removedSockets)
+{
+	for (auto it = removedSockets.begin(); it != removedSockets.end(); it++)
+	{
+		TClientSocket* client = *it;
+		FinalizeConnection(client);
+		if (Game)
+			Game->DisconnectPlayer(client->ID);
+		delete client;
+	}
 }

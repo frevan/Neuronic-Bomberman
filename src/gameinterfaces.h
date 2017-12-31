@@ -12,6 +12,18 @@ DEFINE_GAMEID(IID_IClient, "game::IClient");
 
 
 
+struct TPlayer
+{
+	std::string Name;
+	nel::TGameID ID;
+	nel::TGameID ClientID;
+	int Slot;
+	int Score;
+	int Kills;
+};
+
+
+
 class IServer : public nel::Interface
 {
 public:
@@ -20,6 +32,20 @@ public:
 
 	virtual bool Start(unsigned int port) = 0;
 	virtual void Stop() = 0;
+};
+
+
+
+class IServerSideGame : public nel::Interface
+{
+public:
+	IServerSideGame() : nel::Interface() {};
+	virtual ~IServerSideGame() {};
+
+	virtual unsigned int GetPlayerCount() = 0;
+	virtual bool GetPlayer(TPlayer& Info) = 0;
+	virtual int ConnectPlayer(const std::string& SetName, nel::TGameID SetID) = 0;
+	virtual void DisconnectPlayer(nel::TGameID ID) = 0;
 };
 
 
@@ -38,17 +64,5 @@ public:
 
 	virtual void LeaveLobby() = 0;
 	virtual bool IsInLobby() = 0;
-};
-
-
-
-struct TPlayer
-{
-	std::string Name;
-	sf::IpAddress ClientAddress;
-	nel::TGameID ClientID;
-	int Slot;
-	int Score;
-	int Kills;
 };
 

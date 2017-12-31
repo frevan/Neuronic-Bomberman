@@ -18,7 +18,7 @@ class TServer :	public IServer,
 {
 private:
 	TServerComms Communications;
-	std::list<TPlayer> Players;	
+	TServerSideGame Game;
 
 public:
 	nel::IApplication* Application;

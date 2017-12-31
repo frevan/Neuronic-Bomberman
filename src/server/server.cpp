@@ -10,6 +10,7 @@ TServer::TServer()
 :	IServer(),
 	ILogic(),
 	Communications(),
+	Game(),
 	Application(nullptr)
 {
 }
@@ -23,7 +24,7 @@ bool TServer::Start(unsigned int port)
 {
 	Stop();	// just in case
 
-	bool result = Communications.Start(port);
+	bool result = Communications.Start(port, &Game);
 
 	return result;
 }
