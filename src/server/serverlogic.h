@@ -12,8 +12,7 @@ public:
 	~TServerSideGame();
 
 	// from IServerSideGame
-	virtual unsigned int GetPlayerCount();
-	virtual bool GetPlayer(TPlayer& info);
+	virtual bool GetPlayer(nel::TGameID ID, TPlayer& info);
 	virtual int ConnectPlayer(const std::string& name, nel::TGameID ID);
 	virtual void DisconnectPlayer(nel::TGameID ID);
 };

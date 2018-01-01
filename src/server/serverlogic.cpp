@@ -12,21 +12,46 @@ TServerSideGame::~TServerSideGame()
 {
 }
 
-unsigned int TServerSideGame::GetPlayerCount()
+bool TServerSideGame::GetPlayer(nel::TGameID ID, TPlayer& info)
 {
-	return 0;
-}
+	for (auto it = Players.begin(); it != Players.end(); it++)
+	{
+		if (it->ID == ID)
+		{
+			info = *it;
+			return true;
+		}
+	}
 
-bool TServerSideGame::GetPlayer(TPlayer& info)
-{
 	return false;
 }
 
 int TServerSideGame::ConnectPlayer(const std::string& name, nel::TGameID ID)
 {
-	return -1;
+	int slot = FindAvailableSlot();
+	if (slot >= 0)
+	{
+		TPlayer p;
+		p.ClientID = 0;
+		p.ID = ID;
+		p.Name = name;
+		p.Kills = 0;
+		p.Score = 0;
+		p.Slot = slot;
+
+		Players.push_back(p);
+	}
+	return slot;
 }
 
 void TServerSideGame::DisconnectPlayer(nel::TGameID ID)
 {
+	for (auto it = Players.begin(); it != Players.end(); it++)
+	{
+		if (it->ID == ID)
+		{
+			Players.remove(*it);
+			return;
+		}
+	}
 }

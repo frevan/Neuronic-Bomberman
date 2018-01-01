@@ -42,8 +42,7 @@ public:
 	IServerSideGame() : nel::Interface() {};
 	virtual ~IServerSideGame() {};
 
-	virtual unsigned int GetPlayerCount() = 0;
-	virtual bool GetPlayer(TPlayer& Info) = 0;
+	virtual bool GetPlayer(nel::TGameID ID, TPlayer& Info) = 0;
 	virtual int ConnectPlayer(const std::string& SetName, nel::TGameID SetID) = 0;
 	virtual void DisconnectPlayer(nel::TGameID ID) = 0;
 };
