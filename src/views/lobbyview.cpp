@@ -25,7 +25,7 @@ void TLobbyView::CreateWidgets()
 	AddWidgetToGUI(servernamelbl);
 	servernamelbl->setText("Game name");
 	servernamelbl->setPosition(25, 25);
-	servernamelbl->setTextColor(sf::Color::White);
+	servernamelbl->getRenderer()->setTextColor(sf::Color::White);
 	servernamelbl->setTextSize(14);
 	// ---
 	tgui::EditBox::Ptr servernameedit = std::make_shared<tgui::EditBox>();
@@ -41,21 +41,21 @@ void TLobbyView::CreateWidgets()
 	backbtn->setText("Leave lobby");
 	backbtn->setPosition(25, 535);
 	backbtn->setSize(100, 40);
-	backbtn->connect("pressed", std::bind(&TLobbyView::OnBackBtnClick, this));
-
+	backbtn->connect("pressed", &TLobbyView::OnBackBtnClick, this);
+	
 	// players
 	tgui::Label::Ptr playerslbl = std::make_shared<tgui::Label>();
 	AddWidgetToGUI(playerslbl);
 	playerslbl->setText("Players");
 	playerslbl->setPosition(25, 60);
-	playerslbl->setTextColor(sf::Color::White);
+	playerslbl->getRenderer()->setTextColor(sf::Color::White);
 	playerslbl->setTextSize(14);
 	// --- 
 	tgui::Panel::Ptr playerspanel = std::make_shared<tgui::Panel>();
 	AddWidgetToGUI(playerspanel);
 	playerspanel->setPosition(25, 80);
 	playerspanel->setSize(350, 430);
-	playerspanel->setBackgroundColor(sf::Color(40,0,0));
+	playerspanel->getRenderer()->setBackgroundColor(sf::Color(40,0,0));
 }
 
 void TLobbyView::OnBackBtnClick()

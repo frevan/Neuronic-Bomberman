@@ -50,7 +50,7 @@ void TServerSideGame::DisconnectPlayer(nel::TGameID ID)
 	{
 		if (it->ID == ID)
 		{
-			Players.remove(*it);
+			it = Players.erase(it);
 			return;
 		}
 	}
