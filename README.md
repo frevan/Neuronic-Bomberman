@@ -3,8 +3,8 @@
 This is an attempt to create a 64bit Windows clone of Atomic Bomberman.
 
 External dependencies:
-- SFML (v2.3): http://www.sfml-dev.org
-- TGUI (v0.7): https://tgui.eu/
+- SFML (v2.5.1): http://www.sfml-dev.org
+- TGUI (v0.8): https://tgui.eu/
 
 ----
 
