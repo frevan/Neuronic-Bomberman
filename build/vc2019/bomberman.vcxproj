@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\base\nel_factory.cpp" />
+    <ClCompile Include="..\..\src\base\nel_game.cpp" />
+    <ClCompile Include="..\..\src\base\nel_view.cpp" />
+    <ClCompile Include="..\..\src\base\nel_state.cpp" />
+    <ClCompile Include="..\..\src\base\tgui\nel_game_tgui.cpp" />
+    <ClCompile Include="..\..\src\base\tgui\nel_view_tgui.cpp" />
+    <ClCompile Include="..\..\src\base\utility\nel_eventhandler.cpp" />
+    <ClCompile Include="..\..\src\base\utility\nel_fps.cpp" />
+    <ClCompile Include="..\..\src\base\utility\nel_inputmap.cpp" />
+    <ClCompile Include="..\..\src\base\utility\nel_statemachine.cpp" />
+    <ClCompile Include="..\..\src\base\utility\nel_stateparams.cpp" />
+    <ClCompile Include="..\..\src\client\client.cpp" />
+    <ClCompile Include="..\..\src\game.cpp" />
+    <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\server\server.cpp" />
+    <ClCompile Include="..\..\src\server\servercomms.cpp" />
+    <ClCompile Include="..\..\src\server\serverlogic.cpp" />
+    <ClCompile Include="..\..\src\states\loadmatch.cpp" />
+    <ClCompile Include="..\..\src\states\lobby.cpp" />
+    <ClCompile Include="..\..\src\states\matchend.cpp" />
+    <ClCompile Include="..\..\src\states\menu.cpp" />
+    <ClCompile Include="..\..\src\states\play.cpp" />
+    <ClCompile Include="..\..\src\states\roundend.cpp" />
+    <ClCompile Include="..\..\src\states\servercreate.cpp" />
+    <ClCompile Include="..\..\src\states\serverselect.cpp" />
+    <ClCompile Include="..\..\src\util\networkprotocol.cpp" />
+    <ClCompile Include="..\..\src\views\connectingview.cpp" />
+    <ClCompile Include="..\..\src\views\lobbyview.cpp" />
+    <ClCompile Include="..\..\src\views\matchview.cpp" />
+    <ClCompile Include="..\..\src\views\menuview.cpp" />
+    <ClCompile Include="..\..\src\views\overlayview.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\base\nel_interfaces.h" />
+    <ClInclude Include="..\..\src\base\nel_objecttypes.h" />
+    <ClInclude Include="..\..\src\base\utility\nel_macros.h" />
+    <ClInclude Include="..\..\src\gameinterfaces.h" />
+    <ClInclude Include="..\..\src\states\states.h" />
+    <ClInclude Include="..\..\src\util\networkprotocol.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7A327356-55D7-4A85-98A6-460F60D42534}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Bomberman</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\..\game\$(PlatformName)\</OutDir>
+    <IntDir>..\..\Temp\$(PlatformName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\..\game\$(PlatformName)\</OutDir>
+    <IntDir>..\..\Temp\$(PlatformName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>SFML_STATIC;SFGUI_STATIC;_USE_MATH_DEFINES;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>tgui-s-d.lib;sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-main-d.lib;sfml-network-s-d.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;glew32s.lib;opengl32.lib;openal32.lib;freetype.lib;jpeg.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;winmm.lib;ws2_32.lib;gdi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>SFML_STATIC;SFGUI_STATIC;_USE_MATH_DEFINES;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>Full</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>tgui-s.lib;sfml-audio-s.lib;sfml-graphics-s.lib;sfml-main.lib;sfml-network-s.lib;sfml-system-s.lib;sfml-window-s.lib;glew32s.lib;opengl32.lib;openal32.lib;freetype.lib;jpeg.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
