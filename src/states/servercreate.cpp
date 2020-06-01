@@ -19,6 +19,9 @@ void TServerCreateState::Initialize(nel::IStateMachine* setOwner, nel::IApplicat
 {
 	TGameState::Initialize(setOwner, setApplication, params);
 
+	View = std::make_shared<TConnectingView>(GUI, Owner);
+	Application->AttachView(View);
+
 	// start local server
 	IServer* server = (IServer*)Application->RetrieveInterface(IID_IServer);
 	assert(server);
@@ -30,6 +33,9 @@ void TServerCreateState::Initialize(nel::IStateMachine* setOwner, nel::IApplicat
 
 void TServerCreateState::Finalize()
 {
+	Application->DetachView(View);
+	View.reset();
+
 	IClient* client = (IClient*)Application->RetrieveInterface(IID_IClient);
 	assert(client);
 	client->Disconnect();
@@ -81,5 +87,5 @@ void TServerCreateState::ConnectToServer()
 {	
 	IClient* client = (IClient*)Application->RetrieveInterface(IID_IClient);
 	assert(client);
-	client->Connect("127.0.0.1", ServerPortConst);	
+	client->Connect("127.0.0.1", ServerPortConst);
 }

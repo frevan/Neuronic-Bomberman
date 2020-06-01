@@ -5,6 +5,8 @@
 #include "../base/nel_state.h"
 #include "../gameinterfaces.h"
 
+#include "../views/connectingview.h"
+
 
 
 class TServerCreateState :	public nel::TGameState
@@ -18,6 +20,7 @@ private:
 	} TConnectionProgress;
 
 	std::shared_ptr<tgui::Gui> GUI;
+	std::shared_ptr<TConnectingView> View;
 	TConnectionProgress progress;
 
 	void ConnectToServer();

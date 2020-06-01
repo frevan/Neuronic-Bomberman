@@ -28,7 +28,7 @@ bool TServerSideGame::GetPlayer(nel::TGameID ID, TPlayer& info)
 
 int TServerSideGame::ConnectPlayer(const std::string& name, nel::TGameID ID)
 {
-	int slot = FindAvailableSlot();
+	int slot = -1;//FindAvailableSlot();
 	if (slot >= 0)
 	{
 		TPlayer p;

@@ -103,8 +103,9 @@ void TApplication::Execute()
 			for (auto it = EventHandlers.rbegin(); it != EventHandlers.rend(); it++)
 			{
 				auto eh = it->lock();
-				if (eh)	if (eh->ProcessEvent(event))
-					break;
+				if (eh)	
+					if (eh->ProcessEvent(event))
+						break;
 			}
 		}
 
@@ -114,7 +115,7 @@ void TApplication::Execute()
         while (nowTime > nextGameTick && loops < MAX_FRAMESKIP) 
 		{	
 			TGameTime delta = nowTime-prevTickTime;			
-			// create tempo copy (so we can add new logics from inside the loop)  ---  better solution might be to create jobs for adding and removing logics?
+			// create temp copy (so we can add new logics from inside the loop)  ---  better solution might be to create jobs for adding and removing logics?
 			std::vector<ILogicPtr> tempLogics;
 			{
 				std::lock_guard<std::mutex> g(LogicsMutex);

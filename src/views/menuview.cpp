@@ -73,7 +73,11 @@ void TMenuView::OnJoinGameBtnClick()
 	msgbox->setText("Not implemented yet");
 	msgbox->setPosition(350, 275);
 	msgbox->addButton("OK");
-	msgbox->showWithEffect(tgui::ShowAnimationType::Fade, sf::Time::Zero);
+	msgbox->connect("ButtonPressed", [=](const std::string& button) {
+		if (button == "OK")
+			msgbox->hideWithEffect(tgui::ShowAnimationType::Fade, sf::Time::Zero);
+		});
+	msgbox->showWithEffect(tgui::ShowAnimationType::Fade, sf::Time::Zero);	
 
 	//StateMachine->SetNextState(SID_ServerSelect);
 }
@@ -84,6 +88,11 @@ void TMenuView::OnOptionsBtnClick()
 	AddWidgetToGUI(msgbox);
 	msgbox->setText("Not implemented yet");
 	msgbox->setPosition(350, 275);
+	msgbox->addButton("OK");
+	msgbox->connect("ButtonPressed", [=](const std::string& button) {
+		if (button == "OK")
+			msgbox->hideWithEffect(tgui::ShowAnimationType::Fade, sf::Time::Zero);
+		});
 	msgbox->showWithEffect(tgui::ShowAnimationType::Fade, sf::Time::Zero);
 
 	//StateMachine->SetNextState(SID_Options);
