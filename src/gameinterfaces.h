@@ -15,8 +15,8 @@ DEFINE_GAMEID(IID_IClient, "game::IClient");
 struct TPlayer
 {
 	std::string Name;
-	nel::TGameID ID;
-	nel::TGameID ClientID;
+	nel::TGameID Tag;
+	nel::TGameID ClientTag;
 	int Slot;
 	int Score;
 	int Kills;
@@ -42,9 +42,9 @@ public:
 	IServerSideGame() : nel::Interface() {};
 	virtual ~IServerSideGame() {};
 
-	virtual bool GetPlayer(nel::TGameID ID, TPlayer& Info) = 0;
-	virtual int ConnectPlayer(const std::string& SetName, nel::TGameID SetID) = 0;
-	virtual void DisconnectPlayer(nel::TGameID ID) = 0;
+	virtual bool GetPlayer(uint64_t Tag, TPlayer& Info) = 0;
+	virtual uint64_t ConnectPlayer(const std::string& SetName, const std::string& SetVersion, uint64_t ClientTag) = 0;	// returns server tag
+	virtual void DisconnectPlayer(uint64_t Tag) = 0;
 };
 
 

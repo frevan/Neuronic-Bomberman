@@ -1,18 +1,21 @@
 #pragma once
 
 #include <list>
+#include <random>
 #include "../gameinterfaces.h"
 
 class TServerSideGame: public IServerSideGame
 {
 private:
 	std::list<TPlayer> Players;
+	std::mt19937_64 randomTagGenerator;
+	int FindAvailableSlot();
 public:
 	TServerSideGame();
 	~TServerSideGame();
 
 	// from IServerSideGame
-	virtual bool GetPlayer(nel::TGameID ID, TPlayer& info);
-	virtual int ConnectPlayer(const std::string& name, nel::TGameID ID);
-	virtual void DisconnectPlayer(nel::TGameID ID);
+	virtual bool GetPlayer(uint64_t Tag, TPlayer& info);
+	virtual uint64_t ConnectPlayer(const std::string& ClientName, const std::string& ClientVersion, uint64_t ClientTag);
+	virtual void DisconnectPlayer(uint64_t Tag);
 };

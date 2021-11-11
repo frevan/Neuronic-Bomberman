@@ -1,10 +1,13 @@
 #include "serverlogic.h"
 
+const int SLOT_COUNT = 4;
+
 // TServerSideGame
 
 TServerSideGame::TServerSideGame()
 :	IServerSideGame(),
-	Players()
+	Players(),
+	randomTagGenerator()
 {
 }
 
@@ -12,11 +15,11 @@ TServerSideGame::~TServerSideGame()
 {
 }
 
-bool TServerSideGame::GetPlayer(nel::TGameID ID, TPlayer& info)
+bool TServerSideGame::GetPlayer(uint64_t Tag, TPlayer& info)
 {
 	for (auto it = Players.begin(); it != Players.end(); it++)
 	{
-		if (it->ID == ID)
+		if (it->Tag == Tag)
 		{
 			info = *it;
 			return true;
@@ -26,32 +29,60 @@ bool TServerSideGame::GetPlayer(nel::TGameID ID, TPlayer& info)
 	return false;
 }
 
-int TServerSideGame::ConnectPlayer(const std::string& name, nel::TGameID ID)
+uint64_t TServerSideGame::ConnectPlayer(const std::string& ClientName, const std::string& SetVersion, uint64_t ClientTag)
 {
-	int slot = -1;//FindAvailableSlot();
+	uint64_t tag = nel::INVALID_GAME_ID;
+
+	int slot = FindAvailableSlot();
 	if (slot >= 0)
 	{
+		tag = randomTagGenerator();
 		TPlayer p;
-		p.ClientID = 0;
-		p.ID = ID;
-		p.Name = name;
+		p.ClientTag = ClientTag;		
+		p.Tag = tag;
+		p.Name = ClientName;
 		p.Kills = 0;
 		p.Score = 0;
 		p.Slot = slot;
 
 		Players.push_back(p);
 	}
-	return slot;
+
+	return tag;
 }
 
-void TServerSideGame::DisconnectPlayer(nel::TGameID ID)
+void TServerSideGame::DisconnectPlayer(uint64_t Tag)
 {
 	for (auto it = Players.begin(); it != Players.end(); it++)
 	{
-		if (it->ID == ID)
+		if (it->Tag == Tag)
 		{
 			it = Players.erase(it);
 			return;
 		}
 	}
+}
+
+int TServerSideGame::FindAvailableSlot()
+{
+	bool slotIsUsed = true;
+	int slot = -1;
+	while (slotIsUsed && slot < SLOT_COUNT)
+	{
+		slot++;
+		slotIsUsed = false;
+		for (auto it = Players.begin(); it != Players.end(); it++)
+		{
+			if (it->Slot == slot)
+			{
+				slotIsUsed = true;
+				break;
+			}
+		}
+	}
+
+	if (!slotIsUsed)
+		return slot;
+	else
+		return -1;
 }

@@ -150,8 +150,20 @@ bool TServerComms::OnInfoRequest(sf::Socket* Source)
 	return false;
 }
 
-bool TServerComms::OnConnect(sf::Socket* Source, int Version, const std::string& NodeName, const std::string& ClientVersion)
+bool TServerComms::OnConnect(sf::Socket* Source, int Version, const std::string& NodeName, const std::string& ClientVersion, uint64_t ClientTag)
 {
+	nel::TGameID tag = nel::INVALID_GAME_ID;
+
+	if (Game)
+		tag = Game->ConnectPlayer(NodeName, ClientVersion, ClientTag);
+
+	sf::Packet packet;
+	if (tag != nel::INVALID_GAME_ID)
+		Protocol.ConnectResponse(packet, 0, tag);
+	else
+		Protocol.Error(packet, Err_ServerFull, "The server appears to be full.");
+	Protocol.SendToSocket(Source, packet);
+
 	return false;
 }
 
@@ -165,7 +177,7 @@ bool TServerComms::OnInfoResponse(sf::Socket* Source, unsigned int ProtocolVersi
 	return false;
 }
 
-bool TServerComms::OnConnectResponse(sf::Socket* Source, unsigned int ProtocolVersion, unsigned int ServerID, unsigned int ClientID)
+bool TServerComms::OnConnectResponse(sf::Socket* Source, unsigned int ProtocolVersion, uint64_t ServerID)
 {
 	return false;
 }

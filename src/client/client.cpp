@@ -14,8 +14,8 @@ TClient::TClient()
 	ServerProtocol(0),
 	ServerFlags(0),
 	ServerName(""),
-	ServerID(0),
-	ClientID(0),
+	ServerTag(nel::INVALID_GAME_ID),
+	ClientTag(1),
 	Application(nullptr)
 {
 }
@@ -115,21 +115,6 @@ bool TClient::IsInLobby()
 	return false;
 }
 
-bool TClient::OnInfoRequest(sf::Socket* Source)
-{
-	return false;
-}
-
-bool TClient::OnConnect(sf::Socket* Source, int Version, const std::string& NodeName, const std::string& ClientVersion)
-{
-	return false;
-}
-
-bool TClient::OnRCon(sf::Socket* Source, const std::string& Password, const std::string& Command)
-{
-	return false;
-}
-
 bool TClient::OnInfoResponse(sf::Socket* Source, unsigned int ProtocolVersion, unsigned int Flags, const std::string& HostName)
 {
 	ServerProtocol = ProtocolVersion;
@@ -137,19 +122,22 @@ bool TClient::OnInfoResponse(sf::Socket* Source, unsigned int ProtocolVersion, u
 	ServerName = HostName;
 
 	sf::Packet packet;
-	Protocol.Connect(packet, "LocalUser", "TestVersion");
+	Protocol.Connect(packet, "LocalUser", "TestVersion", ClientTag);
 	Socket.send(packet);
 
 	return true;
 }
 
-bool TClient::OnConnectResponse(sf::Socket* Source, unsigned int ProtocolVersion, unsigned int ServerID, unsigned int ClientID)
+bool TClient::OnConnectResponse(sf::Socket* Source, unsigned int ProtocolVersion, uint64_t ServerTag)
 {
 	ServerProtocol = ProtocolVersion;
-	this->ServerID = ServerID;
-	this->ClientID = ClientID;
+	this->ServerTag = ServerTag;
 
 	Connected = true;
+
+	sf::Packet packet;
+	Protocol.CreateLobby(packet, this->ServerTag);
+	Socket.send(packet);
 
 	return true;
 }

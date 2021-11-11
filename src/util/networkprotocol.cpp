@@ -48,7 +48,7 @@ bool TBombermanProtocol::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& P
 
 	// to be used below
 	uint8_t u8_1, u8_2;
-	uint16_t u16_1, u16_2;
+	uint64_t u64_1;
 	std::string s_1, s_2;
 
 	if (id == ID_Connectionless)
@@ -60,8 +60,8 @@ bool TBombermanProtocol::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& P
 				return Receiver->OnInfoRequest(Source);
 			else if (command == CMD_Connect)
 			{
-				if (Packet >> u8_1 >> s_1 >> s_2)
-					return Receiver->OnConnect(Source, u8_1, s_1, s_2);
+				if (Packet >> u8_1 >> s_1 >> s_2 >> u64_1)
+					return Receiver->OnConnect(Source, u8_1, s_1, s_2, u64_1);
 			}
 			else if (command == CMD_RCon)
 			{
@@ -70,8 +70,8 @@ bool TBombermanProtocol::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& P
 			}
 			else if (command == CMD_ConnectResponse)
 			{
-				if (Packet >> u8_1 >> u16_1 >> u16_2)
-					return Receiver->OnConnectResponse(Source, u8_1, u16_1, u16_2);
+				if (Packet >> u8_1 >> u64_1)
+					return Receiver->OnConnectResponse(Source, u8_1, u64_1);
 			}
 			else if (command == CMD_InfoResponse)
 			{
@@ -121,7 +121,7 @@ void TBombermanProtocol::InfoRequest(sf::Packet& Packet)
 	Packet << CMD_InfoRequest;
 }
 
-void TBombermanProtocol::Connect(sf::Packet& Packet, const std::string& NodeName, const std::string& ClientVersion)
+void TBombermanProtocol::Connect(sf::Packet& Packet, const std::string& NodeName, const std::string& ClientVersion, uint64_t ClientTag)
 {
 	InitPacket(Packet, ID_Connectionless);
 
@@ -130,6 +130,7 @@ void TBombermanProtocol::Connect(sf::Packet& Packet, const std::string& NodeName
 	Packet << version;
 	Packet << NodeName;
 	Packet << ClientVersion;
+	Packet << ClientTag;
 }
 
 void TBombermanProtocol::RCon(sf::Packet& Packet, const std::string& Password, const std::string& Command)
@@ -152,14 +153,14 @@ void TBombermanProtocol::InfoResponse(sf::Packet& Packet, unsigned int Flags, co
 	Packet << HostName;
 }
 
-void TBombermanProtocol::ConnectResponse(sf::Packet& Packet, unsigned int ProtocolVersion, unsigned int ServerID, unsigned int ClientID)
+void TBombermanProtocol::ConnectResponse(sf::Packet& Packet, unsigned int ProtocolVersion, uint64_t ServerTag)
 {
 	InitPacket(Packet, ID_Connectionless);
 
 	Packet << CMD_ConnectResponse;
 	Packet << static_cast<uint8_t>(ProtocolVersion);
-	Packet << static_cast<uint16_t>(ServerID);
-	Packet << static_cast<uint16_t>(ClientID);
+	Packet << static_cast<uint64_t>(ServerTag);
+
 }
 
 void TBombermanProtocol::Print(sf::Packet& Packet, unsigned int Type, const std::string& Text)
@@ -186,4 +187,9 @@ void TBombermanProtocol::Disconnect(sf::Packet& Packet, const std::string& Reaso
 
 	Packet << CMD_Disconnect;
 	Packet << Reason;
+}
+
+void TBombermanProtocol::CreateLobby(sf::Packet& Packet, uint64_t ServerTag)
+{
+	// TODO
 }
