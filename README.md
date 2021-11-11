@@ -6,11 +6,13 @@ External dependencies:
 - SFML (v2.5.1): http://www.sfml-dev.org
 - TGUI (v0.8): https://tgui.eu/
 
+It's currently developed with Visual Studio 2022. Older build folders are still included but may not be up-to-date.
+
 ----
 
 This source code is licensed under the MIT License:
 
-Copyright (c) 2015-2020 Frederic Vanmol
+Copyright (c) 2015-2021 Frederic Vanmol
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
