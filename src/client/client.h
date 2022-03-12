@@ -15,7 +15,7 @@ class TClient :	public IClient,
 {
 private:
 	sf::TcpSocket Socket;
-	bool Connected, SocketConnected;
+	bool Connected, SocketConnected, InLobby;
 	TBombermanProtocol Protocol;
 
 	uint8_t ServerProtocol;
@@ -36,7 +36,7 @@ public:
 	// from IClient
 	void Process() override;
 	void Connect(const std::string& address, unsigned int port) override;
-	void Disconnect() override;	
+	void Disconnect(const std::string& reason) override;
 	bool IsConnected() override;
 	void LeaveLobby() override;
 	bool IsInLobby() override;
@@ -53,4 +53,5 @@ public:
 	bool OnPrint(sf::Socket* Source, unsigned int Type, const std::string& Text) override;
 	bool OnError(sf::Socket* Source, unsigned int Code, const std::string& Reason) override;
 	bool OnDisconnect(sf::Socket* Source, const std::string& Reason) override;
+	bool OnCreateGame(sf::Socket* Source, uint64_t ServerTag, const std::string& LobbyName);
 };

@@ -27,14 +27,14 @@ const uint16_t SRV_Position2		= 1;	// duplicate value?
 
 
 
-const std::string CMD_InfoRequest		= "infoRequest";
-const std::string CMD_Connect			= "connect";
-const std::string CMD_RCon				= "rcon";
-const std::string CMD_ConnectResponse	= "connectResponse";
-const std::string CMD_InfoResponse		= "infoResponse";
-const std::string CMD_Print				= "print";
-const std::string CMD_Error				= "error";
-const std::string CMD_Disconnect		= "disconnect";
+const std::string CMD_InfoRequest = "infoRequest";
+const std::string CMD_Connect = "connect";
+const std::string CMD_RCon = "rcon";
+const std::string CMD_ConnectResponse = "connectResponse";
+const std::string CMD_InfoResponse = "infoResponse";
+const std::string CMD_Print = "print";
+const std::string CMD_Error = "error";
+const std::string CMD_Disconnect = "disconnect";
 
 
 
@@ -189,7 +189,10 @@ void TBombermanProtocol::Disconnect(sf::Packet& Packet, const std::string& Reaso
 	Packet << Reason;
 }
 
-void TBombermanProtocol::CreateLobby(sf::Packet& Packet, uint64_t ServerTag)
+void TBombermanProtocol::SetGameName(sf::Packet& Packet, uint64_t PlayerTag, const std::string& GameName)
 {
-	// TODO
+	InitPacket(Packet, ID_Connectionless);
+
+	Packet << PlayerTag;
+	Packet << GameName;
 }

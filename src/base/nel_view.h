@@ -14,7 +14,7 @@ protected:
 	IStateMachine* StateMachine;
 	bool Visible;
 public:
-	TView(IStateMachine* setStateMachine, TViewType setType = VT_HUMANVIEW);
+	TView(IStateMachine* setStateMachine, TViewType setType = TViewType::VT_HUMANVIEW);
 	~TView() override;
 
 	// from IScene

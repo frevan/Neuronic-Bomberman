@@ -174,7 +174,7 @@ void TApplication::AttachView(IViewPtr view)
 {
 	std::lock_guard<std::mutex> g(ViewsMutex);
 
-	IView::TViewType viewtype = IView::VT_SYSTEMVIEW;
+	IView::TViewType viewtype = IView::TViewType::VT_SYSTEMVIEW;
 
 	auto lockedview = view.lock();
 	if (lockedview)
@@ -184,7 +184,7 @@ void TApplication::AttachView(IViewPtr view)
 	}
 
 	auto insertat = Views.end();
-	if (viewtype == IView::VT_OVERLAY || viewtype == IView::VT_SYSTEMVIEW)
+	if (viewtype == IView::TViewType::VT_OVERLAY || viewtype == IView::TViewType::VT_SYSTEMVIEW)
 	{
 		for (auto it = Views.begin(); it != Views.end(); it++)
 		{

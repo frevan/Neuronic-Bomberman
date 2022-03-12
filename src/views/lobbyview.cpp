@@ -5,6 +5,7 @@
 
 #include "../base/nel_objecttypes.h"
 
+#include "../gameinterfaces.h"
 #include "../states/states.h"
 
 
@@ -60,5 +61,15 @@ void TLobbyView::CreateWidgets()
 
 void TLobbyView::OnBackBtnClick()
 {
+	LeaveLobby();
+}
+
+void TLobbyView::LeaveLobby()
+{
+	IClient* client = (IClient*)Application->RetrieveInterface(IID_IClient);
+	assert(client);
+	client->LeaveLobby();
+	client->Disconnect("Leaving");
+
 	StateMachine->SetNextState(SID_Menu);
 }

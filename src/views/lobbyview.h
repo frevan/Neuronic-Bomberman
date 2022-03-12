@@ -16,4 +16,6 @@ protected:
 public:
 	TLobbyView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine* setStateMachine);
 	~TLobbyView() override;
+
+	void LeaveLobby();
 };

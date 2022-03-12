@@ -13,7 +13,8 @@ TServerComms::TServerComms()
 	ClientSockets(),
 	ClientSocketsMutex(),
 	ThreadsShouldStop(false),
-	Protocol()
+	Protocol(),
+	Game(nullptr)
 {
 }
 

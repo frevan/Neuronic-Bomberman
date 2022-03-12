@@ -10,6 +10,7 @@ TClient::TClient()
 	Socket(),
 	Connected(false),
 	SocketConnected(false),
+	InLobby(false),
 	Protocol(),
 	ServerProtocol(0),
 	ServerFlags(0),
@@ -22,24 +23,24 @@ TClient::TClient()
 
 TClient::~TClient()
 {
-	Disconnect();
+	Disconnect("");
 }
 
 void TClient::Connect(const std::string& address, unsigned int port)
 {
-	Disconnect();	// just in case
+	Disconnect("");	// just in case
 
 	Socket.setBlocking(false);
 
 	Socket.connect(address, port);
 }
 
-void TClient::Disconnect()
+void TClient::Disconnect(const std::string& reason)
 {
 	if (Connected)
 	{
 		sf::Packet packet;
-		Protocol.Disconnect(packet, "no reason");
+		Protocol.Disconnect(packet, reason);
 		Socket.send(packet);
 
 		Connected = false;
@@ -50,6 +51,8 @@ void TClient::Disconnect()
 		Socket.disconnect();
 		SocketConnected = false;
 	}
+
+	InLobby = false;
 }
 
 void TClient::Process()
@@ -104,15 +107,17 @@ void TClient::HandleSocketDisconnect()
 
 	Connected = false;
 	SocketConnected = false;
+	InLobby = false;
 }
 
 void TClient::LeaveLobby()
 {
+	InLobby = false;
 }
 
 bool TClient::IsInLobby()
 {
-	return false;
+	return InLobby;
 }
 
 bool TClient::OnInfoResponse(sf::Socket* Source, unsigned int ProtocolVersion, unsigned int Flags, const std::string& HostName)
@@ -136,8 +141,10 @@ bool TClient::OnConnectResponse(sf::Socket* Source, unsigned int ProtocolVersion
 	Connected = true;
 
 	sf::Packet packet;
-	Protocol.CreateLobby(packet, this->ServerTag);
+	Protocol.SetGameName(packet, this->ServerTag, "LocalGame");
 	Socket.send(packet);
+
+	InLobby = true;
 
 	return true;
 }
@@ -161,7 +168,13 @@ bool TClient::OnError(sf::Socket* Source, unsigned int Code, const std::string& 
 bool TClient::OnDisconnect(sf::Socket* Source, const std::string& Reason)
 {
 	Connected = false;
-	Disconnect();
+	InLobby = false;
+	Disconnect("");
 
 	return true;
+}
+
+bool TClient::OnCreateGame(sf::Socket* Source, uint64_t ServerTag, const std::string& LobbyName)
+{
+	return false;
 }

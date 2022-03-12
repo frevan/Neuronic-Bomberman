@@ -31,20 +31,10 @@ void TLobbyState::Finalize()
 	TGameState::Finalize();
 }
 
-bool TLobbyState::ProcessEvent(const sf::Event& event)
+void TLobbyState::ProcessInput(nel::TGameID inputID, float value)
 {
-	bool handled = false;
-
-	if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
-	{
-		Owner->SetNextState(SID_Menu);
-		handled = true;
-	};
-
-	if (!handled)
-		handled = TGameState::ProcessEvent(event);
-
-	return handled;
+	if (inputID == nel::actionToPreviousScreen && value != 0)
+		View->LeaveLobby();
 }
 
 void TLobbyState::Update(nel::TGameTime deltaTime)

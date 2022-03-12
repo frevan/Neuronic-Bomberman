@@ -4,10 +4,11 @@
 
 
 
-const unsigned int Err_Unknown		= 0;
-const unsigned int Err_ServerFull	= 1;
+const unsigned int Err_Unknown = 0;
+const unsigned int Err_ServerFull = 1;
+const unsigned int Err_NotGameMaster = 2;
 
-const unsigned int SF_PasswordProtected	= 1 << 0;
+const unsigned int SF_PasswordProtected = 1 << 0;
 
 
 
@@ -40,7 +41,7 @@ public:
 	void InfoRequest(sf::Packet& Packet);
 	void Connect(sf::Packet& Packet, const std::string& NodeName, const std::string& ClientVersion, uint64_t ClientTag);
 	void RCon(sf::Packet& Packet, const std::string& Password, const std::string& Command);
-	void CreateLobby(sf::Packet& Packet, uint64_t ServerTag);
+	void SetGameName(sf::Packet& Packet, uint64_t PlayerTag, const std::string& GameName);
 	// - connectionless - server
 	void InfoResponse(sf::Packet& Packet, unsigned int Flags, const std::string& HostName);
 	void ConnectResponse(sf::Packet& Packet, unsigned int Protocol, uint64_t ServerTag);

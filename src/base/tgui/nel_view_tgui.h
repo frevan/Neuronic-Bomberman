@@ -23,7 +23,7 @@ protected:
 	virtual void CreateWidgets() {};
 
 public:
-	TTGUIView(std::shared_ptr<tgui::Gui> setGUI, IStateMachine* setStateMachine, TViewType setType = VT_HUMANVIEW);
+	TTGUIView(std::shared_ptr<tgui::Gui> setGUI, IStateMachine* setStateMachine, TViewType setType = TViewType::VT_HUMANVIEW);
 	~TTGUIView() override;
 
 	std::shared_ptr<tgui::Gui> GetGUIPtr() { return GUI; };

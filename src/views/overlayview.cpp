@@ -25,7 +25,7 @@ DEFINE_GAMEID(actionToggleHelpOverlay, "OverlayView::actionToggleHelpOverlay")
 
 
 TOverlayView::TOverlayView(nel::IStateMachine* setStateMachine)
-:	TView(setStateMachine, nel::IView::VT_OVERLAY),
+:	TView(setStateMachine, nel::IView::TViewType::VT_OVERLAY),
 	CommonFont(),
 	EventHandler(),
 	ShowOverlay(false),
@@ -36,7 +36,7 @@ TOverlayView::TOverlayView(nel::IStateMachine* setStateMachine)
 	FPSText(),
 	BackgroundShape()
 {
-	EventHandler = std::make_shared<nel::TEventHandler>(nel::IEventHandler::OVERLAY, nullptr, std::bind(&TOverlayView::ProcessInput, this, std::placeholders::_1, std::placeholders::_2));
+	EventHandler = std::make_shared<nel::TEventHandler>(nel::IEventHandler::Type::OVERLAY, nullptr, std::bind(&TOverlayView::ProcessInput, this, std::placeholders::_1, std::placeholders::_2));
 
 	nel::TEventHandler* eh = (nel::TEventHandler*)EventHandler.get();
 	eh->InputMap.DefineInput(actionToggleFPSLabel, nel::TInputControl::Pack(nel::TInputControl::KEYBOARD, 0, sf::Keyboard::Key::Tab, 0));
@@ -60,19 +60,22 @@ void TOverlayView::OnAttach(nel::IApplication* setApplication)
 	BackgroundShape.setSize(sf::Vector2f(800, 600));
 
 	FPSText.setFont(CommonFont);
-	FPSText.setColor(sf::Color::Red);
+	FPSText.setFillColor(sf::Color::Red);
+	FPSText.setOutlineColor(sf::Color::Red);
 	FPSText.setCharacterSize(12);
 
 	HelpLine1.setFont(CommonFont);
 	HelpLine1.setString("F1 - toggle help display");
 	HelpLine1.setCharacterSize(24);
-	HelpLine1.setColor(sf::Color::White);
+	HelpLine1.setFillColor(sf::Color::White);
+	HelpLine1.setOutlineColor(sf::Color::White);
 	HelpLine1.setPosition(sf::Vector2f(25, 25));
 
 	HelpLine2.setFont(CommonFont);
 	HelpLine2.setString("TAB - toggle FPS counter");
 	HelpLine2.setCharacterSize(24);
-	HelpLine2.setColor(sf::Color::White);
+	HelpLine2.setFillColor(sf::Color::White);
+	HelpLine2.setOutlineColor(sf::Color::White);
 	HelpLine2.setPosition(sf::Vector2f(25, 60));
 }
 

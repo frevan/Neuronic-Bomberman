@@ -8,7 +8,8 @@ TView::TView(IStateMachine* setStateMachine, TViewType setType)
 :	IView(),
 	StateMachine(setStateMachine),
 	ViewType(setType),
-	Visible(true)
+	Visible(true),
+	Application(nullptr)
 {
 }
 

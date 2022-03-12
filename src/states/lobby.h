@@ -18,6 +18,6 @@ public:
 	// from TGameState
 	void Initialize(nel::IStateMachine* setOwner, nel::IApplication* setApplication, nel::IGameStateParamsPtr params) override;
 	void Finalize() override;
-	bool ProcessEvent(const sf::Event& event) override;
 	void Update(nel::TGameTime deltaTime) override;
+	void ProcessInput(nel::TGameID inputID, float value) override;
 };

@@ -11,7 +11,7 @@ TTGUIApplication::TTGUIApplication()
 	GUI(nullptr),
 	GUIView(nullptr)
 {
-	EventHandler = std::make_shared<TEventHandler>(IEventHandler::APPLICATION, std::bind(&TTGUIApplication::ProcessEvent, this, std::placeholders::_1), nullptr);
+	EventHandler = std::make_shared<TEventHandler>(IEventHandler::Type::APPLICATION, std::bind(&TTGUIApplication::ProcessEvent, this, std::placeholders::_1), nullptr);
 }
 
 void TTGUIApplication::AfterInitialization()

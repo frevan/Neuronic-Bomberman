@@ -85,6 +85,8 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\..\game\$(PlatformName)\</OutDir>
     <IntDir>..\..\Temp\$(PlatformName)\$(Configuration)\</IntDir>
+    <LibraryPath>c:\Files\dev\sdks\_lib\x64\;$(LibraryPath)</LibraryPath>
+    <IncludePath>c:\Files\dev\sdks\sfml\include\;c:\Files\dev\sdks\tgui\include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>

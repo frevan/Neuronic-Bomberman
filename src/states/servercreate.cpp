@@ -36,13 +36,16 @@ void TServerCreateState::Finalize()
 	Application->DetachView(View);
 	View.reset();
 
-	IClient* client = (IClient*)Application->RetrieveInterface(IID_IClient);
-	assert(client);
-	client->Disconnect();
+	if (progress != INLOBBY)
+	{
+		IClient* client = (IClient*)Application->RetrieveInterface(IID_IClient);
+		assert(client);
+		client->Disconnect("");
 
-	IServer* server = (IServer*)Application->RetrieveInterface(IID_IServer);
-	assert(server);
-	server->Stop();
+		IServer* server = (IServer*)Application->RetrieveInterface(IID_IServer);
+		assert(server);
+		server->Stop();
+	}
 
 	TGameState::Finalize();
 }
@@ -62,8 +65,10 @@ void TServerCreateState::Update(nel::TGameTime deltaTime)
 			progress = CONNECTING;
 			break;
 		case CONNECTING:	
-			if (client->IsConnected()) 
-				progress = CONNECTED; 
+			if (client->IsConnected())
+			{
+				progress = CONNECTED;
+			}
 			break;
 		case CONNECTED:
 			if (client->IsInLobby())

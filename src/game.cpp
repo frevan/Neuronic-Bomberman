@@ -18,8 +18,12 @@
 
 
 //#define FULLSCREEN
-#define FRAMERATE_60FPS
+#define FRAMERATE_LIMIT
 #define USE_OVERLAY
+
+#ifdef FRAMERATE_LIMIT
+const int MaxFrameRateConst = 60;
+#endif
 
 
 
@@ -51,8 +55,8 @@ sf::RenderWindow* TGame::CreateWindow()
 
 	auto w = new sf::RenderWindow{sf::VideoMode{800, 600, 32}, "Bomberman", windowstyle};
 
-	#ifdef FRAMERATE_60FPS
-	w->setFramerateLimit(60);
+	#ifdef FRAMERATE_LIMIT
+	w->setFramerateLimit(MaxFrameRateConst);
 	#endif
 
 	return w;
@@ -99,7 +103,7 @@ void TGame::BeforeFinalization()
 	Overlay.reset();
 	#endif
 	
-	Client->Disconnect();
+	Client->Disconnect("");
 	Server->Stop();
 
 	RemoveLogic(Client);

@@ -3,7 +3,7 @@
 
 
 TMatchView::TMatchView(nel::IStateMachine* setStateMachine)
-:	TView(setStateMachine, VT_HUMANVIEW)
+:	TView(setStateMachine, TViewType::VT_HUMANVIEW)
 {
 }
 

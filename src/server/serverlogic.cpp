@@ -6,6 +6,7 @@ const int SLOT_COUNT = 4;
 
 TServerSideGame::TServerSideGame()
 :	IServerSideGame(),
+	NodeName(),
 	Players(),
 	randomTagGenerator()
 {
@@ -85,4 +86,14 @@ int TServerSideGame::FindAvailableSlot()
 		return slot;
 	else
 		return -1;
+}
+
+void TServerSideGame::SetNodeName(const std::string& SetName)
+{
+	NodeName = SetName;
+}
+
+std::string TServerSideGame::GetNodeName()
+{
+	return NodeName;
 }

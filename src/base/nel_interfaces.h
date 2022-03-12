@@ -144,14 +144,14 @@ class IView :	public Interface
 {
 private:
 public:
-	typedef enum 
+	enum class TViewType
 	{
 		VT_OVERLAY		= -1,	// drawn on top of everything
 		VT_SYSTEMVIEW	= 0,	// any other view
 		VT_HUMANVIEW,			// local human player
 		VT_NETWORKVIEW,			// remote human player
 		VT_AIVIEW,				// (local) AI player
-	} TViewType;
+	};
 
 	IView(): Interface() {};
 	virtual ~IView() {};
@@ -203,7 +203,7 @@ public:
 class IEventHandler
 {
 public:
-	enum Type {
+	enum class Type {
 		APPLICATION = 0,
 		STATE,
 		OVERLAY,

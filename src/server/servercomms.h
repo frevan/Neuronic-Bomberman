@@ -17,6 +17,7 @@ class TClientSocket : public sf::TcpSocket
 {
 public:
 	nel::TGameID ID;
+	TClientSocket() : ID(0) {};
 };
 
 
