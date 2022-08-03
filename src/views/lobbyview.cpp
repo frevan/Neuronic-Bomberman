@@ -3,15 +3,11 @@
 #include <iomanip> 
 #include <TGUI/TGUI.hpp>
 
-#include "../base/nel_objecttypes.h"
+#include "../actions.h"
 
-#include "../gameinterfaces.h"
-#include "../states/states.h"
-
-
-
-TLobbyView::TLobbyView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine* setStateMachine)
-:	TTGUIView(setGUI, setStateMachine)
+TLobbyView::TLobbyView(TGame* SetGame, tgui::Gui* SetGUI)
+:	TTGUIView(SetGame, TViewType::VT_HUMANVIEW, SetGUI),
+	PlayersListView(nullptr)
 {
 }
 
@@ -52,11 +48,17 @@ void TLobbyView::CreateWidgets()
 	playerslbl->getRenderer()->setTextColor(sf::Color::White);
 	playerslbl->setTextSize(14);
 	// --- 
-	tgui::Panel::Ptr playerspanel = std::make_shared<tgui::Panel>();
-	AddWidgetToGUI(playerspanel);
-	playerspanel->setPosition(25, 80);
-	playerspanel->setSize(350, 430);
-	playerspanel->getRenderer()->setBackgroundColor(sf::Color(40,0,0));
+	//tgui::Panel::Ptr playerspanel = std::make_shared<tgui::Panel>();
+	//AddWidgetToGUI(playerspanel);
+	//playerspanel->setPosition(25, 80);
+	//playerspanel->setSize(350, 430);
+	//playerspanel->getRenderer()->setBackgroundColor(sf::Color(40,0,0));
+	// ---
+	PlayersListView = std::make_shared<tgui::ListView>();
+	AddWidgetToGUI(PlayersListView);
+	PlayersListView->setPosition(25, 80);
+	PlayersListView->setSize(350, 430);
+	PlayersListView->getRenderer()->setBackgroundColor(sf::Color(40, 0, 0));
 }
 
 void TLobbyView::OnBackBtnClick()
@@ -66,10 +68,36 @@ void TLobbyView::OnBackBtnClick()
 
 void TLobbyView::LeaveLobby()
 {
-	IClient* client = (IClient*)Application->RetrieveInterface(IID_IClient);
-	assert(client);
-	client->LeaveLobby();
-	client->Disconnect("Leaving");
+	Game->Client->CloseGame();
+}
 
-	StateMachine->SetNextState(SID_Menu);
+bool TLobbyView::ProcessInput(TInputID InputID, float Value)
+{
+	bool handled = false;
+
+	if (Value != 1.0f)
+		return false; // only handle key presses
+
+	switch (InputID)
+	{
+		case actionToPreviousScreen:
+			Game->SwitchToState(STATE_MENU);
+			handled = true;
+			break;
+	};
+
+	return handled;
+}
+
+void TLobbyView::StateChanged()
+{
+	PlayersListView->removeAllItems();
+
+	for (int i = 0; i < MAX_NUM_SLOTS; i++)
+	{
+		if (Game->GameData.Players[i].State == PLAYER_NOTPLAYING)
+			continue;
+
+		PlayersListView->addItem(Game->GameData.Players[i].Name);
+	}
 }

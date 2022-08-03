@@ -3,14 +3,11 @@
 #include <iomanip> 
 #include <TGUI/TGUI.hpp>
 
-#include "../base/nel_objecttypes.h"
+#include "../states/lobbystate.h"
+#include "../actions.h"
 
-#include "../states/states.h"
-
-
-
-TMenuView::TMenuView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine* setStateMachine)
-:	TTGUIView(setGUI, setStateMachine)
+TMenuView::TMenuView(TGame* SetGame, tgui::Gui* SetGUI)
+:	TTGUIView(SetGame, TViewType::VT_HUMANVIEW, SetGUI)
 {
 }
 
@@ -63,7 +60,7 @@ void TMenuView::CreateWidgets()
 
 void TMenuView::OnNewGameBtnClick()
 {
-	StateMachine->SetNextState(SID_ServerCreate, nullptr);
+	Game->SwitchToState(STATE_LOBBY);
 }
 
 void TMenuView::OnJoinGameBtnClick()
@@ -77,9 +74,7 @@ void TMenuView::OnJoinGameBtnClick()
 		if (button == "OK")
 			msgbox->hideWithEffect(tgui::ShowAnimationType::Fade, sf::Time::Zero);
 		});
-	msgbox->showWithEffect(tgui::ShowAnimationType::Fade, sf::Time::Zero);	
-
-	//StateMachine->SetNextState(SID_ServerSelect);
+	msgbox->showWithEffect(tgui::ShowAnimationType::Fade, sf::Time::Zero);
 }
 
 void TMenuView::OnOptionsBtnClick()
@@ -100,5 +95,23 @@ void TMenuView::OnOptionsBtnClick()
 
 void TMenuView::OnQuitBtnClick()
 {
-	Application->RequestQuit();
+	Game->RequestQuit();
+}
+
+bool TMenuView::ProcessInput(TInputID InputID, float Value)
+{
+	bool handled = false;
+
+	if (Value != 1.0f)
+		return false; // only handle key presses
+
+	switch (InputID)
+	{
+		case actionToPreviousScreen:
+			Game->RequestQuit();
+			handled = true;
+			break;
+	};
+
+	return handled;
 }

@@ -1,11 +1,10 @@
 #pragma once
 
-#include "../base/nel_interfaces.h"
-#include "../base/tgui/nel_view_tgui.h"
+#include "../view.h"
 
 
 
-class TMenuView :	public nel::TTGUIView
+class TMenuView : public TTGUIView
 {
 private:	
 	void CreateWidgets() override;
@@ -16,6 +15,9 @@ private:
 	void OnQuitBtnClick();
 
 public:
-	TMenuView(std::shared_ptr<tgui::Gui> setGUI, nel::IStateMachine* setStateMachine);
-	~TMenuView() override;
+	TMenuView(TGame* SetGame, tgui::Gui* SetGUI);
+	~TMenuView();
+
+	// from TView
+	bool TMenuView::ProcessInput(TInputID InputID, float Value) override;
 };

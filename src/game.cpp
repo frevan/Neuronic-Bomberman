@@ -1,113 +1,276 @@
 #include "game.h"
 
-#include "base/nel_state.h"
+#include <algorithm>
+#include <cstdint>
+#include <cassert>
 
-#include "states/states.h"
-#include "states/menu.h"
-#include "states/lobby.h"
-#include "states/serverselect.h"
-#include "states/servercreate.h"
-#include "states/loadmatch.h"
-#include "states/play.h"
-#include "states/roundend.h"
-#include "states/matchend.h"
-#include "views/overlayview.h"
+#include <SFML/System.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 
-#include "gameinterfaces.h"
-
-
+#include "actions.h"
+#include "states/menustate.h"
+#include "views/menuview.h"
+#include "views/lobbyview.h"
 
 //#define FULLSCREEN
 #define FRAMERATE_LIMIT
-#define USE_OVERLAY
+//#define USE_OVERLAY
 
 #ifdef FRAMERATE_LIMIT
 const int MaxFrameRateConst = 60;
 #endif
 
-
+int NextViewID = 1;
 
 // --- TGame ---
 
 TGame::TGame()
-:	nel::TTGUIApplication(),
-	Overlay(),
-	Server(nullptr),
-	Client(nullptr)
+:	Window(nullptr),
+	ShouldQuit(false),
+	InputMap(),
+	CurrentState(STATE_NONE),
+	NextState(STATE_NONE),
+	CurrentStateView(nullptr),
+	GUI(nullptr),
+	SystemGUIView(nullptr),
+	AppPath(),
+	Views(),
+	ViewsMutex(),
+	Client(nullptr),
+	GameData()
 {
-	Server = std::make_shared<TServer>();
-	Client = std::make_shared<TClient>();	
 }
 
 TGame::~TGame()
 {
-	Server.reset();
-	Client.reset();
+	assert(Views.size() == 0);
 }
 
-sf::RenderWindow* TGame::CreateWindow()
+bool TGame::Initialize(const std::string& filename)
 {
+	// initialize some data
+	DetermineAppPath(filename);
+
+	// create application window
 	#ifdef FULLSCREEN
 	sf::Uint32 windowstyle = sf::Style::Fullscreen;
 	#else
 	sf::Uint32 windowstyle = sf::Style::Titlebar | sf::Style::Close;
 	#endif
-
-	auto w = new sf::RenderWindow{sf::VideoMode{800, 600, 32}, "Bomberman", windowstyle};
-
+	Window = new sf::RenderWindow(sf::VideoMode{800, 600, 32}, "Neuronic Bomberman", windowstyle);
 	#ifdef FRAMERATE_LIMIT
-	w->setFramerateLimit(MaxFrameRateConst);
+	Window->setFramerateLimit(MaxFrameRateConst);
 	#endif
 
-	return w;
+	// create TGUI object and initialize it
+	GUI = new tgui::Gui(*Window);
+	tgui::setResourcePath(AppPath + GetResourceSubPath());
+	GUI->setFont(GetFontFileName());
+	// create and attacht the TGUI system view
+	//GUIView = new TTGUISystemView(this, GUI);
+	//AttachView(GUIView);
+	SystemGUIView = AttachView(VIEW_TGUISYSTEM);
+
+	// map some inputs
+	InputMap.DefineInput(actionToPreviousScreen, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Escape, 0));
+
+	// set next state
+	NextState = STATE_MENU;
+
+	// create client object
+	Client = new TClient(this);
+	Client->Listener = this;
+		
+	return true;
 }
 
-nel::TGameID TGame::GetInitialGameStateID()
+void TGame::Finalize()
 {
-	return SID_Menu;
+	// finalize state
+	NextState = STATE_QUIT;
+	ActivateNextState();
+
+	// delete the client object
+	Client->Listener = nullptr;
+	delete Client;
+	Client = nullptr;
+
+	// detach our TGUI system view
+	DetachView(SystemGUIView->ID);
+	SystemGUIView = nullptr;
+	// delete the GUI object
+	delete GUI;
+	GUI = nullptr;
+
+	// delete the application window
+	delete Window;
+	Window = nullptr;
 }
 
-void TGame::AfterInitialization()
+void TGame::Execute()
 {
-	nel::TTGUIApplication::AfterInitialization();
+	sf::Clock clock;
 
-	#ifdef USE_OVERLAY
-	// add the overlay scene
-	Overlay = std::make_shared<TOverlayView>(GameState);
-	AttachView(Overlay);
+	const int TICKS_PER_SECOND = 25;
+	const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
+	const int MAX_FRAMESKIP = 5;
+
+	uint32_t startTickForFPS = clock.getElapsedTime().asMilliseconds();
+	uint32_t nextGameTick = startTickForFPS;
+	int loops = 0;
+
+	uint32_t prevTickTime = clock.getElapsedTime().asMilliseconds();
+	uint32_t nowTime;
+
+	while (Window->isOpen())
+	{
+		ActivateNextState();
+		
+		// handle events
+		ProcessInputs();
+
+		// let the logic objects process a tick
+		loops = 0;
+		nowTime = clock.getElapsedTime().asMilliseconds();
+		while (nowTime > nextGameTick && loops < MAX_FRAMESKIP)
+		{
+			TGameTime delta = nowTime - prevTickTime;
+
+			// process client object
+			Client->Process(delta);
+
+			// get new time
+			nextGameTick += SKIP_TICKS;
+			loops++;
+			prevTickTime = nowTime;
+			nowTime = clock.getElapsedTime().asMilliseconds();
+		}
+
+		// draw views
+		sf::RenderTarget* target = Window;
+		target->clear();	// fixed to black, for now
+		{
+			std::lock_guard<std::mutex> g(ViewsMutex);
+			for (auto it = Views.rbegin(); it != Views.rend(); it++)
+			{				
+				TView* view = (*it);
+				if (!view)
+					continue;
+				if (view->IsVisible())
+					view->Draw(target);
+			}
+		}
+
+		/*
+		if (FpsCalculator)
+			FpsCalculator->NewFrame();
+		*/
+
+		// display the window on the screen
+		Window->display();
+
+		// this will most likely be set in reaction to some event, i.e. by the game state
+		if (ShouldQuit)
+			Window->close();
+	}
+}
+
+void TGame::ProcessInputs()
+{
+	sf::Event event;
+	while (Window->pollEvent(event))
+	{
+		bool handled = false;
+		TInputID inputID;
+		float value;
+		if (InputMap.ProcessEvent(event, inputID, value))
+		{
+			std::lock_guard<std::mutex> g(ViewsMutex);
+			for (auto it = Views.rbegin(); it != Views.rend(); it++)
+			{
+				TView* view = (*it);
+				if (!view)
+					continue;
+				if (view->IsVisible())
+					handled = view->ProcessInput(inputID, value);
+				if (handled)
+					break;
+			}
+		}
+		
+		if (!handled)
+			GUI->handleEvent(event);
+	}
+}
+
+void TGame::SwitchToState(int NewState)
+{
+	NextState = NewState;
+}
+
+void TGame::ActivateNextState()
+{
+	if (NextState == STATE_NONE)
+		return;
+
+	// deactivate the old state and delete it
+	if (CurrentStateView)
+	{
+		DetachView(CurrentStateView->ID);
+		CurrentStateView = nullptr;
+	}
+	CurrentState = STATE_NONE;
+
+	// make the switch
+	CurrentState = NextState;
+
+	// attach views
+	switch (CurrentState)
+	{
+		case STATE_MENU: CurrentStateView = AttachView(VIEW_MENU); break;
+		case STATE_LOBBY: CurrentStateView = AttachView(VIEW_LOBBY); break;
+	};
+
+	NextState = STATE_NONE;
+
+	SetupCurrentState();
+}
+
+void TGame::RequestQuit()
+{
+	ShouldQuit = true;
+}
+
+void TGame::DetermineAppPath(const std::string& filename)
+{
+	std::string path = filename;
+	#ifdef WIN32
+	std::replace(path.begin(), path.end(), '\\', '/');
 	#endif
+	size_t found = path.find_last_of('/');
+	path = path.substr(0, found + 1);
 
-	// register our game states
-	Factory.RegisterObjectType(SID_Splash, std::bind(&TGame::CreateState_Splash, this));
-	Factory.RegisterObjectType(SID_Menu, std::bind(&TGame::CreateState_Menu, this));
-	Factory.RegisterObjectType(SID_Options, std::bind(&TGame::CreateState_Options, this));	
-	Factory.RegisterObjectType(SID_ServerSelect, std::bind(&TGame::CreateState_ServerSelect, this));
-	Factory.RegisterObjectType(SID_ServerCreate, std::bind(&TGame::CreateState_ServerCreate, this));
-	Factory.RegisterObjectType(SID_Lobby, std::bind(&TGame::CreateState_Lobby, this));
-	Factory.RegisterObjectType(SID_LoadMatch, std::bind(&TGame::CreateState_LoadMatch, this));
-	Factory.RegisterObjectType(SID_Play, std::bind(&TGame::CreateState_Play, this));
-	Factory.RegisterObjectType(SID_RoundEnd, std::bind(&TGame::CreateState_RoundEnd, this));
-	Factory.RegisterObjectType(SID_MatchEnd, std::bind(&TGame::CreateState_MatchEnd, this));
-
-	Server->Application = this;
-	Client->Application = this;
-
-	AddLogic(Server);
-	AddLogic(Client);
+	AppPath = path;
 }
 
-void TGame::BeforeFinalization()
-{
-	#ifdef USE_OVERLAY
-	DetachView(Overlay);
-	Overlay.reset();
-	#endif
-	
-	Client->Disconnect("");
-	Server->Stop();
+std::string TGame::GetResourceSubPath()
+{ 
+	return "Artwork/"; 
+}
 
-	RemoveLogic(Client);
-	RemoveLogic(Server);
+std::string TGame::GetFontSubPath() 
+{ 
+	return "Fonts/"; 
+};
+
+std::string TGame::GetFontFileName(const std::string& FontIdentifier)
+{
+	std::string name = FontIdentifier;
+	if (FontIdentifier == "")	
+		name = GetDefaultFontName();
+
+	return AppPath + GetResourceSubPath() + GetFontSubPath() + name;
 }
 
 std::string TGame::GetDefaultFontName()
@@ -115,68 +278,97 @@ std::string TGame::GetDefaultFontName()
 	return "OpenSans-Regular.ttf";
 }
 
-void* TGame::CreateState_Splash()
+TView* TGame::AttachView(int NewView)
 {
-	// TODO
-	return nullptr;
+	TView* view = nullptr;
+
+	switch (NewView)
+	{
+		case VIEW_TGUISYSTEM: view = new TTGUISystemView(this, GUI); break;
+		case VIEW_MENU: view = new TMenuView(this, GUI); break;
+		case VIEW_LOBBY: view = new TLobbyView(this, GUI); break;
+	};
+	assert(view);
+
+	view->ID = NextViewID++;
+	view->OnAttach();
+
+	{
+		std::lock_guard<std::mutex> g(ViewsMutex);
+
+		auto insertat = Views.end();
+		if (view->Type == TViewType::VT_OVERLAY || view->Type == TViewType::VT_SYSTEMVIEW)
+		{
+			for (auto it = Views.begin(); it != Views.end(); it++)
+			{
+				if ((*it)->Type > view->Type)
+				{
+					insertat = it;
+					break;
+				}
+			}
+		}
+
+		Views.insert(insertat, view);
+	}
+
+	return view;
 }
 
-void* TGame::CreateState_Menu()
+void TGame::DetachView(TViewID ID)
 {
-	return new TMenuState(GUI);
+	TView* view = nullptr;
+
+	{
+		std::lock_guard<std::mutex> g(ViewsMutex);
+
+		for (auto it = Views.begin(); it != Views.end(); it++)
+		{
+			if ((*it)->ID == ID)
+			{
+				view = (*it);
+				Views.erase(it);
+				break;
+			}
+		}
+	}
+
+	if (view)
+	{
+		view->OnDetach();
+		delete(view);
+	}
 }
 
-void* TGame::CreateState_Options()
+void TGame::OnConnected()
 {
-	// TODO
-	return nullptr;
 }
 
-void* TGame::CreateState_Lobby()
+void TGame::OnDisconnected()
 {
-	return new TLobbyState(GUI);
+	SwitchToState(STATE_MENU);
 }
 
-void* TGame::CreateState_ServerSelect()
+void TGame::OnEnteredLobby()
 {
-	return new TServerSelectState(GUI);
+	Client->AddPlayer("Player 1");
+	// TODO: check result of AddPlayer
 }
 
-void* TGame::CreateState_ServerCreate()
+void TGame::OnPlayerAdded()
 {
-	return new TServerCreateState(GUI);
+	CurrentStateView->StateChanged();
 }
 
-void* TGame::CreateState_LoadMatch()
+void TGame::OnPlayerRemoved()
 {
-	return new TLoadMatchState(GUI);
+	// TODO: update lobby view
 }
 
-void* TGame::CreateState_Play()
+void TGame::SetupCurrentState()
 {
-	return new TPlayState(GUI);
-}
-
-void* TGame::CreateState_RoundEnd()
-{
-	return new TRoundEndState(GUI);
-}
-
-void* TGame::CreateState_MatchEnd()
-{
-	return new TMatchEndState(GUI);
-}
-
-nel::Interface* TGame::RetrieveInterface(nel::TGameID id)
-{
-	nel::Interface* result = nullptr;
-
-	if (id == IID_IServer)
-		result = (Interface*)(Server.get());
-	else if (id == IID_IClient)
-		result = (Interface*)(Client.get());
-	else
-		result = TTGUIApplication::RetrieveInterface(id);
-
-	return result;
+	if (CurrentState == STATE_LOBBY)
+	{
+		Client->CreateGame("Don't Explode");
+	}
 }
