@@ -39,6 +39,14 @@ void TLobbyView::CreateWidgets()
 	backbtn->setPosition(25, 535);
 	backbtn->setSize(100, 40);
 	backbtn->connect("pressed", &TLobbyView::OnBackBtnClick, this);
+
+	// start
+	tgui::Button::Ptr startbtn = std::make_shared<tgui::Button>();
+	AddWidgetToGUI(startbtn);
+	startbtn->setText("Start!");
+	startbtn->setPosition(675, 535);
+	startbtn->setSize(100, 40);
+	startbtn->connect("pressed", &TLobbyView::OnStartBtnClick, this);
 	
 	// players
 	tgui::Label::Ptr playerslbl = std::make_shared<tgui::Label>();
@@ -64,6 +72,11 @@ void TLobbyView::CreateWidgets()
 void TLobbyView::OnBackBtnClick()
 {
 	LeaveLobby();
+}
+
+void TLobbyView::OnStartBtnClick()
+{
+	Game->SwitchToState(STATE_MATCH);
 }
 
 void TLobbyView::LeaveLobby()

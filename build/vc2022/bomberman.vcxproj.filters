@@ -39,12 +39,15 @@
     <ClCompile Include="..\..\src\views\lobbyview.cpp">
       <Filter>source\views</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\views\matchview.cpp">
+      <Filter>source\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\resourcemgr.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\game.h">
-      <Filter>source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\interfaces.h">
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\actions.h">

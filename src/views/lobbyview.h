@@ -8,6 +8,7 @@ private:
 	tgui::ListView::Ptr PlayersListView;
 
 	void OnBackBtnClick();
+	void OnStartBtnClick();
 
 protected:
 	void CreateWidgets() override;

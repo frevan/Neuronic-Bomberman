@@ -12,6 +12,7 @@
 #include "states/menustate.h"
 #include "views/menuview.h"
 #include "views/lobbyview.h"
+#include "views/matchview.h"
 
 //#define FULLSCREEN
 #define FRAMERATE_LIMIT
@@ -38,7 +39,8 @@ TGame::TGame()
 	Views(),
 	ViewsMutex(),
 	Client(nullptr),
-	GameData()
+	GameData(),
+	Fonts()
 {
 }
 
@@ -51,6 +53,8 @@ bool TGame::Initialize(const std::string& filename)
 {
 	// initialize some data
 	DetermineAppPath(filename);
+	Fonts.SetFontPath(AppPath + GetResourceSubPath() + GetFontSubPath());
+	Fonts.LoadFonts();
 
 	// create application window
 	#ifdef FULLSCREEN
@@ -230,6 +234,7 @@ void TGame::ActivateNextState()
 	{
 		case STATE_MENU: CurrentStateView = AttachView(VIEW_MENU); break;
 		case STATE_LOBBY: CurrentStateView = AttachView(VIEW_LOBBY); break;
+		case STATE_MATCH: CurrentStateView = AttachView(VIEW_MATCH); break;
 	};
 
 	NextState = STATE_NONE;
@@ -287,6 +292,7 @@ TView* TGame::AttachView(int NewView)
 		case VIEW_TGUISYSTEM: view = new TTGUISystemView(this, GUI); break;
 		case VIEW_MENU: view = new TMenuView(this, GUI); break;
 		case VIEW_LOBBY: view = new TLobbyView(this, GUI); break;
+		case VIEW_MATCH: view = new TMatchView(this); break;
 	};
 	assert(view);
 

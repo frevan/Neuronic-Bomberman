@@ -16,6 +16,7 @@ class TGame;
 #include "view.h"
 #include "client.h"
 #include "gamedata.h"
+#include "resourcemgr.h"
 
 const int STATE_NONE = 0;
 const int STATE_MENU = 1;
@@ -28,6 +29,7 @@ const int VIEW_OVERLAY = 0;
 const int VIEW_TGUISYSTEM = 1;
 const int VIEW_MENU = 11;
 const int VIEW_LOBBY = 12;
+const int VIEW_MATCH = 13;
 
 class TGame: public TClientListener
 {
@@ -57,6 +59,7 @@ public:
 	TInputMap InputMap;
 	TClient* Client;
 	TGameData GameData;
+	TFontManager Fonts;
 
 	TGame();
 	~TGame();
