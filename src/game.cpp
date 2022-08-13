@@ -36,6 +36,7 @@ TGame::TGame()
 	GUI(nullptr),
 	SystemGUIView(nullptr),
 	AppPath(),
+	MapPath(),
 	Views(),
 	ViewsMutex(),
 	Client(nullptr),
@@ -53,6 +54,7 @@ bool TGame::Initialize(const std::string& filename)
 {
 	// initialize some data
 	DetermineAppPath(filename);
+	MapPath = AppPath + GetMapSubPath();
 	Fonts.SetFontPath(AppPath + GetResourceSubPath() + GetFontSubPath());
 	Fonts.LoadFonts();
 
@@ -269,6 +271,11 @@ std::string TGame::GetFontSubPath()
 	return "Fonts/"; 
 };
 
+std::string TGame::GetMapSubPath()
+{
+	return "Maps/";
+}
+
 std::string TGame::GetFontFileName(const std::string& FontIdentifier)
 {
 	std::string name = FontIdentifier;
@@ -346,35 +353,47 @@ void TGame::DetachView(TViewID ID)
 	}
 }
 
-void TGame::OnConnected()
+void TGame::ClientConnected()
 {
 }
 
-void TGame::OnDisconnected()
+void TGame::ClientDisconnected()
 {
 	SwitchToState(STATE_MENU);
 }
 
-void TGame::OnEnteredLobby()
+void TGame::ClientEnteredLobby()
 {
+	Client->SelectArena(0); // select the first map initially
+
 	Client->AddPlayer("Player 1");
 	// TODO: check result of AddPlayer
 }
 
-void TGame::OnPlayerAdded()
+void TGame::ClientPlayerAdded()
 {
 	CurrentStateView->StateChanged();
 }
 
-void TGame::OnPlayerRemoved()
+void TGame::ClientPlayerRemoved()
 {
-	// TODO: update lobby view
+	CurrentStateView->StateChanged();
+}
+
+void TGame::ClientMatchStarting()
+{
+	CurrentStateView->StateChanged();
+}
+
+void TGame::ClientMatchStarted()
+{
+	CurrentStateView->StateChanged();
 }
 
 void TGame::SetupCurrentState()
 {
 	if (CurrentState == STATE_LOBBY)
-	{
 		Client->CreateGame("Don't Explode");
-	}
+	else if (CurrentState == STATE_MATCH)
+		Client->StartMatch();
 }

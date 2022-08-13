@@ -27,6 +27,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\actions.h" />
     <ClInclude Include="..\..\src\game.h" />
+    <ClInclude Include="..\..\src\utility\stringutil.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7A327356-55D7-4A85-98A6-460F60D42534}</ProjectGuid>

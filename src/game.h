@@ -34,7 +34,6 @@ const int VIEW_MATCH = 13;
 class TGame: public TClientListener
 {
 private:
-	std::string AppPath;
 	sf::RenderWindow* Window;
 	int CurrentState;
 	int NextState;
@@ -47,6 +46,7 @@ private:
 	void DetermineAppPath(const std::string& Filename);
 	std::string GetResourceSubPath();
 	std::string GetFontSubPath();
+	std::string GetMapSubPath();
 	std::string GetFontFileName(const std::string& FontIdentifier = "");
 	std::string GetDefaultFontName();
 
@@ -60,6 +60,7 @@ public:
 	TClient* Client;
 	TGameData GameData;
 	TFontManager Fonts;
+	std::string AppPath, MapPath;
 
 	TGame();
 	~TGame();
@@ -76,9 +77,11 @@ public:
 	void DetachView(TViewID ID);
 
 	// from TClientListener
-	void OnConnected() override;
-	void OnDisconnected() override;
-	void OnEnteredLobby() override;
-	void OnPlayerAdded() override;
-	void OnPlayerRemoved() override;
+	void ClientConnected() override;
+	void ClientDisconnected() override;
+	void ClientEnteredLobby() override;
+	void ClientPlayerAdded() override;
+	void ClientPlayerRemoved() override;
+	void ClientMatchStarting() override;
+	void ClientMatchStarted() override;
 };

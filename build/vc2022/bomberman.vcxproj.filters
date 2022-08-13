@@ -7,6 +7,9 @@
     <Filter Include="source\views">
       <UniqueIdentifier>{323cd62c-8c35-4e92-bedd-cbd9d1bd91f7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\utility">
+      <UniqueIdentifier>{4a97a495-bc1d-4d70-9ea8-ce06480dbae4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -52,6 +55,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\actions.h">
       <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\utility\stringutil.h">
+      <Filter>source\utility</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
