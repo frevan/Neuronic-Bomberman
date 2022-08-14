@@ -59,6 +59,9 @@ void TClient::Process(TGameTime Delta)
 			case CMD_StartMatch:
 				Game->GameData.Status = GAME_STARTING;
 				Listener->ClientMatchStarting();
+
+				Game->GameData.InitNewGame();
+
 				Game->GameData.Status = GAME_RUNNING;
 				Listener->ClientMatchStarted();
 		};

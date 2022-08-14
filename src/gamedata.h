@@ -91,6 +91,7 @@ typedef struct
 	int X;
 	int Y;
 	bool Primary;
+	bool Taken;
 } TStartPosition;
 
 class TArena
@@ -126,6 +127,9 @@ class TGameData
 private:
 	bool ProcessSchemeLine(const std::string& Line);
 	void TokenizeSchemeLine(const std::string& Line, std::string& Command, std::list<std::string>& Parameters);
+	void ApplyBrickDensity();
+	void PositionPlayers();
+	void ClearMapFieldsForPlayer(int X, int Y);
 public:
 	std::string GameName;
 	TGameTime MaxRunTime;
@@ -140,4 +144,5 @@ public:
 	void Reset();
 	bool AddPlayer(const std::string& SetName, int SetSlot = INVALID_SLOT);
 	bool LoadMapFromFile(const std::string& FileName, int FileType = 0);
+	void InitNewGame();
 };

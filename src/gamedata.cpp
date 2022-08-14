@@ -357,3 +357,134 @@ void TGameData::TokenizeSchemeLine(const std::string& Line, std::string& Command
 		Parameters.push_back(tempString);
 	}
 }
+
+void TGameData::InitNewGame()
+{
+	ApplyBrickDensity();
+	PositionPlayers();
+}
+
+void TGameData::ApplyBrickDensity()
+{
+	// count bricks
+	int brickCount = 0;
+	for (int i = 0; i < Arena.Width; i++)	
+		for (int j = 0; j < Arena.Height; j++)
+		{
+			if (Arena.At(i, j)->Type == FIELD_BRICK)
+				brickCount++;
+		}
+
+	// remove them
+	if (Arena.BrickDensity < 100)
+	{
+		srand((unsigned int)time(nullptr));
+		int bricksToLose = (int)(brickCount - (brickCount / 100.0 * Arena.BrickDensity));
+		for (int i = 0; i < Arena.Width; i++)	
+			for (int j = 0; j < Arena.Height; j++)
+			{
+				TField* field = Arena.At(i, j);
+				if (field->Type != FIELD_BRICK)
+					continue;
+
+			bool keep = rand() % brickCount < Arena.BrickDensity;
+			if (!keep)
+			{
+				field->Type = FIELD_EMPTY;
+				bricksToLose--;
+				if (bricksToLose <= 0)
+					break;
+			}
+		}
+	}
+}
+
+void TGameData::PositionPlayers()
+{
+	for (int i = 0; i < Arena.StartPositions.size(); i++)
+		Arena.StartPositions[i].Taken = false;
+
+	int startpos_idx = rand() % Arena.StartPositions.size(); // start at a "random" position
+	for (int it = 0; it < MAX_NUM_SLOTS; it++)
+	{
+		if (Players[it].State == PLAYER_NOTPLAYING)
+			continue;
+
+		Players[it].Position.X = 0.f;
+		Players[it].Position.Y = 0.f;
+
+		// --> first try primary positions
+		bool found = false;
+		for (int i = 0; i < Arena.StartPositions.size(); i++)
+		{
+			int idx = (startpos_idx + i) % Arena.StartPositions.size();
+			if (Arena.StartPositions[idx].Taken)
+				continue;
+			if (!Arena.StartPositions[idx].Primary)
+				continue;
+			Players[it].Position.X = Arena.StartPositions[idx].X + 0.5f;
+			Players[it].Position.Y = Arena.StartPositions[idx].Y + 0.5f;
+			Arena.StartPositions[idx].Taken = true;
+			found = true;
+			break;
+		}
+		// --> then try secondary positions
+		if (!found)	
+			for (int i = 0; i < Arena.StartPositions.size(); i++)
+			{
+				int idx = (startpos_idx + i) % Arena.StartPositions.size();
+				if (Arena.StartPositions[idx].Taken)
+					continue;
+				Players[it].Position.X = Arena.StartPositions[idx].X + 0.5f;
+				Players[it].Position.Y = Arena.StartPositions[idx].Y + 0.5f;
+				Arena.StartPositions[idx].Taken = true;
+				break;
+			}
+
+		// clear fields around player, if necessary, in a + shape
+		int fieldx = (int)Players[it].Position.X;
+		int fieldy = (int)Players[it].Position.Y;
+		ClearMapFieldsForPlayer(fieldx, fieldy);
+	}
+}
+
+void TGameData::ClearMapFieldsForPlayer(int X, int Y)
+{
+	TField* field = Arena.At(X, Y);
+
+	// player's own field
+	if (field->Type == FIELD_BRICK)
+		field->Type = FIELD_EMPTY;
+
+	// x-1	
+	if (X > 0)
+	{
+		field = Arena.At(X - 1, Y);
+		if (field->Type == FIELD_BRICK)
+			field->Type = FIELD_EMPTY;
+	}
+
+	// x+1
+	if (X < Arena.Width - 1)
+	{
+		field = Arena.At(X + 1, Y);
+		if (field->Type == FIELD_BRICK)
+			field->Type = FIELD_EMPTY;
+	}
+
+	// y-1
+	if (Y > 0)
+	{
+		field = Arena.At(X, Y - 1);
+		if (field->Type == FIELD_BRICK)
+			field->Type = FIELD_EMPTY;
+	}
+
+	// y+1
+	if (Y < Arena.Height - 1)
+	{
+		field = Arena.At(X, Y + 1);
+		if (field->Type == FIELD_BRICK)
+			field->Type = FIELD_EMPTY;
+	}
+}
