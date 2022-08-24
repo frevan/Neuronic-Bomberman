@@ -33,6 +33,7 @@ typedef uint32_t TGameTime;
 
 typedef uint8_t TPlayerDirection;
 
+const TPlayerDirection DIRECTION_NONE = 0;
 const TPlayerDirection DIRECTION_UP = 1 << 0;
 const TPlayerDirection DIRECTION_DOWN = 1 << 1;
 const TPlayerDirection DIRECTION_LEFT = 1 << 2;
@@ -41,7 +42,7 @@ const TPlayerDirection DIRECTION_RIGHT = 1 << 3;
 typedef int16_t TPlayerSpeed;
 
 const TPlayerSpeed SPEED_NOTMOVING = 0;
-const TPlayerSpeed SPEED_NORMAL = 256;
+const TPlayerSpeed SPEED_NORMAL = 1000; // just a random value that has room for slower and faster speeds
 
 typedef uint8_t TPlayerState;
 
@@ -99,8 +100,14 @@ class TArena
 private:
 	size_t Stride; // the length of one horizontal line (i.e. the width), used to determine the one-dimensional position	
 	std::vector<TField*> Fields;
+
 	void CreateFields(size_t StartIndex = 0);
+	void ClearFields();
+	bool ProcessSchemeLine(const std::string& Line);
+	void TokenizeSchemeLine(const std::string& Line, std::string& Command, std::list<std::string>& Parameters);
+
 public:
+	std::string OriginalFileName;
 	std::string Caption;
 	size_t Width, Height;
 	int BrickDensity;
@@ -120,13 +127,13 @@ public:
 	// retrieve a field at a position (read-only)
 	TField* At(uint8_t X, uint8_t Y);
 	TField* At(const TFieldPosition Position);
+
+	bool LoadFromFile(const std::string& FileName, int FileType = 0);
 };
 
 class TGameData
 {
 private:
-	bool ProcessSchemeLine(const std::string& Line);
-	void TokenizeSchemeLine(const std::string& Line, std::string& Command, std::list<std::string>& Parameters);
 	void ApplyBrickDensity();
 	void PositionPlayers();
 	void ClearMapFieldsForPlayer(int X, int Y);
@@ -143,6 +150,5 @@ public:
 
 	void Reset();
 	bool AddPlayer(const std::string& SetName, int SetSlot = INVALID_SLOT);
-	bool LoadMapFromFile(const std::string& FileName, int FileType = 0);
 	void InitNewGame();
 };

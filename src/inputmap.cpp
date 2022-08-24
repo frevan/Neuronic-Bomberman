@@ -78,6 +78,11 @@ void TInputMap::DefineInput(TInputID setID, TInputControl::TPacked setDefaultCon
 		Values.insert( std::pair<TInputID, float>(setID, setDefaultValue) );
 }
 
+void TInputMap::RemoveInput(TInputID inputID)
+{
+	Bindings.erase(inputID);
+}
+
 void TInputMap::BindControlToInput(TInputID inputID, TInputControl::TPacked setControl, float setScale)
 {
 	auto it = Bindings.find(inputID);

@@ -1,14 +1,19 @@
 #pragma once
 
 #include "../view.h"
+#include "../gamedata.h"
 
 class TLobbyView :	public TTGUIView
 {
 private:
 	tgui::ListView::Ptr PlayersListView;
+	tgui::ComboBox::Ptr MapCombo;
+	std::vector<TArena> Maps;
 
 	void OnBackBtnClick();
 	void OnStartBtnClick();
+	
+	void FillMapCombo();
 
 protected:
 	void CreateWidgets() override;

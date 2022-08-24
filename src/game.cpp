@@ -27,7 +27,7 @@ int NextViewID = 1;
 // --- TGame ---
 
 TGame::TGame()
-:	Window(nullptr),
+	: Window(nullptr),
 	ShouldQuit(false),
 	InputMap(),
 	CurrentState(STATE_NONE),
@@ -41,7 +41,9 @@ TGame::TGame()
 	ViewsMutex(),
 	Client(nullptr),
 	GameData(),
-	Fonts()
+	Fonts(),
+	Logic(nullptr),
+	Maps()
 {
 }
 
@@ -57,6 +59,7 @@ bool TGame::Initialize(const std::string& filename)
 	MapPath = AppPath + GetMapSubPath();
 	Fonts.SetFontPath(AppPath + GetResourceSubPath() + GetFontSubPath());
 	Fonts.LoadFonts();
+	Maps.LoadAllMaps(AppPath + GetMapSubPath());
 
 	// create application window
 	#ifdef FULLSCREEN
@@ -80,6 +83,7 @@ bool TGame::Initialize(const std::string& filename)
 
 	// map some inputs
 	InputMap.DefineInput(actionToPreviousScreen, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Escape, 0));
+	InputMap.DefineInput(actionDoDefaultAction, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Return, 0));
 
 	// set next state
 	NextState = STATE_MENU;
@@ -87,6 +91,9 @@ bool TGame::Initialize(const std::string& filename)
 	// create client object
 	Client = new TClient(this);
 	Client->Listener = this;
+
+	// create the logic object
+	Logic = new TGameLogic(this);
 		
 	return true;
 }
@@ -96,6 +103,10 @@ void TGame::Finalize()
 	// finalize state
 	NextState = STATE_QUIT;
 	ActivateNextState();
+
+	// delete the logic object
+	delete Logic;
+	Logic = nullptr;
 
 	// delete the client object
 	Client->Listener = nullptr;
@@ -145,6 +156,9 @@ void TGame::Execute()
 
 			// process client object
 			Client->Process(delta);
+
+			// process game logic
+			Logic->Process(delta);
 
 			// get new time
 			nextGameTick += SKIP_TICKS;
@@ -220,26 +234,23 @@ void TGame::ActivateNextState()
 	if (NextState == STATE_NONE)
 		return;
 
-	// deactivate the old state and delete it
+	FinalizeCurrentState();
+
 	if (CurrentStateView)
 	{
 		DetachView(CurrentStateView->ID);
 		CurrentStateView = nullptr;
 	}
-	CurrentState = STATE_NONE;
 
-	// make the switch
-	CurrentState = NextState;
+	CurrentState = NextState; // make the switch
+	NextState = STATE_NONE;
 
-	// attach views
 	switch (CurrentState)
 	{
 		case STATE_MENU: CurrentStateView = AttachView(VIEW_MENU); break;
 		case STATE_LOBBY: CurrentStateView = AttachView(VIEW_LOBBY); break;
 		case STATE_MATCH: CurrentStateView = AttachView(VIEW_MATCH); break;
 	};
-
-	NextState = STATE_NONE;
 
 	SetupCurrentState();
 }
@@ -366,7 +377,8 @@ void TGame::ClientEnteredLobby()
 {
 	Client->SelectArena(0); // select the first map initially
 
-	Client->AddPlayer("Player 1");
+	Client->AddPlayer("Steve");
+	Client->AddPlayer("Bob");
 	// TODO: check result of AddPlayer
 }
 
@@ -395,5 +407,25 @@ void TGame::SetupCurrentState()
 	if (CurrentState == STATE_LOBBY)
 		Client->CreateGame("Don't Explode");
 	else if (CurrentState == STATE_MATCH)
+	{
+		InputMap.DefineInput(actionMatchLeft, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Left, 0));
+		InputMap.DefineInput(actionMatchRight, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Right, 0));
+		InputMap.DefineInput(actionMatchUp, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Up, 0));
+		InputMap.DefineInput(actionMatchDown, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Down, 0));
+
 		Client->StartMatch();
+	}
+}
+
+void TGame::FinalizeCurrentState()
+{
+	if (CurrentState == STATE_MATCH)
+	{
+		InputMap.RemoveInput(actionMatchLeft);
+		InputMap.RemoveInput(actionMatchRight);
+		InputMap.RemoveInput(actionMatchUp);
+		InputMap.RemoveInput(actionMatchDown);
+
+	Client->StartMatch();
+	}
 }

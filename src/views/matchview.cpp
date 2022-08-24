@@ -82,13 +82,30 @@ bool TMatchView::ProcessInput(TInputID InputID, float Value)
 {
 	bool handled = false;
 
-	if (Value != 1.0f)
-		return false; // only handle key presses
-
 	switch (InputID)
 	{
 		case actionToPreviousScreen:
-			Game->SwitchToState(STATE_MENU);
+			if (Value == 1.0f)
+			{
+				Game->SwitchToState(STATE_MENU);
+				handled = true;
+			}
+			break;
+
+		case actionMatchLeft:
+			Game->Client->UpdatePlayerMovement(0, DIRECTION_LEFT, Value > 0.f);
+			handled = true;
+			break;
+		case actionMatchRight:
+			Game->Client->UpdatePlayerMovement(0, DIRECTION_RIGHT, Value > 0.f);
+			handled = true;
+			break;
+		case actionMatchUp:
+			Game->Client->UpdatePlayerMovement(0, DIRECTION_UP, Value > 0.f);
+			handled = true;
+			break;
+		case actionMatchDown:
+			Game->Client->UpdatePlayerMovement(0, DIRECTION_DOWN, Value > 0.f);
 			handled = true;
 			break;
 	};

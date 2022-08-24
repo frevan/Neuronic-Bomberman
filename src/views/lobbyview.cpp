@@ -7,7 +7,8 @@
 
 TLobbyView::TLobbyView(TGame* SetGame, tgui::Gui* SetGUI)
 :	TTGUIView(SetGame, TViewType::VT_HUMANVIEW, SetGUI),
-	PlayersListView(nullptr)
+	PlayersListView(nullptr),
+	Maps()
 {
 }
 
@@ -55,18 +56,28 @@ void TLobbyView::CreateWidgets()
 	playerslbl->setPosition(25, 60);
 	playerslbl->getRenderer()->setTextColor(sf::Color::White);
 	playerslbl->setTextSize(14);
-	// --- 
-	//tgui::Panel::Ptr playerspanel = std::make_shared<tgui::Panel>();
-	//AddWidgetToGUI(playerspanel);
-	//playerspanel->setPosition(25, 80);
-	//playerspanel->setSize(350, 430);
-	//playerspanel->getRenderer()->setBackgroundColor(sf::Color(40,0,0));
 	// ---
 	PlayersListView = std::make_shared<tgui::ListView>();
 	AddWidgetToGUI(PlayersListView);
 	PlayersListView->setPosition(25, 80);
 	PlayersListView->setSize(350, 430);
-	PlayersListView->getRenderer()->setBackgroundColor(sf::Color(40, 0, 0));
+	PlayersListView->getRenderer()->setBackgroundColor(sf::Color(70, 0, 0));
+	PlayersListView->getRenderer()->setTextColor(sf::Color::White);
+
+	// map combo and <> buttons
+	MapCombo = std::make_shared<tgui::ComboBox>();
+	AddWidgetToGUI(MapCombo);
+	MapCombo->setPosition(450, 85);
+	MapCombo->setSize(300, 25);
+	MapCombo->setItemsToDisplay(16);
+	FillMapCombo();
+	MapCombo->setSelectedItemByIndex(0);
+	/*
+	button = addButton(window, ArtworkPath + imgButton, cbMapPrevious, 420, 85, 25, 25);
+	button->setText("<");
+	button = addButton(window, ArtworkPath + imgButton, cbMapNext, 755, 85, 25, 25);
+	button->setText(">");
+	*/
 }
 
 void TLobbyView::OnBackBtnClick()
@@ -76,6 +87,7 @@ void TLobbyView::OnBackBtnClick()
 
 void TLobbyView::OnStartBtnClick()
 {
+	Game->Client->SelectArena(MapCombo->getSelectedItemIndex());
 	Game->SwitchToState(STATE_MATCH);
 }
 
@@ -97,6 +109,11 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 			Game->SwitchToState(STATE_MENU);
 			handled = true;
 			break;
+
+		case actionDoDefaultAction:
+			Game->Client->SelectArena(MapCombo->getSelectedItemIndex());
+			Game->SwitchToState(STATE_MATCH);
+			break;
 	};
 
 	return handled;
@@ -112,5 +129,16 @@ void TLobbyView::StateChanged()
 			continue;
 
 		PlayersListView->addItem(Game->GameData.Players[i].Name);
+	}
+}
+
+void TLobbyView::FillMapCombo()
+{
+	MapCombo->removeAllItems();
+
+	for (auto it = Game->Maps.Maps.begin(); it != Game->Maps.Maps.end(); it++)
+	{
+		std::string caption = (*it)->Caption;
+		MapCombo->addItem(caption);
 	}
 }

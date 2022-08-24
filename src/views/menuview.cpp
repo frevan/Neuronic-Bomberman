@@ -111,6 +111,10 @@ bool TMenuView::ProcessInput(TInputID InputID, float Value)
 			Game->RequestQuit();
 			handled = true;
 			break;
+
+		case actionDoDefaultAction:
+			Game->SwitchToState(STATE_LOBBY);
+			break;
 	};
 
 	return handled;

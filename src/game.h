@@ -17,6 +17,7 @@ class TGame;
 #include "client.h"
 #include "gamedata.h"
 #include "resourcemgr.h"
+#include "gamelogic.h"
 
 const int STATE_NONE = 0;
 const int STATE_MENU = 1;
@@ -31,17 +32,23 @@ const int VIEW_MENU = 11;
 const int VIEW_LOBBY = 12;
 const int VIEW_MATCH = 13;
 
+typedef struct
+{
+	std::string Name;
+	std::string FileName;
+} TMapInfo;
+
 class TGame: public TClientListener
 {
 private:
 	sf::RenderWindow* Window;
-	int CurrentState;
 	int NextState;
 	TView* CurrentStateView;
 	TView* SystemGUIView;
 	tgui::Gui* GUI;	
 	std::vector<TView*> Views;
 	std::mutex ViewsMutex;
+	TGameLogic* Logic;
 
 	void DetermineAppPath(const std::string& Filename);
 	std::string GetResourceSubPath();
@@ -53,14 +60,19 @@ private:
 	void ProcessInputs();
 	void ActivateNextState();
 	void SetupCurrentState();
+	void FinalizeCurrentState();
+
+	void LoadMapInfos();
 
 public:
+	int CurrentState;
 	bool ShouldQuit;
 	TInputMap InputMap;
 	TClient* Client;
 	TGameData GameData;
 	TFontManager Fonts;
 	std::string AppPath, MapPath;
+	TMapList Maps;
 
 	TGame();
 	~TGame();

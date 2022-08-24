@@ -52,6 +52,7 @@ void TClient::Process(TGameTime Delta)
 		{
 			case CMD_OpenLobby:
 				Listener->ClientConnected();
+				Game->GameData.Reset();
 				Game->GameData.Status = GAME_INLOBBY;
 				Listener->ClientEnteredLobby();
 				break;
@@ -70,6 +71,23 @@ void TClient::Process(TGameTime Delta)
 
 void TClient::SelectArena(int Index)
 {
+	TArena* map = Game->Maps.MapFromIndex(Index);
+	if (!map)
+		return;
+
 	// temp: load the standard map file
-	Game->GameData.LoadMapFromFile(Game->MapPath + "4CORNERS.SCH");
+	Game->GameData.Arena.LoadFromFile(map->OriginalFileName);
+}
+
+void TClient::UpdatePlayerMovement(int Slot, TPlayerDirection Direction, bool SetActive)
+{
+	if (Slot < 0 || Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
+		return;
+	if (Game->GameData.Players[Slot].State == PLAYER_NOTPLAYING)
+		return;
+
+	if (SetActive)
+		Game->GameData.Players[Slot].Direction |= Direction;
+	else
+		Game->GameData.Players[Slot].Direction &= ~Direction;
 }

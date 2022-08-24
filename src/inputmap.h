@@ -68,6 +68,7 @@ public:
 	void DefineInput(TInputID setID, TInputControl::TPacked setDefaultControl, float setDefaultValue = 1.0f, float setScale = 1.0f);
 	void BindControlToInput(TInputID inputID, TInputControl::TPacked setControl, float setScale = 1.0f);
 	void ResetInput(TInputID inputID);
+	void RemoveInput(TInputID inputID);
 
 	float GetValueOfInput(TInputID inputID);
 };
