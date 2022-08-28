@@ -14,6 +14,7 @@ private:
 	void OnStartBtnClick();
 	
 	void FillMapCombo();
+	void OnMapComboItemSelected(int ItemIndex);
 
 protected:
 	void CreateWidgets() override;
@@ -25,4 +26,5 @@ public:
 
 	bool ProcessInput(TInputID InputID, float Value) override;
 	void StateChanged() override;
+	void Draw(sf::RenderTarget* target) override;
 };

@@ -45,4 +45,5 @@ public:
 	void SelectArena(int Index);
 
 	void UpdatePlayerMovement(int Slot, TPlayerDirection Direction, bool SetActive);
+	void DropBomb(int Slot);
 };

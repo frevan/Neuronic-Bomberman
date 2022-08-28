@@ -501,3 +501,18 @@ void TGameData::ClearMapFieldsForPlayer(int X, int Y)
 			field->Type = FIELD_EMPTY;
 	}
 }
+
+bool TGameData::BombInField(uint8_t X, uint8_t Y)
+{
+	bool bombAtPosition = false;
+	for (auto it = Bombs.begin(); it != Bombs.end(); it++)
+	{
+		if (((*it).Position.X == X) && ((*it).Position.Y == Y))
+		{
+			bombAtPosition = true;
+			break;
+		}
+	}
+
+	return bombAtPosition;
+}

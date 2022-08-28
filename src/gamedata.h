@@ -151,4 +151,6 @@ public:
 	void Reset();
 	bool AddPlayer(const std::string& SetName, int SetSlot = INVALID_SLOT);
 	void InitNewGame();
+
+	bool BombInField(uint8_t X, uint8_t Y);
 };

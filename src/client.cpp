@@ -91,3 +91,27 @@ void TClient::UpdatePlayerMovement(int Slot, TPlayerDirection Direction, bool Se
 	else
 		Game->GameData.Players[Slot].Direction &= ~Direction;
 }
+
+void TClient::DropBomb(int Slot)
+{
+	if (Slot < 0 || Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
+		return;
+	if (Game->GameData.Players[Slot].State == PLAYER_NOTPLAYING)
+		return;
+
+	// determine the exact position where to drop it (top left pos of the field)
+	TFieldPosition pos;
+	pos.X = static_cast<int>(trunc(Game->GameData.Players[Slot].Position.X));
+	pos.Y = static_cast<int>(trunc(Game->GameData.Players[Slot].Position.Y));
+
+	// check if there's already a bomb at this position
+	if (Game->GameData.BombInField(pos.X, pos.Y))
+		return;
+
+	// add the new bomb
+	TBomb bomb;
+	bomb.Position = pos;
+	bomb.State = BOMB_TICKING;
+	bomb.TimeUntilExplosion = 0; // TODO: set the correct time
+	Game->GameData.Bombs.push_back(bomb);
+}

@@ -73,7 +73,26 @@ void TMatchView::Draw(sf::RenderTarget* target)
 
 		sf::CircleShape shape(playerSize);
 		shape.setPosition(MapOffsetX + player->Position.X * FIELD_SIZE - playerSize, MapOffsetY + player->Position.Y * FIELD_SIZE - playerSize);
-		shape.setFillColor(sf::Color::Blue);
+		switch (idx)
+		{
+			case 0: shape.setFillColor(sf::Color::Blue); break;
+			case 1: shape.setFillColor(sf::Color::Magenta); break;
+		}
+		target->draw(shape);
+	}
+
+	// draw the bombs
+	for (auto it = Game->GameData.Bombs.begin(); it != Game->GameData.Bombs.end(); it++)
+	{
+		TPlayerPosition pos;
+		pos.X = (*it).Position.X + 0.5f;
+		pos.Y = (*it).Position.Y + 0.5f;
+
+		float bombSize = FIELD_SIZE / 3.f;
+
+		sf::CircleShape shape(bombSize);
+		shape.setPosition(MapOffsetX + pos.X * FIELD_SIZE - bombSize, MapOffsetY + pos.Y * FIELD_SIZE - bombSize);
+		shape.setFillColor(sf::Color::Black);
 		target->draw(shape);
 	}
 }
@@ -81,6 +100,9 @@ void TMatchView::Draw(sf::RenderTarget* target)
 bool TMatchView::ProcessInput(TInputID InputID, float Value)
 {
 	bool handled = false;
+
+	int playerIndex = -1;
+	DeterminePlayerActionFromInput(InputID, Value, playerIndex);
 
 	switch (InputID)
 	{
@@ -92,23 +114,39 @@ bool TMatchView::ProcessInput(TInputID InputID, float Value)
 			}
 			break;
 
-		case actionMatchLeft:
-			Game->Client->UpdatePlayerMovement(0, DIRECTION_LEFT, Value > 0.f);
+		case actionMatchPlayer1Left:
+			Game->Client->UpdatePlayerMovement(playerIndex, DIRECTION_LEFT, Value > 0.f);
 			handled = true;
 			break;
-		case actionMatchRight:
-			Game->Client->UpdatePlayerMovement(0, DIRECTION_RIGHT, Value > 0.f);
+		case actionMatchPlayer1Right:
+			Game->Client->UpdatePlayerMovement(playerIndex, DIRECTION_RIGHT, Value > 0.f);
 			handled = true;
 			break;
-		case actionMatchUp:
-			Game->Client->UpdatePlayerMovement(0, DIRECTION_UP, Value > 0.f);
+		case actionMatchPlayer1Up:
+			Game->Client->UpdatePlayerMovement(playerIndex, DIRECTION_UP, Value > 0.f);
 			handled = true;
 			break;
-		case actionMatchDown:
-			Game->Client->UpdatePlayerMovement(0, DIRECTION_DOWN, Value > 0.f);
+		case actionMatchPlayer1Down:
+			Game->Client->UpdatePlayerMovement(playerIndex, DIRECTION_DOWN, Value > 0.f);
 			handled = true;
+			break;
+		case actionMatchPlayer1DropBomb:
+			Game->Client->DropBomb(playerIndex);
 			break;
 	};
 
 	return handled;
+}
+
+void TMatchView::DeterminePlayerActionFromInput(TInputID& InputID, float& Value, int& PlayerIndex)
+{
+	PlayerIndex = -1;
+
+	if (InputID >= actionMatchPlayer1Left && InputID < actionMatchPlayer1Left + PlayerActionCount)
+		PlayerIndex = 0;
+	else if (InputID >= actionMatchPlayer2Left && InputID < actionMatchPlayer2Left + PlayerActionCount)
+		PlayerIndex = 1;
+
+	if (PlayerIndex >= 0)
+		InputID = InputID - (PlayerActionCount * PlayerIndex);
 }

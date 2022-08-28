@@ -253,7 +253,7 @@ bool TGameLogic::CheckMoveAgainstCell(TPlayer* Player, int CellX, int CellY, TPl
 	TField* cell = Game->GameData.Arena.At(CellX, CellY);
 	bool canmove = true;
 	canmove &= (cell->Type != FIELD_BRICK && cell->Type != FIELD_SOLID);
-	//canmove &= (cell->bomb == TMapCell::bombNone);
+	canmove &= !Game->GameData.BombInField(CellX, CellY);
 	if (canmove)
 		return true;
 

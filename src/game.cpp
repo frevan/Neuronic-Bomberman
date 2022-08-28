@@ -405,13 +405,26 @@ void TGame::ClientMatchStarted()
 void TGame::SetupCurrentState()
 {
 	if (CurrentState == STATE_LOBBY)
+	{
 		Client->CreateGame("Don't Explode");
+
+		InputMap.DefineInput(actionLobbyPrevMap, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Up, 0));
+		InputMap.DefineInput(actionLobbyNextMap, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Down, 0));
+	}
 	else if (CurrentState == STATE_MATCH)
 	{
-		InputMap.DefineInput(actionMatchLeft, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Left, 0));
-		InputMap.DefineInput(actionMatchRight, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Right, 0));
-		InputMap.DefineInput(actionMatchUp, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Up, 0));
-		InputMap.DefineInput(actionMatchDown, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Down, 0));
+		// player 1 keys
+		InputMap.DefineInput(actionMatchPlayer1Left, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Left, 0));
+		InputMap.DefineInput(actionMatchPlayer1Right, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Right, 0));
+		InputMap.DefineInput(actionMatchPlayer1Up, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Up, 0));
+		InputMap.DefineInput(actionMatchPlayer1Down, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Down, 0));
+		InputMap.DefineInput(actionMatchPlayer1DropBomb, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::RControl, 0));
+		// player 2 keys
+		InputMap.DefineInput(actionMatchPlayer2Left, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::A, 0));
+		InputMap.DefineInput(actionMatchPlayer2Right, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::D, 0));
+		InputMap.DefineInput(actionMatchPlayer2Up, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::W, 0));
+		InputMap.DefineInput(actionMatchPlayer2Down, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::S, 0));
+		InputMap.DefineInput(actionMatchPlayer2DropBomb, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::LControl, 0));
 
 		Client->StartMatch();
 	}
@@ -419,12 +432,23 @@ void TGame::SetupCurrentState()
 
 void TGame::FinalizeCurrentState()
 {
-	if (CurrentState == STATE_MATCH)
+	if (CurrentState == STATE_LOBBY)
 	{
-		InputMap.RemoveInput(actionMatchLeft);
-		InputMap.RemoveInput(actionMatchRight);
-		InputMap.RemoveInput(actionMatchUp);
-		InputMap.RemoveInput(actionMatchDown);
+		InputMap.RemoveInput(actionLobbyPrevMap);
+		InputMap.RemoveInput(actionLobbyNextMap);
+	}
+	else if (CurrentState == STATE_MATCH)
+	{
+		InputMap.RemoveInput(actionMatchPlayer1Left);
+		InputMap.RemoveInput(actionMatchPlayer1Right);
+		InputMap.RemoveInput(actionMatchPlayer1Up);
+		InputMap.RemoveInput(actionMatchPlayer1Down);
+		InputMap.RemoveInput(actionMatchPlayer2DropBomb);
+		InputMap.RemoveInput(actionMatchPlayer2Left);
+		InputMap.RemoveInput(actionMatchPlayer2Right);
+		InputMap.RemoveInput(actionMatchPlayer2Up);
+		InputMap.RemoveInput(actionMatchPlayer2Down);
+		InputMap.RemoveInput(actionMatchPlayer2DropBomb);
 
 	Client->StartMatch();
 	}

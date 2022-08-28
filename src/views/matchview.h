@@ -4,7 +4,8 @@
 
 class TMatchView : public TView
 {
-private:	
+private:
+	void DeterminePlayerActionFromInput(TInputID& InputID, float& Value, int& PlayerIndex);
 public:
 	TMatchView(TGame* SetGame);
 	~TMatchView();
