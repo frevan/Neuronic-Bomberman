@@ -109,9 +109,8 @@ void TClient::DropBomb(int Slot)
 		return;
 
 	// add the new bomb
-	TBomb bomb;
-	bomb.Position = pos;
-	bomb.State = BOMB_TICKING;
-	bomb.TimeUntilExplosion = 0; // TODO: set the correct time
-	Game->GameData.Bombs.push_back(bomb);
+	TField* field = Game->GameData.Arena.At(pos);
+	field->Bomb.State = BOMB_TICKING;
+	field->Bomb.TimeUntilNextState = 5000; // 5 seconds
+	field->Bomb.Range = 1;
 }

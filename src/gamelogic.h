@@ -13,6 +13,9 @@ private:
 	float CanMove(TPlayer* Player, TPlayerDirection Direction, float Distance, TPlayerDirection& OtherDirection);
 	void AdjustPlayerPos(TPlayer* Player, TPlayerDirection Direction, float Distance);
 	bool CheckMoveAgainstCell(TPlayer* Player, int CellX, int CellY, TPlayerDirection& Direction, TPlayerDirection& OtherDirection, bool Recurse);
+	void UpdatePlayerPositions(TGameTime Delta);
+	void UpdateBombs(TGameTime Delta);
+	void ExplodeBomb(uint8_t X, uint8_t Y);
 public:
 	TGameLogic(TGame* SetGame);
 	~TGameLogic();

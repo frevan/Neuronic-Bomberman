@@ -64,15 +64,15 @@ typedef struct
 
 typedef uint8_t TBombState;
 
-const TBombState BOMB_TICKING = 0;
-const TBombState BOMB_EXPLODING = 1;
-const TBombState BOMB_EXPLODED = 2;
+const TBombState BOMB_NONE = 0;
+const TBombState BOMB_TICKING = 1;
+const TBombState BOMB_EXPLODING = 2;
 
 typedef struct 
 {
-	TFieldPosition Position;
-	TGameTime TimeUntilExplosion;
 	TBombState State;
+	TGameTime TimeUntilNextState; // time in milliseconds until the explosion or the end of the explosion
+	uint8_t Range; // range of the explosion in fields
 } TBomb;
 
 typedef uint8_t TFieldType;
@@ -85,6 +85,7 @@ typedef struct
 {
 	TFieldType Type;
 	TFieldPosition Position;
+	TBomb Bomb;
 } TField;
 
 typedef struct
@@ -143,7 +144,6 @@ public:
 	uint32_t MaxRounds;
 	TGameStatus Status;
 	TPlayer Players[MAX_NUM_SLOTS];
-	std::vector<TBomb> Bombs;
 	TArena Arena;
 
 	TGameData();

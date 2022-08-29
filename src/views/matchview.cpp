@@ -82,19 +82,27 @@ void TMatchView::Draw(sf::RenderTarget* target)
 	}
 
 	// draw the bombs
-	for (auto it = Game->GameData.Bombs.begin(); it != Game->GameData.Bombs.end(); it++)
-	{
-		TPlayerPosition pos;
-		pos.X = (*it).Position.X + 0.5f;
-		pos.Y = (*it).Position.Y + 0.5f;
+	for (uint8_t x = 0; x < Game->GameData.Arena.Width; x++)
+		for (uint8_t y = 0; y < Game->GameData.Arena.Height; y++)
+		{
+			TField* field = Game->GameData.Arena.At(x, y);
+			if (field->Bomb.State == BOMB_NONE)
+				continue;
 
-		float bombSize = FIELD_SIZE / 3.f;
+			TPlayerPosition pos;
+			pos.X = x + 0.5f;
+			pos.Y = y + 0.5f;
 
-		sf::CircleShape shape(bombSize);
-		shape.setPosition(MapOffsetX + pos.X * FIELD_SIZE - bombSize, MapOffsetY + pos.Y * FIELD_SIZE - bombSize);
-		shape.setFillColor(sf::Color::Black);
-		target->draw(shape);
-	}
+			float bombSize = FIELD_SIZE / 3.f;
+
+			sf::CircleShape shape(bombSize);
+			shape.setPosition(MapOffsetX + pos.X * FIELD_SIZE - bombSize, MapOffsetY + pos.Y * FIELD_SIZE - bombSize);
+			if (field->Bomb.State == BOMB_TICKING)
+				shape.setFillColor(sf::Color::Black);
+			else if (field->Bomb.State == BOMB_EXPLODING)
+				shape.setFillColor(sf::Color::Red);
+			target->draw(shape);
+		}
 }
 
 bool TMatchView::ProcessInput(TInputID InputID, float Value)

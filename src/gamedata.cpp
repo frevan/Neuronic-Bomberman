@@ -327,7 +327,6 @@ TGameData::TGameData()
 	MaxRounds(1),
 	Status(GAME_NONE),
 	Players(),
-	Bombs(),
 	Arena()
 {
 	for (int i = 0; i < MAX_NUM_SLOTS; i++)
@@ -504,15 +503,6 @@ void TGameData::ClearMapFieldsForPlayer(int X, int Y)
 
 bool TGameData::BombInField(uint8_t X, uint8_t Y)
 {
-	bool bombAtPosition = false;
-	for (auto it = Bombs.begin(); it != Bombs.end(); it++)
-	{
-		if (((*it).Position.X == X) && ((*it).Position.Y == Y))
-		{
-			bombAtPosition = true;
-			break;
-		}
-	}
-
-	return bombAtPosition;
+	TField* field = Arena.At(X, Y);
+	return (field->Bomb.State != BOMB_NONE);
 }

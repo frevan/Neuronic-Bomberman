@@ -17,33 +17,8 @@ void TGameLogic::Process(TGameTime Delta)
 	if (Game->CurrentState != STATE_MATCH)
 		return;
 
-	// update player positions
-	for (int i = 0; i < MAX_NUM_SLOTS; i++)
-	{
-		TPlayer* player = &Game->GameData.Players[i];
-
-		if (player->Direction == 0)
-			player->Speed = SPEED_NOTMOVING;
-		else
-			player->Speed = SPEED_NORMAL;
-
-		float normalizedSpeed = player->Speed / (float)SPEED_NORMAL;
-		float distanceTravelled = normalizedSpeed * (float)Delta / 1000.f * 1.5f;
-
-		bool changed = false;
-		if (!changed)
-			if ((player->Direction & DIRECTION_LEFT) == DIRECTION_LEFT)
-				changed = (MovePlayer(player, DIRECTION_LEFT, distanceTravelled) > 0);
-		if (!changed)
-			if ((player->Direction & DIRECTION_RIGHT) == DIRECTION_RIGHT)
-				changed = (MovePlayer(player, DIRECTION_RIGHT, distanceTravelled) > 0);
-		if (!changed)
-			if ((player->Direction & DIRECTION_UP) == DIRECTION_UP)	
-				changed = (MovePlayer(player, DIRECTION_UP, distanceTravelled) > 0);
-		if (!changed)
-			if ((player->Direction & DIRECTION_DOWN) == DIRECTION_DOWN)
-				changed = (MovePlayer(player, DIRECTION_DOWN, distanceTravelled) > 0);
-	}
+	UpdatePlayerPositions(Delta);
+	UpdateBombs(Delta);
 }
 
 float TGameLogic::MovePlayer(TPlayer* Player, TPlayerDirection Direction, float Distance, bool Recurse)
@@ -294,4 +269,121 @@ bool TGameLogic::CheckMoveAgainstCell(TPlayer* Player, int CellX, int CellY, TPl
 	}
 
 	return false;
+}
+
+void TGameLogic::UpdatePlayerPositions(TGameTime Delta)
+{
+	for (int i = 0; i < MAX_NUM_SLOTS; i++)
+	{
+		TPlayer* player = &Game->GameData.Players[i];
+
+		if (player->Direction == 0)
+			player->Speed = SPEED_NOTMOVING;
+		else
+			player->Speed = SPEED_NORMAL;
+
+		float normalizedSpeed = player->Speed / (float)SPEED_NORMAL;
+		float distanceTravelled = normalizedSpeed * (float)Delta / 1000.f * 1.5f;
+
+		bool changed = false;
+		if (!changed)
+			if ((player->Direction & DIRECTION_LEFT) == DIRECTION_LEFT)
+				changed = (MovePlayer(player, DIRECTION_LEFT, distanceTravelled) > 0);
+		if (!changed)
+			if ((player->Direction & DIRECTION_RIGHT) == DIRECTION_RIGHT)
+				changed = (MovePlayer(player, DIRECTION_RIGHT, distanceTravelled) > 0);
+		if (!changed)
+			if ((player->Direction & DIRECTION_UP) == DIRECTION_UP)
+				changed = (MovePlayer(player, DIRECTION_UP, distanceTravelled) > 0);
+		if (!changed)
+			if ((player->Direction & DIRECTION_DOWN) == DIRECTION_DOWN)
+				changed = (MovePlayer(player, DIRECTION_DOWN, distanceTravelled) > 0);
+	}
+}
+
+void TGameLogic::UpdateBombs(TGameTime Delta)
+{
+	for (uint8_t x = 0; x < Game->GameData.Arena.Width; x++)
+		for (uint8_t y = 0; y < Game->GameData.Arena.Height; y++)
+		{
+			TField* field = Game->GameData.Arena.At(x, y);
+
+			if (field->Bomb.State == BOMB_TICKING)
+			{
+				if (field->Bomb.TimeUntilNextState <= Delta)
+					ExplodeBomb(x, y);
+				else
+					field->Bomb.TimeUntilNextState -= Delta;
+			}
+			else if (field->Bomb.State == BOMB_EXPLODING)
+			{
+				if (field->Bomb.TimeUntilNextState <= Delta)
+					field->Bomb.State = BOMB_NONE;
+				else
+					field->Bomb.TimeUntilNextState -= Delta;
+			}
+		}
+}
+
+void TGameLogic::ExplodeBomb(uint8_t X, uint8_t Y)
+{
+	TField* field;
+
+	// explode the field itself
+	field = Game->GameData.Arena.At(X, Y);
+	field->Bomb.State = BOMB_EXPLODING;
+	field->Bomb.TimeUntilNextState = 1000; // explode for 1 second
+
+	// explode the fields to the left of the current field
+	for (int i = 1; i <= field->Bomb.Range; i++)
+	{
+		if (X - i < 0)
+			break;
+		TField* field2 = Game->GameData.Arena.At(X - i, Y);
+		if (field2->Type == FIELD_SOLID)
+			break;
+		if (field2->Type == FIELD_BRICK)
+			field2->Type = FIELD_EMPTY;
+
+		field2->Bomb = field->Bomb;
+	}
+	// explode the fields to the right of the current field
+	for (int i = 1; i <= field->Bomb.Range; i++)
+	{
+		if (X + i >= Game->GameData.Arena.Width)
+			break;
+		TField* field2 = Game->GameData.Arena.At(X + i, Y);
+		if (field2->Type == FIELD_SOLID)
+			break;
+		if (field2->Type == FIELD_BRICK)
+			field2->Type = FIELD_EMPTY;
+
+		field2->Bomb = field->Bomb;
+	}
+	// explode the fields above the current field
+	for (int i = 1; i <= field->Bomb.Range; i++)
+	{
+		if (Y - i < 0)
+			break;
+		TField* field2 = Game->GameData.Arena.At(X, Y - i);
+		if (field2->Type == FIELD_SOLID)
+			break;
+		if (field2->Type == FIELD_BRICK)
+			field2->Type = FIELD_EMPTY;
+
+		field2->Bomb = field->Bomb;
+	}
+	// explode the fields below the current field
+	for (int i = 1; i <= field->Bomb.Range; i++)
+	{
+		if (Y + i >= Game->GameData.Arena.Height)
+			break;
+		TField* field2 = Game->GameData.Arena.At(X, Y + i);
+		if (field2->Type == FIELD_SOLID)
+			break;
+		if (field2->Type == FIELD_BRICK)
+			field2->Type = FIELD_EMPTY;
+
+		field2->Bomb = field->Bomb;
+	}
 }
