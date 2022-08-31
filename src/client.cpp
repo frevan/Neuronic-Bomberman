@@ -98,6 +98,8 @@ void TClient::DropBomb(int Slot)
 		return;
 	if (Game->GameData.Players[Slot].State == PLAYER_NOTPLAYING)
 		return;
+	if (Game->GameData.Players[Slot].ActiveBombs == Game->GameData.Players[Slot].MaxActiveBombs)
+		return;
 
 	// determine the exact position where to drop it (top left pos of the field)
 	TFieldPosition pos;
@@ -111,6 +113,10 @@ void TClient::DropBomb(int Slot)
 	// add the new bomb
 	TField* field = Game->GameData.Arena.At(pos);
 	field->Bomb.State = BOMB_TICKING;
+	field->Bomb.DroppedByPlayer = Slot;
 	field->Bomb.TimeUntilNextState = 5000; // 5 seconds
 	field->Bomb.Range = 1;
+
+	// update the player
+	Game->GameData.Players[Slot].ActiveBombs++;
 }

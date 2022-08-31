@@ -60,6 +60,9 @@ typedef struct
 	TPlayerState State;
 	uint32_t RoundsWon; // number of rounds won by the player so far
 	uint32_t Ranking; // ranking in the current round
+	uint8_t MaxActiveBombs; // the maximum amount of bombs a player can drop at any time
+	uint8_t ActiveBombs; // the number of unexploded bombs the player has dropped
+	TGameTime TimeUntilNextState; // time in milliseconds until the player finishes dying (or other state changes)
 } TPlayer;
 
 typedef uint8_t TBombState;
@@ -73,6 +76,7 @@ typedef struct
 	TBombState State;
 	TGameTime TimeUntilNextState; // time in milliseconds until the explosion or the end of the explosion
 	uint8_t Range; // range of the explosion in fields
+	uint8_t DroppedByPlayer; // slot of the player who dropped the bomb
 } TBomb;
 
 typedef uint8_t TFieldType;

@@ -66,18 +66,25 @@ void TMatchView::Draw(sf::RenderTarget* target)
 	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
 	{
 		TPlayer* player = &Game->GameData.Players[idx];
-		if (player->State == PLAYER_NOTPLAYING)
+		if (player->State == PLAYER_NOTPLAYING || player->State == PLAYER_DEAD)
 			continue;
 
 		float playerSize = FIELD_SIZE/2.f;
 
 		sf::CircleShape shape(playerSize);
 		shape.setPosition(MapOffsetX + player->Position.X * FIELD_SIZE - playerSize, MapOffsetY + player->Position.Y * FIELD_SIZE - playerSize);
-		switch (idx)
+		sf::Color playerColor;
+		if (player->State == PLAYER_DYING)
+			playerColor = sf::Color::White;
+		else
 		{
-			case 0: shape.setFillColor(sf::Color::Blue); break;
-			case 1: shape.setFillColor(sf::Color::Magenta); break;
+			switch (idx)
+			{
+				case 0: playerColor = sf::Color::Blue; break;
+				case 1: playerColor = sf::Color::Magenta; break;
+			}
 		}
+		shape.setFillColor(playerColor);
 		target->draw(shape);
 	}
 

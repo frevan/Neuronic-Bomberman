@@ -369,6 +369,23 @@ bool TGameData::AddPlayer(const std::string& SetName, int SetSlot)
 
 void TGameData::InitNewGame()
 {
+	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
+	{
+		Players[idx].Speed = 0;
+		Players[idx].RoundsWon = 0;
+		Players[idx].Ranking = 0;
+		Players[idx].MaxActiveBombs = 1;
+		Players[idx].ActiveBombs = 0;
+	}
+
+	//TPlayer Players[MAX_NUM_SLOTS];
+	for (int x = 0; x < Arena.Width; x++)
+		for (int y = 0; y < Arena.Height; y++)
+		{
+			TField* field = Arena.At(x, y);
+			field->Bomb.State = BOMB_NONE;
+		}
+
 	ApplyBrickDensity();
 	PositionPlayers();
 }
