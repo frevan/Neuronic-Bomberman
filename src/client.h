@@ -10,6 +10,7 @@ public:
 	virtual void ClientPlayerRemoved() = 0;
 	virtual void ClientMatchStarting() = 0;
 	virtual void ClientMatchStarted() = 0;
+	virtual void ClientRoundEnded() = 0;
 };
 
 class TClient;
@@ -43,6 +44,7 @@ public:
 	void RemovePlayer(uint8_t Slot);
 	void StartMatch();
 	void SelectArena(int Index);
+	void EndRound();
 
 	void UpdatePlayerMovement(int Slot, TPlayerDirection Direction, bool SetActive);
 	void DropBomb(int Slot);

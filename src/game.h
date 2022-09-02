@@ -24,6 +24,8 @@ const int STATE_MENU = 1;
 const int STATE_CONNECTING = 2;
 const int STATE_LOBBY = 3;
 const int STATE_MATCH = 4;
+const int STATE_ENDOFROUND = 5;
+const int STATE_ENDOFMATCH = 6;
 const int STATE_QUIT = 1000;
 
 const int VIEW_OVERLAY = 0;
@@ -31,6 +33,7 @@ const int VIEW_TGUISYSTEM = 1;
 const int VIEW_MENU = 11;
 const int VIEW_LOBBY = 12;
 const int VIEW_MATCH = 13;
+const int VIEW_ENDOFROUND = 14;
 
 typedef struct
 {
@@ -96,4 +99,5 @@ public:
 	void ClientPlayerRemoved() override;
 	void ClientMatchStarting() override;
 	void ClientMatchStarted() override;
+	void ClientRoundEnded() override;
 };

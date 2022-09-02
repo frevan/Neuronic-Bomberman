@@ -13,6 +13,7 @@
 #include "views/menuview.h"
 #include "views/lobbyview.h"
 #include "views/matchview.h"
+#include "views/endofroundview.h"
 
 //#define FULLSCREEN
 #define FRAMERATE_LIMIT
@@ -250,6 +251,7 @@ void TGame::ActivateNextState()
 		case STATE_MENU: CurrentStateView = AttachView(VIEW_MENU); break;
 		case STATE_LOBBY: CurrentStateView = AttachView(VIEW_LOBBY); break;
 		case STATE_MATCH: CurrentStateView = AttachView(VIEW_MATCH); break;
+		case STATE_ENDOFROUND: CurrentStateView = AttachView(VIEW_ENDOFROUND); break;
 	};
 
 	SetupCurrentState();
@@ -311,6 +313,7 @@ TView* TGame::AttachView(int NewView)
 		case VIEW_MENU: view = new TMenuView(this, GUI); break;
 		case VIEW_LOBBY: view = new TLobbyView(this, GUI); break;
 		case VIEW_MATCH: view = new TMatchView(this); break;
+		case VIEW_ENDOFROUND: view = new TEndOfRoundView(this); break;
 	};
 	assert(view);
 
@@ -449,7 +452,10 @@ void TGame::FinalizeCurrentState()
 		InputMap.RemoveInput(actionMatchPlayer2Up);
 		InputMap.RemoveInput(actionMatchPlayer2Down);
 		InputMap.RemoveInput(actionMatchPlayer2DropBomb);
-
-	Client->StartMatch();
 	}
+}
+
+void TGame::ClientRoundEnded()
+{
+	SwitchToState(STATE_ENDOFROUND);
 }

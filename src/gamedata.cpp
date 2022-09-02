@@ -369,6 +369,8 @@ bool TGameData::AddPlayer(const std::string& SetName, int SetSlot)
 
 void TGameData::InitNewGame()
 {
+	CurrentTime = 0;
+
 	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
 	{
 		Players[idx].Speed = 0;
@@ -376,6 +378,7 @@ void TGameData::InitNewGame()
 		Players[idx].Ranking = 0;
 		Players[idx].MaxActiveBombs = 1;
 		Players[idx].ActiveBombs = 0;
+		Players[idx].TimeOfDeath = 0;
 	}
 
 	//TPlayer Players[MAX_NUM_SLOTS];

@@ -21,6 +21,8 @@ void TGameLogic::Process(TGameTime Delta)
 	UpdateBombs(Delta);
 	CheckForExplodedPlayers();
 	UpdateDyingPlayers(Delta);
+
+	Game->GameData.CurrentTime += Delta;
 }
 
 float TGameLogic::MovePlayer(TPlayer* Player, TPlayerDirection Direction, float Distance, bool Recurse)
@@ -433,12 +435,15 @@ void TGameLogic::CheckForExplodedPlayers()
 		{
 			p->State = PLAYER_DYING;
 			p->TimeUntilNextState = 1000;
+			p->TimeOfDeath = Game->GameData.CurrentTime;
 		}
 	}
 }
 
 void TGameLogic::UpdateDyingPlayers(TGameTime Delta)
 {
+	int alivePlayerCount = 0;
+
 	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
 	{
 		TPlayer* p = &Game->GameData.Players[idx];
@@ -450,5 +455,41 @@ void TGameLogic::UpdateDyingPlayers(TGameTime Delta)
 			else
 				p->TimeUntilNextState -= Delta;
 		}
+
+		if (p->State != PLAYER_NOTPLAYING && p->State != PLAYER_DEAD)
+			alivePlayerCount++;
 	}
+
+	if (alivePlayerCount <= 1)
+		EndRound();
+}
+
+void TGameLogic::EndRound()
+{
+	// calculate player rank
+	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
+	{
+		TPlayer* p = &Game->GameData.Players[idx];
+		if (p->State == PLAYER_NOTPLAYING)
+			continue;
+
+		if (p->State != PLAYER_DEAD)
+			p->TimeOfDeath = Game->GameData.CurrentTime + 1; // after any other death
+
+		p->Ranking = 1;
+
+		for (int idx2 = 0; idx2 < idx; idx2++)
+		{
+			TPlayer* p2 = &Game->GameData.Players[idx2];
+			if (p2->TimeOfDeath < p->TimeOfDeath) // p2 died earlier
+				p2->Ranking++;
+			else if (p2->TimeOfDeath > p->TimeOfDeath) // p1 died earlier
+				p->Ranking++;
+			else if (p2->TimeOfDeath == p->TimeOfDeath) // p1 and p2 died at the same time
+				p2->Ranking = p->Ranking;
+		}
+	}
+
+	// TODO: stop the round or the match
+	Game->Client->EndRound();
 }

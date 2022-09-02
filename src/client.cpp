@@ -20,6 +20,12 @@ void TClient::CloseGame()
 		Listener->ClientDisconnected();
 }
 
+void TClient::EndRound()
+{
+	if (Listener)
+		Listener->ClientRoundEnded();
+}
+
 bool TClient::AddPlayer(const std::string& PlayerName, uint8_t Slot)
 {
 	bool success = Game->GameData.AddPlayer(PlayerName, Slot);

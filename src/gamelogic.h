@@ -18,6 +18,7 @@ private:
 	void ExplodeBomb(uint8_t X, uint8_t Y);
 	void CheckForExplodedPlayers();
 	void UpdateDyingPlayers(TGameTime Delta);
+	void EndRound();
 public:
 	TGameLogic(TGame* SetGame);
 	~TGameLogic();
