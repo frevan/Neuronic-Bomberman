@@ -20,10 +20,14 @@ void TClient::CloseGame()
 		Listener->ClientDisconnected();
 }
 
+void TClient::StartNextRound()
+{
+	Commands.push(CMD_StartNextRound);
+}
+
 void TClient::EndRound()
 {
-	if (Listener)
-		Listener->ClientRoundEnded();
+	Commands.push(CMD_EndRound);
 }
 
 bool TClient::AddPlayer(const std::string& PlayerName, uint8_t Slot)
@@ -57,20 +61,39 @@ void TClient::Process(TGameTime Delta)
 		switch (cmd)
 		{
 			case CMD_OpenLobby:
-				Listener->ClientConnected();
+				if (Listener)
+					Listener->ClientConnected();
 				Game->GameData.Reset();
 				Game->GameData.Status = GAME_INLOBBY;
-				Listener->ClientEnteredLobby();
+				if (Listener)
+					Listener->ClientEnteredLobby();
 				break;
 
 			case CMD_StartMatch:
 				Game->GameData.Status = GAME_STARTING;
-				Listener->ClientMatchStarting();
-
+				if (Listener)
+					Listener->ClientMatchStarting();
 				Game->GameData.InitNewGame();
-
 				Game->GameData.Status = GAME_RUNNING;
-				Listener->ClientMatchStarted();
+				if (Listener)
+					Listener->ClientMatchStarted();
+				break;
+
+			case CMD_StartNextRound:
+				Game->GameData.Status = GAME_STARTING;
+				if (Listener)
+					Listener->ClientMatchStarting();
+				Game->GameData.InitNewRound();
+				Game->GameData.Status = GAME_RUNNING;
+				if (Listener)
+					Listener->ClientRoundStarted();
+				break;
+
+			case CMD_EndRound:
+				Game->GameData.Status = GAME_ENDED;
+				if (Listener)
+					Listener->ClientRoundEnded();
+				break;
 		};
 	}
 }

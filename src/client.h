@@ -10,6 +10,7 @@ public:
 	virtual void ClientPlayerRemoved() = 0;
 	virtual void ClientMatchStarting() = 0;
 	virtual void ClientMatchStarted() = 0;
+	virtual void ClientRoundStarted() = 0;
 	virtual void ClientRoundEnded() = 0;
 };
 
@@ -25,6 +26,8 @@ const int CMD_OpenLobby = 1;
 //const int CMD_AddPlayer = 2;
 //const int CMD_RemovePlayer = 3;
 const int CMD_StartMatch = 4;
+const int CMD_StartNextRound = 5;
+const int CMD_EndRound = 6;
 
 class TClient
 {
@@ -38,13 +41,14 @@ public:
 
 	void Process(TGameTime Delta);
 
-	void CreateGame(const std::string& LobbyName);
-	void CloseGame();
-	bool AddPlayer(const std::string& PlayerName, uint8_t Slot = INVALID_SLOT);
-	void RemovePlayer(uint8_t Slot);
-	void StartMatch();
-	void SelectArena(int Index);
-	void EndRound();
+	void CreateGame(const std::string& LobbyName); // create a new game / lobby
+	void CloseGame(); // leave the current game (removes all players that were added by this client)
+	bool AddPlayer(const std::string& PlayerName, uint8_t Slot = INVALID_SLOT); // add a player to the current game
+	void RemovePlayer(uint8_t Slot); // remove a player from the current game
+	void StartMatch(); // start the first round of the match
+	void SelectArena(int Index); // set the arena (only possible when the match hasn't started yet)
+	void StartNextRound(); // start a new round when the previous one has ended
+	void EndRound(); // end the current round
 
 	void UpdatePlayerMovement(int Slot, TPlayerDirection Direction, bool SetActive);
 	void DropBomb(int Slot);

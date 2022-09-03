@@ -3,8 +3,9 @@
 const float SmallestDistanceConst = 0.000001f;
 const float CornerAnimationIncConst = 0.05f;
 
-TGameLogic::TGameLogic(TGame* SetGame)
-:	Game(SetGame)
+TGameLogic::TGameLogic(TGame* SetGame, TLogicListener* SetListener)
+:	Game(SetGame),
+	Listener(SetListener)
 {
 }
 
@@ -14,7 +15,7 @@ TGameLogic::~TGameLogic()
 
 void TGameLogic::Process(TGameTime Delta)
 {
-	if (Game->CurrentState != STATE_MATCH)
+	if (Game->GameData.Status != GAME_RUNNING)
 		return;
 
 	UpdatePlayerPositions(Delta);
@@ -490,6 +491,19 @@ void TGameLogic::EndRound()
 		}
 	}
 
+	// assign a point to the winner(s)
+	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
+	{
+		TPlayer* p = &Game->GameData.Players[idx];
+		if (p->State == PLAYER_NOTPLAYING)
+			continue;
+
+		if (p->Ranking == 1)
+			p->RoundsWon++;
+	}
+
 	// TODO: stop the round or the match
-	Game->Client->EndRound();
+	Game->GameData.Status = GAME_ENDED;
+	if (Listener)
+		Listener->LogicRoundEnded();
 }

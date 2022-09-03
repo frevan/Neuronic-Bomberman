@@ -94,7 +94,7 @@ bool TGame::Initialize(const std::string& filename)
 	Client->Listener = this;
 
 	// create the logic object
-	Logic = new TGameLogic(this);
+	Logic = new TGameLogic(this, this);
 		
 	return true;
 }
@@ -429,7 +429,14 @@ void TGame::SetupCurrentState()
 		InputMap.DefineInput(actionMatchPlayer2Down, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::S, 0));
 		InputMap.DefineInput(actionMatchPlayer2DropBomb, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::LControl, 0));
 
-		Client->StartMatch();
+		if (GameData.Status == GAME_NONE || GameData.Status == GAME_INLOBBY)
+			Client->StartMatch();
+		else
+			Client->StartNextRound();
+	}
+	else if (CurrentState == STATE_ENDOFROUND)
+	{
+		Client->EndRound();
 	}
 }
 
@@ -455,7 +462,17 @@ void TGame::FinalizeCurrentState()
 	}
 }
 
+void TGame::ClientRoundStarted()
+{
+	CurrentStateView->StateChanged();
+}
+
 void TGame::ClientRoundEnded()
+{
+	CurrentStateView->StateChanged();
+}
+
+void TGame::LogicRoundEnded()
 {
 	SwitchToState(STATE_ENDOFROUND);
 }

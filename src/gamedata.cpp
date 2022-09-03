@@ -369,19 +369,36 @@ bool TGameData::AddPlayer(const std::string& SetName, int SetSlot)
 
 void TGameData::InitNewGame()
 {
+	MaxRounds = 2; // TODO: let the lobby set this
+
 	CurrentTime = 0;
+	CurrentRound = 0;
+
+	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
+		Players[idx].RoundsWon = 0;
+
+	InitNewRound();
+}
+
+void TGameData::InitNewRound()
+{
+	CurrentTime = 0;
+	CurrentRound++;
 
 	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
 	{
-		Players[idx].Speed = 0;
-		Players[idx].RoundsWon = 0;
-		Players[idx].Ranking = 0;
-		Players[idx].MaxActiveBombs = 1;
-		Players[idx].ActiveBombs = 0;
-		Players[idx].TimeOfDeath = 0;
+		TPlayer* p = &Players[idx];
+		if (p->State == PLAYER_NOTPLAYING)
+			continue;
+		
+		p->Speed = 0;
+		p->Ranking = 0;
+		p->MaxActiveBombs = 1;
+		p->ActiveBombs = 0;
+		p->TimeOfDeath = 0;
+		p->State = PLAYER_ALIVE;
 	}
 
-	//TPlayer Players[MAX_NUM_SLOTS];
 	for (int x = 0; x < Arena.Width; x++)
 		for (int y = 0; y < Arena.Height; y++)
 		{

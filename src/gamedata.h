@@ -63,7 +63,7 @@ typedef struct
 	uint8_t MaxActiveBombs; // the maximum amount of bombs a player can drop at any time
 	uint8_t ActiveBombs; // the number of unexploded bombs the player has dropped
 	TGameTime TimeUntilNextState; // time in milliseconds until the player finishes dying (or other state changes)
-	TGameTime TimeOfDeath;
+	TGameTime TimeOfDeath; // time of death in the current round
 } TPlayer;
 
 typedef uint8_t TBombState;
@@ -147,6 +147,7 @@ public:
 	std::string GameName;
 	TGameTime MaxRunTime;
 	uint32_t MaxRounds;
+	uint32_t CurrentRound;
 	TGameStatus Status;
 	TPlayer Players[MAX_NUM_SLOTS];
 	TArena Arena;
@@ -157,6 +158,7 @@ public:
 	void Reset();
 	bool AddPlayer(const std::string& SetName, int SetSlot = INVALID_SLOT);
 	void InitNewGame();
+	void InitNewRound();
 
 	bool BombInField(uint8_t X, uint8_t Y);
 };

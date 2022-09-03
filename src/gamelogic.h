@@ -2,6 +2,12 @@
 
 class TGameLogic;
 
+class TLogicListener
+{
+public:
+	virtual void LogicRoundEnded() = 0;
+};
+
 #include "game.h"
 #include "gamedata.h"
 
@@ -9,6 +15,8 @@ class TGameLogic
 {
 private:
 	TGame* Game;
+	TLogicListener* Listener;
+
 	float MovePlayer(TPlayer* Player, TPlayerDirection Direction, float Distance, bool Recurse = true);
 	float CanMove(TPlayer* Player, TPlayerDirection Direction, float Distance, TPlayerDirection& OtherDirection);
 	void AdjustPlayerPos(TPlayer* Player, TPlayerDirection Direction, float Distance);
@@ -20,7 +28,7 @@ private:
 	void UpdateDyingPlayers(TGameTime Delta);
 	void EndRound();
 public:
-	TGameLogic(TGame* SetGame);
+	TGameLogic(TGame* SetGame, TLogicListener* SetListener);
 	~TGameLogic();
 
 	void Process(TGameTime Delta);
