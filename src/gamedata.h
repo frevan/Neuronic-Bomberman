@@ -9,6 +9,8 @@
 const int INVALID_SLOT = 255;
 const int MAX_NUM_SLOTS = 10;
 
+const int MAX_NUM_ROUNDS = 50;
+
 typedef uint8_t TGameStatus;
 
 const TGameStatus GAME_NONE = 0;

@@ -336,6 +336,9 @@ TGameData::TGameData()
 void TGameData::Reset()
 {
 	Status = GAME_NONE;
+
+	MaxRounds = 1;
+
 	for (int i = 0; i < MAX_NUM_SLOTS; i++)
 		Players[i].State = PLAYER_NOTPLAYING;
 }
@@ -369,8 +372,6 @@ bool TGameData::AddPlayer(const std::string& SetName, int SetSlot)
 
 void TGameData::InitNewGame()
 {
-	MaxRounds = 2; // TODO: let the lobby set this
-
 	CurrentTime = 0;
 	CurrentRound = 0;
 

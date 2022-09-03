@@ -8,6 +8,8 @@
 TLobbyView::TLobbyView(TGame* SetGame, tgui::Gui* SetGUI)
 :	TTGUIView(SetGame, TViewType::VT_HUMANVIEW, SetGUI),
 	PlayersListView(nullptr),
+	NumRoundsEdit(nullptr),
+	MapCombo(nullptr),
 	Maps()
 {
 }
@@ -79,6 +81,14 @@ void TLobbyView::CreateWidgets()
 	button = addButton(window, ArtworkPath + imgButton, cbMapNext, 755, 85, 25, 25);
 	button->setText(">");
 	*/
+
+	// number of rounds
+	NumRoundsEdit = std::make_shared<tgui::EditBox>();
+	AddWidgetToGUI(NumRoundsEdit);
+	NumRoundsEdit->setPosition(450, 450);
+	NumRoundsEdit->setSize(180, 20);
+	NumRoundsEdit->setInputValidator(tgui::EditBox::Validator::UInt);
+	NumRoundsEdit->setText(std::to_string(Game->GameData.MaxRounds));
 }
 
 void TLobbyView::OnBackBtnClick()
@@ -88,8 +98,7 @@ void TLobbyView::OnBackBtnClick()
 
 void TLobbyView::OnStartBtnClick()
 {
-	Game->Client->SelectArena(MapCombo->getSelectedItemIndex());
-	Game->SwitchToState(STATE_MATCH);
+	StartMatchNow();
 }
 
 void TLobbyView::LeaveLobby()
@@ -114,8 +123,7 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 			break;
 
 		case actionDoDefaultAction:
-			Game->Client->SelectArena(MapCombo->getSelectedItemIndex());
-			Game->SwitchToState(STATE_MATCH);
+			StartMatchNow();
 			break;
 
 		case actionLobbyPrevMap:
@@ -125,7 +133,6 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 			else
 				mapIndex = MapCombo->getItemCount() - 1;
 			MapCombo->setSelectedItemByIndex(mapIndex);
-			//Game->Client->SelectArena(mapIndex);
 			break;
 
 		case actionLobbyNextMap:
@@ -135,7 +142,6 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 			else
 				mapIndex++;
 			MapCombo->setSelectedItemByIndex(mapIndex);
-			//Game->Client->SelectArena(mapIndex);
 			break;
 	};
 
@@ -203,4 +209,15 @@ void TLobbyView::Draw(sf::RenderTarget* target)
 void TLobbyView::OnMapComboItemSelected(int ItemIndex)
 {
 	Game->Client->SelectArena(MapCombo->getSelectedItemIndex());
+}
+
+void TLobbyView::StartMatchNow()
+{
+	std::string s = NumRoundsEdit->getText();
+	int rounds = std::stoi(s);
+
+	Game->Client->SetNumRounds(rounds);
+	Game->Client->SelectArena(MapCombo->getSelectedItemIndex());
+
+	Game->SwitchToState(STATE_MATCH);
 }

@@ -149,3 +149,13 @@ void TClient::DropBomb(int Slot)
 	// update the player
 	Game->GameData.Players[Slot].ActiveBombs++;
 }
+
+void TClient::SetNumRounds(int Value)
+{
+	if (Value < 1)
+		Value = 1;
+	else if (Value > MAX_NUM_ROUNDS)
+		Value = MAX_NUM_ROUNDS;
+
+	Game->GameData.MaxRounds = Value;
+}

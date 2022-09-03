@@ -14,11 +14,13 @@ TMatchView::~TMatchView()
 
 void TMatchView::Draw(sf::RenderTarget* target)
 {
-	std::string s = "MATCH";
+	// ROUND x OF x
+	std::string s = "ROUND " + std::to_string(Game->GameData.CurrentRound) + " OF " + std::to_string(Game->GameData.MaxRounds);
 	sf::Text titleText(s, Game->Fonts.ByIndex(TFontManager::standard), 20);
 	titleText.setPosition(5, 5);
 	target->draw(titleText);
 
+	/*
 	s = "STARTED";
 	switch (Game->GameData.Status)
 	{
@@ -29,6 +31,7 @@ void TMatchView::Draw(sf::RenderTarget* target)
 	sf::Text statusText(s, Game->Fonts.ByIndex(TFontManager::standard), 15);
 	statusText.setPosition(5, 30);
 	target->draw(statusText);
+	*/
 
 	const int FIELD_SIZE = 45;
 	float MapOffsetX = 62.f;

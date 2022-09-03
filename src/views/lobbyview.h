@@ -8,13 +8,16 @@ class TLobbyView :	public TTGUIView
 private:
 	tgui::ListView::Ptr PlayersListView;
 	tgui::ComboBox::Ptr MapCombo;
-	std::vector<TArena> Maps;
+	tgui::EditBox::Ptr NumRoundsEdit;
+	std::vector<TArena> Maps;	
 
 	void OnBackBtnClick();
 	void OnStartBtnClick();
-	
-	void FillMapCombo();
 	void OnMapComboItemSelected(int ItemIndex);
+	
+	void FillMapCombo();	
+
+	void StartMatchNow();
 
 protected:
 	void CreateWidgets() override;
