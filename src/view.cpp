@@ -41,6 +41,10 @@ void TView::StateChanged()
 {
 }
 
+void TView::Process(TGameTime Delta)
+{
+}
+
 // --- TTGUISystemView ---
 
 TTGUISystemView::TTGUISystemView(TGame* SetGame, tgui::Gui* SetGUI)

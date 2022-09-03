@@ -12,6 +12,7 @@ class TTGUISystemView;
 #include "game.h"
 #include "inputmap.h"
 #include "game.h"
+#include "gamedata.h"
 
 enum class TViewType
 {
@@ -38,6 +39,7 @@ public:
 	virtual void Draw(sf::RenderTarget* target);
 	virtual bool ProcessInput(TInputID InputID, float Value);
 	virtual void StateChanged();
+	virtual void Process(TGameTime Delta);
 };
 
 class TTGUISystemView : public TView
@@ -67,7 +69,7 @@ public:
 	TTGUIView(TGame* SetGame, TViewType SetType, tgui::Gui* SetGUI);
 	~TTGUIView();
 
-	// from TViewInterface
+	// from TView
 	void OnAttach() override;
 	void OnDetach() override;
 	void Draw(sf::RenderTarget* Target) override;

@@ -115,6 +115,23 @@ void TMatchView::Draw(sf::RenderTarget* target)
 		}
 }
 
+void TMatchView::Process(TGameTime Delta)
+{
+	for (int slot = 0; slot < MAX_NUM_SLOTS; slot++)
+	{
+		TPlayer* p = &Game->GameData.Players[slot];
+		if (p->State != PLAYER_ALIVE)
+			continue;
+
+		bool left = Game->InputMap.GetValueOfInput(actionMatchPlayer1Left + (slot * PlayerActionCount));
+		bool right = Game->InputMap.GetValueOfInput(actionMatchPlayer1Right + (slot * PlayerActionCount));
+		bool up = Game->InputMap.GetValueOfInput(actionMatchPlayer1Up + (slot * PlayerActionCount));
+		bool down = Game->InputMap.GetValueOfInput(actionMatchPlayer1Down + (slot * PlayerActionCount));
+
+		Game->Client->UpdatePlayerMovement(slot, left, right, up, down);
+	}
+}
+
 bool TMatchView::ProcessInput(TInputID InputID, float Value)
 {
 	bool handled = false;
@@ -132,22 +149,6 @@ bool TMatchView::ProcessInput(TInputID InputID, float Value)
 			}
 			break;
 
-		case actionMatchPlayer1Left:
-			Game->Client->UpdatePlayerMovement(playerIndex, DIRECTION_LEFT, Value > 0.f);
-			handled = true;
-			break;
-		case actionMatchPlayer1Right:
-			Game->Client->UpdatePlayerMovement(playerIndex, DIRECTION_RIGHT, Value > 0.f);
-			handled = true;
-			break;
-		case actionMatchPlayer1Up:
-			Game->Client->UpdatePlayerMovement(playerIndex, DIRECTION_UP, Value > 0.f);
-			handled = true;
-			break;
-		case actionMatchPlayer1Down:
-			Game->Client->UpdatePlayerMovement(playerIndex, DIRECTION_DOWN, Value > 0.f);
-			handled = true;
-			break;
 		case actionMatchPlayer1DropBomb:
 			Game->Client->DropBomb(playerIndex);
 			break;

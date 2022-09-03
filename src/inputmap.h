@@ -63,6 +63,7 @@ public:
 	TInputMap();
 	~TInputMap();
 
+	void CheckKeyboardState();
 	bool ProcessEvent(const sf::Event& event, TInputID& inputID, float& value);
 
 	void DefineInput(TInputID setID, TInputControl::TPacked setDefaultControl, float setDefaultValue = 1.0f, float setScale = 1.0f);

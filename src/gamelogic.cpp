@@ -233,7 +233,7 @@ bool TGameLogic::CheckMoveAgainstCell(TPlayer* Player, int CellX, int CellY, TPl
 	TField* cell = Game->GameData.Arena.At(CellX, CellY);
 	bool canmove = true;
 	canmove &= (cell->Type != FIELD_BRICK && cell->Type != FIELD_SOLID);
-	canmove &= !Game->GameData.BombInField(CellX, CellY);
+	canmove &= !Game->GameData.BombInField(CellX, CellY, true);
 	if (canmove)
 		return true;
 
@@ -350,62 +350,45 @@ void TGameLogic::ExplodeBomb(uint8_t X, uint8_t Y)
 	field->Bomb.State = BOMB_EXPLODING;
 	field->Bomb.TimeUntilNextState = 1000; // explode for 1 second
 
-	// explode the fields to the left of the current field
+	bool stopLeft = false, stopRight = false, stopUp = false, stopDown = false;
+
 	for (int i = 1; i <= field->Bomb.Range; i++)
 	{
-		if (X - i < 0)
-			break;
-		TField* field2 = Game->GameData.Arena.At(X - i, Y);
-		if (field2->Type == FIELD_SOLID)
-			break;
-		if (field2->Type == FIELD_BRICK)
-			field2->Type = FIELD_EMPTY;
-
-		field2->Bomb = field->Bomb;
-		field2->Bomb.DroppedByPlayer = INVALID_SLOT;
+		if (!stopLeft)
+			ExplodeField(X - i, Y, field->Bomb, stopLeft);
+		if (!stopRight)
+			ExplodeField(X + i, Y, field->Bomb, stopRight);
+		if (!stopUp)
+			ExplodeField(X, Y - i, field->Bomb, stopUp);
+		if (!stopDown)
+			ExplodeField(X, Y + i, field->Bomb, stopDown);
 	}
-	// explode the fields to the right of the current field
-	for (int i = 1; i <= field->Bomb.Range; i++)
+}
+
+void TGameLogic::ExplodeField(uint8_t X, uint8_t Y, const TBomb& OriginalBomb, bool& Stop)
+{
+	if (X < 0 || X >= Game->GameData.Arena.Width || Y < 0 || Y >= Game->GameData.Arena.Height)
 	{
-		if (X + i >= Game->GameData.Arena.Width)
-			break;
-		TField* field2 = Game->GameData.Arena.At(X + i, Y);
-		if (field2->Type == FIELD_SOLID)
-			break;
-		if (field2->Type == FIELD_BRICK)
-			field2->Type = FIELD_EMPTY;
-
-		field2->Bomb = field->Bomb;
-		field2->Bomb.DroppedByPlayer = INVALID_SLOT;
+		Stop = true;
+		return;
 	}
-	// explode the fields above the current field
-	for (int i = 1; i <= field->Bomb.Range; i++)
+
+	TField* field = Game->GameData.Arena.At(X, Y);
+	
+	if (field->Type == FIELD_SOLID)
 	{
-		if (Y - i < 0)
-			break;
-		TField* field2 = Game->GameData.Arena.At(X, Y - i);
-		if (field2->Type == FIELD_SOLID)
-			break;
-		if (field2->Type == FIELD_BRICK)
-			field2->Type = FIELD_EMPTY;
-
-		field2->Bomb = field->Bomb;
-		field2->Bomb.DroppedByPlayer = INVALID_SLOT;
+		Stop = true;
+		return;
 	}
-	// explode the fields below the current field
-	for (int i = 1; i <= field->Bomb.Range; i++)
+
+	if (field->Type == FIELD_BRICK)
 	{
-		if (Y + i >= Game->GameData.Arena.Height)
-			break;
-		TField* field2 = Game->GameData.Arena.At(X, Y + i);
-		if (field2->Type == FIELD_SOLID)
-			break;
-		if (field2->Type == FIELD_BRICK)
-			field2->Type = FIELD_EMPTY;
-
-		field2->Bomb = field->Bomb;
-		field2->Bomb.DroppedByPlayer = INVALID_SLOT;
+		Stop = true;
+		field->Type = FIELD_EMPTY;
 	}
+
+	field->Bomb = OriginalBomb;
+	field->Bomb.DroppedByPlayer = INVALID_SLOT;
 }
 
 void TGameLogic::CheckForExplodedPlayers()
@@ -413,6 +396,8 @@ void TGameLogic::CheckForExplodedPlayers()
 	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
 	{
 		TPlayer* p = &Game->GameData.Players[idx];
+		if (p->State == PLAYER_NOTPLAYING || p->State == PLAYER_DEAD)
+			continue;
 
 		int playerPosX = static_cast<int>(trunc(p->Position.X));
 		int playerPosY = static_cast<int>(trunc(p->Position.Y));
@@ -448,6 +433,8 @@ void TGameLogic::UpdateDyingPlayers(TGameTime Delta)
 	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
 	{
 		TPlayer* p = &Game->GameData.Players[idx];
+		if (p->State == PLAYER_NOTPLAYING)
+			continue;
 
 		if (p->State == PLAYER_DYING)
 		{
@@ -457,7 +444,7 @@ void TGameLogic::UpdateDyingPlayers(TGameTime Delta)
 				p->TimeUntilNextState -= Delta;
 		}
 
-		if (p->State != PLAYER_NOTPLAYING && p->State != PLAYER_DEAD)
+		if (p->State != PLAYER_DEAD)
 			alivePlayerCount++;
 	}
 

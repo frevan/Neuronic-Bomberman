@@ -24,6 +24,7 @@ private:
 	void UpdatePlayerPositions(TGameTime Delta);
 	void UpdateBombs(TGameTime Delta);
 	void ExplodeBomb(uint8_t X, uint8_t Y);
+	void ExplodeField(uint8_t X, uint8_t Y, const TBomb& OriginalBomb, bool& Stop);
 	void CheckForExplodedPlayers();
 	void UpdateDyingPlayers(TGameTime Delta);
 	void EndRound();

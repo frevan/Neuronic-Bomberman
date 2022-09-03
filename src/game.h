@@ -65,7 +65,7 @@ private:
 	void SetupCurrentState();
 	void FinalizeCurrentState();
 
-	void LoadMapInfos();
+	//void LoadMapInfos();
 
 public:
 	int CurrentState;

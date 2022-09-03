@@ -63,6 +63,7 @@ typedef struct
 	uint32_t RoundsWon; // number of rounds won by the player so far
 	uint32_t Ranking; // ranking in the current round
 	uint8_t MaxActiveBombs; // the maximum amount of bombs a player can drop at any time
+	uint8_t BombRange; // the range of newly dropped bombs
 	uint8_t ActiveBombs; // the number of unexploded bombs the player has dropped
 	TGameTime TimeUntilNextState; // time in milliseconds until the player finishes dying (or other state changes)
 	TGameTime TimeOfDeath; // time of death in the current round
@@ -162,5 +163,5 @@ public:
 	void InitNewGame();
 	void InitNewRound();
 
-	bool BombInField(uint8_t X, uint8_t Y);
+	bool BombInField(uint8_t X, uint8_t Y, bool OnlyUnexploded);
 };

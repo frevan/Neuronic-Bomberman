@@ -108,35 +108,51 @@ void TClient::SelectArena(int Index)
 	Game->GameData.Arena.LoadFromFile(map->OriginalFileName);
 }
 
-void TClient::UpdatePlayerMovement(int Slot, TPlayerDirection Direction, bool SetActive)
+void TClient::UpdatePlayerMovement(int Slot, bool Left, bool Right, bool Up, bool Down)
 {
 	if (Slot < 0 || Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
-	if (Game->GameData.Players[Slot].State == PLAYER_NOTPLAYING)
+
+	TPlayer* p = &(Game->GameData.Players[Slot]);
+	if (p->State == PLAYER_NOTPLAYING)
 		return;
 
-	if (SetActive)
-		Game->GameData.Players[Slot].Direction |= Direction;
+	if (Left)
+		p->Direction |= DIRECTION_LEFT;
 	else
-		Game->GameData.Players[Slot].Direction &= ~Direction;
+		p->Direction &= ~DIRECTION_LEFT;
+	if (Right)
+		p->Direction |= DIRECTION_RIGHT;
+	else
+		p->Direction &= ~DIRECTION_RIGHT;
+	if (Up)
+		p->Direction |= DIRECTION_UP;
+	else
+		p->Direction &= ~DIRECTION_UP;
+	if (Down)
+		p->Direction |= DIRECTION_DOWN;
+	else
+		p->Direction &= ~DIRECTION_DOWN;
 }
 
 void TClient::DropBomb(int Slot)
 {
 	if (Slot < 0 || Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
-	if (Game->GameData.Players[Slot].State == PLAYER_NOTPLAYING)
+
+	TPlayer* p = &(Game->GameData.Players[Slot]);
+	if (p->State == PLAYER_NOTPLAYING)
 		return;
-	if (Game->GameData.Players[Slot].ActiveBombs == Game->GameData.Players[Slot].MaxActiveBombs)
+	if (p->ActiveBombs == p->MaxActiveBombs)
 		return;
 
 	// determine the exact position where to drop it (top left pos of the field)
 	TFieldPosition pos;
-	pos.X = static_cast<int>(trunc(Game->GameData.Players[Slot].Position.X));
-	pos.Y = static_cast<int>(trunc(Game->GameData.Players[Slot].Position.Y));
+	pos.X = static_cast<int>(trunc(p->Position.X));
+	pos.Y = static_cast<int>(trunc(p->Position.Y));
 
 	// check if there's already a bomb at this position
-	if (Game->GameData.BombInField(pos.X, pos.Y))
+	if (Game->GameData.BombInField(pos.X, pos.Y, false))
 		return;
 
 	// add the new bomb
@@ -144,10 +160,10 @@ void TClient::DropBomb(int Slot)
 	field->Bomb.State = BOMB_TICKING;
 	field->Bomb.DroppedByPlayer = Slot;
 	field->Bomb.TimeUntilNextState = 5000; // 5 seconds
-	field->Bomb.Range = 1;
+	field->Bomb.Range = p->BombRange;
 
 	// update the player
-	Game->GameData.Players[Slot].ActiveBombs++;
+	p->ActiveBombs++;
 }
 
 void TClient::SetNumRounds(int Value)

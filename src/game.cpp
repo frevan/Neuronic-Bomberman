@@ -155,6 +155,10 @@ void TGame::Execute()
 		{
 			TGameTime delta = nowTime - prevTickTime;
 
+			// let the current view process as well
+			if (CurrentStateView)
+				CurrentStateView->Process(delta);
+
 			// process client object
 			Client->Process(delta);
 
@@ -199,6 +203,8 @@ void TGame::Execute()
 
 void TGame::ProcessInputs()
 {
+	InputMap.CheckKeyboardState();
+
 	sf::Event event;
 	while (Window->pollEvent(event))
 	{

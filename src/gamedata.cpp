@@ -395,9 +395,10 @@ void TGameData::InitNewRound()
 		p->Speed = 0;
 		p->Ranking = 0;
 		p->MaxActiveBombs = 1;
+		p->BombRange = 1;
 		p->ActiveBombs = 0;
 		p->TimeOfDeath = 0;
-		p->State = PLAYER_ALIVE;
+		p->State = PLAYER_ALIVE;		
 	}
 
 	for (int x = 0; x < Arena.Width; x++)
@@ -539,8 +540,14 @@ void TGameData::ClearMapFieldsForPlayer(int X, int Y)
 	}
 }
 
-bool TGameData::BombInField(uint8_t X, uint8_t Y)
+bool TGameData::BombInField(uint8_t X, uint8_t Y, bool OnlyUnexploded)
 {
 	TField* field = Arena.At(X, Y);
-	return (field->Bomb.State != BOMB_NONE);
+
+	if (field->Bomb.State == BOMB_NONE)
+		return false;
+	else if (OnlyUnexploded && field->Bomb.State == BOMB_EXPLODING)
+		return false;
+	else
+		return true;
 }

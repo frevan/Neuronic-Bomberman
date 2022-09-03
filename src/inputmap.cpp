@@ -104,11 +104,13 @@ void TInputMap::ResetInput(TInputID inputID)
 
 float TInputMap::GetValueOfInput(TInputID inputID)
 {
+	float result = 0.f;
+
 	auto it = Values.find(inputID);
 	if (it != Values.end())
-		return it->second;
+		result = it->second;
 
-	return 0;
+	return result;
 }
 
 TInputID TInputMap::FindInputIDForControl(const TInputControl& control)
@@ -209,4 +211,20 @@ bool TInputMap::TranslateEventToControlAndValue(const sf::Event& event, TInputCo
 		found = false;
 
 	return found;
+}
+
+void TInputMap::CheckKeyboardState()
+{
+	for (auto it = Bindings.begin(); it != Bindings.end(); it++)
+	{
+		if ((*it).second.Control.Type == TInputControl::KEYBOARD)
+		{
+			sf::Keyboard::Key key = (sf::Keyboard::Key)(*it).second.Control.Button;
+			bool pressed = sf::Keyboard::isKeyPressed(key);
+			if (pressed)
+				Values[(*it).first] = 1.0f;
+			else
+				Values[(*it).first] = 0.0f;
+		}
+	}
 }

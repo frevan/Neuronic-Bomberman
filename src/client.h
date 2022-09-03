@@ -41,18 +41,20 @@ public:
 
 	void Process(TGameTime Delta);
 
+	// start/stop the game, rounds, ...
 	void CreateGame(const std::string& LobbyName); // create a new game / lobby
 	void CloseGame(); // leave the current game (removes all players that were added by this client)
-	bool AddPlayer(const std::string& PlayerName, uint8_t Slot = INVALID_SLOT); // add a player to the current game
-	void RemovePlayer(uint8_t Slot); // remove a player from the current game
 	void StartMatch(); // start the first round of the match	
 	void StartNextRound(); // start a new round when the previous one has ended
 	void EndRound(); // end the current round
 
 	// set game properties (when in the lobby)
+	bool AddPlayer(const std::string& PlayerName, uint8_t Slot = INVALID_SLOT); // add a player to the current game
+	void RemovePlayer(uint8_t Slot); // remove a player from the current game
 	void SelectArena(int Index); // set the arena
 	void SetNumRounds(int Value); // set the number of rounds to be played
 
-	void UpdatePlayerMovement(int Slot, TPlayerDirection Direction, bool SetActive);
+	// during the match
+	void UpdatePlayerMovement(int Slot, bool Left, bool Right, bool Up, bool Down);
 	void DropBomb(int Slot);
 };
