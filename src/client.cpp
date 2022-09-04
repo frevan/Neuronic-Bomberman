@@ -47,7 +47,10 @@ void TClient::AddPlayer(const std::string& PlayerName, uint8_t Slot)
 
 void TClient::RemovePlayer(uint8_t Slot)
 {
-	// TODO
+	TClientCommand cmd;
+	cmd.Command = CMD_RemovePlayer;
+	cmd.Index = Slot;
+	Commands.push(cmd);
 }
 
 void TClient::StartMatch()
@@ -61,6 +64,7 @@ void TClient::Process(TGameTime Delta)
 {
 	TClientCommand cmd;
 	bool success;
+	int slot;
 
 	while (!Commands.empty())
 	{
@@ -79,15 +83,42 @@ void TClient::Process(TGameTime Delta)
 					Listener->ClientEnteredLobby();
 				break;
 
+			case CMD_SetGameName:
+				Game->GameData.SetName(cmd.StrParam);
+				if (Listener)
+					Listener->ClientGameOptionsChanged();
+				break;
+
 			case CMD_AddPlayer:
-				success = Game->GameData.AddPlayer(cmd.StrParam, (int)cmd.Index);
+				slot = (int)cmd.Index;
+				success = Game->GameData.AddPlayer(cmd.StrParam, slot);
 				if (Listener)
 				{
 					if (success)
-						Listener->ClientPlayerAdded();
+						Listener->ClientPlayerAdded(slot);
 					else
-						Listener->ClientPlayerNotAdded();
+						Listener->ClientPlayerNotAdded(slot);
 				}
+				break;
+
+			case CMD_RemovePlayer:
+				slot = (int)cmd.Index;
+				Game->GameData.RemovePlayer(slot);
+				if (Listener)
+					Listener->ClientPlayerRemoved(slot);
+				break;
+
+			case CMD_SetPlayerName:
+				slot = (int)cmd.Index;
+				success = Game->GameData.SetPlayerName(slot, cmd.StrParam);
+				if (Listener && success)
+					Listener->ClientPlayerNameChanged(slot);
+				break;
+
+			case CMD_SetNumRounds:
+				Game->GameData.MaxRounds = (int)cmd.Value;
+				if (Listener)
+					Listener->ClientGameOptionsChanged();
 				break;
 
 			case CMD_StartMatch:
@@ -194,5 +225,25 @@ void TClient::SetNumRounds(int Value)
 	else if (Value > MAX_NUM_ROUNDS)
 		Value = MAX_NUM_ROUNDS;
 
-	Game->GameData.MaxRounds = Value;
+	TClientCommand cmd;
+	cmd.Command = CMD_SetNumRounds;
+	cmd.Value = Value;
+	Commands.push(cmd);
+}
+
+void TClient::SetPlayerName(int Slot, const std::string& Name)
+{
+	TClientCommand cmd;
+	cmd.Command = CMD_SetPlayerName;
+	cmd.Index = Slot;
+	cmd.StrParam = Name;
+	Commands.push(cmd);
+}
+
+void TClient::SetGameName(const std::string& SetName)
+{
+	TClientCommand cmd;
+	cmd.Command = CMD_SetGameName;
+	cmd.StrParam = SetName;
+	Commands.push(cmd);
 }

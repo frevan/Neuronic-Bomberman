@@ -6,14 +6,18 @@
 class TLobbyView :	public TTGUIView
 {
 private:
+	tgui::EditBox::Ptr GameNameEdit;
 	tgui::ListView::Ptr PlayersListView;
 	tgui::ComboBox::Ptr MapCombo;
 	tgui::EditBox::Ptr NumRoundsEdit;
-	std::vector<TArena> Maps;	
+	std::vector<TArena> Maps;
+
+	int SettingGameName;
 
 	void OnBackBtnClick();
 	void OnStartBtnClick();
 	void OnMapComboItemSelected(int ItemIndex);
+	void OnGameNameEditTextEntered(const std::string& Text);
 	
 	void FillMapCombo();	
 

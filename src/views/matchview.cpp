@@ -20,18 +20,10 @@ void TMatchView::Draw(sf::RenderTarget* target)
 	titleText.setPosition(5, 5);
 	target->draw(titleText);
 
-	/*
-	s = "STARTED";
-	switch (Game->GameData.Status)
-	{
-		case GAME_STARTING: s = "starting"; break;
-		case GAME_RUNNING: s = "started"; break;
-		default: s = "error"; break;
-	}
+	s = Game->GameData.GameName;
 	sf::Text statusText(s, Game->Fonts.ByIndex(TFontManager::standard), 15);
 	statusText.setPosition(5, 30);
 	target->draw(statusText);
-	*/
 
 	const int FIELD_SIZE = 45;
 	float MapOffsetX = 62.f;
@@ -108,7 +100,7 @@ void TMatchView::Draw(sf::RenderTarget* target)
 			if (field->Bomb.State == BOMB_TICKING)
 			{
 				const float PulseInterval = 1250.f; // one complete pulse per 1.25 seconds
-				float sine = sinf(fmodf(field->Bomb.TimeUntilNextState, PulseInterval) / PulseInterval * M_PI * 2);
+				float sine = sinf(fmodf(field->Bomb.TimeUntilNextState * 1.f, PulseInterval) / PulseInterval * (float)M_PI * 2);
 				bombSize += sine * (FIELD_SIZE / 25.f);
 			}
 			else if (field->Bomb.State == BOMB_EXPLODING)

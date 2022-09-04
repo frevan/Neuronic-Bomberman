@@ -391,19 +391,23 @@ void TGame::ClientEnteredLobby()
 	// TODO: check result of AddPlayer
 }
 
-void TGame::ClientPlayerAdded()
+void TGame::ClientPlayerAdded(int Slot)
 {
 	CurrentStateView->StateChanged();
 }
 
-void TGame::ClientPlayerNotAdded()
-{
-	// TODO
-}
-
-void TGame::ClientPlayerRemoved()
+void TGame::ClientPlayerNotAdded(int Slot)
 {
 	CurrentStateView->StateChanged();
+}
+
+void TGame::ClientPlayerRemoved(int Slot)
+{
+	CurrentStateView->StateChanged();
+}
+
+void TGame::ClientPlayerNameChanged(int Slot)
+{
 }
 
 void TGame::ClientMatchStarting()
@@ -486,4 +490,9 @@ void TGame::ClientRoundEnded()
 void TGame::LogicRoundEnded()
 {
 	SwitchToState(STATE_ENDOFROUND);
+}
+
+void TGame::ClientGameOptionsChanged()
+{
+	CurrentStateView->StateChanged();
 }

@@ -337,6 +337,7 @@ void TGameData::Reset()
 {
 	Status = GAME_NONE;
 
+	GameName = "Bombi";
 	MaxRounds = 1;
 
 	for (int i = 0; i < MAX_NUM_SLOTS; i++)
@@ -368,6 +369,19 @@ bool TGameData::AddPlayer(const std::string& SetName, int SetSlot)
 	Players[SetSlot].Name = SetName;
 
 	return true;
+}
+
+bool TGameData::RemovePlayer(int Slot)
+{
+	bool result = false;
+	if (Slot >= 0 && Slot < MAX_NUM_SLOTS)
+		if (Players[Slot].State != PLAYER_NOTPLAYING)
+		{
+			result = true;
+			Players[Slot].State = PLAYER_NOTPLAYING;
+		}
+
+	return result;
 }
 
 void TGameData::InitNewGame()
@@ -550,4 +564,22 @@ bool TGameData::BombInField(uint8_t X, uint8_t Y, bool OnlyUnexploded)
 		return false;
 	else
 		return true;
+}
+
+bool TGameData::SetPlayerName(int Slot, const std::string& SetName)
+{
+	bool result = false;
+	if (Slot >= 0 && Slot < MAX_NUM_SLOTS)
+		if (Players[Slot].State != PLAYER_NOTPLAYING)
+		{
+			result = true;
+			Players[Slot].Name = SetName;
+		}
+
+	return result;
+}
+
+void TGameData::SetName(const std::string& SetName)
+{
+	GameName = SetName;
 }

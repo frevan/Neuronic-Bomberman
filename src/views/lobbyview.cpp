@@ -6,11 +6,12 @@
 #include "../actions.h"
 
 TLobbyView::TLobbyView(TGame* SetGame, tgui::Gui* SetGUI)
-:	TTGUIView(SetGame, TViewType::VT_HUMANVIEW, SetGUI),
+	: TTGUIView(SetGame, TViewType::VT_HUMANVIEW, SetGUI),
 	PlayersListView(nullptr),
 	NumRoundsEdit(nullptr),
 	MapCombo(nullptr),
-	Maps()
+	Maps(),
+	SettingGameName(0)
 {
 }
 
@@ -28,12 +29,13 @@ void TLobbyView::CreateWidgets()
 	servernamelbl->getRenderer()->setTextColor(sf::Color::White);
 	servernamelbl->setTextSize(14);
 	// ---
-	tgui::EditBox::Ptr servernameedit = std::make_shared<tgui::EditBox>();
-	AddWidgetToGUI(servernameedit);
-	servernameedit->setText("Bombi");
-	servernameedit->setPosition(120, 21);
-	servernameedit->setSize(180, 20);
-	servernameedit->setTextSize(14);
+	GameNameEdit = std::make_shared<tgui::EditBox>();
+	AddWidgetToGUI(GameNameEdit);
+	GameNameEdit->setText(Game->GameData.GameName);
+	GameNameEdit->setPosition(120, 21);
+	GameNameEdit->setSize(180, 20);
+	GameNameEdit->setTextSize(14);
+	GameNameEdit->connect("TextChanged", &TLobbyView::OnGameNameEditTextEntered, this);
 
 	// back
 	tgui::Button::Ptr backbtn = std::make_shared<tgui::Button>();
@@ -150,6 +152,10 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 
 void TLobbyView::StateChanged()
 {
+	SettingGameName++;
+	GameNameEdit->setText(Game->GameData.GameName);
+	SettingGameName--;
+
 	PlayersListView->removeAllItems();
 
 	for (int i = 0; i < MAX_NUM_SLOTS; i++)
@@ -220,4 +226,10 @@ void TLobbyView::StartMatchNow()
 	Game->Client->SelectArena(MapCombo->getSelectedItemIndex());
 
 	Game->SwitchToState(STATE_MATCH);
+}
+
+void TLobbyView::OnGameNameEditTextEntered(const std::string& Text)
+{
+	if (SettingGameName == 0)
+		Game->Client->SetGameName(Text);
 }

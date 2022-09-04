@@ -159,9 +159,13 @@ public:
 	TGameData();
 
 	void Reset();
-	bool AddPlayer(const std::string& SetName, int SetSlot = INVALID_SLOT);
 	void InitNewGame();
 	void InitNewRound();
+
+	void SetName(const std::string& SetName);
+	bool AddPlayer(const std::string& SetName, int SetSlot = INVALID_SLOT);
+	bool RemovePlayer(int Slot);
+	bool SetPlayerName(int Slot, const std::string& SetName);
 
 	bool BombInField(uint8_t X, uint8_t Y, bool OnlyUnexploded);
 };

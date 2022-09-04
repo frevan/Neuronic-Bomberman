@@ -95,9 +95,11 @@ public:
 	void ClientConnected() override;
 	void ClientDisconnected() override;
 	void ClientEnteredLobby() override;
-	void ClientPlayerAdded() override;
-	void ClientPlayerNotAdded() override;
-	void ClientPlayerRemoved() override;
+	void ClientGameOptionsChanged() override;
+	void ClientPlayerAdded(int Slot) override;
+	void ClientPlayerNotAdded(int Slot) override;
+	void ClientPlayerRemoved(int Slot) override;
+	void ClientPlayerNameChanged(int Slot) override;
 	void ClientMatchStarting() override;
 	void ClientMatchStarted() override;
 	void ClientRoundStarted() override;
