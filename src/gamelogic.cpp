@@ -232,8 +232,14 @@ bool TGameLogic::CheckMoveAgainstCell(TPlayer* Player, int CellX, int CellY, TPl
 	// check cell contents to see if we can move there
 	TField* cell = Game->GameData.Arena.At(CellX, CellY);
 	bool canmove = true;
-	canmove &= (cell->Type != FIELD_BRICK && cell->Type != FIELD_SOLID);
-	canmove &= !Game->GameData.BombInField(CellX, CellY, true);
+	if (cell->Type == FIELD_BRICK || cell->Type == FIELD_SOLID)
+		canmove = false; 
+	if (Game->GameData.BombInField(CellX, CellY, true))
+	{
+		TFieldPosition pos = CalculatePlayerField(Player);
+		if (pos.X != CellX || pos.Y != CellY)
+			canmove &= !Game->GameData.BombInField(CellX, CellY, true);
+	}
 	if (canmove)
 		return true;
 
@@ -254,15 +260,15 @@ bool TGameLogic::CheckMoveAgainstCell(TPlayer* Player, int CellX, int CellY, TPl
 					OtherDirection = DIRECTION_UP;
 				y = OtherDirection == DIRECTION_UP ? CellY - 1 : CellY + 1;
 				break;
-		case DIRECTION_UP:
-		case DIRECTION_DOWN:
-			temp = Player->Position.X - (int)Player->Position.X;
-			if (temp > 0.5f)			
-				OtherDirection = DIRECTION_RIGHT;
-			else if (temp < 0.5f)	
-				OtherDirection = DIRECTION_LEFT;
-			x = OtherDirection == DIRECTION_LEFT ? CellX - 1 : CellX + 1;
-			break;
+			case DIRECTION_UP:
+			case DIRECTION_DOWN:
+				temp = Player->Position.X - (int)Player->Position.X;
+				if (temp > 0.5f)			
+					OtherDirection = DIRECTION_RIGHT;
+				else if (temp < 0.5f)	
+					OtherDirection = DIRECTION_LEFT;
+				x = OtherDirection == DIRECTION_LEFT ? CellX - 1 : CellX + 1;
+				break;
 		}
 		// --> check
 		if (x >= 0 && x < Game->GameData.Arena.Width && y >= 0 && y < Game->GameData.Arena.Height)
@@ -291,7 +297,7 @@ void TGameLogic::UpdatePlayerPositions(TGameTime Delta)
 			player->Speed = SPEED_NORMAL;
 
 		float normalizedSpeed = player->Speed / (float)SPEED_NORMAL;
-		float distanceTravelled = normalizedSpeed * (float)Delta / 1000.f * 1.5f;
+		float distanceTravelled = normalizedSpeed * (float)Delta / 1000.f * 4.0f;
 
 		bool changed = false;
 		if (!changed)
@@ -327,11 +333,6 @@ void TGameLogic::UpdateBombs(TGameTime Delta)
 			{
 				if (field->Bomb.TimeUntilNextState <= Delta)
 				{
-					if (field->Bomb.DroppedByPlayer >= 0 && field->Bomb.DroppedByPlayer < MAX_NUM_SLOTS)
-					{
-						assert(Game->GameData.Players[field->Bomb.DroppedByPlayer].ActiveBombs > 0);
-						Game->GameData.Players[field->Bomb.DroppedByPlayer].ActiveBombs--;
-					}
 					field->Bomb.State = BOMB_NONE;
 					field->Bomb.DroppedByPlayer = INVALID_SLOT;
 				}
@@ -343,12 +344,18 @@ void TGameLogic::UpdateBombs(TGameTime Delta)
 
 void TGameLogic::ExplodeBomb(uint8_t X, uint8_t Y)
 {
-	TField* field;
+	TField* field = Game->GameData.Arena.At(X, Y);
+
+	// update the player's active bomb count
+	if (field->Bomb.DroppedByPlayer >= 0 && field->Bomb.DroppedByPlayer < MAX_NUM_SLOTS)
+	{
+		assert(Game->GameData.Players[field->Bomb.DroppedByPlayer].ActiveBombs > 0);
+		Game->GameData.Players[field->Bomb.DroppedByPlayer].ActiveBombs--;
+	}
 
 	// explode the field itself
-	field = Game->GameData.Arena.At(X, Y);
 	field->Bomb.State = BOMB_EXPLODING;
-	field->Bomb.TimeUntilNextState = 1000; // explode for 1 second
+	field->Bomb.TimeUntilNextState = 600; // explode for 0.6 seconds
 
 	bool stopLeft = false, stopRight = false, stopUp = false, stopDown = false;
 
@@ -387,6 +394,11 @@ void TGameLogic::ExplodeField(uint8_t X, uint8_t Y, const TBomb& OriginalBomb, b
 		field->Type = FIELD_EMPTY;
 	}
 
+	if (field->Bomb.State == BOMB_TICKING && field->Bomb.DroppedByPlayer >= 0 && field->Bomb.DroppedByPlayer < MAX_NUM_SLOTS)
+	{
+		assert(Game->GameData.Players[field->Bomb.DroppedByPlayer].ActiveBombs > 0);
+		Game->GameData.Players[field->Bomb.DroppedByPlayer].ActiveBombs--;
+	}
 	field->Bomb = OriginalBomb;
 	field->Bomb.DroppedByPlayer = INVALID_SLOT;
 }
@@ -399,23 +411,22 @@ void TGameLogic::CheckForExplodedPlayers()
 		if (p->State == PLAYER_NOTPLAYING || p->State == PLAYER_DEAD)
 			continue;
 
-		int playerPosX = static_cast<int>(trunc(p->Position.X));
-		int playerPosY = static_cast<int>(trunc(p->Position.Y));
+		TFieldPosition playerPos = CalculatePlayerField(p);
 
 		int leftField = static_cast<int>(trunc(p->Position.X - 0.49));
 		int rightField = static_cast<int>(trunc(p->Position.X + 0.49));
 		int topField = static_cast<int>(trunc(p->Position.Y - 0.49));
 		int bottomField = static_cast<int>(trunc(p->Position.Y + 0.49));
 
-		bool exploding = Game->GameData.Arena.At(playerPosX, playerPosY)->Bomb.State == BOMB_EXPLODING;
+		bool exploding = Game->GameData.Arena.At(playerPos.X, playerPos.Y)->Bomb.State == BOMB_EXPLODING;
 		if (leftField >= 0)
-			exploding |= Game->GameData.Arena.At(leftField, playerPosY)->Bomb.State == BOMB_EXPLODING;
+			exploding |= Game->GameData.Arena.At(leftField, playerPos.Y)->Bomb.State == BOMB_EXPLODING;
 		if (rightField < Game->GameData.Arena.Width)
-			exploding |= Game->GameData.Arena.At(rightField, playerPosY)->Bomb.State == BOMB_EXPLODING;
+			exploding |= Game->GameData.Arena.At(rightField, playerPos.Y)->Bomb.State == BOMB_EXPLODING;
 		if (topField >= 0)
-			exploding |= Game->GameData.Arena.At(playerPosX, topField)->Bomb.State == BOMB_EXPLODING;
+			exploding |= Game->GameData.Arena.At(playerPos.X, topField)->Bomb.State == BOMB_EXPLODING;
 		if (bottomField < Game->GameData.Arena.Height)
-			exploding |= Game->GameData.Arena.At(playerPosX, bottomField)->Bomb.State == BOMB_EXPLODING;
+			exploding |= Game->GameData.Arena.At(playerPos.X, bottomField)->Bomb.State == BOMB_EXPLODING;
 
 		if (exploding)
 		{
@@ -493,4 +504,12 @@ void TGameLogic::EndRound()
 	Game->GameData.Status = GAME_ENDED;
 	if (Listener)
 		Listener->LogicRoundEnded();
+}
+
+TFieldPosition TGameLogic::CalculatePlayerField(TPlayer* Player)
+{
+	TFieldPosition pos;
+	pos.X = static_cast<int>(trunc(Player->Position.X));
+	pos.Y = static_cast<int>(trunc(Player->Position.Y));
+	return pos;
 }

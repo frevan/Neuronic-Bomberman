@@ -28,6 +28,7 @@ private:
 	void CheckForExplodedPlayers();
 	void UpdateDyingPlayers(TGameTime Delta);
 	void EndRound();
+	TFieldPosition CalculatePlayerField(TPlayer* Player);
 public:
 	TGameLogic(TGame* SetGame, TLogicListener* SetListener);
 	~TGameLogic();

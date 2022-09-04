@@ -96,6 +96,7 @@ public:
 	void ClientDisconnected() override;
 	void ClientEnteredLobby() override;
 	void ClientPlayerAdded() override;
+	void ClientPlayerNotAdded() override;
 	void ClientPlayerRemoved() override;
 	void ClientMatchStarting() override;
 	void ClientMatchStarted() override;

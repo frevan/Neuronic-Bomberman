@@ -396,6 +396,11 @@ void TGame::ClientPlayerAdded()
 	CurrentStateView->StateChanged();
 }
 
+void TGame::ClientPlayerNotAdded()
+{
+	// TODO
+}
+
 void TGame::ClientPlayerRemoved()
 {
 	CurrentStateView->StateChanged();

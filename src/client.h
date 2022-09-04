@@ -5,9 +5,13 @@ class TClientListener
 public:
 	virtual void ClientConnected() = 0;
 	virtual void ClientDisconnected() = 0;
+
 	virtual void ClientEnteredLobby() = 0;
+
 	virtual void ClientPlayerAdded() = 0;
+	virtual void ClientPlayerNotAdded() = 0;
 	virtual void ClientPlayerRemoved() = 0;
+
 	virtual void ClientMatchStarting() = 0;
 	virtual void ClientMatchStarted() = 0;
 	virtual void ClientRoundStarted() = 0;
@@ -23,17 +27,24 @@ class TClient;
 
 const int CMD_None = 0;
 const int CMD_OpenLobby = 1;
-//const int CMD_AddPlayer = 2;
+const int CMD_AddPlayer = 2;
 //const int CMD_RemovePlayer = 3;
 const int CMD_StartMatch = 4;
 const int CMD_StartNextRound = 5;
 const int CMD_EndRound = 6;
 
+typedef struct
+{
+	int Command;
+	intptr_t Index, Value;
+	std::string StrParam;
+} TClientCommand;
+
 class TClient
 {
 private:
 	TGame* Game;
-	std::queue<int> Commands;
+	std::queue<TClientCommand> Commands;
 public:
 	TClientListener* Listener;
 
@@ -49,7 +60,7 @@ public:
 	void EndRound(); // end the current round
 
 	// set game properties (when in the lobby)
-	bool AddPlayer(const std::string& PlayerName, uint8_t Slot = INVALID_SLOT); // add a player to the current game
+	void AddPlayer(const std::string& PlayerName, uint8_t Slot = INVALID_SLOT); // add a player to the current game
 	void RemovePlayer(uint8_t Slot); // remove a player from the current game
 	void SelectArena(int Index); // set the arena
 	void SetNumRounds(int Value); // set the number of rounds to be played

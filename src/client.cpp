@@ -9,8 +9,10 @@ TClient::TClient(TGame* SetGame)
 
 void TClient::CreateGame(const std::string& LobbyName)
 {
-	Game->GameData.GameName = LobbyName;
-	Commands.push(CMD_OpenLobby);
+	TClientCommand cmd;
+	cmd.Command = CMD_OpenLobby;
+	cmd.StrParam = LobbyName;
+	Commands.push(cmd);
 }
 
 void TClient::CloseGame()
@@ -22,51 +24,70 @@ void TClient::CloseGame()
 
 void TClient::StartNextRound()
 {
-	Commands.push(CMD_StartNextRound);
+	TClientCommand cmd;
+	cmd.Command = CMD_StartNextRound;
+	Commands.push(cmd);
 }
 
 void TClient::EndRound()
 {
-	Commands.push(CMD_EndRound);
+	TClientCommand cmd;
+	cmd.Command = CMD_EndRound;
+	Commands.push(cmd);
 }
 
-bool TClient::AddPlayer(const std::string& PlayerName, uint8_t Slot)
+void TClient::AddPlayer(const std::string& PlayerName, uint8_t Slot)
 {
-	bool success = Game->GameData.AddPlayer(PlayerName, Slot);
-
-	if (success && Listener)
-		Listener->ClientPlayerAdded();
-
-	return success;
+	TClientCommand cmd;
+	cmd.Command = CMD_AddPlayer;
+	cmd.StrParam = PlayerName;
+	cmd.Index = Slot;
+	Commands.push(cmd);
 }
 
 void TClient::RemovePlayer(uint8_t Slot)
 {
+	// TODO
 }
 
 void TClient::StartMatch()
 {
-	Commands.push(CMD_StartMatch);
+	TClientCommand cmd;
+	cmd.Command = CMD_StartMatch;
+	Commands.push(cmd);
 }
 
 void TClient::Process(TGameTime Delta)
 {
-	int cmd;
+	TClientCommand cmd;
+	bool success;
 
 	while (!Commands.empty())
 	{
 		cmd = Commands.front();
 		Commands.pop();
 
-		switch (cmd)
+		switch (cmd.Command)
 		{
 			case CMD_OpenLobby:
 				if (Listener)
 					Listener->ClientConnected();
 				Game->GameData.Reset();
+				Game->GameData.GameName = cmd.StrParam;
 				Game->GameData.Status = GAME_INLOBBY;
 				if (Listener)
 					Listener->ClientEnteredLobby();
+				break;
+
+			case CMD_AddPlayer:
+				success = Game->GameData.AddPlayer(cmd.StrParam, (int)cmd.Index);
+				if (Listener)
+				{
+					if (success)
+						Listener->ClientPlayerAdded();
+					else
+						Listener->ClientPlayerNotAdded();
+				}
 				break;
 
 			case CMD_StartMatch:
@@ -159,7 +180,7 @@ void TClient::DropBomb(int Slot)
 	TField* field = Game->GameData.Arena.At(pos);
 	field->Bomb.State = BOMB_TICKING;
 	field->Bomb.DroppedByPlayer = Slot;
-	field->Bomb.TimeUntilNextState = 5000; // 5 seconds
+	field->Bomb.TimeUntilNextState = 4500; // 4.5 seconds
 	field->Bomb.Range = p->BombRange;
 
 	// update the player
