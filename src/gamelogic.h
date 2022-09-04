@@ -8,13 +8,12 @@ public:
 	virtual void LogicRoundEnded() = 0;
 };
 
-#include "game.h"
 #include "gamedata.h"
 
 class TGameLogic
 {
 private:
-	TGame* Game;
+	TGameData* Data;
 	TLogicListener* Listener;
 
 	float MovePlayer(TPlayer* Player, TPlayerDirection Direction, float Distance, bool Recurse = true);
@@ -30,8 +29,6 @@ private:
 	void EndRound();
 	TFieldPosition CalculatePlayerField(TPlayer* Player);
 public:
-	TGameLogic(TGame* SetGame, TLogicListener* SetListener);
-	~TGameLogic();
-
+	TGameLogic(TGameData* SetData, TLogicListener* SetListener);
 	void Process(TGameTime Delta);
 };

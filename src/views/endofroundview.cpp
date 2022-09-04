@@ -14,7 +14,11 @@ TEndOfRoundView::~TEndOfRoundView()
 
 void TEndOfRoundView::Draw(sf::RenderTarget* target)
 {
-	std::string s = "END OF ROUND " + std::to_string(Game->GameData.CurrentRound);
+	std::string s;
+	if (Game->GameData.CurrentRound == Game->GameData.MaxRounds)
+		s = "END OF MATCH";
+	else
+		s = "END OF ROUND " + std::to_string(Game->GameData.CurrentRound);
 	sf::Text titleText(s, Game->Fonts.ByIndex(TFontManager::standard), 20);
 	titleText.setPosition(5, 5);
 	target->draw(titleText);

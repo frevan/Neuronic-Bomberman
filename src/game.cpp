@@ -94,7 +94,7 @@ bool TGame::Initialize(const std::string& filename)
 	Client->Listener = this;
 
 	// create the logic object
-	Logic = new TGameLogic(this, this);
+	Logic = new TGameLogic(&GameData, this);
 		
 	return true;
 }
