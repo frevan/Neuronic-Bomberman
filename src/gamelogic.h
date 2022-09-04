@@ -1,14 +1,12 @@
 #pragma once
 
-class TGameLogic;
+#include "gamedata.h"
 
 class TLogicListener
 {
 public:
 	virtual void LogicRoundEnded() = 0;
 };
-
-#include "gamedata.h"
 
 class TGameLogic
 {

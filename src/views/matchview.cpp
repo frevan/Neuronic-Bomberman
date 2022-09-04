@@ -103,14 +103,20 @@ void TMatchView::Draw(sf::RenderTarget* target)
 			pos.X = x + 0.5f;
 			pos.Y = y + 0.5f;
 
-			float bombSize = FIELD_SIZE / 3.f;
+			float bombSize = FIELD_SIZE / 2.5f;
+			sf::Color color = sf::Color::Black;	
+			if (field->Bomb.State == BOMB_TICKING)
+			{
+				const float PulseInterval = 1250.f; // one complete pulse per 1.25 seconds
+				float sine = sinf(fmodf(field->Bomb.TimeUntilNextState, PulseInterval) / PulseInterval * M_PI * 2);
+				bombSize += sine * (FIELD_SIZE / 25.f);
+			}
+			else if (field->Bomb.State == BOMB_EXPLODING)
+				color = sf::Color::Red;
 
 			sf::CircleShape shape(bombSize);
 			shape.setPosition(MapOffsetX + pos.X * FIELD_SIZE - bombSize, MapOffsetY + pos.Y * FIELD_SIZE - bombSize);
-			if (field->Bomb.State == BOMB_TICKING)
-				shape.setFillColor(sf::Color::Black);
-			else if (field->Bomb.State == BOMB_EXPLODING)
-				shape.setFillColor(sf::Color::Red);
+			shape.setFillColor(color);
 			target->draw(shape);
 		}
 }
