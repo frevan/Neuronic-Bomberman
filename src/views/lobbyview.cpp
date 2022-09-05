@@ -64,9 +64,23 @@ void TLobbyView::CreateWidgets()
 	PlayersListView = std::make_shared<tgui::ListView>();
 	AddWidgetToGUI(PlayersListView);
 	PlayersListView->setPosition(25, 80);
-	PlayersListView->setSize(350, 430);
+	PlayersListView->setSize(350, 375);
 	PlayersListView->getRenderer()->setBackgroundColor(sf::Color(70, 0, 0));
 	PlayersListView->getRenderer()->setTextColor(sf::Color::White);
+	// ---
+	tgui::Button::Ptr addPlayerBtn = std::make_shared<tgui::Button>();
+	AddWidgetToGUI(addPlayerBtn);
+	addPlayerBtn->setText("Add");
+	addPlayerBtn->setPosition(75, 470);
+	addPlayerBtn->setSize(100, 30);
+	addPlayerBtn->connect("pressed", &TLobbyView::OnAddPlayerBtnClick, this);
+	// ---
+	tgui::Button::Ptr removePlayerBtn = std::make_shared<tgui::Button>();
+	AddWidgetToGUI(removePlayerBtn);
+	removePlayerBtn->setText("Remove");
+	removePlayerBtn->setPosition(200, 470);
+	removePlayerBtn->setSize(100, 30);
+	removePlayerBtn->connect("pressed", &TLobbyView::OnRemovePlayerBtnClick, this);
 
 	// map combo and <> buttons
 	MapCombo = std::make_shared<tgui::ComboBox>();
@@ -161,9 +175,9 @@ void TLobbyView::StateChanged()
 	for (int i = 0; i < MAX_NUM_SLOTS; i++)
 	{
 		if (Game->GameData.Players[i].State == PLAYER_NOTPLAYING)
-			continue;
-
-		PlayersListView->addItem(Game->GameData.Players[i].Name);
+			PlayersListView->addItem("----");
+		else
+			PlayersListView->addItem(Game->GameData.Players[i].Name);
 	}
 }
 
@@ -232,4 +246,32 @@ void TLobbyView::OnGameNameEditTextEntered(const std::string& Text)
 {
 	if (SettingGameName == 0)
 		Game->Client->SetGameName(Text);
+}
+
+void TLobbyView::OnAddPlayerBtnClick()
+{
+	int slot = -1;
+	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
+	{
+		if (Game->GameData.Players[idx].State == PLAYER_NOTPLAYING)
+		{
+			slot = idx;
+			break;
+		}
+	}
+
+	if (slot >= 0)
+	{
+		std::string name = "Player " + std::to_string(slot + 1);
+		Game->Client->AddPlayer(name, slot);
+	}
+}
+
+void TLobbyView::OnRemovePlayerBtnClick()
+{
+	int idx = PlayersListView->getSelectedItemIndex();
+	if (idx < 0)
+		return;
+
+	Game->Client->RemovePlayer(idx);
 }

@@ -478,20 +478,34 @@ void TGameData::PositionPlayers()
 		Players[it].Position.X = 0.f;
 		Players[it].Position.Y = 0.f;
 
-		// --> first try primary positions
 		bool found = false;
-		for (int i = 0; i < Arena.StartPositions.size(); i++)
+		// -> first try the position of the player's slot
+		if (Arena.StartPositions.size() >= it)
 		{
-			int idx = (startpos_idx + i) % Arena.StartPositions.size();
-			if (Arena.StartPositions[idx].Taken)
-				continue;
-			if (!Arena.StartPositions[idx].Primary)
-				continue;
-			Players[it].Position.X = Arena.StartPositions[idx].X + 0.5f;
-			Players[it].Position.Y = Arena.StartPositions[idx].Y + 0.5f;
-			Arena.StartPositions[idx].Taken = true;
-			found = true;
-			break;
+			if (!Arena.StartPositions[it].Taken)
+			{
+				Players[it].Position.X = Arena.StartPositions[it].X + 0.5f;
+				Players[it].Position.Y = Arena.StartPositions[it].Y + 0.5f;
+				Arena.StartPositions[it].Taken = true;
+				found = true;
+			}
+		}
+		// --> if not available, try primary positions
+		if (!found)
+		{
+			for (int i = 0; i < Arena.StartPositions.size(); i++)
+			{
+				int idx = (startpos_idx + i) % Arena.StartPositions.size();
+				if (Arena.StartPositions[idx].Taken)
+					continue;
+				if (!Arena.StartPositions[idx].Primary)
+					continue;
+				Players[it].Position.X = Arena.StartPositions[idx].X + 0.5f;
+				Players[it].Position.Y = Arena.StartPositions[idx].Y + 0.5f;
+				Arena.StartPositions[idx].Taken = true;
+				found = true;
+				break;
+			}
 		}
 		// --> then try secondary positions
 		if (!found)	

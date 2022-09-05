@@ -18,6 +18,8 @@ private:
 	void OnStartBtnClick();
 	void OnMapComboItemSelected(int ItemIndex);
 	void OnGameNameEditTextEntered(const std::string& Text);
+	void OnAddPlayerBtnClick();
+	void OnRemovePlayerBtnClick();
 	
 	void FillMapCombo();	
 

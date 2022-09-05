@@ -67,6 +67,8 @@ private:
 
 	//void LoadMapInfos();
 
+	void DefineInputsForPlayer(int Slot, sf::Keyboard::Key Left, sf::Keyboard::Key Right, sf::Keyboard::Key Up, sf::Keyboard::Key Down, sf::Keyboard::Key DropBomb);
+
 public:
 	int CurrentState;
 	bool ShouldQuit;
