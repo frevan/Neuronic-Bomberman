@@ -6,7 +6,7 @@ External dependencies:
 - SFML (v2.5.1): http://www.sfml-dev.org
 - TGUI (v0.8): https://tgui.eu/
 
-It's currently developed with Visual Studio 2022. Older build folders are still included but may not be up-to-date.
+It's currently developed with Visual Studio 2022. 
 
 ----
 
