@@ -211,7 +211,7 @@ void TClient::DropBomb(int Slot)
 	TField* field = Game->GameData.Arena.At(pos);
 	field->Bomb.State = BOMB_TICKING;
 	field->Bomb.DroppedByPlayer = Slot;
-	field->Bomb.TimeUntilNextState = 4500; // 4.5 seconds
+	field->Bomb.TimeUntilNextState = 2000; // 2 seconds
 	field->Bomb.Range = p->BombRange;
 
 	// update the player
