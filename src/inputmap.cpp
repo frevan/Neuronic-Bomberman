@@ -27,6 +27,16 @@ void TInputControl::Unpack(TPacked value, TType& type, uint8_t& controllerIndex,
 	flags =	 (value & 0x00000000000000FF);
 }
 
+uint32_t TInputControl::AxisToButtonIndex(sf::Joystick::Axis Axis)
+{
+	return static_cast<uint32_t>(Axis);
+}
+
+sf::Joystick::Axis TInputControl::ButtonIndexToAxis(uint32_t Index)
+{
+	return static_cast<sf::Joystick::Axis>(Index);
+}
+
 
 
 TInputMap::TInputMap()
@@ -41,31 +51,41 @@ TInputMap::~TInputMap()
 
 bool TInputMap::ProcessEvent(const sf::Event& event, TInputID& inputID, float& value)
 {
+	float v = 0.f;
+	value = 0.f;
+	bool result = false;
+
 	TInputControl control;
-	if (!TranslateEventToControlAndValue(event, control, value))
-		return false;
-
-	TInputBinding binding;
-	if (FindBindingForControl(control, binding))
-	{	
-		inputID = binding.InputID;
-		value = value * binding.Scale;
-
-		Values[inputID] = value;
-
-		return true;
+	if (TranslateEventToControlAndValue(event, control, v))
+	{
+		TInputBinding binding;
+		if (FindBindingForControl(control, v, binding))
+		{
+			ResetValuesForControl(control);
+			if (TranslateValueForBinding(binding, v, value))
+			{
+				inputID = binding.InputID;
+				Values[inputID] = value;
+				result = true;
+			}
+		}
 	}
 
-	return false;
+	return result;
 }
 
-void TInputMap::DefineInput(TInputID setID, TInputControl::TPacked setDefaultControl, float setDefaultValue, float setScale)
+void TInputMap::DefineInput(TInputID setID, TInputControl::TPacked setDefaultControl, float setDefaultValue)
 {
 	TInputBinding binding;
 	binding.InputID = setID;
 	binding.Control = setDefaultControl;
 	binding.DefaultControl = setDefaultControl;
-	binding.Scale = setScale;
+	binding.Scale = 1.f;
+	binding.RangeStart = 0.f;
+	binding.RangeEnd = 1.f;
+	binding.DefaultValue = setDefaultValue;
+	binding.Threshold = 0.f;
+	binding.Inverted = false;
 
 	auto it = Bindings.find(setID);
 	if (it == Bindings.end())
@@ -83,15 +103,11 @@ void TInputMap::RemoveInput(TInputID inputID)
 	Bindings.erase(inputID);
 }
 
-void TInputMap::BindControlToInput(TInputID inputID, TInputControl::TPacked setControl, float setScale)
+void TInputMap::SetInputControl(TInputID inputID, TInputControl::TPacked setControl)
 {
 	auto it = Bindings.find(inputID);
 	if (it != Bindings.end())
-	{
-		// maybe this should reassign the entire binding, since it's a struct?
 		it->second.Control = setControl;
-		it->second.Scale = setScale;
-	}
 }
 
 void TInputMap::ResetInput(TInputID inputID)
@@ -113,27 +129,42 @@ float TInputMap::GetValueOfInput(TInputID inputID)
 	return result;
 }
 
-TInputID TInputMap::FindInputIDForControl(const TInputControl& control)
+bool TInputMap::FindBindingForControl(const TInputControl& control, float Value, TInputBinding& binding)
 {
-	TInputBinding binding;
-	if (FindBindingForControl(control, binding))
-		return binding.InputID;
+	bool result = false;
+	TInputBinding* b;
+	TInputControl* c;
 
-	return INVALID_INPUT_ID;
-}
-
-bool TInputMap::FindBindingForControl(const TInputControl& control, TInputBinding& binding)
-{
 	for (auto it = Bindings.begin(); it != Bindings.end(); it++)
 	{		
-		if (it->second.Control.Type == control.Type && it->second.Control.ControllerIndex == control.ControllerIndex && it->second.Control.Button == control.Button && it->second.Control.Flags == control.Flags)
+		b = &it->second;
+		c = &it->second.Control;
+		if (c->Type == control.Type && c->ControllerIndex == control.ControllerIndex && c->Button == control.Button && c->Flags == control.Flags)
 		{
-			binding = it->second;
-			return true;
+			if (Value >= b->RangeStart && Value <= b->RangeEnd)
+			{
+				binding = it->second;
+				result = true;
+				break;
+			}
 		}
 	}
 
-	return false;
+	return result;
+}
+
+void TInputMap::ResetValuesForControl(const TInputControl& control)
+{
+	TInputBinding* b;
+	TInputControl* c;
+
+	for (auto it = Bindings.begin(); it != Bindings.end(); it++)
+	{
+		b = &it->second;
+		c = &it->second.Control;
+		if (c->Type == control.Type && c->ControllerIndex == control.ControllerIndex && c->Button == control.Button && c->Flags == control.Flags)
+			Values[b->InputID] = b->DefaultValue;
+	}
 }
 
 bool TInputMap::TranslateEventToControlAndValue(const sf::Event& event, TInputControl& control, float& value)
@@ -184,12 +215,24 @@ bool TInputMap::TranslateEventToControlAndValue(const sf::Event& event, TInputCo
 	{
 		///< A joystick button was pressed (data in event.joystickButton)
 		///< A joystick button was released (data in event.joystickButton)
-		found = false;
+		control.Type = TInputControl::TType::JOYSTICKBUTTON;
+		control.ControllerIndex = event.joystickButton.joystickId;
+		control.Button = event.joystickButton.button;
+		control.Flags = 0;
+
+		value = 1.f;
+		if (event.type == sf::Event::JoystickButtonReleased)
+			value = 0.f;
 	}
 	else if (event.type == sf::Event::JoystickMoved)
 	{
 		///< The joystick moved along an axis (data in event.joystickMove)
-		found = false;
+		control.Type = TInputControl::TType::JOYSTICKAXIS;
+		control.ControllerIndex = event.joystickMove.joystickId;
+		control.Button = TInputControl::AxisToButtonIndex(event.joystickMove.axis);
+		control.Flags = 0;
+
+		value = (event.joystickMove.position + 100.f) / 200.f;
 	}
 	else if (event.type == sf::Event::TouchBegan || event.type == sf::Event::TouchEnded)
 	{
@@ -227,4 +270,89 @@ void TInputMap::CheckKeyboardState()
 				Values[(*it).first] = 0.0f;
 		}
 	}
+}
+
+void TInputMap::CheckJoystickState()
+{
+	for (auto it = Bindings.begin(); it != Bindings.end(); it++)
+	{
+		if ((*it).second.Control.Type == TInputControl::JOYSTICKBUTTON)
+		{
+			bool pressed = sf::Joystick::isButtonPressed((*it).second.Control.ControllerIndex, (*it).second.Control.Button);
+			if (pressed)
+				Values[(*it).first] = 1.0f;
+			else
+				Values[(*it).first] = 0.0f;
+		}
+		else if ((*it).second.Control.Type == TInputControl::JOYSTICKAXIS)
+		{
+			float position = sf::Joystick::getAxisPosition((*it).second.Control.ControllerIndex, TInputControl::ButtonIndexToAxis((*it).second.Control.Button));
+			position = (position + 100.f) / 200.f;
+
+			float value;
+			TranslateValueForBinding((*it).second, position, value);
+			Values[(*it).first] = value; 
+		}
+	}
+}
+
+void TInputMap::SetInputScale(TInputID inputID, float SetScale)
+{
+	auto it = Bindings.find(inputID);
+	if (it != Bindings.end())
+		it->second.Scale = SetScale;
+}
+
+void TInputMap::SetInputRange(TInputID inputID, float SetStart, float SetEnd)
+{
+	auto it = Bindings.find(inputID);
+	if (it != Bindings.end())
+	{
+		it->second.RangeStart = SetStart;
+		it->second.RangeEnd = SetEnd;
+	}
+}
+
+void TInputMap::SetInputDefaultValue(TInputID inputID, float SetDefaultValue)
+{
+	auto it = Bindings.find(inputID);
+	if (it != Bindings.end())
+		it->second.DefaultValue = SetDefaultValue;
+}
+
+void TInputMap::SetInputThreshold(TInputID inputID, float SetThreshold)
+{
+	auto it = Bindings.find(inputID);
+	if (it != Bindings.end())
+		it->second.Threshold = SetThreshold;
+}
+
+void TInputMap::SetInputInverted(TInputID inputID, bool SetInverted)
+{
+	auto it = Bindings.find(inputID);
+	if (it != Bindings.end())
+		it->second.Inverted = SetInverted;
+}
+
+bool TInputMap::TranslateValueForBinding(const TInputBinding& binding, float Value, float& OutValue)
+{
+	bool result = false;
+
+	if (Value >= binding.RangeStart || Value <= binding.RangeEnd)
+	{
+		float v = (Value - binding.RangeStart) * (1.f / (binding.RangeEnd - binding.RangeStart));
+
+		if (binding.Inverted)
+			v = 1.f - v;
+
+		if (v >= binding.Threshold)
+		{
+			OutValue = v * binding.Scale;
+			result = true;
+		}
+	}
+
+	if (!result)
+		OutValue = binding.DefaultValue;
+	return result;
 }

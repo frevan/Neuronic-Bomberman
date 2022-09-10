@@ -19,7 +19,8 @@ struct TInputControl
 		KEYBOARD,
 		MOUSE,
 		MOUSEWHEEL,
-		JOYSTICK
+		JOYSTICKAXIS,
+		JOYSTICKBUTTON
 	};
 
 	enum TFlags 
@@ -33,13 +34,15 @@ struct TInputControl
 	
 	TType Type; // device type
 	uint8_t ControllerIndex; // index of device of this type (joysticks)
-	uint32_t Button; // button on device
+	uint32_t Button; // index of button or axis on device
 	uint8_t Flags; // flags, modifiers
 
 	TInputControl& operator=(TPacked packed);
 	TPacked operator=(const TInputControl& unpacked);
 	static TPacked Pack(TType setType, uint8_t setControllerIndex, uint32_t setButton, uint8_t setFlags);
 	static void Unpack(TPacked value, TType& type, uint8_t& controllerIndex, uint32_t& button, uint8_t& flags);
+	static uint32_t AxisToButtonIndex(sf::Joystick::Axis Axis);
+	static sf::Joystick::Axis ButtonIndexToAxis(uint32_t Index);
 
 };
 
@@ -49,6 +52,11 @@ struct TInputBinding
 	TInputControl Control;
 	TInputControl::TPacked DefaultControl;
 	float Scale;
+	float RangeStart;
+	float RangeEnd;
+	float DefaultValue;
+	float Threshold;
+	bool Inverted;
 };
 
 class TInputMap
@@ -56,20 +64,30 @@ class TInputMap
 private:
 	std::map<TInputID, TInputBinding> Bindings;
 	std::map<TInputID, float> Values;
-	TInputID FindInputIDForControl(const TInputControl& control);
-	bool FindBindingForControl(const TInputControl& control, TInputBinding& binding);
+	bool FindBindingForControl(const TInputControl& control, float Value, TInputBinding& binding);
 	bool TranslateEventToControlAndValue(const sf::Event& event, TInputControl& control, float& value);
+	void ResetValuesForControl(const TInputControl& control);
+	bool TranslateValueForBinding(const TInputBinding& binding, float Value, float& OutValue);
 public:
 	TInputMap();
 	~TInputMap();
 
 	void CheckKeyboardState();
+	void CheckJoystickState();
 	bool ProcessEvent(const sf::Event& event, TInputID& inputID, float& value);
 
-	void DefineInput(TInputID setID, TInputControl::TPacked setDefaultControl, float setDefaultValue = 1.0f, float setScale = 1.0f);
-	void BindControlToInput(TInputID inputID, TInputControl::TPacked setControl, float setScale = 1.0f);
+	// add and remove inputs
+	void DefineInput(TInputID setID, TInputControl::TPacked setDefaultControl, float setDefaultValue = 1.0f);
 	void ResetInput(TInputID inputID);
 	void RemoveInput(TInputID inputID);
+
+	// set input properties
+	void SetInputControl(TInputID inputID, TInputControl::TPacked setControl);
+	void SetInputScale(TInputID inputID, float SetScale);
+	void SetInputRange(TInputID inputID, float SetStart, float SetEnd);
+	void SetInputDefaultValue(TInputID inputID, float SetDefaultValue);
+	void SetInputThreshold(TInputID inputID, float SetThreshold);
+	void SetInputInverted(TInputID inputID, bool SetInverted);
 
 	float GetValueOfInput(TInputID inputID);
 };

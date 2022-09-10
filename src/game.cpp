@@ -204,6 +204,7 @@ void TGame::Execute()
 void TGame::ProcessInputs()
 {
 	InputMap.CheckKeyboardState();
+	InputMap.CheckJoystickState();
 
 	sf::Event event;
 	while (Window->pollEvent(event))
@@ -420,7 +421,7 @@ void TGame::ClientMatchStarted()
 	CurrentStateView->StateChanged();
 }
 
-void TGame::DefineInputsForPlayer(int Slot, sf::Keyboard::Key Left, sf::Keyboard::Key Right, sf::Keyboard::Key Up, sf::Keyboard::Key Down, sf::Keyboard::Key DropBomb)
+void TGame::DefineKeyboardForPlayer(int Slot, sf::Keyboard::Key Left, sf::Keyboard::Key Right, sf::Keyboard::Key Up, sf::Keyboard::Key Down, sf::Keyboard::Key DropBomb)
 {
 	int offset = Slot * PlayerActionCount;
 
@@ -429,6 +430,34 @@ void TGame::DefineInputsForPlayer(int Slot, sf::Keyboard::Key Left, sf::Keyboard
 	InputMap.DefineInput(actionMatchPlayer1Up + offset, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, Up, 0));
 	InputMap.DefineInput(actionMatchPlayer1Down + offset, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, Down, 0));
 	InputMap.DefineInput(actionMatchPlayer1DropBomb + offset, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, DropBomb, 0));
+}
+
+void TGame::DefineJoystickForPlayer(int Slot, int JoystickIndex, sf::Joystick::Axis LeftRight, sf::Joystick::Axis UpDown, int DropBombBtn)
+{
+	int offset = Slot * PlayerActionCount;
+
+	TInputID id = actionMatchPlayer1Left + offset;
+	InputMap.DefineInput(id, TInputControl::Pack(TInputControl::TType::JOYSTICKAXIS, JoystickIndex, TInputControl::AxisToButtonIndex(LeftRight), 0), 0.f);
+	InputMap.SetInputRange(id, 0.f, 0.5f);
+	InputMap.SetInputInverted(id, true);
+	InputMap.SetInputThreshold(id, 0.1f);
+	id = actionMatchPlayer1Right + offset;
+	InputMap.DefineInput(id, TInputControl::Pack(TInputControl::TType::JOYSTICKAXIS, JoystickIndex, TInputControl::AxisToButtonIndex(LeftRight), 0), 0.f);
+	InputMap.SetInputRange(id, 0.5f, 1.f);
+	InputMap.SetInputInverted(id, false);
+	InputMap.SetInputThreshold(id, 0.1f);
+	id = actionMatchPlayer1Up + offset;
+	InputMap.DefineInput(id, TInputControl::Pack(TInputControl::TType::JOYSTICKAXIS, JoystickIndex, TInputControl::AxisToButtonIndex(UpDown), 0), 0.f);
+	InputMap.SetInputRange(id, 0.5f, 1.f);
+	InputMap.SetInputInverted(id, false);
+	InputMap.SetInputThreshold(id, 0.1f);
+	id = actionMatchPlayer1Down + offset;
+	InputMap.DefineInput(id, TInputControl::Pack(TInputControl::TType::JOYSTICKAXIS, JoystickIndex, TInputControl::AxisToButtonIndex(UpDown), 0), 0.f);
+	InputMap.SetInputRange(id, 0.f, 0.5f);
+	InputMap.SetInputInverted(id, true);
+	InputMap.SetInputThreshold(id, 0.1f);
+	id = actionMatchPlayer1DropBomb + offset;
+	InputMap.DefineInput(id, TInputControl::Pack(TInputControl::TType::JOYSTICKBUTTON, JoystickIndex, DropBombBtn, 0));
 }
 
 void TGame::SetupCurrentState()
@@ -442,16 +471,16 @@ void TGame::SetupCurrentState()
 	}
 	else if (CurrentState == STATE_MATCH)
 	{
-		DefineInputsForPlayer(0, sf::Keyboard::Key::Left, sf::Keyboard::Key::Right, sf::Keyboard::Key::Up, sf::Keyboard::Key::Down, sf::Keyboard::Key::RControl);
-		DefineInputsForPlayer(1, sf::Keyboard::Key::A, sf::Keyboard::Key::D, sf::Keyboard::Key::W, sf::Keyboard::Key::S, sf::Keyboard::Key::LControl);
-		DefineInputsForPlayer(2, sf::Keyboard::Key::G, sf::Keyboard::Key::J, sf::Keyboard::Key::Y, sf::Keyboard::Key::H, sf::Keyboard::Key::LShift);
-		DefineInputsForPlayer(3, sf::Keyboard::Key::L, sf::Keyboard::Key::Quote, sf::Keyboard::Key::P, sf::Keyboard::Key::SemiColon, sf::Keyboard::Key::RShift);
-		DefineInputsForPlayer(4, sf::Keyboard::Key::E, sf::Keyboard::Key::T, sf::Keyboard::Key::Num4, sf::Keyboard::Key::R, sf::Keyboard::Key::Num3);
-		DefineInputsForPlayer(5, sf::Keyboard::Key::U, sf::Keyboard::Key::O, sf::Keyboard::Key::Num8, sf::Keyboard::Key::I, sf::Keyboard::Key::Num7);
-		DefineInputsForPlayer(6, sf::Keyboard::Key::C, sf::Keyboard::Key::B, sf::Keyboard::Key::F, sf::Keyboard::Key::V, sf::Keyboard::Key::X);
-		DefineInputsForPlayer(7, sf::Keyboard::Key::M, sf::Keyboard::Key::Period, sf::Keyboard::Key::K, sf::Keyboard::Key::Comma, sf::Keyboard::Key::N);
-		//DefineInputsForPlayer(8, sf::Keyboard::Key::A, sf::Keyboard::Key::D, sf::Keyboard::Key::W, sf::Keyboard::Key::S, sf::Keyboard::Key::LControl);
-		//DefineInputsForPlayer(9, sf::Keyboard::Key::A, sf::Keyboard::Key::D, sf::Keyboard::Key::W, sf::Keyboard::Key::S, sf::Keyboard::Key::LControl);
+		DefineKeyboardForPlayer(0, sf::Keyboard::Key::Left, sf::Keyboard::Key::Right, sf::Keyboard::Key::Up, sf::Keyboard::Key::Down, sf::Keyboard::Key::RControl);
+		DefineJoystickForPlayer(1, 0, sf::Joystick::PovX, sf::Joystick::PovY, 1);
+		DefineKeyboardForPlayer(2, sf::Keyboard::Key::A, sf::Keyboard::Key::D, sf::Keyboard::Key::W, sf::Keyboard::Key::S, sf::Keyboard::Key::LControl);
+		DefineKeyboardForPlayer(3, sf::Keyboard::Key::G, sf::Keyboard::Key::J, sf::Keyboard::Key::Y, sf::Keyboard::Key::H, sf::Keyboard::Key::LShift);
+		DefineKeyboardForPlayer(4, sf::Keyboard::Key::L, sf::Keyboard::Key::Quote, sf::Keyboard::Key::P, sf::Keyboard::Key::SemiColon, sf::Keyboard::Key::RShift);
+		DefineKeyboardForPlayer(5, sf::Keyboard::Key::E, sf::Keyboard::Key::T, sf::Keyboard::Key::Num4, sf::Keyboard::Key::R, sf::Keyboard::Key::Num3);
+		DefineKeyboardForPlayer(6, sf::Keyboard::Key::U, sf::Keyboard::Key::O, sf::Keyboard::Key::Num8, sf::Keyboard::Key::I, sf::Keyboard::Key::Num7);
+		DefineKeyboardForPlayer(7, sf::Keyboard::Key::C, sf::Keyboard::Key::B, sf::Keyboard::Key::F, sf::Keyboard::Key::V, sf::Keyboard::Key::X);
+		DefineKeyboardForPlayer(8, sf::Keyboard::Key::M, sf::Keyboard::Key::Period, sf::Keyboard::Key::K, sf::Keyboard::Key::Comma, sf::Keyboard::Key::N);
+		//DefineKeyboardForPlayer(9, sf::Keyboard::Key::A, sf::Keyboard::Key::D, sf::Keyboard::Key::W, sf::Keyboard::Key::S, sf::Keyboard::Key::LControl);
 
 		if (GameData.Status == GAME_NONE || GameData.Status == GAME_INLOBBY)
 			Client->StartMatch();
