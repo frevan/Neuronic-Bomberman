@@ -9,6 +9,11 @@ const uint32_t actionDoDefaultAction = 2; // do whatever is the default action
 // lobby actions
 const uint32_t actionLobbyPrevMap = 200;
 const uint32_t actionLobbyNextMap = 201;
+const uint32_t actionLobbyPrevSlot = 202;
+const uint32_t actionLobbyNextSlot = 203;
+const uint32_t actionLobbyAddPlayer = 204;
+const uint32_t actionLobbyRemovePlayer = 205;
+const uint32_t actionLobbyRemapPlayerControls = 206;
 
 // action definitions during a match
 const uint32_t PlayerActionCount = 6;

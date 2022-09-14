@@ -51,6 +51,9 @@
     <ClCompile Include="..\..\src\views\endofroundview.cpp">
       <Filter>source\views</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\server.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\game.h">

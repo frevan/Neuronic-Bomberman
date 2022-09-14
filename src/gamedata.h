@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <SFML/Graphics.hpp>
 
 const int INVALID_SLOT = 255;
 const int MAX_NUM_SLOTS = 10;
@@ -155,6 +156,7 @@ public:
 	TPlayer Players[MAX_NUM_SLOTS];
 	TArena Arena;
 	TGameTime CurrentTime;
+	sf::Color PlayerColors[MAX_NUM_SLOTS];
 
 	TGameData();
 

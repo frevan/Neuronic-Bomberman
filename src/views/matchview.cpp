@@ -3,21 +3,9 @@
 #include "../actions.h"
 #include "../resourcemgr.h"
 
-sf::Color PlayerColors[MAX_NUM_SLOTS];
-
 TMatchView::TMatchView(TGame* SetGame)
 	: TView(SetGame, TViewType::VT_HUMANVIEW)
 {
-	PlayerColors[0] = sf::Color::Blue;
-	PlayerColors[1] = sf::Color::Magenta;
-	PlayerColors[2] = sf::Color::Yellow;
-	PlayerColors[3] = sf::Color(160, 120, 80);
-	PlayerColors[4] = sf::Color(80, 80, 0);
-	PlayerColors[5] = sf::Color(80, 0, 80);
-	PlayerColors[6] = sf::Color(0, 80, 80);
-	PlayerColors[7] = sf::Color(80, 80, 80);
-	PlayerColors[8] = sf::Color(160, 160, 160);
-	PlayerColors[9] = sf::Color(160, 0, 160);
 }
 
 TMatchView::~TMatchView()
@@ -84,7 +72,7 @@ void TMatchView::Draw(sf::RenderTarget* target)
 		if (player->State == PLAYER_DYING)
 			playerColor = sf::Color::White;
 		else
-			playerColor = PlayerColors[idx];
+			playerColor = Game->GameData.PlayerColors[idx];
 		shape.setFillColor(playerColor);
 		target->draw(shape);
 	}

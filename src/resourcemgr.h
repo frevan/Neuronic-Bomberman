@@ -41,4 +41,5 @@ public:
 	void Clear();
 
 	TArena* MapFromIndex(int Index);
+	TArena* MapFromName(const std::string& Name);
 };

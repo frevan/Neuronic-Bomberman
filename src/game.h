@@ -18,6 +18,7 @@ class TGame;
 #include "gamedata.h"
 #include "resourcemgr.h"
 #include "gamelogic.h"
+#include "server.h"
 
 const int STATE_NONE = 0;
 const int STATE_MENU = 1;
@@ -67,6 +68,8 @@ private:
 
 	//void LoadMapInfos();
 
+	void DefineDefaultPlayerInputs();
+	void RemovePlayerInputs();
 	void DefineKeyboardForPlayer(int Slot, sf::Keyboard::Key Left, sf::Keyboard::Key Right, sf::Keyboard::Key Up, sf::Keyboard::Key Down, sf::Keyboard::Key DropBomb);
 	void DefineJoystickForPlayer(int Slot, int JoystickIndex, sf::Joystick::Axis LeftRight, sf::Joystick::Axis UpDown, int DropBombBtn);
 
@@ -75,6 +78,7 @@ public:
 	bool ShouldQuit;
 	TInputMap InputMap;
 	TClient* Client;
+	TServer* Server;
 	TGameData GameData;
 	TFontManager Fonts;
 	std::string AppPath, MapPath;

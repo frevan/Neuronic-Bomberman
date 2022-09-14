@@ -331,6 +331,17 @@ TGameData::TGameData()
 {
 	for (int i = 0; i < MAX_NUM_SLOTS; i++)
 		Players[i].State = PLAYER_NOTPLAYING;
+
+	PlayerColors[0] = sf::Color::Blue;
+	PlayerColors[1] = sf::Color::Magenta;
+	PlayerColors[2] = sf::Color::Yellow;
+	PlayerColors[3] = sf::Color(160, 120, 80);
+	PlayerColors[4] = sf::Color(80, 80, 0);
+	PlayerColors[5] = sf::Color(80, 0, 80);
+	PlayerColors[6] = sf::Color(0, 80, 80);
+	PlayerColors[7] = sf::Color(80, 80, 80);
+	PlayerColors[8] = sf::Color(160, 160, 160);
+	PlayerColors[9] = sf::Color(160, 0, 160);
 }
 
 void TGameData::Reset()

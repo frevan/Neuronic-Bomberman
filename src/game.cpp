@@ -41,6 +41,7 @@ TGame::TGame()
 	Views(),
 	ViewsMutex(),
 	Client(nullptr),
+	Server(nullptr),
 	GameData(),
 	Fonts(),
 	Logic(nullptr),
@@ -85,6 +86,7 @@ bool TGame::Initialize(const std::string& filename)
 	// map some inputs
 	InputMap.DefineInput(actionToPreviousScreen, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Escape, 0));
 	InputMap.DefineInput(actionDoDefaultAction, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Return, 0));
+	DefineDefaultPlayerInputs();
 
 	// set next state
 	NextState = STATE_MENU;
@@ -92,6 +94,10 @@ bool TGame::Initialize(const std::string& filename)
 	// create client object
 	Client = new TClient(this);
 	Client->Listener = this;
+
+	// create server object
+	Server = new TServer();
+	Server->LoadMaps(AppPath + GetMapSubPath());
 
 	// create the logic object
 	Logic = new TGameLogic(&GameData, this);
@@ -105,6 +111,9 @@ void TGame::Finalize()
 	NextState = STATE_QUIT;
 	ActivateNextState();
 
+	// remove the player input bindings that are always created
+	RemovePlayerInputs();
+
 	// delete the logic object
 	delete Logic;
 	Logic = nullptr;
@@ -113,6 +122,10 @@ void TGame::Finalize()
 	Client->Listener = nullptr;
 	delete Client;
 	Client = nullptr;
+
+	// delete the server object
+	delete Server;
+	Server = nullptr;
 
 	// detach our TGUI system view
 	DetachView(SystemGUIView->ID);
@@ -158,6 +171,9 @@ void TGame::Execute()
 			// let the current view process as well
 			if (CurrentStateView)
 				CurrentStateView->Process(delta);
+
+			// process the server object
+			Server->Process(delta);
 
 			// process client object
 			Client->Process(delta);
@@ -421,6 +437,94 @@ void TGame::ClientMatchStarted()
 	CurrentStateView->StateChanged();
 }
 
+void TGame::DefineDefaultPlayerInputs()
+{
+	DefineKeyboardForPlayer(0, sf::Keyboard::Key::Left, sf::Keyboard::Key::Right, sf::Keyboard::Key::Up, sf::Keyboard::Key::Down, sf::Keyboard::Key::RControl);
+	DefineJoystickForPlayer(1, 0, sf::Joystick::PovX, sf::Joystick::PovY, 1);
+	DefineKeyboardForPlayer(2, sf::Keyboard::Key::A, sf::Keyboard::Key::D, sf::Keyboard::Key::W, sf::Keyboard::Key::S, sf::Keyboard::Key::LControl);
+	DefineKeyboardForPlayer(3, sf::Keyboard::Key::G, sf::Keyboard::Key::J, sf::Keyboard::Key::Y, sf::Keyboard::Key::H, sf::Keyboard::Key::LShift);
+	DefineKeyboardForPlayer(4, sf::Keyboard::Key::L, sf::Keyboard::Key::Quote, sf::Keyboard::Key::P, sf::Keyboard::Key::SemiColon, sf::Keyboard::Key::RShift);
+	DefineKeyboardForPlayer(5, sf::Keyboard::Key::E, sf::Keyboard::Key::T, sf::Keyboard::Key::Num4, sf::Keyboard::Key::R, sf::Keyboard::Key::Num3);
+	DefineKeyboardForPlayer(6, sf::Keyboard::Key::U, sf::Keyboard::Key::O, sf::Keyboard::Key::Num8, sf::Keyboard::Key::I, sf::Keyboard::Key::Num7);
+	DefineKeyboardForPlayer(7, sf::Keyboard::Key::C, sf::Keyboard::Key::B, sf::Keyboard::Key::F, sf::Keyboard::Key::V, sf::Keyboard::Key::X);
+	DefineKeyboardForPlayer(8, sf::Keyboard::Key::M, sf::Keyboard::Key::Period, sf::Keyboard::Key::K, sf::Keyboard::Key::Comma, sf::Keyboard::Key::N);
+	DefineJoystickForPlayer(9, 1, sf::Joystick::PovX, sf::Joystick::PovY, 1);
+
+	for (int i = 0; i < MAX_NUM_SLOTS; i++)
+	{
+		int offset = i * PlayerActionCount;
+		InputMap.SetInputActive(actionMatchPlayer1Left + offset, false);
+		InputMap.SetInputActive(actionMatchPlayer1Right + offset, false);
+		InputMap.SetInputActive(actionMatchPlayer1Up + offset, false);
+		InputMap.SetInputActive(actionMatchPlayer1Down + offset, false);
+		InputMap.SetInputActive(actionMatchPlayer1DropBomb + offset, false);
+	}
+}
+
+void TGame::RemovePlayerInputs()
+{
+	// 1
+	InputMap.RemoveInput(actionMatchPlayer1Left);
+	InputMap.RemoveInput(actionMatchPlayer1Right);
+	InputMap.RemoveInput(actionMatchPlayer1Up);
+	InputMap.RemoveInput(actionMatchPlayer1Down);
+	InputMap.RemoveInput(actionMatchPlayer1DropBomb);
+	// 2
+	InputMap.RemoveInput(actionMatchPlayer2Left);
+	InputMap.RemoveInput(actionMatchPlayer2Right);
+	InputMap.RemoveInput(actionMatchPlayer2Up);
+	InputMap.RemoveInput(actionMatchPlayer2Down);
+	InputMap.RemoveInput(actionMatchPlayer2DropBomb);
+	// 3
+	InputMap.RemoveInput(actionMatchPlayer3Left);
+	InputMap.RemoveInput(actionMatchPlayer3Right);
+	InputMap.RemoveInput(actionMatchPlayer3Up);
+	InputMap.RemoveInput(actionMatchPlayer3Down);
+	InputMap.RemoveInput(actionMatchPlayer3DropBomb);
+	// 4
+	InputMap.RemoveInput(actionMatchPlayer4Left);
+	InputMap.RemoveInput(actionMatchPlayer4Right);
+	InputMap.RemoveInput(actionMatchPlayer4Up);
+	InputMap.RemoveInput(actionMatchPlayer4Down);
+	InputMap.RemoveInput(actionMatchPlayer4DropBomb);
+	// 5
+	InputMap.RemoveInput(actionMatchPlayer5Left);
+	InputMap.RemoveInput(actionMatchPlayer5Right);
+	InputMap.RemoveInput(actionMatchPlayer5Up);
+	InputMap.RemoveInput(actionMatchPlayer5Down);
+	InputMap.RemoveInput(actionMatchPlayer5DropBomb);
+	// 6
+	InputMap.RemoveInput(actionMatchPlayer6Left);
+	InputMap.RemoveInput(actionMatchPlayer6Right);
+	InputMap.RemoveInput(actionMatchPlayer6Up);
+	InputMap.RemoveInput(actionMatchPlayer6Down);
+	InputMap.RemoveInput(actionMatchPlayer6DropBomb);
+	// 7
+	InputMap.RemoveInput(actionMatchPlayer7Left);
+	InputMap.RemoveInput(actionMatchPlayer7Right);
+	InputMap.RemoveInput(actionMatchPlayer7Up);
+	InputMap.RemoveInput(actionMatchPlayer7Down);
+	InputMap.RemoveInput(actionMatchPlayer7DropBomb);
+	// 8
+	InputMap.RemoveInput(actionMatchPlayer8Left);
+	InputMap.RemoveInput(actionMatchPlayer8Right);
+	InputMap.RemoveInput(actionMatchPlayer8Up);
+	InputMap.RemoveInput(actionMatchPlayer8Down);
+	InputMap.RemoveInput(actionMatchPlayer8DropBomb);
+	// 9
+	InputMap.RemoveInput(actionMatchPlayer9Left);
+	InputMap.RemoveInput(actionMatchPlayer9Right);
+	InputMap.RemoveInput(actionMatchPlayer9Up);
+	InputMap.RemoveInput(actionMatchPlayer9Down);
+	InputMap.RemoveInput(actionMatchPlayer9DropBomb);
+	// 10
+	InputMap.RemoveInput(actionMatchPlayer10Left);
+	InputMap.RemoveInput(actionMatchPlayer10Right);
+	InputMap.RemoveInput(actionMatchPlayer10Up);
+	InputMap.RemoveInput(actionMatchPlayer10Down);
+	InputMap.RemoveInput(actionMatchPlayer10DropBomb);
+}
+
 void TGame::DefineKeyboardForPlayer(int Slot, sf::Keyboard::Key Left, sf::Keyboard::Key Right, sf::Keyboard::Key Up, sf::Keyboard::Key Down, sf::Keyboard::Key DropBomb)
 {
 	int offset = Slot * PlayerActionCount;
@@ -466,21 +570,25 @@ void TGame::SetupCurrentState()
 	{
 		Client->CreateGame("Don't Explode");
 
-		InputMap.DefineInput(actionLobbyPrevMap, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Left, 0));
-		InputMap.DefineInput(actionLobbyNextMap, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Right, 0));
+		InputMap.DefineInput(actionLobbyPrevMap, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Left, 0));
+		InputMap.DefineInput(actionLobbyNextMap, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Right, 0));
+		InputMap.DefineInput(actionLobbyPrevSlot, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Up, 0));
+		InputMap.DefineInput(actionLobbyNextSlot, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Down, 0));
+		InputMap.DefineInput(actionLobbyAddPlayer, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Equal, 0));
+		InputMap.DefineInput(actionLobbyRemovePlayer, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Hyphen, 0));
+		InputMap.DefineInput(actionLobbyRemapPlayerControls, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Num0, 0));
 	}
 	else if (CurrentState == STATE_MATCH)
 	{
-		DefineKeyboardForPlayer(0, sf::Keyboard::Key::Left, sf::Keyboard::Key::Right, sf::Keyboard::Key::Up, sf::Keyboard::Key::Down, sf::Keyboard::Key::RControl);
-		DefineJoystickForPlayer(1, 0, sf::Joystick::PovX, sf::Joystick::PovY, 1);
-		DefineKeyboardForPlayer(2, sf::Keyboard::Key::A, sf::Keyboard::Key::D, sf::Keyboard::Key::W, sf::Keyboard::Key::S, sf::Keyboard::Key::LControl);
-		DefineKeyboardForPlayer(3, sf::Keyboard::Key::G, sf::Keyboard::Key::J, sf::Keyboard::Key::Y, sf::Keyboard::Key::H, sf::Keyboard::Key::LShift);
-		DefineKeyboardForPlayer(4, sf::Keyboard::Key::L, sf::Keyboard::Key::Quote, sf::Keyboard::Key::P, sf::Keyboard::Key::SemiColon, sf::Keyboard::Key::RShift);
-		DefineKeyboardForPlayer(5, sf::Keyboard::Key::E, sf::Keyboard::Key::T, sf::Keyboard::Key::Num4, sf::Keyboard::Key::R, sf::Keyboard::Key::Num3);
-		DefineKeyboardForPlayer(6, sf::Keyboard::Key::U, sf::Keyboard::Key::O, sf::Keyboard::Key::Num8, sf::Keyboard::Key::I, sf::Keyboard::Key::Num7);
-		DefineKeyboardForPlayer(7, sf::Keyboard::Key::C, sf::Keyboard::Key::B, sf::Keyboard::Key::F, sf::Keyboard::Key::V, sf::Keyboard::Key::X);
-		DefineKeyboardForPlayer(8, sf::Keyboard::Key::M, sf::Keyboard::Key::Period, sf::Keyboard::Key::K, sf::Keyboard::Key::Comma, sf::Keyboard::Key::N);
-		//DefineKeyboardForPlayer(9, sf::Keyboard::Key::A, sf::Keyboard::Key::D, sf::Keyboard::Key::W, sf::Keyboard::Key::S, sf::Keyboard::Key::LControl);
+		for (int i = 0; i < MAX_NUM_SLOTS; i++)
+		{
+			int offset = i * PlayerActionCount;
+			InputMap.SetInputActive(actionMatchPlayer1Left + offset, true);
+			InputMap.SetInputActive(actionMatchPlayer1Right + offset, true);
+			InputMap.SetInputActive(actionMatchPlayer1Up + offset, true);
+			InputMap.SetInputActive(actionMatchPlayer1Down + offset, true);
+			InputMap.SetInputActive(actionMatchPlayer1DropBomb + offset, true);
+		}
 
 		if (GameData.Status == GAME_NONE || GameData.Status == GAME_INLOBBY)
 			Client->StartMatch();
@@ -502,66 +610,15 @@ void TGame::FinalizeCurrentState()
 	}
 	else if (CurrentState == STATE_MATCH)
 	{
-		// 1
-		InputMap.RemoveInput(actionMatchPlayer1Left);
-		InputMap.RemoveInput(actionMatchPlayer1Right);
-		InputMap.RemoveInput(actionMatchPlayer1Up);
-		InputMap.RemoveInput(actionMatchPlayer1Down);
-		InputMap.RemoveInput(actionMatchPlayer1DropBomb);
-		// 2
-		InputMap.RemoveInput(actionMatchPlayer2Left);
-		InputMap.RemoveInput(actionMatchPlayer2Right);
-		InputMap.RemoveInput(actionMatchPlayer2Up);
-		InputMap.RemoveInput(actionMatchPlayer2Down);
-		InputMap.RemoveInput(actionMatchPlayer2DropBomb);
-		// 3
-		InputMap.RemoveInput(actionMatchPlayer3Left);
-		InputMap.RemoveInput(actionMatchPlayer3Right);
-		InputMap.RemoveInput(actionMatchPlayer3Up);
-		InputMap.RemoveInput(actionMatchPlayer3Down);
-		InputMap.RemoveInput(actionMatchPlayer3DropBomb);
-		// 4
-		InputMap.RemoveInput(actionMatchPlayer4Left);
-		InputMap.RemoveInput(actionMatchPlayer4Right);
-		InputMap.RemoveInput(actionMatchPlayer4Up);
-		InputMap.RemoveInput(actionMatchPlayer4Down);
-		InputMap.RemoveInput(actionMatchPlayer4DropBomb);
-		// 5
-		InputMap.RemoveInput(actionMatchPlayer5Left);
-		InputMap.RemoveInput(actionMatchPlayer5Right);
-		InputMap.RemoveInput(actionMatchPlayer5Up);
-		InputMap.RemoveInput(actionMatchPlayer5Down);
-		InputMap.RemoveInput(actionMatchPlayer5DropBomb);
-		// 6
-		InputMap.RemoveInput(actionMatchPlayer6Left);
-		InputMap.RemoveInput(actionMatchPlayer6Right);
-		InputMap.RemoveInput(actionMatchPlayer6Up);
-		InputMap.RemoveInput(actionMatchPlayer6Down);
-		InputMap.RemoveInput(actionMatchPlayer6DropBomb);
-		// 7
-		InputMap.RemoveInput(actionMatchPlayer7Left);
-		InputMap.RemoveInput(actionMatchPlayer7Right);
-		InputMap.RemoveInput(actionMatchPlayer7Up);
-		InputMap.RemoveInput(actionMatchPlayer7Down);
-		InputMap.RemoveInput(actionMatchPlayer7DropBomb);
-		// 8
-		InputMap.RemoveInput(actionMatchPlayer8Left);
-		InputMap.RemoveInput(actionMatchPlayer8Right);
-		InputMap.RemoveInput(actionMatchPlayer8Up);
-		InputMap.RemoveInput(actionMatchPlayer8Down);
-		InputMap.RemoveInput(actionMatchPlayer8DropBomb);
-		// 9
-		InputMap.RemoveInput(actionMatchPlayer9Left);
-		InputMap.RemoveInput(actionMatchPlayer9Right);
-		InputMap.RemoveInput(actionMatchPlayer9Up);
-		InputMap.RemoveInput(actionMatchPlayer9Down);
-		InputMap.RemoveInput(actionMatchPlayer9DropBomb);
-		// 10
-		InputMap.RemoveInput(actionMatchPlayer10Left);
-		InputMap.RemoveInput(actionMatchPlayer10Right);
-		InputMap.RemoveInput(actionMatchPlayer10Up);
-		InputMap.RemoveInput(actionMatchPlayer10Down);
-		InputMap.RemoveInput(actionMatchPlayer10DropBomb);
+		for (int i = 0; i < MAX_NUM_SLOTS; i++)
+		{
+			int offset = i * PlayerActionCount;
+			InputMap.SetInputActive(actionMatchPlayer1Left + offset, false);
+			InputMap.SetInputActive(actionMatchPlayer1Right + offset, false);
+			InputMap.SetInputActive(actionMatchPlayer1Up + offset, false);
+			InputMap.SetInputActive(actionMatchPlayer1Down + offset, false);
+			InputMap.SetInputActive(actionMatchPlayer1DropBomb + offset, false);
+		}
 	}
 }
 

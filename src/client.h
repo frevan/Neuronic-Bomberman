@@ -37,6 +37,7 @@ const int CMD_EndRound = 6;
 const int CMD_SetNumRounds = 7;
 const int CMD_SetPlayerName = 8;
 const int CMD_SetGameName = 9;
+const int CMD_SelectArena = 10;
 
 typedef struct
 {

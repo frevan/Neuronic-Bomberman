@@ -98,3 +98,17 @@ TArena* TMapList::MapFromIndex(int Index)
 
 	return nullptr;
 }
+
+TArena* TMapList::MapFromName(const std::string& Name)
+{
+	TArena* result = nullptr;
+
+	for (auto it = Maps.begin(); it != Maps.end(); it++)
+		if ((*it)->Caption == Name)
+		{
+			result = (*it);
+			break;
+		}
+
+	return result;
+}

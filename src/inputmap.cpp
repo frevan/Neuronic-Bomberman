@@ -59,7 +59,7 @@ bool TInputMap::ProcessEvent(const sf::Event& event, TInputID& inputID, float& v
 	if (TranslateEventToControlAndValue(event, control, v))
 	{
 		TInputBinding binding;
-		if (FindBindingForControl(control, v, binding))
+		if (FindActiveBindingForControl(control, v, binding))
 		{
 			ResetValuesForControl(control);
 			if (TranslateValueForBinding(binding, v, value))
@@ -80,6 +80,7 @@ void TInputMap::DefineInput(TInputID setID, TInputControl::TPacked setDefaultCon
 	binding.InputID = setID;
 	binding.Control = setDefaultControl;
 	binding.DefaultControl = setDefaultControl;
+	binding.Active = true;
 	binding.Scale = 1.f;
 	binding.RangeStart = 0.f;
 	binding.RangeEnd = 1.f;
@@ -129,14 +130,17 @@ float TInputMap::GetValueOfInput(TInputID inputID)
 	return result;
 }
 
-bool TInputMap::FindBindingForControl(const TInputControl& control, float Value, TInputBinding& binding)
+bool TInputMap::FindActiveBindingForControl(const TInputControl& control, float Value, TInputBinding& binding)
 {
 	bool result = false;
 	TInputBinding* b;
 	TInputControl* c;
 
 	for (auto it = Bindings.begin(); it != Bindings.end(); it++)
-	{		
+	{
+		if (!it->second.Active)
+			continue;
+
 		b = &it->second;
 		c = &it->second.Control;
 		if (c->Type == control.Type && c->ControllerIndex == control.ControllerIndex && c->Button == control.Button && c->Flags == control.Flags)
@@ -334,6 +338,16 @@ void TInputMap::SetInputInverted(TInputID inputID, bool SetInverted)
 		it->second.Inverted = SetInverted;
 }
 
+void TInputMap::SetInputActive(TInputID inputID, bool SetActive)
+{
+	auto it = Bindings.find(inputID);
+	if (it != Bindings.end())
+	{
+		it->second.Active = SetActive;
+		Values[it->second.InputID] = it->second.DefaultValue; // reset the value when changing the active state
+	}
+}
+
 bool TInputMap::TranslateValueForBinding(const TInputBinding& binding, float Value, float& OutValue)
 {
 	bool result = false;
@@ -355,4 +369,16 @@ bool TInputMap::TranslateValueForBinding(const TInputBinding& binding, float Val
 	if (!result)
 		OutValue = binding.DefaultValue;
 	return result;
+}
+
+bool TInputMap::GetControlForInput(TInputID  inputID, TInputControl::TPacked& result)
+{
+	auto it = Bindings.find(inputID);
+	if (it != Bindings.end())
+	{
+		result = TInputControl::Pack(it->second.Control.Type, it->second.Control.ControllerIndex, it->second.Control.Button, it->second.Control.Flags);
+		return true;
+	}
+	else
+		return false;
 }

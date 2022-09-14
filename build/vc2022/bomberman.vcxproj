@@ -18,6 +18,7 @@
     <ClCompile Include="..\..\src\inputmap.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\resourcemgr.cpp" />
+    <ClCompile Include="..\..\src\server.cpp" />
     <ClCompile Include="..\..\src\state.cpp" />
     <ClCompile Include="..\..\src\view.cpp" />
     <ClCompile Include="..\..\src\views\endofroundview.cpp" />

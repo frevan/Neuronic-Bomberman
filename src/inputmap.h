@@ -51,6 +51,7 @@ struct TInputBinding
 	TInputID InputID;
 	TInputControl Control;
 	TInputControl::TPacked DefaultControl;
+	bool Active;
 	float Scale;
 	float RangeStart;
 	float RangeEnd;
@@ -64,7 +65,7 @@ class TInputMap
 private:
 	std::map<TInputID, TInputBinding> Bindings;
 	std::map<TInputID, float> Values;
-	bool FindBindingForControl(const TInputControl& control, float Value, TInputBinding& binding);
+	bool FindActiveBindingForControl(const TInputControl& control, float Value, TInputBinding& binding);
 	bool TranslateEventToControlAndValue(const sf::Event& event, TInputControl& control, float& value);
 	void ResetValuesForControl(const TInputControl& control);
 	bool TranslateValueForBinding(const TInputBinding& binding, float Value, float& OutValue);
@@ -80,8 +81,10 @@ public:
 	void DefineInput(TInputID setID, TInputControl::TPacked setDefaultControl, float setDefaultValue = 1.0f);
 	void ResetInput(TInputID inputID);
 	void RemoveInput(TInputID inputID);
+	bool GetControlForInput(TInputID inputID, TInputControl::TPacked& result);
 
 	// set input properties
+	void SetInputActive(TInputID inputID, bool SetActive);
 	void SetInputControl(TInputID inputID, TInputControl::TPacked setControl);
 	void SetInputScale(TInputID inputID, float SetScale);
 	void SetInputRange(TInputID inputID, float SetStart, float SetEnd);
