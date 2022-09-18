@@ -27,16 +27,30 @@ TArena::~TArena()
 	Clear();
 }
 
-TField* TArena::At(uint8_t X, uint8_t Y)
+void TArena::At(uint8_t X, uint8_t Y, TField*& Field)
 {
 	size_t index = Stride * (size_t)Y + X;
-	return Fields.at(index);
+	Field = Fields.at(index);
 }
 
-TField* TArena::At(const TFieldPosition Position)
+void TArena::At(const TFieldPosition Position, TField*& Field)
 {
 	size_t index = Stride * (size_t)Position.Y + Position.X;
-	return Fields.at(index);
+	Field = Fields.at(index);
+}
+
+const TField& TArena::At(uint8_t X, uint8_t Y)
+{
+	TField* field{};
+	At(X, Y, field);
+	return (*field);
+}
+
+const TField& TArena::At(const TFieldPosition Position)
+{
+	TField* field{};
+	At(Position, field);
+	return (*field);
 }
 
 void TArena::SetSize(uint8_t SetWidth, uint8_t SetHeight)
@@ -222,11 +236,13 @@ bool TArena::ProcessSchemeLine(const std::string& line)
 						break;
 					char c = *colIt;
 
+					TField* field{};
+					At(idx, (uint8_t)rownumber, field);
 					switch (c)
 					{
-					case '.': At(idx, (uint8_t)rownumber)->Type = FIELD_EMPTY; break;
-					case ':': At(idx, (uint8_t)rownumber)->Type = FIELD_BRICK; break;
-					case '#': At(idx, (uint8_t)rownumber)->Type = FIELD_SOLID; break;
+						case '.': field->Type = FIELD_EMPTY; break;
+						case ':': field->Type = FIELD_BRICK; break;
+						case '#': field->Type = FIELD_SOLID; break;
 					}
 					idx++;
 				}
@@ -429,7 +445,8 @@ void TGameData::InitNewRound()
 	for (int x = 0; x < Arena.Width; x++)
 		for (int y = 0; y < Arena.Height; y++)
 		{
-			TField* field = Arena.At(x, y);
+			TField* field{};
+			Arena.At(x, y, field);
 			field->Bomb.State = BOMB_NONE;
 		}
 
@@ -444,7 +461,7 @@ void TGameData::ApplyBrickDensity()
 	for (int i = 0; i < Arena.Width; i++)	
 		for (int j = 0; j < Arena.Height; j++)
 		{
-			if (Arena.At(i, j)->Type == FIELD_BRICK)
+			if (Arena.At(i, j).Type == FIELD_BRICK)
 				brickCount++;
 		}
 
@@ -456,19 +473,20 @@ void TGameData::ApplyBrickDensity()
 		for (int i = 0; i < Arena.Width; i++)	
 			for (int j = 0; j < Arena.Height; j++)
 			{
-				TField* field = Arena.At(i, j);
+				TField* field{};
+				Arena.At(i, j, field);
 				if (field->Type != FIELD_BRICK)
 					continue;
 
-			bool keep = rand() % brickCount < Arena.BrickDensity;
-			if (!keep)
-			{
-				field->Type = FIELD_EMPTY;
-				bricksToLose--;
-				if (bricksToLose <= 0)
-					break;
+				bool keep = rand() % brickCount < Arena.BrickDensity;
+				if (!keep)
+				{
+					field->Type = FIELD_EMPTY;
+					bricksToLose--;
+					if (bricksToLose <= 0)
+						break;
+				}
 			}
-		}
 	}
 }
 
@@ -540,7 +558,8 @@ void TGameData::PositionPlayers()
 
 void TGameData::ClearMapFieldsForPlayer(int X, int Y)
 {
-	TField* field = Arena.At(X, Y);
+	TField* field{};
+	Arena.At(X, Y, field);
 
 	// player's own field
 	if (field->Type == FIELD_BRICK)
@@ -549,7 +568,7 @@ void TGameData::ClearMapFieldsForPlayer(int X, int Y)
 	// x-1	
 	if (X > 0)
 	{
-		field = Arena.At(X - 1, Y);
+		Arena.At(X - 1, Y, field);
 		if (field->Type == FIELD_BRICK)
 			field->Type = FIELD_EMPTY;
 	}
@@ -557,7 +576,7 @@ void TGameData::ClearMapFieldsForPlayer(int X, int Y)
 	// x+1
 	if (X < Arena.Width - 1)
 	{
-		field = Arena.At(X + 1, Y);
+		Arena.At(X + 1, Y, field);
 		if (field->Type == FIELD_BRICK)
 			field->Type = FIELD_EMPTY;
 	}
@@ -565,7 +584,7 @@ void TGameData::ClearMapFieldsForPlayer(int X, int Y)
 	// y-1
 	if (Y > 0)
 	{
-		field = Arena.At(X, Y - 1);
+		Arena.At(X, Y - 1, field);
 		if (field->Type == FIELD_BRICK)
 			field->Type = FIELD_EMPTY;
 	}
@@ -573,7 +592,7 @@ void TGameData::ClearMapFieldsForPlayer(int X, int Y)
 	// y+1
 	if (Y < Arena.Height - 1)
 	{
-		field = Arena.At(X, Y + 1);
+		Arena.At(X, Y + 1, field);
 		if (field->Type == FIELD_BRICK)
 			field->Type = FIELD_EMPTY;
 	}
@@ -581,7 +600,8 @@ void TGameData::ClearMapFieldsForPlayer(int X, int Y)
 
 bool TGameData::BombInField(uint8_t X, uint8_t Y, bool OnlyUnexploded)
 {
-	TField* field = Arena.At(X, Y);
+	TField* field{};
+	Arena.At(X, Y, field);
 
 	if (field->Bomb.State == BOMB_NONE)
 		return false;
@@ -607,4 +627,41 @@ bool TGameData::SetPlayerName(int Slot, const std::string& SetName)
 void TGameData::SetName(const std::string& SetName)
 {
 	GameName = SetName;
+}
+
+void TGameData::UpdateGameFrom(TGameData* Source)
+{
+	for (uint8_t slot = 0; slot < MAX_NUM_SLOTS; slot++)
+	{
+		TPlayer* p = &Players[slot];
+		const TPlayer* src = &Source->Players[slot];
+
+		p->Position = src->Position;
+		p->Direction = src->Direction;
+		p->Speed = src->Speed;
+		p->State = src->State;
+		p->RoundsWon = src->RoundsWon;
+		p->Ranking = src->Ranking;
+		p->MaxActiveBombs = src->MaxActiveBombs;
+		p->BombRange = src->BombRange;
+		p->ActiveBombs = src->ActiveBombs;
+		p->TimeUntilNextState = src->TimeUntilNextState;
+		p->TimeOfDeath = src->TimeOfDeath;
+	}
+
+	for (uint8_t x = 0; x < Arena.Width; x++)
+		for (uint8_t y = 0; y < Arena.Height; y++)
+		{
+			TField* field{};
+			Arena.At(x, y, field);
+			TField src = Source->Arena.At(x, y);
+
+			field->Type = src.Type;
+			field->Bomb.DroppedByPlayer = src.Bomb.DroppedByPlayer;
+			field->Bomb.Range = src.Bomb.Range;
+			field->Bomb.State = src.Bomb.State;
+			field->Bomb.TimeUntilNextState = src.Bomb.TimeUntilNextState;
+		}
+
+	CurrentTime = Source->CurrentTime;
 }

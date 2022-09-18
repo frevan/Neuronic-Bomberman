@@ -228,9 +228,9 @@ bool TGameLogic::CheckMoveAgainstCell(TPlayer* Player, int CellX, int CellY, TPl
 		return false;
 
 	// check cell contents to see if we can move there
-	TField* cell = Data->Arena.At(CellX, CellY);
+	TField field = Data->Arena.At(CellX, CellY);
 	bool canmove = true;
-	if (cell->Type == FIELD_BRICK || cell->Type == FIELD_SOLID)
+	if (field.Type == FIELD_BRICK || field.Type == FIELD_SOLID)
 		canmove = false; 
 	if (Data->BombInField(CellX, CellY, true))
 	{
@@ -318,7 +318,8 @@ void TGameLogic::UpdateBombs(TGameTime Delta)
 	for (uint8_t x = 0; x < Data->Arena.Width; x++)
 		for (uint8_t y = 0; y < Data->Arena.Height; y++)
 		{
-			TField* field = Data->Arena.At(x, y);
+			TField* field{};
+			Data->Arena.At(x, y, field);
 
 			if (field->Bomb.State == BOMB_TICKING)
 			{
@@ -342,7 +343,8 @@ void TGameLogic::UpdateBombs(TGameTime Delta)
 
 void TGameLogic::ExplodeBomb(uint8_t X, uint8_t Y)
 {
-	TField* field = Data->Arena.At(X, Y);
+	TField* field{};
+	Data->Arena.At(X, Y, field);
 
 	// update the player's active bomb count
 	if (field->Bomb.DroppedByPlayer >= 0 && field->Bomb.DroppedByPlayer < MAX_NUM_SLOTS)
@@ -379,7 +381,8 @@ void TGameLogic::ExplodeField(uint8_t X, uint8_t Y, const TBomb& OriginalBomb, b
 		return;
 	}
 
-	TField* field = Data->Arena.At(X, Y);
+	TField* field{};
+	Data->Arena.At(X, Y, field);
 	
 	if (field->Type == FIELD_SOLID)
 	{
@@ -417,15 +420,15 @@ void TGameLogic::CheckForExplodedPlayers()
 		int topField = static_cast<int>(trunc(p->Position.Y - 0.49));
 		int bottomField = static_cast<int>(trunc(p->Position.Y + 0.49));
 
-		bool exploding = Data->Arena.At(playerPos.X, playerPos.Y)->Bomb.State == BOMB_EXPLODING;
+		bool exploding = Data->Arena.At(playerPos.X, playerPos.Y).Bomb.State == BOMB_EXPLODING;
 		if (leftField >= 0)
-			exploding |= Data->Arena.At(leftField, playerPos.Y)->Bomb.State == BOMB_EXPLODING;
+			exploding |= Data->Arena.At(leftField, playerPos.Y).Bomb.State == BOMB_EXPLODING;
 		if (rightField < Data->Arena.Width)
-			exploding |= Data->Arena.At(rightField, playerPos.Y)->Bomb.State == BOMB_EXPLODING;
+			exploding |= Data->Arena.At(rightField, playerPos.Y).Bomb.State == BOMB_EXPLODING;
 		if (topField >= 0)
-			exploding |= Data->Arena.At(playerPos.X, topField)->Bomb.State == BOMB_EXPLODING;
+			exploding |= Data->Arena.At(playerPos.X, topField).Bomb.State == BOMB_EXPLODING;
 		if (bottomField < Data->Arena.Height)
-			exploding |= Data->Arena.At(playerPos.X, bottomField)->Bomb.State == BOMB_EXPLODING;
+			exploding |= Data->Arena.At(playerPos.X, bottomField).Bomb.State == BOMB_EXPLODING;
 
 		if (exploding)
 		{
@@ -500,7 +503,6 @@ void TGameLogic::EndRound()
 	}
 
 	// TODO: stop the round or the match
-	Data->Status = GAME_ENDED;
 	if (Listener)
 		Listener->LogicRoundEnded();
 }

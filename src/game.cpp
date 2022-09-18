@@ -172,14 +172,14 @@ void TGame::Execute()
 			if (CurrentStateView)
 				CurrentStateView->Process(delta);
 
+			// process game logic (before the server logic)
+			//Logic->Process(delta);
+
 			// process the server object
 			Server->Process(delta);
 
 			// process client object
 			Client->Process(delta);
-
-			// process game logic
-			Logic->Process(delta);
 
 			// get new time
 			nextGameTick += SKIP_TICKS;
@@ -401,11 +401,12 @@ void TGame::ClientDisconnected()
 
 void TGame::ClientEnteredLobby()
 {
-	Client->SelectArena(0); // select the first map initially
+	// select the first map initially
+	Client->SelectArena(0); 
 
+	// add initial player(s)
 	Client->AddPlayer("Steve");
 	Client->AddPlayer("Bob");
-	// TODO: check result of AddPlayer
 }
 
 void TGame::ClientPlayerAdded(int Slot)
@@ -425,6 +426,7 @@ void TGame::ClientPlayerRemoved(int Slot)
 
 void TGame::ClientPlayerNameChanged(int Slot)
 {
+	CurrentStateView->StateChanged();
 }
 
 void TGame::ClientMatchStarting()
@@ -595,10 +597,6 @@ void TGame::SetupCurrentState()
 		else
 			Client->StartNextRound();
 	}
-	else if (CurrentState == STATE_ENDOFROUND)
-	{
-		Client->EndRound();
-	}
 }
 
 void TGame::FinalizeCurrentState()
@@ -629,12 +627,13 @@ void TGame::ClientRoundStarted()
 
 void TGame::ClientRoundEnded()
 {
-	CurrentStateView->StateChanged();
+	//CurrentStateView->StateChanged();
+	SwitchToState(STATE_ENDOFROUND);
 }
 
 void TGame::LogicRoundEnded()
 {
-	SwitchToState(STATE_ENDOFROUND);
+	//SwitchToState(STATE_ENDOFROUND);
 }
 
 void TGame::ClientGameOptionsChanged()

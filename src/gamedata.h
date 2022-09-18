@@ -19,7 +19,8 @@ const TGameStatus GAME_INLOBBY = 1;
 const TGameStatus GAME_MATCHSTARTED = 2;
 const TGameStatus GAME_ROUNDSTARTING = 3;
 const TGameStatus GAME_PLAYING = 4;
-const TGameStatus GAME_ENDED = 5;
+const TGameStatus GAME_ROUNDENDED = 5;
+const TGameStatus GAME_MATCHENDED = 6;
 
 typedef struct 
 {
@@ -135,9 +136,11 @@ public:
 
 	void AddStartPosition(int PlayerIndex, int X, int Y, bool IsPrimary);
 
-	// retrieve a field at a position (read-only)
-	TField* At(uint8_t X, uint8_t Y);
-	TField* At(const TFieldPosition Position);
+	// retrieve a field at a position
+	void At(uint8_t X, uint8_t Y, TField*& Field); // returns pointer to field strunct in Field
+	void At(const TFieldPosition Position, TField*& Field); // returns pointer to field strunct in Field
+	const TField& At(uint8_t X, uint8_t Y);
+	const TField& At(const TFieldPosition Position);
 
 	bool LoadFromFile(const std::string& FileName, int FileType = 0);
 };
@@ -171,4 +174,6 @@ public:
 	bool SetPlayerName(int Slot, const std::string& SetName);
 
 	bool BombInField(uint8_t X, uint8_t Y, bool OnlyUnexploded);
+
+	void UpdateGameFrom(TGameData* Source);
 };

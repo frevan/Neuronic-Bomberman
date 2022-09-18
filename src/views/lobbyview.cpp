@@ -213,8 +213,8 @@ void TLobbyView::Draw(sf::RenderTarget* target)
 		{
 			sf::Color fieldColor;
 
-			TField* field = Game->GameData.Arena.At((uint8_t)col, (uint8_t)row);
-			switch (field->Type)
+			TField field = Game->GameData.Arena.At((uint8_t)col, (uint8_t)row); // read-only access
+			switch (field.Type)
 			{
 				case FIELD_EMPTY: fieldColor = sf::Color::Green; break;
 				case FIELD_BRICK: fieldColor = sf::Color::Red; break;

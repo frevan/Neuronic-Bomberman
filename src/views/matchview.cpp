@@ -36,7 +36,8 @@ void TMatchView::Draw(sf::RenderTarget* target)
 		{
 			sf::Color fieldColor;
 
-			TField* field = Game->GameData.Arena.At((uint8_t)col, (uint8_t)row);
+			TField* field{};
+			Game->GameData.Arena.At((uint8_t)col, (uint8_t)row, field);
 			switch (field->Type)
 			{
 				case FIELD_EMPTY: fieldColor = sf::Color::Green; break;
@@ -81,7 +82,8 @@ void TMatchView::Draw(sf::RenderTarget* target)
 	for (uint8_t x = 0; x < Game->GameData.Arena.Width; x++)
 		for (uint8_t y = 0; y < Game->GameData.Arena.Height; y++)
 		{
-			TField* field = Game->GameData.Arena.At(x, y);
+			TField* field{};
+			Game->GameData.Arena.At(x, y, field);
 			if (field->Bomb.State == BOMB_NONE)
 				continue;
 

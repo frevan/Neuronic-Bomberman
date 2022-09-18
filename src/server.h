@@ -4,6 +4,10 @@
 #include "gamelogic.h"
 #include "resourcemgr.h"
 
+#include <thread>
+#include <mutex>
+#include <SFML/Network.hpp>
+
 class TServerListener
 {
 public:
@@ -16,15 +20,26 @@ public:
 	virtual void ServerArenaChanged(const std::string& ArenaName) = 0;
 	virtual void ServerNumRoundsChanged(int NumRounds) = 0;
 
-	virtual void ServerPlayerAdded(int Slot, const std::string& PlayerName) = 0;
-	virtual void ServerPlayerRemoved(int Slot) = 0;
-	virtual void ServerPlayerNameChanged(int Slot, const std::string& PlayerName) = 0;
+	virtual void ServerPlayerAdded(uint8_t Slot, const std::string& PlayerName) = 0;
+	virtual void ServerPlayerRemoved(uint8_t Slot) = 0;
+	virtual void ServerPlayerNameChanged(uint8_t Slot, const std::string& PlayerName) = 0;
 
 	virtual void ServerMatchStarted() = 0;
-	virtual void MatchEnded() = 0;
+	virtual void ServerMatchEnded() = 0;
 	virtual void ServerRoundStarting() = 0;
 	virtual void ServerRoundStarted() = 0;
 	virtual void ServerRoundEnded() = 0;
+
+	virtual void ServerPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down) = 0;
+	virtual void ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position) = 0;
+
+	virtual void ServerFullUpdate(TGameData* Data) = 0;
+};
+
+class TClientSocket : public sf::TcpSocket
+{
+public:
+	intptr_t ID;
 };
 
 class TServer: public TLogicListener
@@ -44,8 +59,36 @@ private:
 	TMapList Maps;
 	TServerListener* Listener;
 
-	void BroadCastChange(int Command, intptr_t Index, intptr_t Value, std::string StrParam);
+	bool ThreadsShouldStop;
 
+	std::thread* NetworkListenerThread;
+	sf::TcpListener NetworkListener;
+	sf::SocketSelector SocketSelector;
+	std::list<TClientSocket*> ClientSockets;
+	std::mutex ClientSocketsMutex;
+
+	void ListenToNetwork();
+	void CheckForDisconnectedSockets();
+
+	void DoLobbyCreated(intptr_t ConnectionID);
+	void DoLobbyClosed();
+	void DoEnteredLobby(intptr_t ConnectionID, const std::string& GameName);
+	void DoLeftLobby(intptr_t ConnectionID);
+	void DoGameNameChanged(const std::string& GameName);
+	void DoArenaChanged(const std::string& ArenaName);
+	void DoNumRoundsChanged(int NumRounds);
+	void DoPlayerAdded(uint8_t Slot, const std::string& PlayerName);
+	void DoPlayerRemoved(uint8_t Slot);
+	void DoPlayerNameChanged(uint8_t Slot, const std::string& PlayerName);
+	void DoMatchStarted();
+	void DoMatchEnded();
+	void DoRoundStarting();
+	void DoRoundStarted();
+	void DoRoundEnded();
+	void DoPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
+	void DoPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position);
+	void DoFullUpdate(TGameData* Data);
+	
 public:
 	TServer(TServerListener* SetListener);
 	~TServer();
@@ -68,6 +111,9 @@ public:
 	bool SetPlayerName(int Slot, const std::string& Name); // change a player's name
 	bool SelectArena(const std::string& ArenaName); // set the arena
 	int SetNumRounds(int Value); // set the number of rounds to be played
+
+	void SetPlayerDirections(uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
+	void DropBomb(uint8_t Slot);
 
 	void Process(TGameTime Delta);
 

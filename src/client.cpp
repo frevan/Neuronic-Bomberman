@@ -3,7 +3,8 @@
 TClient::TClient(TGame* SetGame)
 :	Game(SetGame),
 	Listener(nullptr),
-	Commands()
+	Commands(),
+	Socket()
 {
 }
 
@@ -35,13 +36,6 @@ void TClient::StartNextRound()
 	Commands.push(cmd);
 }
 
-void TClient::EndRound()
-{
-	TClientCommand cmd;
-	cmd.Command = CMD_EndRound;
-	Commands.push(cmd);
-}
-
 void TClient::AddPlayer(const std::string& PlayerName, uint8_t Slot)
 {
 	TClientCommand cmd;
@@ -69,7 +63,6 @@ void TClient::StartMatch()
 void TClient::Process(TGameTime Delta)
 {
 	TClientCommand cmd;
-	int slot;
 
 	while (!Commands.empty())
 	{
@@ -80,13 +73,12 @@ void TClient::Process(TGameTime Delta)
 		{
 			case CMD_OpenLobby:	Game->Server->OpenLobby(); break;
 			case CMD_SetGameName: Game->Server->SetGameName(cmd.StrParam); break;
-			case CMD_AddPlayer: slot = Game->Server->AddPlayer(cmd.StrParam, (int)cmd.Index); break;
+			case CMD_AddPlayer: Game->Server->AddPlayer(cmd.StrParam, (int)cmd.Index); break;
 			case CMD_RemovePlayer: Game->Server->RemovePlayer((int)cmd.Index); break;
 			case CMD_SetPlayerName: Game->Server->SetPlayerName((int)cmd.Index, cmd.StrParam); break;
-			case CMD_SetNumRounds: cmd.Value = Game->Server->SetNumRounds((int)cmd.Value); break;
+			case CMD_SetNumRounds: Game->Server->SetNumRounds((int)cmd.Value); break;
 			case CMD_StartMatch: Game->Server->StartMatch(); break;
 			case CMD_StartNextRound: Game->Server->StartRound(); break;
-			case CMD_EndRound: Game->Server->EndRound(); break;
 			case CMD_SelectArena:
 				TArena* map = Game->Maps.MapFromIndex((int)cmd.Index);
 				if (map)
@@ -104,62 +96,20 @@ void TClient::SelectArena(int Index)
 	Commands.push(cmd);
 }
 
-void TClient::UpdatePlayerMovement(int Slot, bool Left, bool Right, bool Up, bool Down)
+void TClient::UpdatePlayerMovement(uint8_t Slot, bool Left, bool Right, bool Up, bool Down)
 {
 	if (Slot < 0 || Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
-	TPlayer* p = &(Game->GameData.Players[Slot]);
-	if (p->State == PLAYER_NOTPLAYING)
-		return;
-
-	if (Left)
-		p->Direction |= DIRECTION_LEFT;
-	else
-		p->Direction &= ~DIRECTION_LEFT;
-	if (Right)
-		p->Direction |= DIRECTION_RIGHT;
-	else
-		p->Direction &= ~DIRECTION_RIGHT;
-	if (Up)
-		p->Direction |= DIRECTION_UP;
-	else
-		p->Direction &= ~DIRECTION_UP;
-	if (Down)
-		p->Direction |= DIRECTION_DOWN;
-	else
-		p->Direction &= ~DIRECTION_DOWN;
+	Game->Server->SetPlayerDirections(Slot, Left, Right, Up, Down);
 }
 
-void TClient::DropBomb(int Slot)
+void TClient::DropBomb(uint8_t Slot)
 {
-	if (Slot < 0 || Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
+	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
-	TPlayer* p = &(Game->GameData.Players[Slot]);
-	if (p->State == PLAYER_NOTPLAYING)
-		return;
-	if (p->ActiveBombs == p->MaxActiveBombs)
-		return;
-
-	// determine the exact position where to drop it (top left pos of the field)
-	TFieldPosition pos;
-	pos.X = static_cast<int>(trunc(p->Position.X));
-	pos.Y = static_cast<int>(trunc(p->Position.Y));
-
-	// check if there's already a bomb at this position
-	if (Game->GameData.BombInField(pos.X, pos.Y, false))
-		return;
-
-	// add the new bomb
-	TField* field = Game->GameData.Arena.At(pos);
-	field->Bomb.State = BOMB_TICKING;
-	field->Bomb.DroppedByPlayer = Slot;
-	field->Bomb.TimeUntilNextState = 2000; // 2 seconds
-	field->Bomb.Range = p->BombRange;
-
-	// update the player
-	p->ActiveBombs++;
+	Game->Server->DropBomb(Slot);
 }
 
 void TClient::SetNumRounds(int Value)
@@ -175,7 +125,7 @@ void TClient::SetNumRounds(int Value)
 	Commands.push(cmd);
 }
 
-void TClient::SetPlayerName(int Slot, const std::string& Name)
+void TClient::SetPlayerName(uint8_t Slot, const std::string& Name)
 {
 	TClientCommand cmd;
 	cmd.Command = CMD_SetPlayerName;
@@ -245,9 +195,9 @@ void TClient::ServerMatchStarted()
 		Listener->ClientMatchStarted();
 }
 
-void TClient::MatchEnded()
+void TClient::ServerMatchEnded()
 {
-	//Game->GameData.Status = GAME_ENDED;
+	Game->GameData.Status = GAME_MATCHENDED;
 }
 
 void TClient::ServerRoundStarting()
@@ -268,28 +218,91 @@ void TClient::ServerRoundStarted()
 
 void TClient::ServerRoundEnded()
 {
-	Game->GameData.Status = GAME_ENDED;
+	Game->GameData.Status = GAME_ROUNDENDED;
 	if (Listener)
 		Listener->ClientRoundEnded();
 }
 
-void TClient::ServerPlayerAdded(int Slot, const std::string& PlayerName)
+void TClient::ServerPlayerAdded(uint8_t Slot, const std::string& PlayerName)
 {
+	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
+		return;
+
 	Game->GameData.AddPlayer(PlayerName, Slot);
 	if (Listener)
 		Listener->ClientPlayerAdded(Slot);
 }
 
-void TClient::ServerPlayerRemoved(int Slot)
+void TClient::ServerPlayerRemoved(uint8_t Slot)
 {
+	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
+		return;
+
 	Game->GameData.RemovePlayer(Slot);
 	if (Listener)
 		Listener->ClientPlayerRemoved(Slot);
 }
 
-void TClient::ServerPlayerNameChanged(int Slot, const std::string& PlayerName)
+void TClient::ServerPlayerNameChanged(uint8_t Slot, const std::string& PlayerName)
 {
+	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
+		return;
+
 	Game->GameData.SetPlayerName(Slot, PlayerName);
 	if (Listener)
 		Listener->ClientPlayerNameChanged(Slot);
+}
+
+void TClient::ServerPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down)
+{
+	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
+		return;
+
+	TPlayer* p = &(Game->GameData.Players[Slot]);
+	p->Direction = DIRECTION_NONE;
+	if (Left)
+		p->Direction |= DIRECTION_LEFT;
+	if (Right)
+		p->Direction |= DIRECTION_RIGHT;
+	if (Up)
+		p->Direction |= DIRECTION_UP;
+	if (Down)
+		p->Direction |= DIRECTION_DOWN;
+}
+
+void TClient::ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position)
+{
+	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
+		return;
+
+	TPlayer* p = &(Game->GameData.Players[Slot]);
+	p->ActiveBombs++;
+
+	TField* field{};
+	Game->GameData.Arena.At(Position, field);
+	if (field)
+	{
+		field->Bomb.State = BOMB_TICKING;
+		field->Bomb.DroppedByPlayer = Slot;
+		field->Bomb.TimeUntilNextState = 2000; // 2 seconds
+		field->Bomb.Range = p->BombRange;
+	}
+}
+
+void TClient::ServerFullUpdate(TGameData* Data)
+{
+	Game->GameData.UpdateGameFrom(Data);
+}
+
+void TClient::Connect(const std::string& ServerAddress, unsigned int ServerPort)
+{
+	Disconnect(); // just in case
+
+	Socket.setBlocking(false);
+	Socket.connect(ServerAddress, ServerPort);
+}
+
+void TClient::Disconnect()
+{
+	Socket.disconnect();
 }
