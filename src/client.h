@@ -26,6 +26,7 @@ class TClient;
 
 #include "gamedata.h"
 #include "game.h"
+#include "server.h"
 
 const int CMD_None = 0;
 const int CMD_OpenLobby = 1;
@@ -46,7 +47,7 @@ typedef struct
 	std::string StrParam;
 } TClientCommand;
 
-class TClient
+class TClient: public TServerListener
 {
 private:
 	TGame* Game;
@@ -76,4 +77,21 @@ public:
 	// during the match
 	void UpdatePlayerMovement(int Slot, bool Left, bool Right, bool Up, bool Down);
 	void DropBomb(int Slot);
+
+	// from TServerListener
+	void ServerLobbyCreated() override;
+	void ServerLobbyClosed() override;
+	void ServerEnteredLobby(const std::string& GameName) override;
+	void ServerLeftLobby() override;
+	void ServerGameNameChanged(const std::string& GameName) override;
+	void ServerArenaChanged(const std::string& ArenaName) override;
+	void ServerNumRoundsChanged(int NumRounds) override;
+	void ServerPlayerAdded(int Slot, const std::string& PlayerName) override;
+	void ServerPlayerRemoved(int Slot) override;
+	void ServerPlayerNameChanged(int Slot, const std::string& PlayerName) override;
+	void ServerMatchStarted() override;
+	void MatchEnded() override;
+	void ServerRoundStarting() override;
+	void ServerRoundStarted() override;
+	void ServerRoundEnded() override;
 };

@@ -1,9 +1,10 @@
 #include "server.h"
 
-TServer::TServer()
+TServer::TServer(TServerListener* SetListener)
 :	State(INACTIVE),
 	Data(),
-	Maps()
+	Maps(),
+	Listener(SetListener)
 {
 	Logic = new TGameLogic(&Data, this);
 }
@@ -42,6 +43,12 @@ bool TServer::OpenLobby()
 		Data.Reset();
 		Data.Status = GAME_INLOBBY;
 
+		if (Listener)
+		{
+			Listener->ServerLobbyCreated();
+			Listener->ServerEnteredLobby(Data.GameName);
+		}
+
 		result = true;
 	}
 
@@ -57,18 +64,26 @@ void TServer::CloseLobby()
 
 bool TServer::StartMatch()
 {
-	Data.Status = GAME_STARTING;
-	Data.InitNewGame();
-	Data.Status = GAME_RUNNING;
+	Data.Status = GAME_MATCHSTARTED;
+	if (Listener)
+		Listener->ServerMatchStarted();
+
+	StartRound();
 
 	return true;
 }
 
-bool TServer::StartNextRound()
+bool TServer::StartRound()
 {
-	Data.Status = GAME_STARTING;
+	Data.Status = GAME_ROUNDSTARTING;
+	if (Listener)
+		Listener->ServerRoundStarting();
+
 	Data.InitNewRound();
-	Data.Status = GAME_RUNNING;
+
+	Data.Status = GAME_PLAYING;
+	if (Listener)
+		Listener->ServerRoundStarted();
 
 	return true;
 }
@@ -76,6 +91,8 @@ bool TServer::StartNextRound()
 bool TServer::EndRound()
 {
 	Data.Status = GAME_ENDED;
+	if (Listener)
+		Listener->ServerRoundEnded();
 
 	return true;
 }
@@ -83,6 +100,9 @@ bool TServer::EndRound()
 void TServer::SetGameName(const std::string& SetName)
 {
 	Data.GameName = SetName;
+
+	if (Listener)
+		Listener->ServerGameNameChanged(Data.GameName);
 }
 
 uint8_t TServer::AddPlayer(const std::string& PlayerName, uint8_t Slot)
@@ -105,9 +125,14 @@ uint8_t TServer::AddPlayer(const std::string& PlayerName, uint8_t Slot)
 		if (Data.Players[Slot].State == PLAYER_NOTPLAYING)
 		{
 			Data.Players[Slot].State = PLAYER_ALIVE;
+			Data.Players[Slot].Name = PlayerName;
 
 			result = Slot;
 		}
+
+	if (result < MAX_NUM_SLOTS)
+		if (Listener)
+			Listener->ServerPlayerAdded(result, Data.Players[result].Name);
 
 	return result;
 }
@@ -124,6 +149,10 @@ bool TServer::RemovePlayer(uint8_t Slot)
 			result = true;
 		}
 
+	if (result)
+		if (Listener)
+			Listener->ServerPlayerRemoved(Slot);
+
 	return result;
 }
 
@@ -138,6 +167,10 @@ bool TServer::SetPlayerName(int Slot, const std::string& Name)
 
 			result = true;
 		}
+
+	if (result)
+		if (Listener)
+			Listener->ServerPlayerNameChanged(Slot, Data.Players[Slot].Name);
 
 	return result;
 }
@@ -154,6 +187,10 @@ bool TServer::SelectArena(const std::string& ArenaName)
 		result = true;
 	}
 
+	if (result)
+		if (Listener)
+			Listener->ServerArenaChanged(ArenaName);
+
 	return result;
 }
 
@@ -165,6 +202,9 @@ int TServer::SetNumRounds(int Value)
 		Value = MAX_NUM_ROUNDS;
 
 	Data.MaxRounds = Value;
+
+	if (Listener)
+		Listener->ServerNumRoundsChanged(Data.MaxRounds);
 
 	return Data.MaxRounds;
 }

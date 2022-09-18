@@ -69,7 +69,6 @@ void TClient::StartMatch()
 void TClient::Process(TGameTime Delta)
 {
 	TClientCommand cmd;
-	bool success;
 	int slot;
 
 	while (!Commands.empty())
@@ -79,110 +78,19 @@ void TClient::Process(TGameTime Delta)
 
 		switch (cmd.Command)
 		{
-			case CMD_OpenLobby:
-				if (Game->Server->OpenLobby())
-				{
-					if (Listener)
-						Listener->ClientConnected();
-					Game->GameData.Reset();
-					Game->GameData.GameName = cmd.StrParam;
-					Game->GameData.Status = GAME_INLOBBY;
-					if (Listener)
-						Listener->ClientEnteredLobby();
-				}
-				break;
-
-			case CMD_SetGameName:
-				Game->Server->SetGameName(cmd.StrParam);
-				Game->GameData.SetName(cmd.StrParam);
-				if (Listener)
-					Listener->ClientGameOptionsChanged();
-				break;
-
-			case CMD_AddPlayer:
-				slot = (int)cmd.Index;
-				slot = Game->Server->AddPlayer(cmd.StrParam, slot);
-				success = (slot < MAX_NUM_SLOTS);
-				if (success)
-					Game->GameData.AddPlayer(cmd.StrParam, slot);
-				if (Listener)
-				{
-					if (success)
-						Listener->ClientPlayerAdded(slot);
-					else
-						Listener->ClientPlayerNotAdded(slot);
-				}
-				break;
-
-			case CMD_RemovePlayer:
-				slot = (int)cmd.Index;
-				if (Game->Server->RemovePlayer(slot))
-				{
-					Game->GameData.RemovePlayer(slot);
-					if (Listener)
-						Listener->ClientPlayerRemoved(slot);
-				}
-				break;
-
-			case CMD_SetPlayerName:
-				slot = (int)cmd.Index;
-				if (Game->Server->SetPlayerName(slot, cmd.StrParam))
-				{
-					Game->GameData.SetPlayerName(slot, cmd.StrParam);
-					if (Listener)
-						Listener->ClientPlayerNameChanged(slot);
-				}
-				break;
-
-			case CMD_SetNumRounds:
-				cmd.Value = Game->Server->SetNumRounds((int)cmd.Value);
-				Game->GameData.MaxRounds = (int)cmd.Value;
-				if (Listener)
-					Listener->ClientGameOptionsChanged();
-				break;
-
-			case CMD_StartMatch:
-				if (Game->Server->StartMatch())
-				{
-					Game->GameData.Status = GAME_STARTING;
-					if (Listener)
-						Listener->ClientMatchStarting();
-					Game->GameData.InitNewGame();
-					Game->GameData.Status = GAME_RUNNING;
-					if (Listener)
-						Listener->ClientMatchStarted();
-				}
-				break;
-
-			case CMD_StartNextRound:
-				if (Game->Server->StartNextRound())
-				{
-					Game->GameData.Status = GAME_STARTING;
-					if (Listener)
-						Listener->ClientMatchStarting();
-					Game->GameData.InitNewRound();
-					Game->GameData.Status = GAME_RUNNING;
-					if (Listener)
-						Listener->ClientRoundStarted();
-				}
-				break;
-
-			case CMD_EndRound:
-				if (Game->Server->EndRound())
-				{
-					Game->GameData.Status = GAME_ENDED;
-					if (Listener)
-						Listener->ClientRoundEnded();
-				}
-				break;
-
+			case CMD_OpenLobby:	Game->Server->OpenLobby(); break;
+			case CMD_SetGameName: Game->Server->SetGameName(cmd.StrParam); break;
+			case CMD_AddPlayer: slot = Game->Server->AddPlayer(cmd.StrParam, (int)cmd.Index); break;
+			case CMD_RemovePlayer: Game->Server->RemovePlayer((int)cmd.Index); break;
+			case CMD_SetPlayerName: Game->Server->SetPlayerName((int)cmd.Index, cmd.StrParam); break;
+			case CMD_SetNumRounds: cmd.Value = Game->Server->SetNumRounds((int)cmd.Value); break;
+			case CMD_StartMatch: Game->Server->StartMatch(); break;
+			case CMD_StartNextRound: Game->Server->StartRound(); break;
+			case CMD_EndRound: Game->Server->EndRound(); break;
 			case CMD_SelectArena:
-				TArena* map = Game->Maps.MapFromIndex(cmd.Index);
+				TArena* map = Game->Maps.MapFromIndex((int)cmd.Index);
 				if (map)
-				{
-					if (Game->Server->SelectArena(map->Caption))
-						Game->GameData.Arena.LoadFromFile(map->OriginalFileName);
-				}
+					(Game->Server->SelectArena(map->Caption));
 				break;
 		};
 	}
@@ -282,4 +190,106 @@ void TClient::SetGameName(const std::string& SetName)
 	cmd.Command = CMD_SetGameName;
 	cmd.StrParam = SetName;
 	Commands.push(cmd);
+}
+
+void TClient::ServerLobbyCreated()
+{
+	if (Listener)
+		Listener->ClientConnected();
+}
+
+void TClient::ServerLobbyClosed()
+{
+}
+
+void TClient::ServerEnteredLobby(const std::string& GameName)
+{
+	Game->GameData.Reset();
+	Game->GameData.GameName = GameName;
+	Game->GameData.Status = GAME_INLOBBY;
+	if (Listener)
+		Listener->ClientEnteredLobby();
+}
+
+void TClient::ServerLeftLobby()
+{
+}
+
+void TClient::ServerGameNameChanged(const std::string& GameName)
+{
+	Game->GameData.SetName(GameName);
+	if (Listener)
+		Listener->ClientGameOptionsChanged();
+}
+
+void TClient::ServerArenaChanged(const std::string& ArenaName)
+{
+	TArena* map = Game->Maps.MapFromName(ArenaName);
+	if (map)
+		Game->GameData.Arena.LoadFromFile(map->OriginalFileName);
+}
+
+void TClient::ServerNumRoundsChanged(int NumRounds)
+{
+	Game->GameData.MaxRounds = NumRounds;
+	if (Listener)
+		Listener->ClientGameOptionsChanged();
+}
+
+void TClient::ServerMatchStarted()
+{
+	Game->GameData.InitNewGame();
+	Game->GameData.Status = GAME_MATCHSTARTED;
+
+	if (Listener)
+		Listener->ClientMatchStarted();
+}
+
+void TClient::MatchEnded()
+{
+	//Game->GameData.Status = GAME_ENDED;
+}
+
+void TClient::ServerRoundStarting()
+{
+	Game->GameData.Status = GAME_ROUNDSTARTING;
+	if (Listener)
+		Listener->ClientMatchStarting();
+
+	Game->GameData.InitNewRound();
+}
+
+void TClient::ServerRoundStarted()
+{
+	Game->GameData.Status = GAME_PLAYING;
+	if (Listener)
+		Listener->ClientRoundStarted();
+}
+
+void TClient::ServerRoundEnded()
+{
+	Game->GameData.Status = GAME_ENDED;
+	if (Listener)
+		Listener->ClientRoundEnded();
+}
+
+void TClient::ServerPlayerAdded(int Slot, const std::string& PlayerName)
+{
+	Game->GameData.AddPlayer(PlayerName, Slot);
+	if (Listener)
+		Listener->ClientPlayerAdded(Slot);
+}
+
+void TClient::ServerPlayerRemoved(int Slot)
+{
+	Game->GameData.RemovePlayer(Slot);
+	if (Listener)
+		Listener->ClientPlayerRemoved(Slot);
+}
+
+void TClient::ServerPlayerNameChanged(int Slot, const std::string& PlayerName)
+{
+	Game->GameData.SetPlayerName(Slot, PlayerName);
+	if (Listener)
+		Listener->ClientPlayerNameChanged(Slot);
 }

@@ -13,7 +13,7 @@ TGameLogic::TGameLogic(TGameData* SetData, TLogicListener* SetListener)
 
 void TGameLogic::Process(TGameTime Delta)
 {
-	if (Data->Status != GAME_RUNNING)
+	if (Data->Status != GAME_PLAYING)
 		return;
 
 	UpdatePlayerPositions(Delta);

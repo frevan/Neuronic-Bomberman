@@ -16,9 +16,10 @@ typedef uint8_t TGameStatus;
 
 const TGameStatus GAME_NONE = 0;
 const TGameStatus GAME_INLOBBY = 1;
-const TGameStatus GAME_STARTING = 2;
-const TGameStatus GAME_RUNNING = 3;
-const TGameStatus GAME_ENDED = 4;
+const TGameStatus GAME_MATCHSTARTED = 2;
+const TGameStatus GAME_ROUNDSTARTING = 3;
+const TGameStatus GAME_PLAYING = 4;
+const TGameStatus GAME_ENDED = 5;
 
 typedef struct 
 {

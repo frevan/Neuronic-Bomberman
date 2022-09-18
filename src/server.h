@@ -4,6 +4,29 @@
 #include "gamelogic.h"
 #include "resourcemgr.h"
 
+class TServerListener
+{
+public:
+	virtual void ServerLobbyCreated() = 0; // new lobby created
+	virtual void ServerLobbyClosed() = 0; // lobby closed
+	virtual void ServerEnteredLobby(const std::string& GameName) = 0; // client entered the lobby
+	virtual void ServerLeftLobby() = 0; // client left the lobby
+
+	virtual void ServerGameNameChanged(const std::string& GameName) = 0; 
+	virtual void ServerArenaChanged(const std::string& ArenaName) = 0;
+	virtual void ServerNumRoundsChanged(int NumRounds) = 0;
+
+	virtual void ServerPlayerAdded(int Slot, const std::string& PlayerName) = 0;
+	virtual void ServerPlayerRemoved(int Slot) = 0;
+	virtual void ServerPlayerNameChanged(int Slot, const std::string& PlayerName) = 0;
+
+	virtual void ServerMatchStarted() = 0;
+	virtual void MatchEnded() = 0;
+	virtual void ServerRoundStarting() = 0;
+	virtual void ServerRoundStarted() = 0;
+	virtual void ServerRoundEnded() = 0;
+};
+
 class TServer: public TLogicListener
 {
 private:
@@ -19,11 +42,12 @@ private:
 	TGameLogic* Logic;
 	TState State;
 	TMapList Maps;
+	TServerListener* Listener;
 
 	void BroadCastChange(int Command, intptr_t Index, intptr_t Value, std::string StrParam);
 
 public:
-	TServer();
+	TServer(TServerListener* SetListener);
 	~TServer();
 
 	void LoadMaps(const std::string& Path);
@@ -35,7 +59,7 @@ public:
 	void CloseLobby(); // close the lobby
 
 	bool StartMatch(); // start the first round of the match	
-	bool StartNextRound(); // start a new round when the previous one has ended
+	bool StartRound(); // start a new round when the previous one has ended
 	bool EndRound(); // end the current round
 
 	void SetGameName(const std::string& SetName); // change the game's name

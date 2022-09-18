@@ -96,7 +96,7 @@ bool TGame::Initialize(const std::string& filename)
 	Client->Listener = this;
 
 	// create server object
-	Server = new TServer();
+	Server = new TServer(Client);
 	Server->LoadMaps(AppPath + GetMapSubPath());
 
 	// create the logic object

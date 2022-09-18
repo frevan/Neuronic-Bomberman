@@ -42,7 +42,8 @@ typedef struct
 	std::string FileName;
 } TMapInfo;
 
-class TGame: public TClientListener, public TLogicListener
+class TGame:	public TClientListener, 
+				public TLogicListener
 {
 private:
 	sf::RenderWindow* Window;
