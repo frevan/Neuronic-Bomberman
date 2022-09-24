@@ -39,10 +39,10 @@ typedef uint32_t TGameTime;
 typedef uint8_t TPlayerDirection;
 
 const TPlayerDirection DIRECTION_NONE = 0;
-const TPlayerDirection DIRECTION_UP = 1 << 0;
-const TPlayerDirection DIRECTION_DOWN = 1 << 1;
-const TPlayerDirection DIRECTION_LEFT = 1 << 2;
-const TPlayerDirection DIRECTION_RIGHT = 1 << 3;
+const TPlayerDirection DIRECTION_LEFT = 1 << 0;
+const TPlayerDirection DIRECTION_RIGHT = 1 << 1;
+const TPlayerDirection DIRECTION_UP = 1 << 2;
+const TPlayerDirection DIRECTION_DOWN = 1 << 3;
 
 typedef int16_t TPlayerSpeed;
 

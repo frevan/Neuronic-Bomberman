@@ -42,8 +42,7 @@ typedef struct
 	std::string FileName;
 } TMapInfo;
 
-class TGame:	public TClientListener, 
-				public TLogicListener
+class TGame:	public TClientListener
 {
 private:
 	sf::RenderWindow* Window;
@@ -112,7 +111,4 @@ public:
 	void ClientMatchStarted() override;
 	void ClientRoundStarted() override;
 	void ClientRoundEnded() override;
-
-	// from TLogicListener
-	void LogicRoundEnded() override;
 };

@@ -1,17 +1,27 @@
 #include "client.h"
 
+#include "comms.h"
+
+const int CLIENT_IDLE = 0;
+const int CLIENT_CONNECTING = 1;
+const int CLIENT_CONNECTED = 2;
+
 TClient::TClient(TGame* SetGame)
 :	Game(SetGame),
 	Listener(nullptr),
 	Commands(),
-	Socket()
+	Socket(),
+	ConnectionStatus(CLIENT_IDLE)
 {
+}
+
+TClient::~TClient()
+{
+	DisconnectInternal();
 }
 
 void TClient::CreateGame(const std::string& LobbyName)
 {
-	Game->Server->Start();
-
 	TClientCommand cmd;
 	cmd.Command = CMD_OpenLobby;
 	cmd.StrParam = LobbyName;
@@ -20,6 +30,8 @@ void TClient::CreateGame(const std::string& LobbyName)
 
 void TClient::CloseGame()
 {
+	Disconnect();
+
 	Game->GameData.Reset();
 
 	Game->Server->CloseLobby();
@@ -64,27 +76,83 @@ void TClient::Process(TGameTime Delta)
 {
 	TClientCommand cmd;
 
+	if (ConnectionStatus == CLIENT_CONNECTING)
+	{
+		if (Socket.getRemoteAddress() != sf::IpAddress::None)
+		{
+			ConnectionStatus = CLIENT_CONNECTED;
+			ConnectedToServer();
+		}
+	}
+
+	if (ConnectionStatus == CLIENT_CONNECTED && Socket.getRemoteAddress() == sf::IpAddress::None)
+	{
+		ConnectionStatus = CLIENT_CONNECTED;
+		DisconnectedFromServer();
+	}
+
+	if (ConnectionStatus != CLIENT_CONNECTED)
+		return;
+
 	while (!Commands.empty())
 	{
 		cmd = Commands.front();
 		Commands.pop();
 
+		sf::Packet packet;
 		switch (cmd.Command)
 		{
-			case CMD_OpenLobby:	Game->Server->OpenLobby(); break;
-			case CMD_SetGameName: Game->Server->SetGameName(cmd.StrParam); break;
-			case CMD_AddPlayer: Game->Server->AddPlayer(cmd.StrParam, (int)cmd.Index); break;
-			case CMD_RemovePlayer: Game->Server->RemovePlayer((int)cmd.Index); break;
-			case CMD_SetPlayerName: Game->Server->SetPlayerName((int)cmd.Index, cmd.StrParam); break;
-			case CMD_SetNumRounds: Game->Server->SetNumRounds((int)cmd.Value); break;
-			case CMD_StartMatch: Game->Server->StartMatch(); break;
-			case CMD_StartNextRound: Game->Server->StartRound(); break;
+			case CMD_OpenLobby:	
+				packet << SRV_CreateLobby << cmd.StrParam;
+				Socket.send(packet);
+				break;
+			case CMD_SetGameName: 
+				packet << SRV_SetGameName << cmd.StrParam;
+				Socket.send(packet);
+				break;
+			case CMD_AddPlayer: 
+				packet << SRV_AddPlayer << (uint8_t)cmd.Index << cmd.StrParam;
+				Socket.send(packet);
+				break;
+			case CMD_RemovePlayer:
+				packet << SRV_RemovePlayer << (uint8_t)cmd.Index;
+				Socket.send(packet);
+				break;
+			case CMD_SetPlayerName: 
+				packet << SRV_SetPlayerName << (uint8_t)cmd.Index << cmd.StrParam;
+				Socket.send(packet);
+				break;
+			case CMD_SetNumRounds:
+				packet << SRV_SetNumRounds << (uint8_t)cmd.Value;
+				Socket.send(packet);
+				break;
+			case CMD_StartMatch:
+				packet << SRV_StartMatch;
+				Socket.send(packet);
+				break;
+			case CMD_StartNextRound: 
+				packet << SRV_StartNextRound;
+				Socket.send(packet);
+				break;
 			case CMD_SelectArena:
 				TArena* map = Game->Maps.MapFromIndex((int)cmd.Index);
 				if (map)
-					(Game->Server->SelectArena(map->Caption));
+				{
+					packet << SRV_SetArena << map->Caption;
+					Socket.send(packet);
+				}
 				break;
 		};
+	}
+
+	sf::Packet packet;
+	while (Socket.getRemoteAddress() != sf::IpAddress::None)
+	{
+		sf::Socket::Status r = Socket.receive(packet);
+		if (r != sf::Socket::Done && r != sf::Socket::Partial)
+			break;
+
+		ProcessReceivedPacket(&Socket, packet);
 	}
 }
 
@@ -101,7 +169,24 @@ void TClient::UpdatePlayerMovement(uint8_t Slot, bool Left, bool Right, bool Up,
 	if (Slot < 0 || Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
-	Game->Server->SetPlayerDirections(Slot, Left, Right, Up, Down);
+	uint8_t direction = 0;
+	if (Left)
+		direction |= DIRECTION_LEFT;
+	if (Right)
+		direction |= DIRECTION_RIGHT;
+	if (Up)
+		direction |= DIRECTION_UP;
+	if (Down)
+		direction |= DIRECTION_DOWN;
+
+	if (direction != Game->GameData.Players[Slot].Direction)
+	{
+		Game->GameData.Players[Slot].Direction = direction;
+
+		sf::Packet packet;
+		packet << SRV_UpdatePlayerMovement << Slot << direction;
+		Socket.send(packet);
+	}
 }
 
 void TClient::DropBomb(uint8_t Slot)
@@ -109,7 +194,9 @@ void TClient::DropBomb(uint8_t Slot)
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
-	Game->Server->DropBomb(Slot);
+	sf::Packet packet;
+	packet << SRV_DropBomb << Slot;
+	Socket.send(packet);
 }
 
 void TClient::SetNumRounds(int Value)
@@ -270,7 +357,7 @@ void TClient::ServerPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, 
 		p->Direction |= DIRECTION_DOWN;
 }
 
-void TClient::ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position)
+void TClient::ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, uint16_t TimeUntilExplosion)
 {
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
@@ -284,7 +371,7 @@ void TClient::ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Positi
 	{
 		field->Bomb.State = BOMB_TICKING;
 		field->Bomb.DroppedByPlayer = Slot;
-		field->Bomb.TimeUntilNextState = 2000; // 2 seconds
+		field->Bomb.TimeUntilNextState = TimeUntilExplosion;
 		field->Bomb.Range = p->BombRange;
 	}
 }
@@ -294,9 +381,27 @@ void TClient::ServerFullUpdate(TGameData* Data)
 	Game->GameData.UpdateGameFrom(Data);
 }
 
+void TClient::ServerBombExploding(const TFieldPosition& Position)
+{
+	TField* field;
+	Game->GameData.Arena.At(Position, field);
+	if (field)
+		field->Bomb.State = BOMB_EXPLODING;
+}
+
+void TClient::ServerBombExploded(const TFieldPosition& Position)
+{
+	TField* field;
+	Game->GameData.Arena.At(Position, field);
+	if (field)
+		field->Bomb.State = BOMB_NONE;
+}
+
 void TClient::Connect(const std::string& ServerAddress, unsigned int ServerPort)
 {
-	Disconnect(); // just in case
+	DisconnectInternal(); // just in case
+
+	ConnectionStatus = CLIENT_CONNECTING;
 
 	Socket.setBlocking(false);
 	Socket.connect(ServerAddress, ServerPort);
@@ -304,5 +409,167 @@ void TClient::Connect(const std::string& ServerAddress, unsigned int ServerPort)
 
 void TClient::Disconnect()
 {
+	DisconnectInternal();
+	DisconnectedFromServer();
+}
+
+void TClient::DisconnectInternal() 
+{
 	Socket.disconnect();
+	ConnectionStatus = CLIENT_IDLE;
+}
+
+void TClient::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet)
+{
+	uint16_t cmd;
+
+	if (!(Packet >> cmd))
+		return;
+
+	uint8_t u8_1, u8_2, u8_3;
+	uint16_t u16_1;
+	float f_1, f_2;
+	std::string s_1;
+
+	if (cmd == CLN_CommandFailed)
+	{
+		uint16_t failedCmd;
+		if (Packet >> failedCmd)
+		{
+			switch (failedCmd)
+			{
+				case SRV_Connect:
+					Disconnect();
+					break;
+			};
+		}
+		return;
+	}
+	
+	switch (cmd)
+	{
+		case CLN_Connected:
+			break;
+		case CLN_Disconnected:
+			DisconnectInternal();
+			DisconnectedFromServer();
+			break;
+
+		case CLN_LobbyCreated:
+			ServerLobbyCreated();
+			break;
+		case CLN_LobbyClosed:
+			ServerLobbyClosed();
+			break;
+		case CLN_EnteredLobby:
+			if (Packet >> s_1)
+				ServerEnteredLobby(s_1);
+			break;
+
+		case CLN_PlayerAdded:
+			if (Packet >> u8_1 >> s_1)
+				ServerPlayerAdded(u8_1, s_1);
+			break;
+		case CLN_PlayerRemoved: 
+			if (Packet >> u8_1)
+				ServerPlayerRemoved(u8_1);
+			break;
+		case CLN_PlayerIsReady: 
+			break;
+		case CLN_PlayerNameChanged: 
+			if (Packet >> u8_1 >> s_1)
+				ServerPlayerNameChanged(u8_1, s_1);
+			break;
+		
+		case CLN_GameNameChanged:
+			if (Packet >> s_1)
+				ServerGameNameChanged(s_1);
+			break;
+		case CLN_NumRoundsChanged: 
+			if (Packet >> u8_1)
+				ServerNumRoundsChanged(u8_1);
+			break;
+		case CLN_ArenaChanged: 
+			if (Packet >> s_1)
+				ServerArenaChanged(s_1);
+			break;
+		case CLN_ArenaList: 
+			break;
+		
+		case CLN_MatchStarted:
+			if (Packet >> u8_1)
+			{
+				ServerNumRoundsChanged(u8_1);
+				ServerMatchStarted();
+			}
+			break;
+		case CLN_RoundStarting:
+			ServerRoundStarting();
+			break;
+		case CLN_RoundStarted:
+			ServerRoundStarted();
+			break;
+		case CLN_RoundEnded: 
+			ServerRoundEnded();
+			break;
+
+		case CLN_PlayerMovement:
+			if (Packet >> u8_1 >> u8_2 >> f_1 >> f_2)
+			{
+				ServerPlayerDirectionChanged(u8_1, u8_2 & DIRECTION_LEFT, u8_2 & DIRECTION_RIGHT, u8_2 & DIRECTION_UP, u8_2 & DIRECTION_DOWN);
+				ServerPlayerPositionChanged(u8_1, f_1, f_2);
+			}
+			break;
+
+		case CLN_BombDropped: 
+			if (Packet >> u8_1 >> u8_2 >> u8_3 >> u16_1)
+			{
+				TFieldPosition p{u8_2, u8_3};
+				ServerPlayerDroppedBomb(u8_1, p, u16_1);
+			}
+			break;
+		case CLN_BombExploding:
+			if (Packet >> u8_1 >> u8_2)
+			{
+				TFieldPosition position{u8_1, u8_2};
+				ServerBombExploding(position);
+			}
+			break;
+		case CLN_BombExploded:
+			if (Packet >> u8_1 >> u8_2)
+			{
+				TFieldPosition position{u8_1, u8_2};
+				ServerBombExploded(position);
+			}
+			break;
+		case CLN_PlayerDying: 
+			break;
+		case CLN_PlayerDied: 
+			break;
+	};
+}
+
+void TClient::ConnectedToServer()
+{
+	sf::Packet packet;
+	packet << SRV_Connect << SERVER_VERSION;
+	Socket.send(packet);
+
+	if (Listener)
+		Listener->ClientConnected();
+}
+
+void TClient::DisconnectedFromServer()
+{
+	if (Listener)
+		Listener->ClientDisconnected();
+}
+
+void TClient::ServerPlayerPositionChanged(uint8_t Slot, float X, float Y)
+{
+	if (Slot >= 0 && Slot < MAX_NUM_SLOTS)
+	{
+		Game->GameData.Players[Slot].Position.X = X;
+		Game->GameData.Players[Slot].Position.Y = Y;
+	}
 }

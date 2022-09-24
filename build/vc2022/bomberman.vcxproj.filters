@@ -65,5 +65,6 @@
     <ClInclude Include="..\..\src\utility\stringutil.h">
       <Filter>source\utility</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\comms.h" />
   </ItemGroup>
 </Project>

@@ -334,6 +334,11 @@ void TGameLogic::UpdateBombs(TGameTime Delta)
 				{
 					field->Bomb.State = BOMB_NONE;
 					field->Bomb.DroppedByPlayer = INVALID_SLOT;
+					if (Listener)
+					{
+						TFieldPosition position{x, y};
+						Listener->LogicBombExploded(position);
+					}
 				}
 				else
 					field->Bomb.TimeUntilNextState -= Delta;
@@ -357,6 +362,9 @@ void TGameLogic::ExplodeBomb(uint8_t X, uint8_t Y)
 	field->Bomb.State = BOMB_EXPLODING;
 	field->Bomb.TimeUntilNextState = 600; // explode for 0.6 seconds
 
+	if (Listener)
+		Listener->LogicBombExploding(field->Position);
+
 	bool stopLeft = false, stopRight = false, stopUp = false, stopDown = false;
 
 	for (int i = 1; i <= field->Bomb.Range; i++)
@@ -370,7 +378,6 @@ void TGameLogic::ExplodeBomb(uint8_t X, uint8_t Y)
 		if (!stopDown)
 			ExplodeField(X, Y + i, field->Bomb, stopDown);
 	}
-
 }
 
 void TGameLogic::ExplodeField(uint8_t X, uint8_t Y, const TBomb& OriginalBomb, bool& Stop)
@@ -403,6 +410,9 @@ void TGameLogic::ExplodeField(uint8_t X, uint8_t Y, const TBomb& OriginalBomb, b
 	}
 	field->Bomb = OriginalBomb;
 	field->Bomb.DroppedByPlayer = INVALID_SLOT;
+
+	if (Listener)
+		Listener->LogicBombExploding(field->Position);
 }
 
 void TGameLogic::CheckForExplodedPlayers()
@@ -435,6 +445,9 @@ void TGameLogic::CheckForExplodedPlayers()
 			p->State = PLAYER_DYING;
 			p->TimeUntilNextState = 1000;
 			p->TimeOfDeath = Data->CurrentTime;
+
+			if (Listener)
+				Listener->LogicPlayerDying(idx);
 		}
 	}
 }
@@ -452,7 +465,11 @@ void TGameLogic::UpdateDyingPlayers(TGameTime Delta)
 		if (p->State == PLAYER_DYING)
 		{
 			if (p->TimeUntilNextState <= Delta)
+			{
 				p->State = PLAYER_DEAD;
+				if (Listener)
+					Listener->LogicPlayerDied(idx);
+			}
 			else
 				p->TimeUntilNextState -= Delta;
 		}

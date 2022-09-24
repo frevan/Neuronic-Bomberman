@@ -1,6 +1,7 @@
 #include "lobbyview.h"
 
-#include <iomanip> 
+#include <iomanip>
+#include <stdexcept>
 #include <TGUI/TGUI.hpp>
 
 #include "../actions.h"
@@ -10,7 +11,7 @@ TLobbyView::TLobbyView(TGame* SetGame, tgui::Gui* SetGUI)
 	NumRoundsEdit(nullptr),
 	MapCombo(nullptr),
 	Maps(),
-	SettingGameName(0),
+	SettingGameData(0),
 	SelectedSlot(0)
 {
 }
@@ -98,6 +99,7 @@ void TLobbyView::CreateWidgets()
 	NumRoundsEdit->setSize(180, 20);
 	NumRoundsEdit->setInputValidator(tgui::EditBox::Validator::UInt);
 	NumRoundsEdit->setText(std::to_string(Game->GameData.MaxRounds));
+	NumRoundsEdit->connect("TextChanged", &TLobbyView::OnNumRoundsEditTextEntered, this);
 }
 
 void TLobbyView::OnBackBtnClick()
@@ -183,9 +185,11 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 
 void TLobbyView::StateChanged()
 {
-	SettingGameName++;
+	SettingGameData++;
 	GameNameEdit->setText(Game->GameData.GameName);
-	SettingGameName--;
+	std::string s = std::to_string(Game->GameData.MaxRounds);
+	NumRoundsEdit->setText(s);
+	SettingGameData--;
 }
 
 void TLobbyView::FillMapCombo()
@@ -289,8 +293,9 @@ void TLobbyView::OnMapComboItemSelected(int ItemIndex)
 
 void TLobbyView::StartMatchNow()
 {
-	std::string s = NumRoundsEdit->getText();
-	int rounds = std::stoi(s);
+	int rounds;
+	if (!GetNumRoundsFromEdit(rounds))
+		rounds = 1;
 
 	Game->Client->SetNumRounds(rounds);
 	Game->Client->SelectArena(MapCombo->getSelectedItemIndex());
@@ -298,10 +303,52 @@ void TLobbyView::StartMatchNow()
 	Game->SwitchToState(STATE_MATCH);
 }
 
+bool TLobbyView::GetNumRoundsFromEdit(int& Value)
+{
+	bool result = false;
+
+	int rounds = Value;
+
+	std::string s = NumRoundsEdit->getText();
+	if (!s.empty())
+	{
+		try 
+		{
+			rounds = std::stoi(s);
+
+			if (rounds <= 0)
+				rounds = 1;
+			if (rounds > MAX_NUM_ROUNDS)
+				rounds = MAX_NUM_ROUNDS;
+
+			result = true;
+		}
+		catch (const std::invalid_argument&)
+		{
+			result = false;
+		}
+	}
+
+	if (result)
+		Value = rounds;
+
+	return result;
+}
+
 void TLobbyView::OnGameNameEditTextEntered(const std::string& Text)
 {
-	if (SettingGameName == 0)
+	if (SettingGameData == 0)
 		Game->Client->SetGameName(Text);
+}
+
+void TLobbyView::OnNumRoundsEditTextEntered(const std::string& Text)
+{
+	if (SettingGameData == 0)
+	{
+		int rounds = 1;
+		if (GetNumRoundsFromEdit(rounds))
+			Game->Client->SetNumRounds(rounds);
+	}
 }
 
 void TLobbyView::OnAddPlayerBtnClick()

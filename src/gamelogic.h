@@ -5,6 +5,10 @@
 class TLogicListener
 {
 public:
+	virtual void LogicBombExploding(const TFieldPosition& FieldPosition) = 0;
+	virtual void LogicBombExploded(const TFieldPosition& FieldPosition) = 0;
+	virtual void LogicPlayerDying(uint8_t Slot) = 0;
+	virtual void LogicPlayerDied(uint8_t Slot) = 0;
 	virtual void LogicRoundEnded() = 0;
 };
 

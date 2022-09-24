@@ -12,7 +12,7 @@ private:
 	std::vector<TArena> Maps;
 	int SelectedSlot;
 
-	int SettingGameName;
+	int SettingGameData;
 
 	void OnBackBtnClick();
 	void OnStartBtnClick();
@@ -21,6 +21,7 @@ private:
 	void OnAddPlayerBtnClick();
 	void OnRemovePlayerBtnClick();
 	void OnRemapPlayerControlsBtnClick();
+	void OnNumRoundsEditTextEntered(const std::string& Text);
 	
 	void FillMapCombo();
 	void DoAddPlayer();
@@ -31,6 +32,8 @@ private:
 
 	const std::string CreatePlayerShortcutString(int Slot);
 	const std::string ControlToString(TInputControl::TPacked Control);
+
+	bool GetNumRoundsFromEdit(int& Value);
 
 protected:
 	void CreateWidgets() override;

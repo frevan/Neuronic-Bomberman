@@ -50,13 +50,22 @@ typedef struct
 class TClient: public TServerListener
 {
 private:
+	int ConnectionStatus;
 	TGame* Game;
 	sf::TcpSocket Socket;
 	std::queue<TClientCommand> Commands;
+	void ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet);
+	void ConnectedToServer();
+	void DisconnectedFromServer();
+	void DisconnectInternal();
+	void ServerPlayerPositionChanged(uint8_t Slot, float X, float Y);
+	void ServerBombExploding(const TFieldPosition& Position);
+	void ServerBombExploded(const TFieldPosition& Position);
 public:
 	TClientListener* Listener;
 
 	TClient(TGame* SetGame);
+	~TClient();
 
 	void Process(TGameTime Delta);
 
@@ -99,6 +108,6 @@ public:
 	void ServerRoundStarted() override;
 	void ServerRoundEnded() override;
 	void ServerPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down) override;
-	void ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position) override;
+	void ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, uint16_t TimeUntilExplosion) override;
 	void ServerFullUpdate(TGameData* Data) override;
 };

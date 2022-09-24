@@ -8,6 +8,8 @@
 #include <mutex>
 #include <SFML/Network.hpp>
 
+const int SERVER_PORT = 45091;
+
 class TServerListener
 {
 public:
@@ -31,7 +33,7 @@ public:
 	virtual void ServerRoundEnded() = 0;
 
 	virtual void ServerPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down) = 0;
-	virtual void ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position) = 0;
+	virtual void ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, uint16_t TimeUntilExplosion) = 0;
 
 	virtual void ServerFullUpdate(TGameData* Data) = 0;
 };
@@ -67,8 +69,25 @@ private:
 	std::list<TClientSocket*> ClientSockets;
 	std::mutex ClientSocketsMutex;
 
+	TClientSocket* FindSocketForConnection(intptr_t ConnectionID);
+
+	// network
 	void ListenToNetwork();
 	void CheckForDisconnectedSockets();
+	void ProcessReceivedPacket(intptr_t ConnectionID, sf::Packet& Packet);
+	void SendErrorResponse(TClientSocket* Socket, uint16_t FailedCommand);
+	bool SendPacketToSocket(TClientSocket* Socket, sf::Packet& Packet);
+	void SendPacketToAllClients(sf::Packet& Packet);
+	// process received network communication
+	bool ProcessConnectionRequest(intptr_t ConnectionID, uint32_t ClientVersion);
+	bool ProcessCreateLobby(intptr_t ConnectionID, const std::string& GameName);
+	bool ProcessAddPlayer(intptr_t ConnectionID, uint8_t Slot, const std::string& PlayerName);
+	bool ProcessRemovePlayer(intptr_t ConnectionID, uint8_t Slot);
+	bool ProcessSetPlayerName(intptr_t ConnectionID, uint8_t Slot, const std::string& PlayerName);
+	bool ProcessSetGameName(intptr_t ConnectionID, const std::string& GameName);
+	bool ProcessSetNumRounds(intptr_t ConnectionID, uint8_t NumRounds);
+	bool ProcessSetArena(intptr_t ConnectionID, const std::string& ArenaName);
+	bool ProcessUpdatePlayerMovement(intptr_t ConnectionID, uint8_t Slot, uint8_t Direction);
 
 	void DoLobbyCreated(intptr_t ConnectionID);
 	void DoLobbyClosed();
@@ -86,8 +105,10 @@ private:
 	void DoRoundStarted();
 	void DoRoundEnded();
 	void DoPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
-	void DoPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position);
-	void DoFullUpdate(TGameData* Data);
+	void DoPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, uint16_t TimeUntilExplosion);
+	void DoFullUpdate(TGameTime Delta);
+
+	void SendPlayerPositionsToAllClients();
 	
 public:
 	TServer(TServerListener* SetListener);
@@ -98,14 +119,14 @@ public:
 	void Start(); // activate the server
 	void Stop(); // deactivate the server
 
-	bool OpenLobby(); // create a lobby for a new game
+	bool OpenLobby(intptr_t ConnectionID); // create a lobby for a new game, owned by ConnectionID
 	void CloseLobby(); // close the lobby
 
 	bool StartMatch(); // start the first round of the match	
 	bool StartRound(); // start a new round when the previous one has ended
 	bool EndRound(); // end the current round
 
-	void SetGameName(const std::string& SetName); // change the game's name
+	bool SetGameName(const std::string& SetName); // change the game's name
 	uint8_t AddPlayer(const std::string& PlayerName, uint8_t Slot = INVALID_SLOT); // add a player to the current game
 	bool RemovePlayer(uint8_t Slot); // remove a player from the current game
 	bool SetPlayerName(int Slot, const std::string& Name); // change a player's name
@@ -113,10 +134,14 @@ public:
 	int SetNumRounds(int Value); // set the number of rounds to be played
 
 	void SetPlayerDirections(uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
-	void DropBomb(uint8_t Slot);
+	bool DropBomb(uint8_t Slot);
 
 	void Process(TGameTime Delta);
 
 	// inherited from TLogicListener
+	void LogicBombExploding(const TFieldPosition& FieldPosition) override;
+	void LogicBombExploded(const TFieldPosition& FieldPosition) override;
+	void LogicPlayerDying(uint8_t Slot) override;
+	void LogicPlayerDied(uint8_t Slot) override;
 	void LogicRoundEnded() override; 
 };

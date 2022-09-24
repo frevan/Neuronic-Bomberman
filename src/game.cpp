@@ -96,11 +96,11 @@ bool TGame::Initialize(const std::string& filename)
 	Client->Listener = this;
 
 	// create server object
-	Server = new TServer(Client);
+	Server = new TServer(nullptr);
 	Server->LoadMaps(AppPath + GetMapSubPath());
 
 	// create the logic object
-	Logic = new TGameLogic(&GameData, this);
+	Logic = new TGameLogic(&GameData, nullptr);
 		
 	return true;
 }
@@ -570,6 +570,9 @@ void TGame::SetupCurrentState()
 {
 	if (CurrentState == STATE_LOBBY)
 	{
+		Server->Start();
+
+		Client->Connect("127.0.0.1", SERVER_PORT);
 		Client->CreateGame("Don't Explode");
 
 		InputMap.DefineInput(actionLobbyPrevMap, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Left, 0));
@@ -629,11 +632,6 @@ void TGame::ClientRoundEnded()
 {
 	//CurrentStateView->StateChanged();
 	SwitchToState(STATE_ENDOFROUND);
-}
-
-void TGame::LogicRoundEnded()
-{
-	//SwitchToState(STATE_ENDOFROUND);
 }
 
 void TGame::ClientGameOptionsChanged()
