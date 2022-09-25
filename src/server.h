@@ -107,6 +107,7 @@ private:
 	void DoPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
 	void DoPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, uint16_t TimeUntilExplosion);
 	void DoFullUpdate(TGameTime Delta);
+	void DoArenaUpdate(TGameTime Delta);
 
 	void SendPlayerPositionsToAllClients();
 	

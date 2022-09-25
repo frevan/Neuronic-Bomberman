@@ -59,8 +59,11 @@ private:
 	void DisconnectedFromServer();
 	void DisconnectInternal();
 	void ServerPlayerPositionChanged(uint8_t Slot, float X, float Y);
-	void ServerBombExploding(const TFieldPosition& Position);
+	void ServerBombExploding(const TFieldPosition& Position, TGameTime TimeUntilExploded);
 	void ServerBombExploded(const TFieldPosition& Position);
+	void ServerPlayerDying(uint8_t Slot, uint16_t TimeUntilDeath);
+	void ServerPlayerDied(uint8_t Slot);
+	void ServerArenaInfo(uint8_t Width, uint8_t Height, sf::Packet& Packet);
 public:
 	TClientListener* Listener;
 

@@ -381,12 +381,19 @@ void TClient::ServerFullUpdate(TGameData* Data)
 	Game->GameData.UpdateGameFrom(Data);
 }
 
-void TClient::ServerBombExploding(const TFieldPosition& Position)
+void TClient::ServerBombExploding(const TFieldPosition& Position, TGameTime TimeUntilExploded)
 {
 	TField* field;
 	Game->GameData.Arena.At(Position, field);
 	if (field)
+	{
+		uint8_t slot = field->Bomb.DroppedByPlayer;
+		if (slot < MAX_NUM_SLOTS)
+			Game->GameData.Players[slot].ActiveBombs--;
+
 		field->Bomb.State = BOMB_EXPLODING;
+		field->Bomb.TimeUntilNextState = TimeUntilExploded;
+	}
 }
 
 void TClient::ServerBombExploded(const TFieldPosition& Position)
@@ -395,6 +402,25 @@ void TClient::ServerBombExploded(const TFieldPosition& Position)
 	Game->GameData.Arena.At(Position, field);
 	if (field)
 		field->Bomb.State = BOMB_NONE;
+}
+
+void TClient::ServerPlayerDying(uint8_t Slot, uint16_t TimeUntilDeath)
+{
+	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
+		return;
+
+	TPlayer* p = &(Game->GameData.Players[Slot]);
+	p->State = PLAYER_DYING;
+	p->TimeUntilNextState = TimeUntilDeath;
+}
+
+void TClient::ServerPlayerDied(uint8_t Slot)
+{
+	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
+		return;
+
+	TPlayer* p = &(Game->GameData.Players[Slot]);
+	p->State = PLAYER_DEAD;
 }
 
 void TClient::Connect(const std::string& ServerAddress, unsigned int ServerPort)
@@ -529,10 +555,10 @@ void TClient::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet)
 			}
 			break;
 		case CLN_BombExploding:
-			if (Packet >> u8_1 >> u8_2)
+			if (Packet >> u8_1 >> u8_2 >> u16_1)
 			{
 				TFieldPosition position{u8_1, u8_2};
-				ServerBombExploding(position);
+				ServerBombExploding(position, u16_1);
 			}
 			break;
 		case CLN_BombExploded:
@@ -542,9 +568,18 @@ void TClient::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet)
 				ServerBombExploded(position);
 			}
 			break;
-		case CLN_PlayerDying: 
+		case CLN_PlayerDying:
+			if (Packet >> u8_1 >> u16_1)
+				ServerPlayerDying(u8_1, u16_1);
 			break;
 		case CLN_PlayerDied: 
+			if (Packet >> u8_1)
+				ServerPlayerDied(u8_1);
+			break;
+
+		case CLN_ArenaInfo:
+			if (Packet >> u8_1 >> u8_2)
+				ServerArenaInfo(u8_1, u8_2, Packet);
 			break;
 	};
 }
@@ -572,4 +607,22 @@ void TClient::ServerPlayerPositionChanged(uint8_t Slot, float X, float Y)
 		Game->GameData.Players[Slot].Position.X = X;
 		Game->GameData.Players[Slot].Position.Y = Y;
 	}
+}
+
+void TClient::ServerArenaInfo(uint8_t Width, uint8_t Height, sf::Packet& Packet)
+{
+	if (Width < 0 || Height < 0)
+		return;
+
+	uint8_t type;
+	TField* field = nullptr;
+	for (uint8_t y = 0; y < Height; y++)
+		for (uint8_t x = 0; x < Width; x++)
+		{
+			if (!(Packet >> type))
+				break;
+
+			Game->GameData.Arena.At(x, y, field);
+			field->Type = type;
+		}
 }

@@ -252,12 +252,18 @@ void TServer::Process(TGameTime Delta)
 
 void TServer::LogicBombExploding(const TFieldPosition& FieldPosition)
 {
-	uint8_t x = FieldPosition.X;
-	uint8_t y = FieldPosition.Y;
+	TField* field = nullptr;
+	Data.Arena.At(FieldPosition, field);
+	if (field)
+	{
+		uint8_t x = FieldPosition.X;
+		uint8_t y = FieldPosition.Y;
+		uint16_t time = field->Bomb.TimeUntilNextState;
 
-	sf::Packet packet;
-	packet << CLN_BombExploding << x << y;
-	SendPacketToAllClients(packet);
+		sf::Packet packet;
+		packet << CLN_BombExploding << x << y << time;
+		SendPacketToAllClients(packet);
+	}
 }
 
 void TServer::LogicBombExploded(const TFieldPosition& FieldPosition)
@@ -272,10 +278,18 @@ void TServer::LogicBombExploded(const TFieldPosition& FieldPosition)
 
 void TServer::LogicPlayerDying(uint8_t Slot)
 {
+	uint16_t time = Data.Players[Slot].TimeUntilNextState;
+
+	sf::Packet packet;
+	packet << CLN_PlayerDying << Slot << time;
+	SendPacketToAllClients(packet);
 }
 
 void TServer::LogicPlayerDied(uint8_t Slot)
 {
+	sf::Packet packet;
+	packet << CLN_PlayerDied << Slot;
+	SendPacketToAllClients(packet);
 }
 
 void TServer::LogicRoundEnded()
@@ -625,7 +639,30 @@ void TServer::DoFullUpdate(TGameTime Delta)
 	if (Listener)
 		Listener->ServerFullUpdate(&Data);
 
+	DoArenaUpdate(Delta);
 	SendPlayerPositionsToAllClients();
+}
+
+void TServer::DoArenaUpdate(TGameTime Delta)
+{
+	sf::Packet packet;
+
+	packet << CLN_ArenaInfo;
+
+	uint8_t width = (uint8_t)Data.Arena.Width;
+	uint8_t height = (uint8_t)Data.Arena.Height;
+	packet << width << height;
+
+	TField field{};
+	uint8_t fieldType;
+	for (int y = 0; y < height; y++)
+		for (int x = 0; x < width; x++)
+		{
+			fieldType = Data.Arena.At(x, y).Type;
+			packet << fieldType;
+		}
+
+	SendPacketToAllClients(packet);
 }
 
 void TServer::ProcessReceivedPacket(intptr_t ConnectionID, sf::Packet& Packet)
