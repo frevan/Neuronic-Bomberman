@@ -99,7 +99,7 @@ void TLobbyView::CreateWidgets()
 	NumRoundsEdit->setSize(180, 20);
 	NumRoundsEdit->setInputValidator(tgui::EditBox::Validator::UInt);
 	NumRoundsEdit->setText(std::to_string(Game->GameData.MaxRounds));
-	NumRoundsEdit->connect("TextChanged", &TLobbyView::OnNumRoundsEditTextEntered, this);
+	NumRoundsEdit->connect("ReturnKeyPressed", &TLobbyView::OnNumRoundsEditReturnKeyPressed, this);
 }
 
 void TLobbyView::OnBackBtnClick()
@@ -341,7 +341,7 @@ void TLobbyView::OnGameNameEditTextEntered(const std::string& Text)
 		Game->Client->SetGameName(Text);
 }
 
-void TLobbyView::OnNumRoundsEditTextEntered(const std::string& Text)
+void TLobbyView::OnNumRoundsEditReturnKeyPressed(const std::string& Text)
 {
 	if (SettingGameData == 0)
 	{

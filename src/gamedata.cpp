@@ -414,12 +414,12 @@ bool TGameData::RemovePlayer(int Slot)
 void TGameData::InitNewGame()
 {
 	CurrentTime = 0;
-	CurrentRound = -1;
+	CurrentRound = 0;
 
 	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
 		Players[idx].RoundsWon = 0;
 
-	InitNewRound();
+	//InitNewRound();
 }
 
 void TGameData::InitNewRound()

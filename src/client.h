@@ -14,7 +14,7 @@ public:
 	virtual void ClientPlayerAdded(int Slot) = 0;
 	virtual void ClientPlayerNotAdded(int Slot) = 0;
 	virtual void ClientPlayerRemoved(int Slot) = 0;
-	virtual void ClientPlayerNameChanged(int Slot) = 0;
+	virtual void ClientPlayerInfoChanged(int Slot) = 0;
 
 	virtual void ClientMatchStarting() = 0;
 	virtual void ClientMatchStarted() = 0;
@@ -64,6 +64,7 @@ private:
 	void ServerPlayerDying(uint8_t Slot, uint16_t TimeUntilDeath);
 	void ServerPlayerDied(uint8_t Slot);
 	void ServerArenaInfo(uint8_t Width, uint8_t Height, sf::Packet& Packet);
+	void ServerPlayerScore(uint8_t Slot, uint8_t Score);
 public:
 	TClientListener* Listener;
 

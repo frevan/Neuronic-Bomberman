@@ -21,7 +21,7 @@ private:
 	void OnAddPlayerBtnClick();
 	void OnRemovePlayerBtnClick();
 	void OnRemapPlayerControlsBtnClick();
-	void OnNumRoundsEditTextEntered(const std::string& Text);
+	void OnNumRoundsEditReturnKeyPressed(const std::string& Text);
 	
 	void FillMapCombo();
 	void DoAddPlayer();

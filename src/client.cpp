@@ -337,7 +337,7 @@ void TClient::ServerPlayerNameChanged(uint8_t Slot, const std::string& PlayerNam
 
 	Game->GameData.SetPlayerName(Slot, PlayerName);
 	if (Listener)
-		Listener->ClientPlayerNameChanged(Slot);
+		Listener->ClientPlayerInfoChanged(Slot);
 }
 
 void TClient::ServerPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down)
@@ -459,7 +459,7 @@ void TClient::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet)
 
 	if (cmd == CLN_CommandFailed)
 	{
-		uint16_t failedCmd;
+		TCommand failedCmd;
 		if (Packet >> failedCmd)
 		{
 			switch (failedCmd)
@@ -576,6 +576,10 @@ void TClient::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet)
 			if (Packet >> u8_1)
 				ServerPlayerDied(u8_1);
 			break;
+		case CLN_PlayerScore:
+			if (Packet >> u8_1 >> u8_2)
+				ServerPlayerScore(u8_1, u8_2);
+			break;
 
 		case CLN_ArenaInfo:
 			if (Packet >> u8_1 >> u8_2)
@@ -625,4 +629,15 @@ void TClient::ServerArenaInfo(uint8_t Width, uint8_t Height, sf::Packet& Packet)
 			Game->GameData.Arena.At(x, y, field);
 			field->Type = type;
 		}
+}
+
+void TClient::ServerPlayerScore(uint8_t Slot, uint8_t Score)
+{
+	if (Slot >= MAX_NUM_SLOTS)
+		return;
+
+	Game->GameData.Players[Slot].RoundsWon = Score;
+
+	if (Listener)
+		Listener->ClientPlayerInfoChanged(Slot);
 }

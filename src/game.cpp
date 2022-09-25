@@ -424,7 +424,7 @@ void TGame::ClientPlayerRemoved(int Slot)
 	CurrentStateView->StateChanged();
 }
 
-void TGame::ClientPlayerNameChanged(int Slot)
+void TGame::ClientPlayerInfoChanged(int Slot)
 {
 	CurrentStateView->StateChanged();
 }

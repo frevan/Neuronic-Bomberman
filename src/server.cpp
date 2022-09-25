@@ -32,6 +32,9 @@ void TServer::LoadMaps(const std::string& Path)
 
 void TServer::Start()
 {
+	if (State != INACTIVE)
+		Stop();
+
 	Data.Reset();
 	Data.Status = GAME_NONE;
 
@@ -97,7 +100,10 @@ void TServer::CloseLobby()
 bool TServer::StartMatch()
 {
 	State = PLAYING;
+
 	Data.Status = GAME_MATCHSTARTED;
+	Data.InitNewGame();
+
 	DoMatchStarted();
 
 	StartRound();
@@ -300,6 +306,8 @@ void TServer::LogicRoundEnded()
 	{
 		Data.Status = GAME_MATCHENDED;
 		DoMatchEnded();
+
+		State = RUNNING;
 	}
 }
 
@@ -603,6 +611,19 @@ void TServer::DoRoundEnded()
 	sf::Packet packet;
 	packet << CLN_RoundEnded;
 	SendPacketToAllClients(packet);
+
+	for (uint8_t slot = 0; slot < MAX_NUM_SLOTS; slot++)
+	{
+		TPlayer* p = &Data.Players[slot];
+		if (p->State == PLAYER_NOTPLAYING)
+			continue;
+
+		uint8_t score = p->RoundsWon;
+		
+		packet.clear();
+		packet << CLN_PlayerScore << slot << score;
+		SendPacketToAllClients(packet);
+	}
 }
 
 void TServer::DoPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down)
@@ -673,14 +694,14 @@ void TServer::ProcessReceivedPacket(intptr_t ConnectionID, sf::Packet& Packet)
 
 	bool success = false;
 	uint8_t u8_1, u8_2;
-	uint32_t u32_1;
 	std::string s_1;
 
 	switch (cmd)
 	{
 		case SRV_Connect:
-			if (Packet >> u32_1)
-				success = ProcessConnectionRequest(ConnectionID, u32_1);
+			TProtocolVersion version;
+			if (Packet >> version)
+				success = ProcessConnectionRequest(ConnectionID, version);
 			break;
 
 		case SRV_CreateLobby: 

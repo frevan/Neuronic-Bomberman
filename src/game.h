@@ -106,7 +106,7 @@ public:
 	void ClientPlayerAdded(int Slot) override;
 	void ClientPlayerNotAdded(int Slot) override;
 	void ClientPlayerRemoved(int Slot) override;
-	void ClientPlayerNameChanged(int Slot) override;
+	void ClientPlayerInfoChanged(int Slot) override;
 	void ClientMatchStarting() override;
 	void ClientMatchStarted() override;
 	void ClientRoundStarted() override;
