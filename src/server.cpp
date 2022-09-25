@@ -47,6 +47,9 @@ void TServer::Start()
 
 void TServer::Stop()
 {
+	if (State == INLOBBY || State == PLAYING)
+		CloseLobby();
+
 	ThreadsShouldStop = true;
 	if (NetworkListenerThread)
 	{
@@ -141,9 +144,9 @@ bool TServer::SetGameName(const std::string& SetName)
 	return true;
 }
 
-uint8_t TServer::AddPlayer(const std::string& PlayerName, uint8_t Slot)
+bool TServer::AddPlayer(const std::string& PlayerName, uint8_t Slot)
 {
-	uint8_t result = MAX_NUM_SLOTS;
+	bool result = false;
 
 	// find a free slot if necessary
 	if (Slot >= MAX_NUM_SLOTS)
@@ -163,10 +166,10 @@ uint8_t TServer::AddPlayer(const std::string& PlayerName, uint8_t Slot)
 			Data.Players[Slot].State = PLAYER_ALIVE;
 			Data.Players[Slot].Name = PlayerName;
 
-			result = Slot;
+			result = true;
 		}
 
-	if (result < MAX_NUM_SLOTS)
+	if (result)
 		DoPlayerAdded(result, Data.Players[result].Name);
 
 	return result;
@@ -177,15 +180,17 @@ bool TServer::RemovePlayer(uint8_t Slot)
 	bool result = false;
 
 	if (Slot < MAX_NUM_SLOTS)
-		if (Data.Players[Slot].State != PLAYER_NOTPLAYING)
+	{
+		TPlayer* p = &Data.Players[Slot];
+		if (p->State != PLAYER_NOTPLAYING)
 		{
-			Data.Players[Slot].State = PLAYER_NOTPLAYING;
-
+			p->State = PLAYER_NOTPLAYING;
 			result = true;
 		}
 
-	if (result)
-		DoPlayerRemoved(Slot);
+		if (result)
+			DoPlayerRemoved(Slot);
+	}
 
 	return result;
 }
@@ -195,15 +200,18 @@ bool TServer::SetPlayerName(int Slot, const std::string& Name)
 	bool result = false;
 
 	if (Slot < MAX_NUM_SLOTS)
-		if (Data.Players[Slot].State != PLAYER_NOTPLAYING)
-		{
-			Data.Players[Slot].Name = Name;
+	{
+		TPlayer* p = &Data.Players[Slot];
 
+		if (p->State != PLAYER_NOTPLAYING)
+		{
+			p->Name = Name;
 			result = true;
 		}
 
-	if (result)
-		DoPlayerNameChanged(Slot, Data.Players[Slot].Name);
+		if (result)
+			DoPlayerNameChanged(Slot, p->Name);
+	}
 
 	return result;
 }
@@ -226,7 +234,7 @@ bool TServer::SelectArena(const std::string& ArenaName)
 	return result;
 }
 
-int TServer::SetNumRounds(int Value)
+bool TServer::SetNumRounds(int Value)
 {
 	if (Value < 1)
 		Value = 1;
@@ -237,7 +245,7 @@ int TServer::SetNumRounds(int Value)
 
 	DoNumRoundsChanged(Data.MaxRounds);		
 
-	return Data.MaxRounds;
+	return true;
 }
 
 void TServer::Process(TGameTime Delta)
@@ -479,7 +487,9 @@ void TServer::DoLobbyCreated(intptr_t ConnectionID)
 
 void TServer::DoLobbyClosed()
 {
-	// TODO
+	sf::Packet packet;
+	packet << CLN_LobbyClosed;
+	SendPacketToAllClients(packet);
 }
 
 void TServer::DoEnteredLobby(intptr_t ConnectionID, const std::string& GameName)
@@ -612,11 +622,11 @@ void TServer::DoPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, 
 
 void TServer::DoFullUpdate(TGameTime Delta)
 {
-	DoArenaUpdate(Delta);
-	SendPlayerPositionsToAllClients();
+	DoArenaUpdate();
+	DoPlayerPositionUpdate();
 }
 
-void TServer::DoArenaUpdate(TGameTime Delta)
+void TServer::DoArenaUpdate()
 {
 	sf::Packet packet;
 
@@ -658,7 +668,11 @@ void TServer::ProcessReceivedPacket(intptr_t ConnectionID, sf::Packet& Packet)
 
 		case SRV_CreateLobby: 
 			if (Packet >> s_1)
-				success = ProcessCreateLobby(ConnectionID, s_1);
+			{
+				success = OpenLobby(ConnectionID);
+				if (success)
+					SetGameName(s_1);
+			}
 			break;
 
 		case SRV_CloseLobby: 
@@ -666,29 +680,29 @@ void TServer::ProcessReceivedPacket(intptr_t ConnectionID, sf::Packet& Packet)
 
 		case SRV_AddPlayer: 
 			if (Packet >> u8_1 >> s_1)
-				success = ProcessAddPlayer(ConnectionID, u8_1, s_1);
+				success = AddPlayer(s_1, u8_1);
 			break;
 		case SRV_RemovePlayer:
 			if (Packet >> u8_1)
-				success = ProcessRemovePlayer(ConnectionID, u8_1);
+				success = RemovePlayer(u8_1);
 			break;
 		case SRV_SetPlayerReady: break;
 		case SRV_SetPlayerName: 
 			if (Packet >> u8_1 >> s_1)
-				success = ProcessSetPlayerName(ConnectionID, u8_1, s_1);
+				success = SetPlayerName(u8_1, s_1);
 			break;
 
 		case SRV_SetGameName: 
 			if (Packet >> s_1)
-				success = ProcessSetGameName(ConnectionID, s_1);
+				success = SetGameName(s_1);
 			break;
 		case SRV_SetNumRounds: 
 			if (Packet >> u8_1)
-				success = ProcessSetNumRounds(ConnectionID, u8_1);
+				success = SetNumRounds(u8_1);
 			break;
 		case SRV_SetArena:
 			if (Packet >> s_1)
-				success = ProcessSetArena(ConnectionID, s_1);
+				success = SelectArena(s_1);
 			break;
 
 		case SRV_StartMatch:
@@ -758,74 +772,6 @@ bool TServer::ProcessConnectionRequest(intptr_t ConnectionID, uint32_t ClientVer
 	return result;
 }
 
-bool TServer::ProcessCreateLobby(intptr_t ConnectionID, const std::string& GameName)
-{
-	bool result = false;
-
-	// TODO: don't create more than one lobby!
-
-	if (OpenLobby(ConnectionID))
-	{
-		result = true;
-		SetGameName(GameName);
-	}
-
-	return result;
-}
-
-bool TServer::ProcessAddPlayer(intptr_t ConnectionID, uint8_t Slot, const std::string& PlayerName)
-{
-	bool result = false;
-
-	if (AddPlayer(PlayerName, Slot))
-		result = true;
-
-	return result;
-}
-
-bool TServer::ProcessRemovePlayer(intptr_t ConnectionID, uint8_t Slot)
-{
-	bool result = false;
-
-	if (RemovePlayer(Slot))
-		result = true;
-
-	return result;
-}
-
-bool TServer::ProcessSetPlayerName(intptr_t ConnectionID, uint8_t Slot, const std::string& PlayerName)
-{
-	bool result = false;
-
-	if (SetPlayerName(Slot, PlayerName))
-		result = true;
-
-	return result;
-}
-
-bool TServer::ProcessSetGameName(intptr_t ConnectionID, const std::string& GameName)
-{
-	return SetGameName(GameName);
-}
-
-bool TServer::ProcessSetNumRounds(intptr_t ConnectionID, uint8_t NumRounds)
-{
-	bool result = false;
-
-	if (NumRounds >= 0 && NumRounds <= MAX_NUM_ROUNDS)
-	{
-		SetNumRounds(NumRounds);
-		result = true;
-	}
-
-	return result;
-}
-
-bool TServer::ProcessSetArena(intptr_t ConnectionID, const std::string& ArenaName)
-{
-	return SelectArena(ArenaName);
-}
-
 bool TServer::ProcessUpdatePlayerMovement(intptr_t ConnectionID, uint8_t Slot, uint8_t Direction)
 {
 	bool result = false;
@@ -845,7 +791,6 @@ bool TServer::ProcessUpdatePlayerMovement(intptr_t ConnectionID, uint8_t Slot, u
 	return result;
 }
 
-
 TClientSocket* TServer::FindSocketForConnection(intptr_t ConnectionID)
 {
 	TClientSocket* result = nullptr;
@@ -864,7 +809,7 @@ TClientSocket* TServer::FindSocketForConnection(intptr_t ConnectionID)
 	return result;
 }
 
-void TServer::SendPlayerPositionsToAllClients()
+void TServer::DoPlayerPositionUpdate()
 {
 	sf::Packet packet;
 

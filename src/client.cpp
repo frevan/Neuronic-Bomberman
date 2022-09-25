@@ -34,7 +34,6 @@ void TClient::CloseGame()
 
 	Game->GameData.Reset();
 
-	Game->Server->CloseLobby();
 	if (Listener)
 		Listener->ClientDisconnected();
 
