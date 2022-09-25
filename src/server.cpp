@@ -170,7 +170,7 @@ bool TServer::AddPlayer(const std::string& PlayerName, uint8_t Slot)
 		}
 
 	if (result)
-		DoPlayerAdded(result, Data.Players[result].Name);
+		DoPlayerAdded(Slot, Data.Players[Slot].Name);
 
 	return result;
 }
