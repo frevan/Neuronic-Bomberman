@@ -3,11 +3,10 @@
 #include <functional>
 #include "comms.h"
 
-TServer::TServer(TServerListener* SetListener)
+TServer::TServer()
 :	State(INACTIVE),
 	Data(),
 	Maps(),
-	Listener(SetListener),
 	NetworkListenerThread(nullptr),
 	NetworkListener(),
 	SocketSelector(),
@@ -469,9 +468,6 @@ void TServer::CheckForDisconnectedSockets()
 
 void TServer::DoLobbyCreated(intptr_t ConnectionID)
 {
-	if (Listener)
-		Listener->ServerLobbyCreated();
-
 	TClientSocket* socket = FindSocketForConnection(ConnectionID);
 	if (socket)
 	{
@@ -483,15 +479,11 @@ void TServer::DoLobbyCreated(intptr_t ConnectionID)
 
 void TServer::DoLobbyClosed()
 {
-	if (Listener)
-		Listener->ServerLobbyClosed();
+	// TODO
 }
 
 void TServer::DoEnteredLobby(intptr_t ConnectionID, const std::string& GameName)
 {
-	if (Listener)
-		Listener->ServerEnteredLobby(Data.GameName);
-
 	TClientSocket* socket = FindSocketForConnection(ConnectionID);
 	if (socket)
 	{
@@ -507,9 +499,6 @@ void TServer::DoLeftLobby(intptr_t ConnectionID)
 
 void TServer::DoGameNameChanged(const std::string& GameName)
 {
-	if (Listener)
-		Listener->ServerGameNameChanged(GameName);
-
 	sf::Packet packet;
 	packet << CLN_GameNameChanged << GameName;
 	SendPacketToAllClients(packet);
@@ -517,9 +506,6 @@ void TServer::DoGameNameChanged(const std::string& GameName)
 
 void TServer::DoArenaChanged(const std::string& ArenaName)
 {
-	if (Listener)
-		Listener->ServerArenaChanged(ArenaName);
-
 	sf::Packet packet;
 	packet << CLN_ArenaChanged << ArenaName;
 	SendPacketToAllClients(packet);
@@ -527,9 +513,6 @@ void TServer::DoArenaChanged(const std::string& ArenaName)
 
 void TServer::DoNumRoundsChanged(int NumRounds)
 {
-	if (Listener)
-		Listener->ServerNumRoundsChanged(Data.MaxRounds);
-
 	sf::Packet packet;
 	packet << CLN_NumRoundsChanged << Data.MaxRounds;
 	SendPacketToAllClients(packet);
@@ -537,9 +520,6 @@ void TServer::DoNumRoundsChanged(int NumRounds)
 
 void TServer::DoPlayerAdded(uint8_t Slot, const std::string& PlayerName)
 {
-	if (Listener)
-		Listener->ServerPlayerAdded(Slot, PlayerName);
-
 	sf::Packet packet;
 	packet << CLN_PlayerAdded << Slot << PlayerName;
 	SendPacketToAllClients(packet);
@@ -547,9 +527,6 @@ void TServer::DoPlayerAdded(uint8_t Slot, const std::string& PlayerName)
 
 void TServer::DoPlayerRemoved(uint8_t Slot)
 {
-	if (Listener)
-		Listener->ServerPlayerRemoved(Slot);
-
 	sf::Packet packet;
 	packet << CLN_PlayerRemoved << Slot;
 	SendPacketToAllClients(packet);
@@ -557,9 +534,6 @@ void TServer::DoPlayerRemoved(uint8_t Slot)
 
 void TServer::DoPlayerNameChanged(uint8_t Slot, const std::string& PlayerName)
 {
-	if (Listener)
-		Listener->ServerPlayerNameChanged(Slot, PlayerName);
-
 	sf::Packet packet;
 	packet << CLN_PlayerNameChanged << Slot << PlayerName;
 	SendPacketToAllClients(packet);
@@ -567,9 +541,6 @@ void TServer::DoPlayerNameChanged(uint8_t Slot, const std::string& PlayerName)
 
 void TServer::DoMatchStarted()
 {
-	if (Listener)
-		Listener->ServerMatchStarted();
-
 	uint8_t rounds = Data.MaxRounds;
 
 	sf::Packet packet;
@@ -579,15 +550,11 @@ void TServer::DoMatchStarted()
 
 void TServer::DoMatchEnded()
 {
-	if (Listener)
-		Listener->ServerMatchEnded();
+	// TODO
 }
 
 void TServer::DoRoundStarting()
 {
-	if (Listener)
-		Listener->ServerRoundStarting();
-
 	sf::Packet packet;
 	packet << CLN_RoundStarting;
 	SendPacketToAllClients(packet);
@@ -595,9 +562,6 @@ void TServer::DoRoundStarting()
 
 void TServer::DoRoundStarted()
 {
-	if (Listener)
-		Listener->ServerRoundStarted();
-
 	sf::Packet packet;
 	packet << CLN_RoundStarted;
 	SendPacketToAllClients(packet);
@@ -605,9 +569,6 @@ void TServer::DoRoundStarted()
 
 void TServer::DoRoundEnded()
 {
-	if (Listener)
-		Listener->ServerRoundEnded();
-
 	sf::Packet packet;
 	packet << CLN_RoundEnded;
 	SendPacketToAllClients(packet);
@@ -628,9 +589,6 @@ void TServer::DoRoundEnded()
 
 void TServer::DoPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down)
 {
-	if (Listener)
-		Listener->ServerPlayerDirectionChanged(Slot, Left, Right, Up, Down);
-
 	TPlayer* p = &Data.Players[Slot];
 
 	uint8_t direction = p->Direction;
@@ -644,9 +602,6 @@ void TServer::DoPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool
 
 void TServer::DoPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, uint16_t TimeUntilExplosion)
 {
-	if (Listener)
-		Listener->ServerPlayerDroppedBomb(Slot, Position, TimeUntilExplosion);
-
 	uint8_t x = Position.X;
 	uint8_t y = Position.Y;
 
@@ -657,9 +612,6 @@ void TServer::DoPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, 
 
 void TServer::DoFullUpdate(TGameTime Delta)
 {
-	if (Listener)
-		Listener->ServerFullUpdate(&Data);
-
 	DoArenaUpdate(Delta);
 	SendPlayerPositionsToAllClients();
 }

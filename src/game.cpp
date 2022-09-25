@@ -14,6 +14,7 @@
 #include "views/lobbyview.h"
 #include "views/matchview.h"
 #include "views/endofroundview.h"
+#include "comms.h"
 
 //#define FULLSCREEN
 #define FRAMERATE_LIMIT
@@ -96,7 +97,7 @@ bool TGame::Initialize(const std::string& filename)
 	Client->Listener = this;
 
 	// create server object
-	Server = new TServer(nullptr);
+	Server = new TServer();
 	Server->LoadMaps(AppPath + GetMapSubPath());
 
 	// create the logic object

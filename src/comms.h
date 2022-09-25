@@ -5,6 +5,7 @@
 typedef uint16_t TCommand;
 typedef uint32_t TProtocolVersion;
 
+const int SERVER_PORT = 45091;
 const TProtocolVersion SERVER_VERSION = 1;
 
 // server commands (sent by client)

@@ -47,7 +47,7 @@ typedef struct
 	std::string StrParam;
 } TClientCommand;
 
-class TClient: public TServerListener
+class TClient
 {
 private:
 	int ConnectionStatus;
@@ -96,22 +96,22 @@ public:
 	void DropBomb(uint8_t Slot);
 
 	// from TServerListener
-	void ServerLobbyCreated() override;
-	void ServerLobbyClosed() override;
-	void ServerEnteredLobby(const std::string& GameName) override;
-	void ServerLeftLobby() override;
-	void ServerGameNameChanged(const std::string& GameName) override;
-	void ServerArenaChanged(const std::string& ArenaName) override;
-	void ServerNumRoundsChanged(int NumRounds) override;
-	void ServerPlayerAdded(uint8_t Slot, const std::string& PlayerName) override;
-	void ServerPlayerRemoved(uint8_t Slot) override;
-	void ServerPlayerNameChanged(uint8_t Slot, const std::string& PlayerName) override;
-	void ServerMatchStarted() override;
-	void ServerMatchEnded() override;
-	void ServerRoundStarting() override;
-	void ServerRoundStarted() override;
-	void ServerRoundEnded() override;
-	void ServerPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down) override;
-	void ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, uint16_t TimeUntilExplosion) override;
-	void ServerFullUpdate(TGameData* Data) override;
+	void ServerLobbyCreated();
+	void ServerLobbyClosed();
+	void ServerEnteredLobby(const std::string& GameName);
+	void ServerLeftLobby();
+	void ServerGameNameChanged(const std::string& GameName);
+	void ServerArenaChanged(const std::string& ArenaName);
+	void ServerNumRoundsChanged(int NumRounds);
+	void ServerPlayerAdded(uint8_t Slot, const std::string& PlayerName);
+	void ServerPlayerRemoved(uint8_t Slot);
+	void ServerPlayerNameChanged(uint8_t Slot, const std::string& PlayerName);
+	void ServerMatchStarted();
+	void ServerMatchEnded();
+	void ServerRoundStarting();
+	void ServerRoundStarted();
+	void ServerRoundEnded();
+	void ServerPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
+	void ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, uint16_t TimeUntilExplosion);
+	void ServerFullUpdate(TGameData* Data);
 };

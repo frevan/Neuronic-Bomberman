@@ -8,36 +8,6 @@
 #include <mutex>
 #include <SFML/Network.hpp>
 
-const int SERVER_PORT = 45091;
-
-class TServerListener
-{
-public:
-	virtual void ServerLobbyCreated() = 0; // new lobby created
-	virtual void ServerLobbyClosed() = 0; // lobby closed
-	virtual void ServerEnteredLobby(const std::string& GameName) = 0; // client entered the lobby
-	virtual void ServerLeftLobby() = 0; // client left the lobby
-
-	virtual void ServerGameNameChanged(const std::string& GameName) = 0; 
-	virtual void ServerArenaChanged(const std::string& ArenaName) = 0;
-	virtual void ServerNumRoundsChanged(int NumRounds) = 0;
-
-	virtual void ServerPlayerAdded(uint8_t Slot, const std::string& PlayerName) = 0;
-	virtual void ServerPlayerRemoved(uint8_t Slot) = 0;
-	virtual void ServerPlayerNameChanged(uint8_t Slot, const std::string& PlayerName) = 0;
-
-	virtual void ServerMatchStarted() = 0;
-	virtual void ServerMatchEnded() = 0;
-	virtual void ServerRoundStarting() = 0;
-	virtual void ServerRoundStarted() = 0;
-	virtual void ServerRoundEnded() = 0;
-
-	virtual void ServerPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down) = 0;
-	virtual void ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, uint16_t TimeUntilExplosion) = 0;
-
-	virtual void ServerFullUpdate(TGameData* Data) = 0;
-};
-
 class TClientSocket : public sf::TcpSocket
 {
 public:
@@ -59,7 +29,6 @@ private:
 	TGameLogic* Logic;
 	TState State;
 	TMapList Maps;
-	TServerListener* Listener;
 
 	bool ThreadsShouldStop;
 
@@ -112,7 +81,7 @@ private:
 	void SendPlayerPositionsToAllClients();
 	
 public:
-	TServer(TServerListener* SetListener);
+	TServer();
 	~TServer();
 
 	void LoadMaps(const std::string& Path);
