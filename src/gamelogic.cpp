@@ -5,6 +5,8 @@
 const float SmallestDistanceConst = 0.000001f;
 const float CornerAnimationIncConst = 0.05f;
 
+// TGameLogic
+
 TGameLogic::TGameLogic(TGameData* SetData, TLogicListener* SetListener)
 :	Data(SetData),
 	Listener(SetListener)
@@ -530,4 +532,24 @@ TFieldPosition TGameLogic::CalculatePlayerField(TPlayer* Player)
 	pos.X = static_cast<int>(trunc(Player->Position.X));
 	pos.Y = static_cast<int>(trunc(Player->Position.Y));
 	return pos;
+}
+
+// TClientLogic
+
+TClientLogic::TClientLogic(TGameData* SetData)
+:	Data(SetData)
+{
+}
+
+void TClientLogic::Process(TGameTime Delta)
+{
+	if (Data->Status != GAME_PLAYING)
+		return;
+
+	//UpdatePlayerPositions(Delta);
+	//UpdateBombs(Delta);
+	//CheckForExplodedPlayers();
+	//UpdateDyingPlayers(Delta);
+
+	Data->CurrentTime += Delta;
 }

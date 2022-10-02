@@ -13,6 +13,7 @@ const TProtocolVersion SERVER_VERSION = 1;
 const TCommand SRV_Connect = 0; // TProtocolVersion Version
 const TCommand SRV_CreateLobby = 1; // string GameName
 const TCommand SRV_CloseLobby = 2;
+const TCommand SRV_JoinLobby = 3;
 // - players
 const TCommand SRV_AddPlayer = 100; // uint8_t Slot | string PlayerName
 const TCommand SRV_RemovePlayer = 101;// uint8_t Slot
@@ -60,3 +61,4 @@ const TCommand CLN_PlayerDying = 1308; // uint8_t Slot | uint16_t TimeUntilDeath
 const TCommand CLN_PlayerDied = 1309; // uint8_t Slot
 const TCommand CLN_ArenaInfo = 1310; // uint8_t Widdth | uint8_t Height | Field Type (x=0,y=0), Field Type (x=1,y=0) .. Fieldt Type (x=width-1,y=height-1)
 const TCommand CLN_PlayerScore = 1311; // uint8_t Slot | uint8_t Score
+const TCommand CLN_PlayerInfo = 1312; // uint8_t Slot | uint8_t State | string Name

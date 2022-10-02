@@ -14,6 +14,7 @@
 #include "views/lobbyview.h"
 #include "views/matchview.h"
 #include "views/endofroundview.h"
+#include "views/connectview.h"
 #include "comms.h"
 
 //#define FULLSCREEN
@@ -46,7 +47,8 @@ TGame::TGame()
 	GameData(),
 	Fonts(),
 	Logic(nullptr),
-	Maps()
+	Maps(),
+	IsServer(false)
 {
 }
 
@@ -101,7 +103,7 @@ bool TGame::Initialize(const std::string& filename)
 	Server->LoadMaps(AppPath + GetMapSubPath());
 
 	// create the logic object
-	Logic = new TGameLogic(&GameData, nullptr);
+	Logic = new TClientLogic(&GameData);
 		
 	return true;
 }
@@ -173,8 +175,8 @@ void TGame::Execute()
 			if (CurrentStateView)
 				CurrentStateView->Process(delta);
 
-			// process game logic (before the server logic)
-			//Logic->Process(delta);
+			// process game logic (before the server is processed)
+			Logic->Process(delta);
 
 			// process the server object
 			Server->Process(delta);
@@ -276,6 +278,7 @@ void TGame::ActivateNextState()
 		case STATE_LOBBY: CurrentStateView = AttachView(VIEW_LOBBY); break;
 		case STATE_MATCH: CurrentStateView = AttachView(VIEW_MATCH); break;
 		case STATE_ENDOFROUND: CurrentStateView = AttachView(VIEW_ENDOFROUND); break;
+		case STATE_CONNECTTOSERVER: CurrentStateView = AttachView(VIEW_CONNECTTOSERVER); break;
 	};
 
 	SetupCurrentState();
@@ -338,6 +341,7 @@ TView* TGame::AttachView(int NewView)
 		case VIEW_LOBBY: view = new TLobbyView(this, GUI); break;
 		case VIEW_MATCH: view = new TMatchView(this); break;
 		case VIEW_ENDOFROUND: view = new TEndOfRoundView(this); break;
+		case VIEW_CONNECTTOSERVER: view = new TConnectToServerView(this, GUI); break;
 	};
 	assert(view);
 
@@ -393,6 +397,8 @@ void TGame::DetachView(TViewID ID)
 
 void TGame::ClientConnected()
 {
+	if (!IsServer)
+		Client->JoinGame();
 }
 
 void TGame::ClientDisconnected()
@@ -402,12 +408,19 @@ void TGame::ClientDisconnected()
 
 void TGame::ClientEnteredLobby()
 {
-	// select the first map initially
-	Client->SelectArena(0); 
-
 	// add initial player(s)
-	Client->AddPlayer("Steve");
-	Client->AddPlayer("Bob");
+	if (IsServer)
+	{		
+		Client->SelectArena(0); // select the first map initially
+
+		Client->AddPlayer("Steve");
+		Client->AddPlayer("Bob");
+	}
+	else
+	{
+		Client->AddPlayer("Charles");
+		SwitchToState(STATE_LOBBY);
+	}
 }
 
 void TGame::ClientPlayerAdded(int Slot)
@@ -569,12 +582,19 @@ void TGame::DefineJoystickForPlayer(int Slot, int JoystickIndex, sf::Joystick::A
 
 void TGame::SetupCurrentState()
 {
-	if (CurrentState == STATE_LOBBY)
+	if (CurrentState == STATE_MENU)
 	{
-		Server->Start();
+		InputMap.DefineInput(actionMenuJoinGame, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Space, 0));
+	}
+	else if (CurrentState == STATE_LOBBY)
+	{
+		if (IsServer)
+		{
+			Server->Start();
 
-		Client->Connect("127.0.0.1", SERVER_PORT);
-		Client->CreateGame("Don't Explode");
+			Client->Connect("127.0.0.1", SERVER_PORT);
+			Client->CreateGame("Don't Explode");
+		}
 
 		InputMap.DefineInput(actionLobbyPrevMap, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Left, 0));
 		InputMap.DefineInput(actionLobbyNextMap, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Right, 0));

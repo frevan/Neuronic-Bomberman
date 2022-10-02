@@ -8,11 +8,18 @@
 #include <mutex>
 #include <SFML/Network.hpp>
 
+typedef intptr_t TConnectionID;
+
 class TClientSocket : public sf::TcpSocket
 {
 public:
-	intptr_t ID;
+	TConnectionID ID;
 };
+
+typedef struct 
+{
+	TConnectionID ConnectionID;
+} TSlotInfo;
 
 class TServer: public TLogicListener
 {
@@ -29,6 +36,8 @@ private:
 	TGameLogic* Logic;
 	TState State;
 	TMapList Maps;
+	TConnectionID OwnerID;
+	TSlotInfo Slots[MAX_NUM_SLOTS];
 
 	bool ThreadsShouldStop;
 
@@ -39,7 +48,7 @@ private:
 	std::mutex ClientSocketsMutex;
 
 	// utility
-	TClientSocket* FindSocketForConnection(intptr_t ConnectionID);
+	TClientSocket* FindSocketForConnection(TConnectionID ConnectionID);
 	void SendErrorResponse(TClientSocket* Socket, uint16_t FailedCommand);
 	bool SendPacketToSocket(TClientSocket* Socket, sf::Packet& Packet);
 	void SendPacketToAllClients(sf::Packet& Packet);
@@ -47,16 +56,16 @@ private:
 	// receive input from network
 	void ListenToNetwork();
 	void CheckForDisconnectedSockets();
-	void ProcessReceivedPacket(intptr_t ConnectionID, sf::Packet& Packet);
+	void ProcessReceivedPacket(TConnectionID ConnectionID, sf::Packet& Packet);
 	// process received network communication
-	bool ProcessConnectionRequest(intptr_t ConnectionID, uint32_t ClientVersion);
-	bool ProcessUpdatePlayerMovement(intptr_t ConnectionID, uint8_t Slot, uint8_t Direction);
+	bool ProcessConnectionRequest(TConnectionID ConnectionID, uint32_t ClientVersion);
+	bool ProcessUpdatePlayerMovement(TConnectionID ConnectionID, uint8_t Slot, uint8_t Direction);
 
 	// notify connected clients
-	void DoLobbyCreated(intptr_t ConnectionID);
+	void DoLobbyCreated(TConnectionID ConnectionID);
 	void DoLobbyClosed();
-	void DoEnteredLobby(intptr_t ConnectionID, const std::string& GameName);
-	void DoLeftLobby(intptr_t ConnectionID);
+	void DoEnteredLobby(TConnectionID ConnectionID, const std::string& GameName);
+	void DoLeftLobby(TConnectionID ConnectionID);
 	void DoGameNameChanged(const std::string& GameName);
 	void DoArenaChanged(const std::string& ArenaName);
 	void DoNumRoundsChanged(int NumRounds);
@@ -70,24 +79,26 @@ private:
 	void DoRoundEnded();
 	void DoPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
 	void DoPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, uint16_t TimeUntilExplosion);
-	void DoFullUpdate(TGameTime Delta);
-	void DoArenaUpdate();
-	void DoPlayerPositionUpdate();
+	void DoFullUpdate(TConnectionID ConnectionID = 0);
+	void DoArenaUpdate(TConnectionID ConnectionID = 0);
+	void DoPlayerPositionUpdate(TConnectionID ConnectionID = 0);
+	void DoPlayerInfoUpdate(TConnectionID ConnectionID = 0);
 
 	// do things
-	bool OpenLobby(intptr_t ConnectionID); // create a lobby for a new game, owned by ConnectionID
-	void CloseLobby(); // close the lobby
-	bool StartMatch(); // start the first round of the match	
-	bool StartRound(); // start a new round when the previous one has ended
+	bool OpenLobby(TConnectionID ConnectionID); // create a lobby for a new game, owned by ConnectionID
+	bool JoinLobby(TConnectionID ConnectionID);  // join an existing lobby
+	void CloseLobby(TConnectionID ConnectionID); // close the lobby
+	bool StartMatch(TConnectionID ConnectionID); // start the first round of the match	
+	bool StartRound(TConnectionID ConnectionID); // start a new round when the previous one has ended
 	bool EndRound(); // end the current round
-	bool SetGameName(const std::string& SetName); // change the game's name
-	bool AddPlayer(const std::string& PlayerName, uint8_t Slot = INVALID_SLOT); // add a player to the current game
-	bool RemovePlayer(uint8_t Slot); // remove a player from the current game
-	bool SetPlayerName(int Slot, const std::string& Name); // change a player's name
-	bool SelectArena(const std::string& ArenaName); // set the arena
-	bool SetNumRounds(int Value); // set the number of rounds to be played
-	void SetPlayerDirections(uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
-	bool DropBomb(uint8_t Slot);
+	bool SetGameName(TConnectionID ConnectionID, const std::string& SetName); // change the game's name
+	bool AddPlayer(TConnectionID ConnectionID, const std::string& PlayerName, uint8_t Slot = INVALID_SLOT); // add a player to the current game
+	bool RemovePlayer(TConnectionID ConnectionID, uint8_t Slot); // remove a player from the current game
+	bool SetPlayerName(TConnectionID ConnectionID, int Slot, const std::string& Name); // change a player's name
+	bool SelectArena(TConnectionID ConnectionID, const std::string& ArenaName); // set the arena
+	bool SetNumRounds(TConnectionID ConnectionID, int Value); // set the number of rounds to be played
+	void SetPlayerDirections(TConnectionID ConnectionID, uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
+	bool DropBomb(TConnectionID ConnectionID, uint8_t Slot);
 	
 public:
 	TServer();

@@ -28,6 +28,13 @@ void TClient::CreateGame(const std::string& LobbyName)
 	Commands.push(cmd);
 }
 
+void TClient::JoinGame()
+{
+	TClientCommand cmd;
+	cmd.Command = CMD_JoinLobby;
+	Commands.push(cmd);
+}
+
 void TClient::CloseGame()
 {
 	Disconnect();
@@ -103,6 +110,10 @@ void TClient::Process(TGameTime Delta)
 		{
 			case CMD_OpenLobby:	
 				packet << SRV_CreateLobby << cmd.StrParam;
+				Socket.send(packet);
+				break;
+			case CMD_JoinLobby:
+				packet << SRV_JoinLobby;
 				Socket.send(packet);
 				break;
 			case CMD_SetGameName: 
@@ -228,10 +239,18 @@ void TClient::SetGameName(const std::string& SetName)
 	Commands.push(cmd);
 }
 
-void TClient::ServerLobbyCreated()
+void TClient::ServerConnected()
 {
 	if (Listener)
 		Listener->ClientConnected();
+}
+
+void TClient::ServerLobbyCreated()
+{
+	/*
+	if (Listener)
+		Listener->ClientConnected();
+	*/
 }
 
 void TClient::ServerLobbyClosed()
@@ -327,6 +346,18 @@ void TClient::ServerPlayerRemoved(uint8_t Slot)
 	Game->GameData.RemovePlayer(Slot);
 	if (Listener)
 		Listener->ClientPlayerRemoved(Slot);
+}
+
+void TClient::ServerPlayerInfo(uint8_t Slot, uint8_t state, std::string Name)
+{
+	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
+		return;
+
+	Game->GameData.Players[Slot].State = state;
+	Game->GameData.Players[Slot].Name = Name;
+
+	if (Listener)
+		Listener->ClientPlayerInfoChanged(Slot);
 }
 
 void TClient::ServerPlayerNameChanged(uint8_t Slot, const std::string& PlayerName)
@@ -474,6 +505,7 @@ void TClient::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet)
 	switch (cmd)
 	{
 		case CLN_Connected:
+			ServerConnected();
 			break;
 		case CLN_Disconnected:
 			DisconnectInternal();
@@ -584,6 +616,10 @@ void TClient::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet)
 			if (Packet >> u8_1 >> u8_2)
 				ServerArenaInfo(u8_1, u8_2, Packet);
 			break;
+		case CLN_PlayerInfo:
+			if (Packet >> u8_1 >> u8_2 >> s_1)
+				ServerPlayerInfo(u8_1, u8_2, s_1);
+			break;
 	};
 }
 
@@ -592,9 +628,6 @@ void TClient::ConnectedToServer()
 	sf::Packet packet;
 	packet << SRV_Connect << SERVER_VERSION;
 	Socket.send(packet);
-
-	if (Listener)
-		Listener->ClientConnected();
 }
 
 void TClient::DisconnectedFromServer()
@@ -616,6 +649,8 @@ void TClient::ServerArenaInfo(uint8_t Width, uint8_t Height, sf::Packet& Packet)
 {
 	if (Width < 0 || Height < 0)
 		return;
+
+	Game->GameData.Arena.SetSize(Width, Height);
 
 	uint8_t type;
 	TField* field = nullptr;

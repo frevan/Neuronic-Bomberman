@@ -12,9 +12,13 @@ TServer::TServer()
 	SocketSelector(),
 	ClientSockets(),
 	ClientSocketsMutex(),
-	ThreadsShouldStop(false)
+	ThreadsShouldStop(false),
+	OwnerID(0)
 {
 	Logic = new TGameLogic(&Data, this);
+
+	for (uint8_t slot = 0; slot < MAX_NUM_SLOTS; slot++)
+		Slots[slot].ConnectionID = 0;
 }
 
 TServer::~TServer()
@@ -48,7 +52,7 @@ void TServer::Start()
 void TServer::Stop()
 {
 	if (State == INLOBBY || State == PLAYING)
-		CloseLobby();
+		CloseLobby(0);
 
 	ThreadsShouldStop = true;
 	if (NetworkListenerThread)
@@ -70,16 +74,18 @@ void TServer::Stop()
 	State = INACTIVE;
 }
 
-bool TServer::OpenLobby(intptr_t ConnectionID)
+bool TServer::OpenLobby(TConnectionID ConnectionID)
 {
 	bool result = false;
-
+	
 	if (State == RUNNING)
 	{
 		State = INLOBBY;
 
 		Data.Reset();
 		Data.Status = GAME_INLOBBY;
+
+		OwnerID = ConnectionID;
 
 		DoLobbyCreated(ConnectionID);
 		DoEnteredLobby(ConnectionID, Data.GameName);
@@ -90,17 +96,33 @@ bool TServer::OpenLobby(intptr_t ConnectionID)
 	return result;
 }
 
-void TServer::CloseLobby()
+bool TServer::JoinLobby(TConnectionID ConnectionID)
 {
-	State = RUNNING;
-
-	Data.Status = GAME_NONE;
-
-	DoLobbyClosed();
+	DoEnteredLobby(ConnectionID, Data.GameName);
+	return true;
 }
 
-bool TServer::StartMatch()
+void TServer::CloseLobby(TConnectionID ConnectionID)
 {
+	if (ConnectionID == OwnerID || ConnectionID == 0)
+	{
+		State = RUNNING;
+
+		Data.Status = GAME_NONE;
+
+		OwnerID = 0;
+
+		DoLobbyClosed();
+	}
+}
+
+bool TServer::StartMatch(TConnectionID ConnectionID)
+{
+	if (ConnectionID != OwnerID)
+		return false;
+	if (State == PLAYING)
+		return false;
+
 	State = PLAYING;
 
 	Data.Status = GAME_MATCHSTARTED;
@@ -108,19 +130,22 @@ bool TServer::StartMatch()
 
 	DoMatchStarted();
 
-	StartRound();
+	StartRound(ConnectionID);
 
 	return true;
 }
 
-bool TServer::StartRound()
+bool TServer::StartRound(TConnectionID ConnectionID)
 {
+	if (ConnectionID != OwnerID)
+		return false;
+
 	Data.Status = GAME_ROUNDSTARTING;
 	DoRoundStarting();
 
 	Data.InitNewRound();
 
-	DoFullUpdate(0);
+	DoFullUpdate();
 
 	Data.Status = GAME_PLAYING;
 	DoRoundStarted();
@@ -136,15 +161,18 @@ bool TServer::EndRound()
 	return true;
 }
 
-bool TServer::SetGameName(const std::string& SetName)
+bool TServer::SetGameName(TConnectionID ConnectionID, const std::string& SetName)
 {
+	if (ConnectionID != OwnerID)
+		return false;
+
 	Data.GameName = SetName;
 	DoGameNameChanged(Data.GameName);
 
 	return true;
 }
 
-bool TServer::AddPlayer(const std::string& PlayerName, uint8_t Slot)
+bool TServer::AddPlayer(TConnectionID ConnectionID, const std::string& PlayerName, uint8_t Slot)
 {
 	bool result = false;
 
@@ -166,6 +194,8 @@ bool TServer::AddPlayer(const std::string& PlayerName, uint8_t Slot)
 			Data.Players[Slot].State = PLAYER_ALIVE;
 			Data.Players[Slot].Name = PlayerName;
 
+			Slots[Slot].ConnectionID = ConnectionID;
+
 			result = true;
 		}
 
@@ -175,67 +205,81 @@ bool TServer::AddPlayer(const std::string& PlayerName, uint8_t Slot)
 	return result;
 }
 
-bool TServer::RemovePlayer(uint8_t Slot)
+bool TServer::RemovePlayer(TConnectionID ConnectionID, uint8_t Slot)
 {
 	bool result = false;
 
 	if (Slot < MAX_NUM_SLOTS)
 	{
-		TPlayer* p = &Data.Players[Slot];
-		if (p->State != PLAYER_NOTPLAYING)
+		if (ConnectionID == Slots[Slot].ConnectionID || ConnectionID == OwnerID)
 		{
-			p->State = PLAYER_NOTPLAYING;
-			result = true;
-		}
 
-		if (result)
-			DoPlayerRemoved(Slot);
+			TPlayer* p = &Data.Players[Slot];
+			if (p->State != PLAYER_NOTPLAYING)
+			{
+				p->State = PLAYER_NOTPLAYING;
+				result = true;
+			}
+
+			Slots[Slot].ConnectionID = 0;
+
+			if (result)
+				DoPlayerRemoved(Slot);
+		}
 	}
 
 	return result;
 }
 
-bool TServer::SetPlayerName(int Slot, const std::string& Name)
+bool TServer::SetPlayerName(TConnectionID ConnectionID, int Slot, const std::string& Name)
 {
 	bool result = false;
 
 	if (Slot < MAX_NUM_SLOTS)
 	{
-		TPlayer* p = &Data.Players[Slot];
-
-		if (p->State != PLAYER_NOTPLAYING)
+		if (ConnectionID == Slots[Slot].ConnectionID || ConnectionID == OwnerID)
 		{
-			p->Name = Name;
-			result = true;
-		}
+			TPlayer* p = &Data.Players[Slot];
 
-		if (result)
-			DoPlayerNameChanged(Slot, p->Name);
+			if (p->State != PLAYER_NOTPLAYING)
+			{
+				p->Name = Name;
+				result = true;
+			}
+
+			if (result)
+				DoPlayerNameChanged(Slot, p->Name);
+		}
 	}
 
 	return result;
 }
 
-bool TServer::SelectArena(const std::string& ArenaName)
+bool TServer::SelectArena(TConnectionID ConnectionID, const std::string& ArenaName)
 {
 	bool result = false;
 
-	TArena* map =  Maps.MapFromName(ArenaName);
-
-	if (map)
+	if (ConnectionID == OwnerID)
 	{
-		Data.Arena.LoadFromFile(map->OriginalFileName);
-		result = true;
-	}
+		TArena* map = Maps.MapFromName(ArenaName);
 
-	if (result)
-		DoArenaChanged(ArenaName);
+		if (map)
+		{
+			Data.Arena.LoadFromFile(map->OriginalFileName);
+			result = true;
+
+			DoArenaChanged(ArenaName);
+		}
+	}
 
 	return result;
 }
 
-bool TServer::SetNumRounds(int Value)
+bool TServer::SetNumRounds(TConnectionID ConnectionID, int Value)
 {
+	if (ConnectionID == OwnerID)
+		return false;
+
 	if (Value < 1)
 		Value = 1;
 	if (Value > MAX_NUM_ROUNDS)
@@ -259,7 +303,7 @@ void TServer::Process(TGameTime Delta)
 	{
 		Logic->Process(Delta);
 
-		DoFullUpdate(Delta);
+		DoFullUpdate();
 	}
 }
 
@@ -318,9 +362,11 @@ void TServer::LogicRoundEnded()
 	}
 }
 
-void TServer::SetPlayerDirections(uint8_t Slot, bool Left, bool Right, bool Up, bool Down)
+void TServer::SetPlayerDirections(TConnectionID ConnectionID, uint8_t Slot, bool Left, bool Right, bool Up, bool Down)
 {
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
+		return;
+	if (ConnectionID != Slots[Slot].ConnectionID)
 		return;
 
 	TPlayer* p = &(Data.Players[Slot]);
@@ -347,9 +393,11 @@ void TServer::SetPlayerDirections(uint8_t Slot, bool Left, bool Right, bool Up, 
 	DoPlayerDirectionChanged(Slot, Left, Right, Up, Down);
 }
 
-bool TServer::DropBomb(uint8_t Slot)
+bool TServer::DropBomb(TConnectionID ConnectionID, uint8_t Slot)
 {
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
+		return false;
+	if (ConnectionID != OwnerID)
 		return false;
 
 	TPlayer* p = &(Data.Players[Slot]);
@@ -388,7 +436,7 @@ bool TServer::DropBomb(uint8_t Slot)
 
 typedef struct
 {
-	intptr_t ConnectionID;
+	TConnectionID ConnectionID;
 	sf::Packet* Packet;
 } TPacketInfoRec;
 
@@ -474,7 +522,7 @@ void TServer::CheckForDisconnectedSockets()
 	}
 }
 
-void TServer::DoLobbyCreated(intptr_t ConnectionID)
+void TServer::DoLobbyCreated(TConnectionID ConnectionID)
 {
 	TClientSocket* socket = FindSocketForConnection(ConnectionID);
 	if (socket)
@@ -492,7 +540,7 @@ void TServer::DoLobbyClosed()
 	SendPacketToAllClients(packet);
 }
 
-void TServer::DoEnteredLobby(intptr_t ConnectionID, const std::string& GameName)
+void TServer::DoEnteredLobby(TConnectionID ConnectionID, const std::string& GameName)
 {
 	TClientSocket* socket = FindSocketForConnection(ConnectionID);
 	if (socket)
@@ -500,10 +548,13 @@ void TServer::DoEnteredLobby(intptr_t ConnectionID, const std::string& GameName)
 		sf::Packet packet;
 		packet << CLN_EnteredLobby << GameName;
 		SendPacketToSocket(socket, packet);
+
+		DoPlayerInfoUpdate(ConnectionID);
+		DoFullUpdate(ConnectionID);
 	}
 }
 
-void TServer::DoLeftLobby(intptr_t ConnectionID)
+void TServer::DoLeftLobby(TConnectionID ConnectionID)
 {
 }
 
@@ -620,13 +671,13 @@ void TServer::DoPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, 
 	SendPacketToAllClients(packet);
 }
 
-void TServer::DoFullUpdate(TGameTime Delta)
+void TServer::DoFullUpdate(TConnectionID ConnectionID)
 {
-	DoArenaUpdate();
-	DoPlayerPositionUpdate();
+	DoArenaUpdate(ConnectionID);
+	DoPlayerPositionUpdate(ConnectionID);
 }
 
-void TServer::DoArenaUpdate()
+void TServer::DoArenaUpdate(TConnectionID ConnectionID)
 {
 	sf::Packet packet;
 
@@ -645,10 +696,17 @@ void TServer::DoArenaUpdate()
 			packet << fieldType;
 		}
 
-	SendPacketToAllClients(packet);
+	if (ConnectionID == 0)
+		SendPacketToAllClients(packet);
+	else
+	{
+		TClientSocket* socket = FindSocketForConnection(ConnectionID);
+		if (socket)
+			SendPacketToSocket(socket, packet);
+	}
 }
 
-void TServer::ProcessReceivedPacket(intptr_t ConnectionID, sf::Packet& Packet)
+void TServer::ProcessReceivedPacket(TConnectionID ConnectionID, sf::Packet& Packet)
 {
 	uint16_t cmd;
 	if (!(Packet >> cmd))
@@ -671,8 +729,12 @@ void TServer::ProcessReceivedPacket(intptr_t ConnectionID, sf::Packet& Packet)
 			{
 				success = OpenLobby(ConnectionID);
 				if (success)
-					SetGameName(s_1);
+					SetGameName(ConnectionID, s_1);
 			}
+			break;
+
+		case SRV_JoinLobby:
+			success = JoinLobby(ConnectionID);
 			break;
 
 		case SRV_CloseLobby: 
@@ -680,36 +742,36 @@ void TServer::ProcessReceivedPacket(intptr_t ConnectionID, sf::Packet& Packet)
 
 		case SRV_AddPlayer: 
 			if (Packet >> u8_1 >> s_1)
-				success = AddPlayer(s_1, u8_1);
+				success = AddPlayer(ConnectionID, s_1, u8_1);
 			break;
 		case SRV_RemovePlayer:
 			if (Packet >> u8_1)
-				success = RemovePlayer(u8_1);
+				success = RemovePlayer(ConnectionID, u8_1);
 			break;
 		case SRV_SetPlayerReady: break;
 		case SRV_SetPlayerName: 
 			if (Packet >> u8_1 >> s_1)
-				success = SetPlayerName(u8_1, s_1);
+				success = SetPlayerName(ConnectionID, u8_1, s_1);
 			break;
 
 		case SRV_SetGameName: 
 			if (Packet >> s_1)
-				success = SetGameName(s_1);
+				success = SetGameName(ConnectionID, s_1);
 			break;
 		case SRV_SetNumRounds: 
 			if (Packet >> u8_1)
-				success = SetNumRounds(u8_1);
+				success = SetNumRounds(ConnectionID, u8_1);
 			break;
 		case SRV_SetArena:
 			if (Packet >> s_1)
-				success = SelectArena(s_1);
+				success = SelectArena(ConnectionID, s_1);
 			break;
 
 		case SRV_StartMatch:
-			success = StartMatch();
+			success = StartMatch(ConnectionID);
 			break;
 		case SRV_StartNextRound:
-			success = StartRound();
+			success = StartRound(ConnectionID);
 			break;
 
 		case SRV_UpdatePlayerMovement:
@@ -718,7 +780,7 @@ void TServer::ProcessReceivedPacket(intptr_t ConnectionID, sf::Packet& Packet)
 			break;
 		case SRV_DropBomb:
 			if (Packet >> u8_1)
-				success = DropBomb(u8_1);
+				success = DropBomb(ConnectionID, u8_1);
 			break;
 	};
 
@@ -752,7 +814,7 @@ void TServer::SendPacketToAllClients(sf::Packet& Packet)
 		SendPacketToSocket((*it), Packet);
 }
 
-bool TServer::ProcessConnectionRequest(intptr_t ConnectionID, uint32_t ClientVersion)
+bool TServer::ProcessConnectionRequest(TConnectionID ConnectionID, uint32_t ClientVersion)
 {
 	bool result = false;
 
@@ -772,7 +834,7 @@ bool TServer::ProcessConnectionRequest(intptr_t ConnectionID, uint32_t ClientVer
 	return result;
 }
 
-bool TServer::ProcessUpdatePlayerMovement(intptr_t ConnectionID, uint8_t Slot, uint8_t Direction)
+bool TServer::ProcessUpdatePlayerMovement(TConnectionID ConnectionID, uint8_t Slot, uint8_t Direction)
 {
 	bool result = false;
 
@@ -783,7 +845,7 @@ bool TServer::ProcessUpdatePlayerMovement(intptr_t ConnectionID, uint8_t Slot, u
 		bool up = Direction & DIRECTION_UP;
 		bool down = Direction & DIRECTION_DOWN;
 
-		SetPlayerDirections(Slot, left, right, up, down);
+		SetPlayerDirections(ConnectionID, Slot, left, right, up, down);
 
 		result = true;
 	}
@@ -791,7 +853,7 @@ bool TServer::ProcessUpdatePlayerMovement(intptr_t ConnectionID, uint8_t Slot, u
 	return result;
 }
 
-TClientSocket* TServer::FindSocketForConnection(intptr_t ConnectionID)
+TClientSocket* TServer::FindSocketForConnection(TConnectionID ConnectionID)
 {
 	TClientSocket* result = nullptr;
 
@@ -809,7 +871,32 @@ TClientSocket* TServer::FindSocketForConnection(intptr_t ConnectionID)
 	return result;
 }
 
-void TServer::DoPlayerPositionUpdate()
+void TServer::DoPlayerInfoUpdate(TConnectionID ConnectionID)
+{
+	sf::Packet packet;
+
+	for (uint8_t slot = 0; slot < MAX_NUM_SLOTS; slot++)
+	{
+		TPlayer* p = &Data.Players[slot];
+
+		uint8_t state = p->State;
+		std::string name = p->Name;
+
+		packet.clear();
+		packet << CLN_PlayerInfo << slot << state << name;
+
+		if (ConnectionID == 0)
+			SendPacketToAllClients(packet);
+		else
+		{
+			TClientSocket* socket = FindSocketForConnection(ConnectionID);
+			if (socket)
+				SendPacketToSocket(socket, packet);
+		}
+	}
+}
+
+void TServer::DoPlayerPositionUpdate(TConnectionID ConnectionID)
 {
 	sf::Packet packet;
 
@@ -825,6 +912,14 @@ void TServer::DoPlayerPositionUpdate()
 
 		packet.clear();
 		packet << CLN_PlayerMovement << slot << direction << fieldX << fieldY;
-		SendPacketToAllClients(packet);
+
+		if (ConnectionID == 0)
+			SendPacketToAllClients(packet);
+		else
+		{
+			TClientSocket* socket = FindSocketForConnection(ConnectionID);
+			if (socket)
+				SendPacketToSocket(socket, packet);
+		}
 	}
 }

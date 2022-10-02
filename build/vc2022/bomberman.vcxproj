@@ -21,6 +21,7 @@
     <ClCompile Include="..\..\src\server.cpp" />
     <ClCompile Include="..\..\src\state.cpp" />
     <ClCompile Include="..\..\src\view.cpp" />
+    <ClCompile Include="..\..\src\views\connectview.cpp" />
     <ClCompile Include="..\..\src\views\endofroundview.cpp" />
     <ClCompile Include="..\..\src\views\lobbyview.cpp" />
     <ClCompile Include="..\..\src\views\matchview.cpp" />

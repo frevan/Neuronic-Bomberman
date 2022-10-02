@@ -58,13 +58,20 @@ void TMenuView::CreateWidgets()
 	quitbtn->connect("pressed", &TMenuView::OnQuitBtnClick, this);
 }
 
+void TMenuView::StartNewGame()
+{
+	Game->IsServer = true;
+	Game->SwitchToState(STATE_LOBBY);
+}
+
 void TMenuView::OnNewGameBtnClick()
 {
-	Game->SwitchToState(STATE_LOBBY);
+	StartNewGame();
 }
 
 void TMenuView::OnJoinGameBtnClick()
 {
+	/*
 	tgui::MessageBox::Ptr msgbox = std::make_shared<tgui::MessageBox>();
 	AddWidgetToGUI(msgbox);
 	msgbox->setText("Not implemented yet");
@@ -75,6 +82,9 @@ void TMenuView::OnJoinGameBtnClick()
 			msgbox->hideWithEffect(tgui::ShowAnimationType::Fade, sf::Time::Zero);
 		});
 	msgbox->showWithEffect(tgui::ShowAnimationType::Fade, sf::Time::Zero);
+	*/
+
+	Game->SwitchToState(STATE_CONNECTTOSERVER);
 }
 
 void TMenuView::OnOptionsBtnClick()
@@ -113,7 +123,11 @@ bool TMenuView::ProcessInput(TInputID InputID, float Value)
 			break;
 
 		case actionDoDefaultAction:
-			Game->SwitchToState(STATE_LOBBY);
+			StartNewGame();
+			break;
+
+		case actionMenuJoinGame:
+			Game->SwitchToState(STATE_CONNECTTOSERVER);
 			break;
 	};
 

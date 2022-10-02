@@ -138,21 +138,27 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 			break;
 
 		case actionLobbyPrevMap:
-			mapIndex = MapCombo->getSelectedItemIndex();
-			if (mapIndex > 0)
-				mapIndex--;
-			else
-				mapIndex = MapCombo->getItemCount() - 1;
-			MapCombo->setSelectedItemByIndex(mapIndex);
+			if (Game->IsServer)
+			{
+				mapIndex = MapCombo->getSelectedItemIndex();
+				if (mapIndex > 0)
+					mapIndex--;
+				else
+					mapIndex = MapCombo->getItemCount() - 1;
+				MapCombo->setSelectedItemByIndex(mapIndex);
+			}
 			break;
 
 		case actionLobbyNextMap:
-			mapIndex = MapCombo->getSelectedItemIndex();
-			if (mapIndex >= MapCombo->getItemCount() - 1)
-				mapIndex = 0;
-			else
-				mapIndex++;
-			MapCombo->setSelectedItemByIndex(mapIndex);
+			if (Game->IsServer)
+			{
+				mapIndex = MapCombo->getSelectedItemIndex();
+				if (mapIndex >= MapCombo->getItemCount() - 1)
+					mapIndex = 0;
+				else
+					mapIndex++;
+				MapCombo->setSelectedItemByIndex(mapIndex);
+			}
 			break;
 
 		case actionLobbyPrevSlot:

@@ -27,6 +27,7 @@ const int STATE_LOBBY = 3;
 const int STATE_MATCH = 4;
 const int STATE_ENDOFROUND = 5;
 const int STATE_ENDOFMATCH = 6;
+const int STATE_CONNECTTOSERVER = 7;
 const int STATE_QUIT = 1000;
 
 const int VIEW_OVERLAY = 0;
@@ -35,6 +36,7 @@ const int VIEW_MENU = 11;
 const int VIEW_LOBBY = 12;
 const int VIEW_MATCH = 13;
 const int VIEW_ENDOFROUND = 14;
+const int VIEW_CONNECTTOSERVER = 15;
 
 typedef struct
 {
@@ -52,7 +54,7 @@ private:
 	tgui::Gui* GUI;	
 	std::vector<TView*> Views;
 	std::mutex ViewsMutex;
-	TGameLogic* Logic;
+	TClientLogic* Logic;
 
 	void DetermineAppPath(const std::string& Filename);
 	std::string GetResourceSubPath();
@@ -83,6 +85,7 @@ public:
 	TFontManager Fonts;
 	std::string AppPath, MapPath;
 	TMapList Maps;
+	bool IsServer; 
 
 	TGame();
 	~TGame();

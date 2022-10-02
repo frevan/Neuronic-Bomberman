@@ -14,6 +14,8 @@ private:
 	void OnOptionsBtnClick();
 	void OnQuitBtnClick();
 
+	void StartNewGame();
+
 public:
 	TMenuView(TGame* SetGame, tgui::Gui* SetGUI);
 	~TMenuView();

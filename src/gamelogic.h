@@ -34,3 +34,12 @@ public:
 	TGameLogic(TGameData* SetData, TLogicListener* SetListener);
 	void Process(TGameTime Delta);
 };
+
+class TClientLogic
+{
+private:
+	TGameData* Data;
+public:
+	TClientLogic(TGameData* SetData);
+	void Process(TGameTime Delta);
+};

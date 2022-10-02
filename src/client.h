@@ -39,6 +39,7 @@ const int CMD_SetNumRounds = 6;
 const int CMD_SetPlayerName = 7;
 const int CMD_SetGameName = 8;
 const int CMD_SelectArena = 9;
+const int CMD_JoinLobby = 10;
 
 typedef struct
 {
@@ -55,8 +56,8 @@ private:
 	sf::TcpSocket Socket;
 	std::queue<TClientCommand> Commands;
 	void ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet);
-	void ConnectedToServer();
-	void DisconnectedFromServer();
+	void ConnectedToServer(); // socket was connected
+	void DisconnectedFromServer(); // socket was disconnected
 	void DisconnectInternal();
 	void ServerPlayerPositionChanged(uint8_t Slot, float X, float Y);
 	void ServerBombExploding(const TFieldPosition& Position, TGameTime TimeUntilExploded);
@@ -79,6 +80,7 @@ public:
 
 	// start/stop the game, rounds, ...
 	void CreateGame(const std::string& SetName); // create a new game / lobby
+	void JoinGame(); // join a game / lobby
 	void CloseGame(); // leave the current game (removes all players that were added by this client)
 	void StartMatch(); // start the first round of the match	
 	void StartNextRound(); // start a new round when the previous one has ended
@@ -96,6 +98,7 @@ public:
 	void DropBomb(uint8_t Slot);
 
 	// from TServerListener
+	void ServerConnected(); //  not the same as ServerConnected!
 	void ServerLobbyCreated();
 	void ServerLobbyClosed();
 	void ServerEnteredLobby(const std::string& GameName);
@@ -114,4 +117,5 @@ public:
 	void ServerPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
 	void ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, uint16_t TimeUntilExplosion);
 	void ServerFullUpdate(TGameData* Data);
+	void ServerPlayerInfo(uint8_t Slot, uint8_t state, std::string Name);
 };
