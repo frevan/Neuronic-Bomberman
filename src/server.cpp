@@ -268,7 +268,8 @@ bool TServer::SelectArena(TConnectionID ConnectionID, const std::string& ArenaNa
 			Data.Arena.LoadFromFile(map->OriginalFileName);
 			result = true;
 
-			DoArenaChanged(ArenaName);
+			DoArenaChanged(0);
+			DoArenaUpdate(0);
 		}
 	}
 
@@ -550,6 +551,7 @@ void TServer::DoEnteredLobby(TConnectionID ConnectionID, const std::string& Game
 		SendPacketToSocket(socket, packet);
 
 		DoPlayerInfoUpdate(ConnectionID);
+		DoArenaChanged(ConnectionID);
 		DoFullUpdate(ConnectionID);
 	}
 }
@@ -565,11 +567,21 @@ void TServer::DoGameNameChanged(const std::string& GameName)
 	SendPacketToAllClients(packet);
 }
 
-void TServer::DoArenaChanged(const std::string& ArenaName)
+void TServer::DoArenaChanged(TConnectionID ConnectionID)
 {
+	std::string name = Data.Arena.Caption;
+
 	sf::Packet packet;
-	packet << CLN_ArenaChanged << ArenaName;
-	SendPacketToAllClients(packet);
+	packet << CLN_ArenaChanged << name;
+
+	if (ConnectionID == 0)
+		SendPacketToAllClients(packet);
+	else
+	{
+		TClientSocket* socket = FindSocketForConnection(ConnectionID);
+		if (socket)
+			socket->send(packet);
+	}
 }
 
 void TServer::DoNumRoundsChanged(int NumRounds)

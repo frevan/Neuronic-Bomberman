@@ -279,9 +279,13 @@ void TClient::ServerGameNameChanged(const std::string& GameName)
 
 void TClient::ServerArenaChanged(const std::string& ArenaName)
 {
+	if (Listener)
+		Listener->ClientGameOptionsChanged();
+	/*
 	TArena* map = Game->Maps.MapFromName(ArenaName);
 	if (map)
 		Game->GameData.Arena.LoadFromFile(map->OriginalFileName);
+	*/
 }
 
 void TClient::ServerNumRoundsChanged(int NumRounds)
@@ -650,7 +654,8 @@ void TClient::ServerArenaInfo(uint8_t Width, uint8_t Height, sf::Packet& Packet)
 	if (Width < 0 || Height < 0)
 		return;
 
-	Game->GameData.Arena.SetSize(Width, Height);
+	if (Game->GameData.Arena.Width != Width || Game->GameData.Arena.Height != Height)
+		Game->GameData.Arena.SetSize(Width, Height);
 
 	uint8_t type;
 	TField* field = nullptr;
@@ -663,6 +668,9 @@ void TClient::ServerArenaInfo(uint8_t Width, uint8_t Height, sf::Packet& Packet)
 			Game->GameData.Arena.At(x, y, field);
 			field->Type = type;
 		}
+
+	if (Listener)
+		Listener->ClientGameOptionsChanged();
 }
 
 void TClient::ServerPlayerScore(uint8_t Slot, uint8_t Score)

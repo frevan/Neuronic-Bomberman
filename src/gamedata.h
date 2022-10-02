@@ -121,7 +121,7 @@ private:
 public:
 	std::string OriginalFileName;
 	std::string Caption;
-	size_t Width, Height;
+	uint8_t Width, Height;
 	int BrickDensity;
 	std::vector<TStartPosition> StartPositions;
 

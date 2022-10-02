@@ -1,5 +1,6 @@
 #include "matchview.h"
 
+#include "../game.h"
 #include "../actions.h"
 #include "../resourcemgr.h"
 
@@ -30,15 +31,14 @@ void TMatchView::Draw(sf::RenderTarget* target)
 	float MapOffsetY = 65.f;
 
 	// draw the field
-	for (size_t row = 0; row < Game->GameData.Arena.Height; row++)
+	for (uint8_t y = 0; y < Game->GameData.Arena.Height; y++)
 	{
-		for (size_t col = 0; col < Game->GameData.Arena.Width; col++)
+		for (uint8_t x = 0; x < Game->GameData.Arena.Width; x++)
 		{
 			sf::Color fieldColor;
 
-			TField* field{};
-			Game->GameData.Arena.At((uint8_t)col, (uint8_t)row, field);
-			switch (field->Type)
+			TField field = Game->GameData.Arena.At(x, y);
+			switch (field.Type)
 			{
 				case FIELD_EMPTY: fieldColor = sf::Color::Green; break;
 				case FIELD_BRICK: fieldColor = sf::Color::Red; break;
@@ -50,7 +50,7 @@ void TMatchView::Draw(sf::RenderTarget* target)
 			};
 
 			sf::RectangleShape shape(sf::Vector2f(FIELD_SIZE, FIELD_SIZE));
-			shape.setPosition(MapOffsetX + col * FIELD_SIZE, MapOffsetY + row * FIELD_SIZE);
+			shape.setPosition(MapOffsetX + x * FIELD_SIZE, MapOffsetY + y * FIELD_SIZE);
 			shape.setFillColor(fieldColor);
 			shape.setOutlineColor(sf::Color::White);
 			shape.setOutlineThickness(1.f);
@@ -82,9 +82,8 @@ void TMatchView::Draw(sf::RenderTarget* target)
 	for (uint8_t x = 0; x < Game->GameData.Arena.Width; x++)
 		for (uint8_t y = 0; y < Game->GameData.Arena.Height; y++)
 		{
-			TField* field{};
-			Game->GameData.Arena.At(x, y, field);
-			if (field->Bomb.State == BOMB_NONE)
+			TField field = Game->GameData.Arena.At(x, y);
+			if (field.Bomb.State == BOMB_NONE)
 				continue;
 
 			TPlayerPosition pos;
@@ -93,13 +92,13 @@ void TMatchView::Draw(sf::RenderTarget* target)
 
 			float bombSize = FIELD_SIZE / 2.5f;
 			sf::Color color = sf::Color::Black;	
-			if (field->Bomb.State == BOMB_TICKING)
+			if (field.Bomb.State == BOMB_TICKING)
 			{
 				const float PulseInterval = 1250.f; // one complete pulse per 1.25 seconds
-				float sine = sinf(fmodf(field->Bomb.TimeUntilNextState * 1.f, PulseInterval) / PulseInterval * (float)M_PI * 2);
+				float sine = sinf(fmodf(field.Bomb.TimeUntilNextState * 1.f, PulseInterval) / PulseInterval * (float)M_PI * 2);
 				bombSize += sine * (FIELD_SIZE / 25.f);
 			}
-			else if (field->Bomb.State == BOMB_EXPLODING)
+			else if (field.Bomb.State == BOMB_EXPLODING)
 				color = sf::Color::Red;
 
 			sf::CircleShape shape(bombSize);

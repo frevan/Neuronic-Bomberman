@@ -67,7 +67,7 @@ private:
 	void DoEnteredLobby(TConnectionID ConnectionID, const std::string& GameName);
 	void DoLeftLobby(TConnectionID ConnectionID);
 	void DoGameNameChanged(const std::string& GameName);
-	void DoArenaChanged(const std::string& ArenaName);
+	void DoArenaChanged(TConnectionID ConnectionID);
 	void DoNumRoundsChanged(int NumRounds);
 	void DoPlayerAdded(uint8_t Slot, const std::string& PlayerName);
 	void DoPlayerRemoved(uint8_t Slot);
