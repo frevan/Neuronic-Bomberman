@@ -43,3 +43,13 @@ public:
 	TClientLogic(TGameData* SetData);
 	void Process(TGameTime Delta);
 };
+
+class TAnimation
+{
+private:
+public:
+	intptr_t ID;
+	TGameTime Time;
+	TAnimation() : ID(0), Time(0) {};
+	void Process(TGameTime Delta) { Time += Delta; };
+};

@@ -5,7 +5,8 @@
 #include "../resourcemgr.h"
 
 TMatchView::TMatchView(TGame* SetGame)
-	: TView(SetGame, TViewType::VT_HUMANVIEW)
+:	TView(SetGame, TViewType::VT_HUMANVIEW),
+	BombAnimation()
 {
 }
 
@@ -95,7 +96,7 @@ void TMatchView::Draw(sf::RenderTarget* target)
 			if (field.Bomb.State == BOMB_TICKING)
 			{
 				const float PulseInterval = 1250.f; // one complete pulse per 1.25 seconds
-				float sine = sinf(fmodf(field.Bomb.TimeUntilNextState * 1.f, PulseInterval) / PulseInterval * (float)M_PI * 2);
+				float sine = sinf(fmodf(BombAnimation.Time * 1.f, PulseInterval) / PulseInterval * (float)M_PI * 2);
 				bombSize += sine * (FIELD_SIZE / 25.f);
 			}
 			else if (field.Bomb.State == BOMB_EXPLODING)
@@ -110,6 +111,8 @@ void TMatchView::Draw(sf::RenderTarget* target)
 
 void TMatchView::Process(TGameTime Delta)
 {
+	BombAnimation.Process(Delta);
+
 	for (int slot = 0; slot < MAX_NUM_SLOTS; slot++)
 	{
 		TPlayer* p = &Game->GameData.Players[slot];
