@@ -62,10 +62,10 @@ private:
 	bool ProcessUpdatePlayerMovement(TConnectionID ConnectionID, uint8_t Slot, uint8_t Direction);
 
 	// notify connected clients
-	void DoLobbyCreated(TConnectionID ConnectionID);
-	void DoLobbyClosed();
+	void DoGameCreated(TConnectionID ConnectionID);
+	void DoGameEnded();
 	void DoEnteredLobby(TConnectionID ConnectionID, const std::string& GameName);
-	void DoLeftLobby(TConnectionID ConnectionID);
+	void DoLeftGame(TConnectionID ConnectionID);
 	void DoGameNameChanged(const std::string& GameName);
 	void DoArenaChanged(TConnectionID ConnectionID);
 	void DoNumRoundsChanged(int NumRounds);
@@ -99,6 +99,7 @@ private:
 	bool SetNumRounds(TConnectionID ConnectionID, int Value); // set the number of rounds to be played
 	void SetPlayerDirections(TConnectionID ConnectionID, uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
 	bool DropBomb(TConnectionID ConnectionID, uint8_t Slot);
+	void ClientDisconnected(TConnectionID ConnectionID);
 	
 public:
 	TServer();

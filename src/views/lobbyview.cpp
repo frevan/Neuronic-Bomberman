@@ -129,6 +129,7 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 	switch (InputID)
 	{
 		case actionToPreviousScreen:
+			Game->Client->CloseGame();
 			Game->SwitchToState(STATE_MENU);
 			handled = true;
 			break;
@@ -306,7 +307,7 @@ void TLobbyView::StartMatchNow()
 	Game->Client->SetNumRounds(rounds);
 	Game->Client->SelectArena(MapCombo->getSelectedItemIndex());
 
-	Game->SwitchToState(STATE_MATCH);
+	Game->Client->StartMatch();
 }
 
 bool TLobbyView::GetNumRoundsFromEdit(int& Value)

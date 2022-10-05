@@ -87,7 +87,7 @@ bool TServer::OpenLobby(TConnectionID ConnectionID)
 
 		OwnerID = ConnectionID;
 
-		DoLobbyCreated(ConnectionID);
+		DoGameCreated(ConnectionID);
 		DoEnteredLobby(ConnectionID, Data.GameName);
 
 		result = true;
@@ -98,8 +98,15 @@ bool TServer::OpenLobby(TConnectionID ConnectionID)
 
 bool TServer::JoinLobby(TConnectionID ConnectionID)
 {
-	DoEnteredLobby(ConnectionID, Data.GameName);
-	return true;
+	bool result = false;
+
+	if (State == INLOBBY)
+	{
+		DoEnteredLobby(ConnectionID, Data.GameName);
+		result = true;
+	}
+
+	return result;
 }
 
 void TServer::CloseLobby(TConnectionID ConnectionID)
@@ -112,7 +119,7 @@ void TServer::CloseLobby(TConnectionID ConnectionID)
 
 		OwnerID = 0;
 
-		DoLobbyClosed();
+		DoGameEnded();
 	}
 }
 
@@ -278,7 +285,7 @@ bool TServer::SelectArena(TConnectionID ConnectionID, const std::string& ArenaNa
 
 bool TServer::SetNumRounds(TConnectionID ConnectionID, int Value)
 {
-	if (ConnectionID == OwnerID)
+	if (ConnectionID != OwnerID)
 		return false;
 
 	if (Value < 1)
@@ -519,11 +526,12 @@ void TServer::CheckForDisconnectedSockets()
 	for (auto it = removedSockets.begin(); it != removedSockets.end(); it++)
 	{
 		TClientSocket* client = *it;
+		ClientDisconnected(client->ID);
 		delete client;
 	}
 }
 
-void TServer::DoLobbyCreated(TConnectionID ConnectionID)
+void TServer::DoGameCreated(TConnectionID ConnectionID)
 {
 	TClientSocket* socket = FindSocketForConnection(ConnectionID);
 	if (socket)
@@ -534,7 +542,7 @@ void TServer::DoLobbyCreated(TConnectionID ConnectionID)
 	}
 }
 
-void TServer::DoLobbyClosed()
+void TServer::DoGameEnded()
 {
 	sf::Packet packet;
 	packet << CLN_LobbyClosed;
@@ -556,8 +564,9 @@ void TServer::DoEnteredLobby(TConnectionID ConnectionID, const std::string& Game
 	}
 }
 
-void TServer::DoLeftLobby(TConnectionID ConnectionID)
+void TServer::DoLeftGame(TConnectionID ConnectionID)
 {
+	// TODO
 }
 
 void TServer::DoGameNameChanged(const std::string& GameName)
@@ -736,7 +745,7 @@ void TServer::ProcessReceivedPacket(TConnectionID ConnectionID, sf::Packet& Pack
 				success = ProcessConnectionRequest(ConnectionID, version);
 			break;
 
-		case SRV_CreateLobby: 
+		case SRV_CreateGame:
 			if (Packet >> s_1)
 			{
 				success = OpenLobby(ConnectionID);
@@ -745,11 +754,16 @@ void TServer::ProcessReceivedPacket(TConnectionID ConnectionID, sf::Packet& Pack
 			}
 			break;
 
-		case SRV_JoinLobby:
+		case SRV_JoinGame:
 			success = JoinLobby(ConnectionID);
 			break;
 
-		case SRV_CloseLobby: 
+		case SRV_EndGame: 
+			CloseLobby(ConnectionID);
+			success = true;
+			break;
+		case SRV_LeaveGame:
+			ClientDisconnected(ConnectionID);
 			break;
 
 		case SRV_AddPlayer: 
@@ -933,5 +947,24 @@ void TServer::DoPlayerPositionUpdate(TConnectionID ConnectionID)
 			if (socket)
 				SendPacketToSocket(socket, packet);
 		}
+	}
+}
+
+void TServer::ClientDisconnected(TConnectionID ConnectionID)
+{
+	// remove players for this client
+	for (uint8_t slot = 0; slot < MAX_NUM_SLOTS; slot++)
+	{
+		if (Slots[slot].ConnectionID == ConnectionID)
+			RemovePlayer(ConnectionID, slot);
+	}
+
+	if (ConnectionID == OwnerID)
+	{
+		CloseLobby(ConnectionID);
+	}
+	else
+	{
+
 	}
 }

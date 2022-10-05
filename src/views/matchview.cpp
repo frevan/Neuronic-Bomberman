@@ -140,6 +140,7 @@ bool TMatchView::ProcessInput(TInputID InputID, float Value)
 		case actionToPreviousScreen:
 			if (Value == 1.0f)
 			{
+				Game->Client->CloseGame();
 				Game->SwitchToState(STATE_MENU);
 				handled = true;
 			}

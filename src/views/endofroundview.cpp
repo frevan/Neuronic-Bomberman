@@ -58,7 +58,7 @@ bool TEndOfRoundView::ProcessInput(TInputID InputID, float Value)
 				if (Game->GameData.CurrentRound >= Game->GameData.MaxRounds)
 					Game->SwitchToState(STATE_MENU);
 				else
-					Game->SwitchToState(STATE_MATCH);
+					Game->Client->StartNextRound();
 				handled = true;
 			}
 			break;

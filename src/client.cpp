@@ -44,7 +44,8 @@ void TClient::CloseGame()
 	if (Listener)
 		Listener->ClientDisconnected();
 
-	Game->Server->Stop();
+	if (Game->IsServer)
+		Game->Server->Stop();
 }
 
 void TClient::StartNextRound()
@@ -109,11 +110,11 @@ void TClient::Process(TGameTime Delta)
 		switch (cmd.Command)
 		{
 			case CMD_OpenLobby:	
-				packet << SRV_CreateLobby << cmd.StrParam;
+				packet << SRV_CreateGame << cmd.StrParam;
 				Socket.send(packet);
 				break;
 			case CMD_JoinLobby:
-				packet << SRV_JoinLobby;
+				packet << SRV_JoinGame;
 				Socket.send(packet);
 				break;
 			case CMD_SetGameName: 
@@ -255,6 +256,7 @@ void TClient::ServerLobbyCreated()
 
 void TClient::ServerLobbyClosed()
 {
+	Disconnect();
 }
 
 void TClient::ServerEnteredLobby(const std::string& GameName)
@@ -469,6 +471,13 @@ void TClient::Connect(const std::string& ServerAddress, unsigned int ServerPort)
 
 void TClient::Disconnect()
 {
+	if (ConnectionStatus != CLIENT_IDLE)
+	{
+		sf::Packet packet;
+		packet << SRV_LeaveGame;
+		Socket.send(packet);
+	}
+
 	DisconnectInternal();
 	DisconnectedFromServer();
 }

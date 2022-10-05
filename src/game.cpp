@@ -450,7 +450,8 @@ void TGame::ClientMatchStarting()
 
 void TGame::ClientMatchStarted()
 {
-	CurrentStateView->StateChanged();
+	SwitchToState(STATE_MATCH);
+	//CurrentStateView->StateChanged();
 }
 
 void TGame::DefineDefaultPlayerInputs()
@@ -616,10 +617,12 @@ void TGame::SetupCurrentState()
 			InputMap.SetInputActive(actionMatchPlayer1DropBomb + offset, true);
 		}
 
+		/*
 		if (GameData.Status == GAME_NONE || GameData.Status == GAME_INLOBBY)
 			Client->StartMatch();
 		else
 			Client->StartNextRound();
+		*/
 	}
 }
 
@@ -646,12 +649,11 @@ void TGame::FinalizeCurrentState()
 
 void TGame::ClientRoundStarted()
 {
-	CurrentStateView->StateChanged();
+	SwitchToState(STATE_MATCH);
 }
 
 void TGame::ClientRoundEnded()
 {
-	//CurrentStateView->StateChanged();
 	SwitchToState(STATE_ENDOFROUND);
 }
 

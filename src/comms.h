@@ -11,9 +11,10 @@ const TProtocolVersion SERVER_VERSION = 1;
 // server commands (sent by client)
 // - connection
 const TCommand SRV_Connect = 0; // TProtocolVersion Version
-const TCommand SRV_CreateLobby = 1; // string GameName
-const TCommand SRV_CloseLobby = 2;
-const TCommand SRV_JoinLobby = 3;
+const TCommand SRV_CreateGame = 1; // string GameName
+const TCommand SRV_JoinGame = 2;
+const TCommand SRV_EndGame = 3;
+const TCommand SRV_LeaveGame = 4;
 // - players
 const TCommand SRV_AddPlayer = 100; // uint8_t Slot | string PlayerName
 const TCommand SRV_RemovePlayer = 101;// uint8_t Slot
