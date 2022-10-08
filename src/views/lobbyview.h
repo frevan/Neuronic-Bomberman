@@ -23,7 +23,7 @@ private:
 	void OnRemapPlayerControlsBtnClick();
 	void OnNumRoundsEditReturnKeyPressed(const std::string& Text);
 	
-	void FillMapCombo();
+	void FillMapCombo(bool KeepSelectedItem);
 	void DoAddPlayer();
 	void DoRemovePlayer();
 	void DoRemapPlayerControls();

@@ -20,6 +20,8 @@ public:
 	virtual void ClientMatchStarted() = 0;
 	virtual void ClientRoundStarted() = 0;
 	virtual void ClientRoundEnded() = 0;
+
+	virtual void ClientArenaName(int Count, int Index, const std::string Name) = 0;
 };
 
 class TClient;
@@ -52,52 +54,15 @@ class TClient
 {
 private:
 	int ConnectionStatus;
-	TGame* Game;
+	TGameData* Data;
 	sf::TcpSocket Socket;
 	std::queue<TClientCommand> Commands;
+
 	void ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet);
 	void ConnectedToServer(); // socket was connected
 	void DisconnectedFromServer(); // socket was disconnected
 	void DisconnectInternal();
-	void ServerPlayerPositionChanged(uint8_t Slot, float X, float Y);
-	void ServerBombExploding(const TFieldPosition& Position, TGameTime TimeUntilExploded);
-	void ServerBombExploded(const TFieldPosition& Position);
-	void ServerPlayerDying(uint8_t Slot, uint16_t TimeUntilDeath);
-	void ServerPlayerDied(uint8_t Slot);
-	void ServerArenaInfo(uint8_t Width, uint8_t Height, sf::Packet& Packet);
-	void ServerPlayerScore(uint8_t Slot, uint8_t Score);
-public:
-	TClientListener* Listener;
 
-	TClient(TGame* SetGame);
-	~TClient();
-
-	void Process(TGameTime Delta);
-
-	// connect to and disconnect from the server
-	void Connect(const std::string& ServerAddress, unsigned int ServerPort);
-	void Disconnect();
-
-	// start/stop the game, rounds, ...
-	void CreateGame(const std::string& SetName); // create a new game / lobby
-	void JoinGame(); // join a game / lobby
-	void CloseGame(); // leave the current game (removes all players that were added by this client)
-	void StartMatch(); // start the first round of the match	
-	void StartNextRound(); // start a new round when the previous one has ended
-
-	// set game properties (when in the lobby)
-	void SetGameName(const std::string& SetName); // change the game's name
-	void AddPlayer(const std::string& PlayerName, uint8_t Slot = INVALID_SLOT); // add a player to the current game
-	void RemovePlayer(uint8_t Slot); // remove a player from the current game
-	void SetPlayerName(uint8_t Slot, const std::string& Name); // change a player's name
-	void SelectArena(int Index); // set the arena
-	void SetNumRounds(int Value); // set the number of rounds to be played
-
-	// during the match
-	void UpdatePlayerMovement(uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
-	void DropBomb(uint8_t Slot);
-
-	// from TServerListener
 	void ServerConnected(); //  not the same as ServerConnected!
 	void ServerLobbyCreated();
 	void ServerLobbyClosed();
@@ -118,4 +83,43 @@ public:
 	void ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, uint16_t TimeUntilExplosion);
 	void ServerFullUpdate(TGameData* Data);
 	void ServerPlayerInfo(uint8_t Slot, uint8_t state, std::string Name);
+	void ServerPlayerPositionChanged(uint8_t Slot, float X, float Y);
+	void ServerBombExploding(const TFieldPosition& Position, TGameTime TimeUntilExploded);
+	void ServerBombExploded(const TFieldPosition& Position);
+	void ServerPlayerDying(uint8_t Slot, uint16_t TimeUntilDeath);
+	void ServerPlayerDied(uint8_t Slot);
+	void ServerArenaInfo(uint8_t Width, uint8_t Height, sf::Packet& Packet);
+	void ServerPlayerScore(uint8_t Slot, uint8_t Score);
+	void ServerArenaName(uint16_t Count, uint16_t Index, const std::string Name);
+
+public:
+	TClientListener* Listener;
+
+	TClient(TGameData* SetData);
+	~TClient();
+
+	void Process(TGameTime Delta);
+
+	// connect to and disconnect from the server
+	void Connect(const std::string& ServerAddress, unsigned int ServerPort);
+	void Disconnect();
+
+	// start/stop the game, rounds, ...
+	void CreateGame(const std::string& SetName); // create a new game / lobby
+	void JoinGame(); // join a game / lobby
+	void CloseGame(); // leave the current game (removes all players that were added by this client)
+	void StartMatch(); // start the first round of the match	
+	void StartNextRound(); // start a new round when the previous one has ended
+
+	// set game properties (when in the lobby)
+	void SetGameName(const std::string& SetName); // change the game's name
+	void AddPlayer(const std::string& PlayerName, uint8_t Slot = INVALID_SLOT); // add a player to the current game
+	void RemovePlayer(uint8_t Slot); // remove a player from the current game
+	void SetPlayerName(uint8_t Slot, const std::string& Name); // change a player's name
+	void SelectArena(const std::string ArenaName); // set the arena
+	void SetNumRounds(int Value); // set the number of rounds to be played
+
+	// during the match
+	void UpdatePlayerMovement(uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
+	void DropBomb(uint8_t Slot);
 };

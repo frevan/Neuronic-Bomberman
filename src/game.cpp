@@ -48,7 +48,8 @@ TGame::TGame()
 	Fonts(),
 	Logic(nullptr),
 	Maps(),
-	IsServer(false)
+	IsServer(false),
+	ArenaNames()
 {
 }
 
@@ -95,7 +96,7 @@ bool TGame::Initialize(const std::string& filename)
 	NextState = STATE_MENU;
 
 	// create client object
-	Client = new TClient(this);
+	Client = new TClient(&GameData);
 	Client->Listener = this;
 
 	// create server object
@@ -403,6 +404,9 @@ void TGame::ClientConnected()
 
 void TGame::ClientDisconnected()
 {
+	if (IsServer)
+		Server->Stop();
+
 	SwitchToState(STATE_MENU);
 }
 
@@ -411,8 +415,6 @@ void TGame::ClientEnteredLobby()
 	// add initial player(s)
 	if (IsServer)
 	{		
-		Client->SelectArena(0); // select the first map initially
-
 		Client->AddPlayer("Steve");
 		Client->AddPlayer("Bob");
 	}
@@ -452,6 +454,17 @@ void TGame::ClientMatchStarted()
 {
 	SwitchToState(STATE_MATCH);
 	//CurrentStateView->StateChanged();
+}
+
+void TGame::ClientArenaName(int Count, int Index, const std::string Name)
+{
+	if (Index == 0)
+		ArenaNames.clear();
+
+	ArenaNames.push_back(Name);
+
+	if (Index == Count - 1)
+		CurrentStateView->StateChanged();
 }
 
 void TGame::DefineDefaultPlayerInputs()

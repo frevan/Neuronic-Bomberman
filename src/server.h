@@ -83,6 +83,7 @@ private:
 	void DoArenaUpdate(TConnectionID ConnectionID = 0);
 	void DoPlayerPositionUpdate(TConnectionID ConnectionID = 0);
 	void DoPlayerInfoUpdate(TConnectionID ConnectionID = 0);
+	void DoArenaNameList(TConnectionID ConnectionID);
 
 	// do things
 	bool OpenLobby(TConnectionID ConnectionID); // create a lobby for a new game, owned by ConnectionID

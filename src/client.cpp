@@ -6,8 +6,8 @@ const int CLIENT_IDLE = 0;
 const int CLIENT_CONNECTING = 1;
 const int CLIENT_CONNECTED = 2;
 
-TClient::TClient(TGame* SetGame)
-:	Game(SetGame),
+TClient::TClient(TGameData* SetData)
+:	Data(SetData),
 	Listener(nullptr),
 	Commands(),
 	Socket(),
@@ -39,13 +39,10 @@ void TClient::CloseGame()
 {
 	Disconnect();
 
-	Game->GameData.Reset();
+	Data->Reset();
 
 	if (Listener)
 		Listener->ClientDisconnected();
-
-	if (Game->IsServer)
-		Game->Server->Stop();
 }
 
 void TClient::StartNextRound()
@@ -146,12 +143,8 @@ void TClient::Process(TGameTime Delta)
 				Socket.send(packet);
 				break;
 			case CMD_SelectArena:
-				TArena* map = Game->Maps.MapFromIndex((int)cmd.Index);
-				if (map)
-				{
-					packet << SRV_SetArena << map->Caption;
-					Socket.send(packet);
-				}
+				packet << SRV_SetArena << cmd.StrParam;
+				Socket.send(packet);
 				break;
 		};
 	}
@@ -167,11 +160,11 @@ void TClient::Process(TGameTime Delta)
 	}
 }
 
-void TClient::SelectArena(int Index)
+void TClient::SelectArena(const std::string ArenaName)
 {
 	TClientCommand cmd;
 	cmd.Command = CMD_SelectArena;
-	cmd.Index = Index;
+	cmd.StrParam = ArenaName;
 	Commands.push(cmd);
 }
 
@@ -190,9 +183,9 @@ void TClient::UpdatePlayerMovement(uint8_t Slot, bool Left, bool Right, bool Up,
 	if (Down)
 		direction |= DIRECTION_DOWN;
 
-	if (direction != Game->GameData.Players[Slot].Direction)
+	if (direction != Data->Players[Slot].Direction)
 	{
-		Game->GameData.Players[Slot].Direction = direction;
+		Data->Players[Slot].Direction = direction;
 
 		sf::Packet packet;
 		packet << SRV_UpdatePlayerMovement << Slot << direction;
@@ -261,9 +254,9 @@ void TClient::ServerLobbyClosed()
 
 void TClient::ServerEnteredLobby(const std::string& GameName)
 {
-	Game->GameData.Reset();
-	Game->GameData.GameName = GameName;
-	Game->GameData.Status = GAME_INLOBBY;
+	Data->Reset();
+	Data->GameName = GameName;
+	Data->Status = GAME_INLOBBY;
 	if (Listener)
 		Listener->ClientEnteredLobby();
 }
@@ -274,7 +267,7 @@ void TClient::ServerLeftLobby()
 
 void TClient::ServerGameNameChanged(const std::string& GameName)
 {
-	Game->GameData.SetName(GameName);
+	Data->SetName(GameName);
 	if (Listener)
 		Listener->ClientGameOptionsChanged();
 }
@@ -286,21 +279,21 @@ void TClient::ServerArenaChanged(const std::string& ArenaName)
 	/*
 	TArena* map = Game->Maps.MapFromName(ArenaName);
 	if (map)
-		Game->GameData.Arena.LoadFromFile(map->OriginalFileName);
+		Data->Arena.LoadFromFile(map->OriginalFileName);
 	*/
 }
 
 void TClient::ServerNumRoundsChanged(int NumRounds)
 {
-	Game->GameData.MaxRounds = NumRounds;
+	Data->MaxRounds = NumRounds;
 	if (Listener)
 		Listener->ClientGameOptionsChanged();
 }
 
 void TClient::ServerMatchStarted()
 {
-	Game->GameData.InitNewGame();
-	Game->GameData.Status = GAME_MATCHSTARTED;
+	Data->InitNewGame();
+	Data->Status = GAME_MATCHSTARTED;
 
 	if (Listener)
 		Listener->ClientMatchStarted();
@@ -308,28 +301,28 @@ void TClient::ServerMatchStarted()
 
 void TClient::ServerMatchEnded()
 {
-	Game->GameData.Status = GAME_MATCHENDED;
+	Data->Status = GAME_MATCHENDED;
 }
 
 void TClient::ServerRoundStarting()
 {
-	Game->GameData.Status = GAME_ROUNDSTARTING;
+	Data->Status = GAME_ROUNDSTARTING;
 	if (Listener)
 		Listener->ClientMatchStarting();
 
-	Game->GameData.InitNewRound();
+	Data->InitNewRound();
 }
 
 void TClient::ServerRoundStarted()
 {
-	Game->GameData.Status = GAME_PLAYING;
+	Data->Status = GAME_PLAYING;
 	if (Listener)
 		Listener->ClientRoundStarted();
 }
 
 void TClient::ServerRoundEnded()
 {
-	Game->GameData.Status = GAME_ROUNDENDED;
+	Data->Status = GAME_ROUNDENDED;
 	if (Listener)
 		Listener->ClientRoundEnded();
 }
@@ -339,7 +332,7 @@ void TClient::ServerPlayerAdded(uint8_t Slot, const std::string& PlayerName)
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
-	Game->GameData.AddPlayer(PlayerName, Slot);
+	Data->AddPlayer(PlayerName, Slot);
 	if (Listener)
 		Listener->ClientPlayerAdded(Slot);
 }
@@ -349,7 +342,7 @@ void TClient::ServerPlayerRemoved(uint8_t Slot)
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
-	Game->GameData.RemovePlayer(Slot);
+	Data->RemovePlayer(Slot);
 	if (Listener)
 		Listener->ClientPlayerRemoved(Slot);
 }
@@ -359,8 +352,8 @@ void TClient::ServerPlayerInfo(uint8_t Slot, uint8_t state, std::string Name)
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
-	Game->GameData.Players[Slot].State = state;
-	Game->GameData.Players[Slot].Name = Name;
+	Data->Players[Slot].State = state;
+	Data->Players[Slot].Name = Name;
 
 	if (Listener)
 		Listener->ClientPlayerInfoChanged(Slot);
@@ -371,7 +364,7 @@ void TClient::ServerPlayerNameChanged(uint8_t Slot, const std::string& PlayerNam
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
-	Game->GameData.SetPlayerName(Slot, PlayerName);
+	Data->SetPlayerName(Slot, PlayerName);
 	if (Listener)
 		Listener->ClientPlayerInfoChanged(Slot);
 }
@@ -381,7 +374,7 @@ void TClient::ServerPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, 
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
-	TPlayer* p = &(Game->GameData.Players[Slot]);
+	TPlayer* p = &(Data->Players[Slot]);
 	p->Direction = DIRECTION_NONE;
 	if (Left)
 		p->Direction |= DIRECTION_LEFT;
@@ -398,11 +391,11 @@ void TClient::ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Positi
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
-	TPlayer* p = &(Game->GameData.Players[Slot]);
+	TPlayer* p = &(Data->Players[Slot]);
 	p->ActiveBombs++;
 
 	TField* field{};
-	Game->GameData.Arena.At(Position, field);
+	Data->Arena.At(Position, field);
 	if (field)
 	{
 		field->Bomb.State = BOMB_TICKING;
@@ -414,18 +407,18 @@ void TClient::ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Positi
 
 void TClient::ServerFullUpdate(TGameData* Data)
 {
-	Game->GameData.UpdateGameFrom(Data);
+	Data->UpdateGameFrom(Data);
 }
 
 void TClient::ServerBombExploding(const TFieldPosition& Position, TGameTime TimeUntilExploded)
 {
 	TField* field;
-	Game->GameData.Arena.At(Position, field);
+	Data->Arena.At(Position, field);
 	if (field)
 	{
 		uint8_t slot = field->Bomb.DroppedByPlayer;
 		if (slot < MAX_NUM_SLOTS)
-			Game->GameData.Players[slot].ActiveBombs--;
+			Data->Players[slot].ActiveBombs--;
 
 		field->Bomb.State = BOMB_EXPLODING;
 		field->Bomb.TimeUntilNextState = TimeUntilExploded;
@@ -435,7 +428,7 @@ void TClient::ServerBombExploding(const TFieldPosition& Position, TGameTime Time
 void TClient::ServerBombExploded(const TFieldPosition& Position)
 {
 	TField* field;
-	Game->GameData.Arena.At(Position, field);
+	Data->Arena.At(Position, field);
 	if (field)
 		field->Bomb.State = BOMB_NONE;
 }
@@ -445,7 +438,7 @@ void TClient::ServerPlayerDying(uint8_t Slot, uint16_t TimeUntilDeath)
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
-	TPlayer* p = &(Game->GameData.Players[Slot]);
+	TPlayer* p = &(Data->Players[Slot]);
 	p->State = PLAYER_DYING;
 	p->TimeUntilNextState = TimeUntilDeath;
 }
@@ -455,7 +448,7 @@ void TClient::ServerPlayerDied(uint8_t Slot)
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
-	TPlayer* p = &(Game->GameData.Players[Slot]);
+	TPlayer* p = &(Data->Players[Slot]);
 	p->State = PLAYER_DEAD;
 }
 
@@ -496,7 +489,7 @@ void TClient::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet)
 		return;
 
 	uint8_t u8_1, u8_2, u8_3;
-	uint16_t u16_1;
+	uint16_t u16_1, u16_2;
 	float f_1, f_2;
 	std::string s_1;
 
@@ -564,6 +557,8 @@ void TClient::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet)
 				ServerArenaChanged(s_1);
 			break;
 		case CLN_ArenaList: 
+			if (Packet >> u16_1 >> u16_2 >> s_1)
+				ServerArenaName(u16_1, u16_2, s_1);
 			break;
 		
 		case CLN_MatchStarted:
@@ -653,8 +648,8 @@ void TClient::ServerPlayerPositionChanged(uint8_t Slot, float X, float Y)
 {
 	if (Slot >= 0 && Slot < MAX_NUM_SLOTS)
 	{
-		Game->GameData.Players[Slot].Position.X = X;
-		Game->GameData.Players[Slot].Position.Y = Y;
+		Data->Players[Slot].Position.X = X;
+		Data->Players[Slot].Position.Y = Y;
 	}
 }
 
@@ -663,8 +658,8 @@ void TClient::ServerArenaInfo(uint8_t Width, uint8_t Height, sf::Packet& Packet)
 	if (Width < 0 || Height < 0)
 		return;
 
-	if (Game->GameData.Arena.Width != Width || Game->GameData.Arena.Height != Height)
-		Game->GameData.Arena.SetSize(Width, Height);
+	if (Data->Arena.Width != Width || Data->Arena.Height != Height)
+		Data->Arena.SetSize(Width, Height);
 
 	uint8_t type;
 	TField* field = nullptr;
@@ -674,7 +669,7 @@ void TClient::ServerArenaInfo(uint8_t Width, uint8_t Height, sf::Packet& Packet)
 			if (!(Packet >> type))
 				break;
 
-			Game->GameData.Arena.At(x, y, field);
+			Data->Arena.At(x, y, field);
 			field->Type = type;
 		}
 
@@ -687,8 +682,14 @@ void TClient::ServerPlayerScore(uint8_t Slot, uint8_t Score)
 	if (Slot >= MAX_NUM_SLOTS)
 		return;
 
-	Game->GameData.Players[Slot].RoundsWon = Score;
+	Data->Players[Slot].RoundsWon = Score;
 
 	if (Listener)
 		Listener->ClientPlayerInfoChanged(Slot);
+}
+
+void TClient::ServerArenaName(uint16_t Count, uint16_t Index, const std::string Name)
+{
+	if (Listener)
+		Listener->ClientArenaName(Count, Index, Name);
 }

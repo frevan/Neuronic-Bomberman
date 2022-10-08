@@ -87,6 +87,12 @@ bool TServer::OpenLobby(TConnectionID ConnectionID)
 
 		OwnerID = ConnectionID;
 
+		if (Maps.Maps.size() > 0)
+		{
+			auto it = Maps.Maps.begin();
+			SelectArena(ConnectionID, (*it)->Caption);
+		}
+
 		DoGameCreated(ConnectionID);
 		DoEnteredLobby(ConnectionID, Data.GameName);
 
@@ -558,6 +564,7 @@ void TServer::DoEnteredLobby(TConnectionID ConnectionID, const std::string& Game
 		packet << CLN_EnteredLobby << GameName;
 		SendPacketToSocket(socket, packet);
 
+		DoArenaNameList(ConnectionID);
 		DoPlayerInfoUpdate(ConnectionID);
 		DoArenaChanged(ConnectionID);
 		DoFullUpdate(ConnectionID);
@@ -947,6 +954,28 @@ void TServer::DoPlayerPositionUpdate(TConnectionID ConnectionID)
 			if (socket)
 				SendPacketToSocket(socket, packet);
 		}
+	}
+}
+
+void TServer::DoArenaNameList(TConnectionID ConnectionID)
+{
+	TClientSocket* socket = FindSocketForConnection(ConnectionID);
+	if (!socket)
+		return;
+
+	sf::Packet packet;
+
+	uint16_t count = (uint16_t)Maps.Maps.size();
+	uint16_t index = 0;
+	for (auto it = Maps.Maps.begin(); it != Maps.Maps.end(); it++)
+	{
+		std::string name = (*it)->Caption;
+
+		packet.clear();
+		packet << CLN_ArenaList << count << index << name;
+		socket->send(packet);
+
+		index++;
 	}
 }
 
