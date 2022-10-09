@@ -36,6 +36,7 @@ private:
 	TGameLogic* Logic;
 	TState State;
 	TMapList Maps;
+	uint16_t CurrentMapIndex;
 	TConnectionID OwnerID;
 	TSlotInfo Slots[MAX_NUM_SLOTS];
 
@@ -96,7 +97,7 @@ private:
 	bool AddPlayer(TConnectionID ConnectionID, const std::string& PlayerName, uint8_t Slot = INVALID_SLOT); // add a player to the current game
 	bool RemovePlayer(TConnectionID ConnectionID, uint8_t Slot); // remove a player from the current game
 	bool SetPlayerName(TConnectionID ConnectionID, int Slot, const std::string& Name); // change a player's name
-	bool SelectArena(TConnectionID ConnectionID, const std::string& ArenaName); // set the arena
+	bool SelectArena(TConnectionID ConnectionID, uint16_t Index); // set the arena
 	bool SetNumRounds(TConnectionID ConnectionID, int Value); // set the number of rounds to be played
 	void SetPlayerDirections(TConnectionID ConnectionID, uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
 	bool DropBomb(TConnectionID ConnectionID, uint8_t Slot);

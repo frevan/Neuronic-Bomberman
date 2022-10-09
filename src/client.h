@@ -21,6 +21,7 @@ public:
 	virtual void ClientRoundStarted() = 0;
 	virtual void ClientRoundEnded() = 0;
 
+	virtual void ClientArenaSelected(int Index, const std::string Name) = 0;
 	virtual void ClientArenaName(int Count, int Index, const std::string Name) = 0;
 };
 
@@ -69,7 +70,7 @@ private:
 	void ServerEnteredLobby(const std::string& GameName);
 	void ServerLeftLobby();
 	void ServerGameNameChanged(const std::string& GameName);
-	void ServerArenaChanged(const std::string& ArenaName);
+	void ServerArenaChanged(uint16_t ArenaIndex, const std::string& ArenaName);
 	void ServerNumRoundsChanged(int NumRounds);
 	void ServerPlayerAdded(uint8_t Slot, const std::string& PlayerName);
 	void ServerPlayerRemoved(uint8_t Slot);
@@ -116,7 +117,7 @@ public:
 	void AddPlayer(const std::string& PlayerName, uint8_t Slot = INVALID_SLOT); // add a player to the current game
 	void RemovePlayer(uint8_t Slot); // remove a player from the current game
 	void SetPlayerName(uint8_t Slot, const std::string& Name); // change a player's name
-	void SelectArena(const std::string ArenaName); // set the arena
+	void SelectArena(uint16_t Index); // set the arena
 	void SetNumRounds(int Value); // set the number of rounds to be played
 
 	// during the match

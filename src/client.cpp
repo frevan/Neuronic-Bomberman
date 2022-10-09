@@ -143,7 +143,7 @@ void TClient::Process(TGameTime Delta)
 				Socket.send(packet);
 				break;
 			case CMD_SelectArena:
-				packet << SRV_SetArena << cmd.StrParam;
+				packet << SRV_SetArena << (uint16_t)cmd.Value;
 				Socket.send(packet);
 				break;
 		};
@@ -160,11 +160,11 @@ void TClient::Process(TGameTime Delta)
 	}
 }
 
-void TClient::SelectArena(const std::string ArenaName)
+void TClient::SelectArena(uint16_t Index)
 {
 	TClientCommand cmd;
 	cmd.Command = CMD_SelectArena;
-	cmd.StrParam = ArenaName;
+	cmd.Value = Index;
 	Commands.push(cmd);
 }
 
@@ -272,15 +272,10 @@ void TClient::ServerGameNameChanged(const std::string& GameName)
 		Listener->ClientGameOptionsChanged();
 }
 
-void TClient::ServerArenaChanged(const std::string& ArenaName)
+void TClient::ServerArenaChanged(uint16_t ArenaIndex, const std::string& ArenaName)
 {
 	if (Listener)
-		Listener->ClientGameOptionsChanged();
-	/*
-	TArena* map = Game->Maps.MapFromName(ArenaName);
-	if (map)
-		Data->Arena.LoadFromFile(map->OriginalFileName);
-	*/
+		Listener->ClientArenaSelected(ArenaIndex, ArenaName);
 }
 
 void TClient::ServerNumRoundsChanged(int NumRounds)
@@ -553,8 +548,8 @@ void TClient::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet)
 				ServerNumRoundsChanged(u8_1);
 			break;
 		case CLN_ArenaChanged: 
-			if (Packet >> s_1)
-				ServerArenaChanged(s_1);
+			if (Packet >> u16_1 >> s_1)
+				ServerArenaChanged(u16_1, s_1);
 			break;
 		case CLN_ArenaList: 
 			if (Packet >> u16_1 >> u16_2 >> s_1)

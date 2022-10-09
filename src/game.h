@@ -86,7 +86,9 @@ public:
 	std::string AppPath, MapPath;
 	TMapList Maps;
 	std::vector<std::string> ArenaNames;
-	bool IsServer; 
+	bool IsServer;
+	int CurrentArenaIndex;
+	std::string CurrentArenaName;
 
 	TGame();
 	~TGame();
@@ -115,5 +117,6 @@ public:
 	void ClientMatchStarted() override;
 	void ClientRoundStarted() override;
 	void ClientRoundEnded() override;
+	void ClientArenaSelected(int Index, const std::string Name) override;
 	void ClientArenaName(int Count, int Index, const std::string Name) override;
 };

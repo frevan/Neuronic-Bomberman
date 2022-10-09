@@ -88,10 +88,7 @@ bool TServer::OpenLobby(TConnectionID ConnectionID)
 		OwnerID = ConnectionID;
 
 		if (Maps.Maps.size() > 0)
-		{
-			auto it = Maps.Maps.begin();
-			SelectArena(ConnectionID, (*it)->Caption);
-		}
+			SelectArena(ConnectionID, 0);
 
 		DoGameCreated(ConnectionID);
 		DoEnteredLobby(ConnectionID, Data.GameName);
@@ -268,16 +265,17 @@ bool TServer::SetPlayerName(TConnectionID ConnectionID, int Slot, const std::str
 	return result;
 }
 
-bool TServer::SelectArena(TConnectionID ConnectionID, const std::string& ArenaName)
+bool TServer::SelectArena(TConnectionID ConnectionID, uint16_t Index)
 {
 	bool result = false;
 
 	if (ConnectionID == OwnerID)
 	{
-		TArena* map = Maps.MapFromName(ArenaName);
+		TArena* map = Maps.MapFromIndex(Index);
 
 		if (map)
 		{
+			CurrentMapIndex = Index;
 			Data.Arena.LoadFromFile(map->OriginalFileName);
 			result = true;
 
@@ -586,9 +584,10 @@ void TServer::DoGameNameChanged(const std::string& GameName)
 void TServer::DoArenaChanged(TConnectionID ConnectionID)
 {
 	std::string name = Data.Arena.Caption;
+	uint16_t index = CurrentMapIndex;
 
 	sf::Packet packet;
-	packet << CLN_ArenaChanged << name;
+	packet << CLN_ArenaChanged << index << name;
 
 	if (ConnectionID == 0)
 		SendPacketToAllClients(packet);
@@ -742,6 +741,7 @@ void TServer::ProcessReceivedPacket(TConnectionID ConnectionID, sf::Packet& Pack
 
 	bool success = false;
 	uint8_t u8_1, u8_2;
+	uint16_t u16_1;
 	std::string s_1;
 
 	switch (cmd)
@@ -796,8 +796,8 @@ void TServer::ProcessReceivedPacket(TConnectionID ConnectionID, sf::Packet& Pack
 				success = SetNumRounds(ConnectionID, u8_1);
 			break;
 		case SRV_SetArena:
-			if (Packet >> s_1)
-				success = SelectArena(ConnectionID, s_1);
+			if (Packet >> u16_1)
+				success = SelectArena(ConnectionID, u16_1);
 			break;
 
 		case SRV_StartMatch:

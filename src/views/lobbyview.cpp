@@ -124,7 +124,7 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 	if (Value != 1.0f)
 		return false; // only handle key presses
 
-	size_t mapIndex;
+	int mapIndex;
 
 	switch (InputID)
 	{
@@ -145,9 +145,9 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 				if (mapIndex > 0)
 					mapIndex--;
 				else
-					mapIndex = MapCombo->getItemCount() - 1;
+					mapIndex = (int)MapCombo->getItemCount() - 1;
 				MapCombo->setSelectedItemByIndex(mapIndex);
-				Game->Client->SelectArena(MapCombo->getSelectedItem());
+				Game->Client->SelectArena(mapIndex);
 			}
 			break;
 
@@ -160,7 +160,7 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 				else
 					mapIndex++;
 				MapCombo->setSelectedItemByIndex(mapIndex);
-				Game->Client->SelectArena(MapCombo->getSelectedItem());
+				Game->Client->SelectArena(mapIndex);
 			}
 			break;
 
@@ -208,23 +208,19 @@ void TLobbyView::StateChanged()
 
 void TLobbyView::FillMapCombo(bool KeepSelectedItem)
 {
-	bool isInList = false;
-	std::string oldSelectedItem = MapCombo->getSelectedItem();
-
 	MapCombo->removeAllItems();
 
 	for (auto it = Game->ArenaNames.begin(); it != Game->ArenaNames.end(); it++)
 	{
 		std::string caption = (*it);
 		MapCombo->addItem(caption);
-		if (caption == oldSelectedItem)
-			isInList = true;
 	}
 
-	if (!oldSelectedItem.empty() && isInList && KeepSelectedItem)
-		MapCombo->setSelectedItem(oldSelectedItem);
-	else
-		MapCombo->setSelectedItemByIndex(0);
+	int idx = 0;
+	if (Game->CurrentArenaIndex >= 0)
+		idx = Game->CurrentArenaIndex;
+
+	MapCombo->setSelectedItemByIndex(idx);
 }
 
 void TLobbyView::Draw(sf::RenderTarget* target)
@@ -315,7 +311,7 @@ void TLobbyView::OnMapComboItemSelected(int ItemIndex)
 	if (SettingGameData)
 		return;
 
-	Game->Client->SelectArena(MapCombo->getSelectedItem());
+	Game->Client->SelectArena(ItemIndex);
 }
 
 void TLobbyView::StartMatchNow()
@@ -325,7 +321,7 @@ void TLobbyView::StartMatchNow()
 		rounds = 1;
 
 	Game->Client->SetNumRounds(rounds);
-	Game->Client->SelectArena(MapCombo->getSelectedItem());
+	Game->Client->SelectArena(MapCombo->getSelectedItemIndex());
 
 	Game->Client->StartMatch();
 }

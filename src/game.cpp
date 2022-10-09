@@ -49,7 +49,9 @@ TGame::TGame()
 	Logic(nullptr),
 	Maps(),
 	IsServer(false),
-	ArenaNames()
+	ArenaNames(),
+	CurrentArenaIndex(-1),
+	CurrentArenaName()
 {
 }
 
@@ -407,6 +409,9 @@ void TGame::ClientDisconnected()
 	if (IsServer)
 		Server->Stop();
 
+	CurrentArenaIndex = -1;
+	CurrentArenaName = "";
+
 	SwitchToState(STATE_MENU);
 }
 
@@ -672,5 +677,13 @@ void TGame::ClientRoundEnded()
 
 void TGame::ClientGameOptionsChanged()
 {
+	CurrentStateView->StateChanged();
+}
+
+void TGame::ClientArenaSelected(int Index, const std::string Name)
+{
+	CurrentArenaIndex = Index;
+	CurrentArenaName = Name;
+
 	CurrentStateView->StateChanged();
 }
