@@ -47,12 +47,15 @@ void TLobbyView::CreateWidgets()
 	backbtn->connect("pressed", &TLobbyView::OnBackBtnClick, this);
 
 	// start
-	tgui::Button::Ptr startbtn = std::make_shared<tgui::Button>();
-	AddWidgetToGUI(startbtn);
-	startbtn->setText("Start!");
-	startbtn->setPosition(625, 535);
-	startbtn->setSize(150, 40);
-	startbtn->connect("pressed", &TLobbyView::OnStartBtnClick, this);
+	if (Game->IsServer)
+	{
+		tgui::Button::Ptr startbtn = std::make_shared<tgui::Button>();
+		AddWidgetToGUI(startbtn);
+		startbtn->setText("Start!");
+		startbtn->setPosition(625, 535);
+		startbtn->setSize(150, 40);
+		startbtn->connect("pressed", &TLobbyView::OnStartBtnClick, this);
+	}
 	
 	// add player
 	tgui::Button::Ptr addPlayerBtn = std::make_shared<tgui::Button>();
