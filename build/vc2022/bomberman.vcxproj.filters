@@ -10,6 +10,9 @@
     <Filter Include="source\utility">
       <UniqueIdentifier>{4a97a495-bc1d-4d70-9ea8-ce06480dbae4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\states">
+      <UniqueIdentifier>{c273794f-9172-4dfe-b821-e86c3d0855e2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">

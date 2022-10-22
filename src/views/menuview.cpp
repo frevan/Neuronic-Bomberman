@@ -61,7 +61,7 @@ void TMenuView::CreateWidgets()
 void TMenuView::StartNewGame()
 {
 	Game->IsServer = true;
-	Game->SwitchToState(STATE_LOBBY);
+	Game->SwitchToState(GAMESTATE_LOBBY);
 }
 
 void TMenuView::OnNewGameBtnClick()
@@ -84,7 +84,7 @@ void TMenuView::OnJoinGameBtnClick()
 	msgbox->showWithEffect(tgui::ShowAnimationType::Fade, sf::Time::Zero);
 	*/
 
-	Game->SwitchToState(STATE_CONNECTTOSERVER);
+	Game->SwitchToState(GAMESTATE_CONNECTTOSERVER);
 }
 
 void TMenuView::OnOptionsBtnClick()
@@ -127,7 +127,7 @@ bool TMenuView::ProcessInput(TInputID InputID, float Value)
 			break;
 
 		case actionMenuJoinGame:
-			Game->SwitchToState(STATE_CONNECTTOSERVER);
+			Game->SwitchToState(GAMESTATE_CONNECTTOSERVER);
 			break;
 	};
 

@@ -141,7 +141,7 @@ bool TMatchView::ProcessInput(TInputID InputID, float Value)
 			if (Value == 1.0f)
 			{
 				Game->Client->CloseGame();
-				Game->SwitchToState(STATE_MENU);
+				Game->SwitchToState(GAMESTATE_MENU);
 				handled = true;
 			}
 			break;

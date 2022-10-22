@@ -20,16 +20,6 @@ class TGame;
 #include "gamelogic.h"
 #include "server.h"
 
-const int STATE_NONE = 0;
-const int STATE_MENU = 1;
-const int STATE_CONNECTING = 2;
-const int STATE_LOBBY = 3;
-const int STATE_MATCH = 4;
-const int STATE_ENDOFROUND = 5;
-const int STATE_ENDOFMATCH = 6;
-const int STATE_CONNECTTOSERVER = 7;
-const int STATE_QUIT = 1000;
-
 const int VIEW_OVERLAY = 0;
 const int VIEW_TGUISYSTEM = 1;
 const int VIEW_MENU = 11;
@@ -44,12 +34,11 @@ typedef struct
 	std::string FileName;
 } TMapInfo;
 
-class TGame:	public TClientListener
+class TGame : public TClientListener
 {
 private:
 	sf::RenderWindow* Window;
 	int NextState;
-	TView* CurrentStateView;
 	TView* SystemGUIView;
 	tgui::Gui* GUI;	
 	std::vector<TView*> Views;
@@ -65,8 +54,6 @@ private:
 
 	void ProcessInputs();
 	void ActivateNextState();
-	void SetupCurrentState();
-	void FinalizeCurrentState();
 
 	//void LoadMapInfos();
 
@@ -76,17 +63,16 @@ private:
 	void DefineJoystickForPlayer(int Slot, int JoystickIndex, sf::Joystick::Axis LeftRight, sf::Joystick::Axis UpDown, int DropBombBtn);
 
 public:
-	int CurrentState;
+	TState* CurrentState;
 	bool ShouldQuit;
+	bool IsServer;
 	TInputMap InputMap;
 	TClient* Client;
 	TServer* Server;
 	TGameData GameData;
 	TFontManager Fonts;
-	std::string AppPath, MapPath;
-	TMapList Maps;
+	std::string AppPath;
 	std::vector<std::string> ArenaNames;
-	bool IsServer;
 	int CurrentArenaIndex;
 	std::string CurrentArenaName;
 
@@ -98,7 +84,6 @@ public:
 
 	void Execute();
 
-	// from TGameInterface
 	void SwitchToState(int NewState); // see STATE_ constants
 	void RequestQuit();
 	TView* AttachView(int NewView); // see VIEW_ constants 

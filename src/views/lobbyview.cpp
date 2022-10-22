@@ -133,7 +133,7 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 	{
 		case actionToPreviousScreen:
 			Game->Client->CloseGame();
-			Game->SwitchToState(STATE_MENU);
+			Game->SwitchToState(GAMESTATE_MENU);
 			handled = true;
 			break;
 

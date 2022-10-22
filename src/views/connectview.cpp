@@ -47,7 +47,7 @@ bool TConnectToServerView::ProcessInput(TInputID InputID, float Value)
 	switch (InputID)
 	{
 		case actionToPreviousScreen:
-			Game->SwitchToState(STATE_MENU);
+			Game->SwitchToState(GAMESTATE_MENU);
 			handled = true;
 			break;
 

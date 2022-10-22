@@ -33,13 +33,11 @@ TGame::TGame()
 	: Window(nullptr),
 	ShouldQuit(false),
 	InputMap(),
-	CurrentState(STATE_NONE),
-	NextState(STATE_NONE),
-	CurrentStateView(nullptr),
+	CurrentState(GAMESTATE_NONE),
+	NextState(GAMESTATE_NONE),
 	GUI(nullptr),
 	SystemGUIView(nullptr),
 	AppPath(),
-	MapPath(),
 	Views(),
 	ViewsMutex(),
 	Client(nullptr),
@@ -47,7 +45,6 @@ TGame::TGame()
 	GameData(),
 	Fonts(),
 	Logic(nullptr),
-	Maps(),
 	IsServer(false),
 	ArenaNames(),
 	CurrentArenaIndex(-1),
@@ -64,10 +61,8 @@ bool TGame::Initialize(const std::string& filename)
 {
 	// initialize some data
 	DetermineAppPath(filename);
-	MapPath = AppPath + GetMapSubPath();
 	Fonts.SetFontPath(AppPath + GetResourceSubPath() + GetFontSubPath());
 	Fonts.LoadFonts();
-	Maps.LoadAllMaps(AppPath + GetMapSubPath());
 
 	// create application window
 	#ifdef FULLSCREEN
@@ -95,7 +90,7 @@ bool TGame::Initialize(const std::string& filename)
 	DefineDefaultPlayerInputs();
 
 	// set next state
-	NextState = STATE_MENU;
+	NextState = GAMESTATE_MENU;
 
 	// create client object
 	Client = new TClient(&GameData);
@@ -114,7 +109,7 @@ bool TGame::Initialize(const std::string& filename)
 void TGame::Finalize()
 {
 	// finalize state
-	NextState = STATE_QUIT;
+	NextState = GAMESTATE_QUIT;
 	ActivateNextState();
 
 	// remove the player input bindings that are always created
@@ -175,8 +170,9 @@ void TGame::Execute()
 			TGameTime delta = nowTime - prevTickTime;
 
 			// let the current view process as well
-			if (CurrentStateView)
-				CurrentStateView->Process(delta);
+			if (CurrentState)
+				if (CurrentState->View)
+					CurrentState->View->Process(delta);
 
 			// process game logic (before the server is processed)
 			Logic->Process(delta);
@@ -261,30 +257,33 @@ void TGame::SwitchToState(int NewState)
 
 void TGame::ActivateNextState()
 {
-	if (NextState == STATE_NONE)
+	if (NextState == GAMESTATE_NONE)
 		return;
 
-	FinalizeCurrentState();
-
-	if (CurrentStateView)
+	if (CurrentState)
 	{
-		DetachView(CurrentStateView->ID);
-		CurrentStateView = nullptr;
+		CurrentState->Finish();
+		delete CurrentState;
+		CurrentState = nullptr;
 	}
 
-	CurrentState = NextState; // make the switch
-	NextState = STATE_NONE;
-
-	switch (CurrentState)
+	switch (NextState)
 	{
-		case STATE_MENU: CurrentStateView = AttachView(VIEW_MENU); break;
-		case STATE_LOBBY: CurrentStateView = AttachView(VIEW_LOBBY); break;
-		case STATE_MATCH: CurrentStateView = AttachView(VIEW_MATCH); break;
-		case STATE_ENDOFROUND: CurrentStateView = AttachView(VIEW_ENDOFROUND); break;
-		case STATE_CONNECTTOSERVER: CurrentStateView = AttachView(VIEW_CONNECTTOSERVER); break;
+		case GAMESTATE_NONE: break;
+		case GAMESTATE_MENU: CurrentState = new TMenuState(this); break;
+		case GAMESTATE_CONNECTING: CurrentState = new TConnectingState(this); break;
+		case GAMESTATE_LOBBY: CurrentState = new TLobbyState(this); break;
+		case GAMESTATE_MATCH: CurrentState = new TMatchState(this); break;
+		case GAMESTATE_ENDOFROUND: CurrentState = new TEndOfRoundState(this); break;
+		case GAMESTATE_ENDOFMATCH: CurrentState = new TEndOfMatchState(this); break;
+		case GAMESTATE_CONNECTTOSERVER: CurrentState = new TConnectToServerState(this); break;
+		case GAMESTATE_QUIT: break;
 	};
 
-	SetupCurrentState();
+	NextState = GAMESTATE_NONE;
+
+	if (CurrentState)
+		CurrentState->Init();
 }
 
 void TGame::RequestQuit()
@@ -412,7 +411,7 @@ void TGame::ClientDisconnected()
 	CurrentArenaIndex = -1;
 	CurrentArenaName = "";
 
-	SwitchToState(STATE_MENU);
+	SwitchToState(GAMESTATE_MENU);
 }
 
 void TGame::ClientEnteredLobby()
@@ -426,38 +425,43 @@ void TGame::ClientEnteredLobby()
 	else
 	{
 		Client->AddPlayer("Charles");
-		SwitchToState(STATE_LOBBY);
+		SwitchToState(GAMESTATE_LOBBY);
 	}
 }
 
 void TGame::ClientPlayerAdded(int Slot)
 {
-	CurrentStateView->StateChanged();
+	if (CurrentState)
+		CurrentState->GameStateChanged();
 }
 
 void TGame::ClientPlayerNotAdded(int Slot)
 {
-	CurrentStateView->StateChanged();
+	if (CurrentState)
+		CurrentState->GameStateChanged();
 }
 
 void TGame::ClientPlayerRemoved(int Slot)
 {
-	CurrentStateView->StateChanged();
+	if (CurrentState)
+		CurrentState->GameStateChanged();
 }
 
 void TGame::ClientPlayerInfoChanged(int Slot)
 {
-	CurrentStateView->StateChanged();
+	if (CurrentState)
+		CurrentState->GameStateChanged();
 }
 
 void TGame::ClientMatchStarting()
 {
-	CurrentStateView->StateChanged();
+	if (CurrentState)
+		CurrentState->GameStateChanged();
 }
 
 void TGame::ClientMatchStarted()
 {
-	SwitchToState(STATE_MATCH);
+	SwitchToState(GAMESTATE_MATCH);
 	//CurrentStateView->StateChanged();
 }
 
@@ -469,7 +473,8 @@ void TGame::ClientArenaName(int Count, int Index, const std::string Name)
 	ArenaNames.push_back(Name);
 
 	if (Index == Count - 1)
-		CurrentStateView->StateChanged();
+		if (CurrentState)
+			CurrentState->GameStateChanged();
 }
 
 void TGame::DefineDefaultPlayerInputs()
@@ -599,85 +604,20 @@ void TGame::DefineJoystickForPlayer(int Slot, int JoystickIndex, sf::Joystick::A
 	InputMap.DefineInput(id, TInputControl::Pack(TInputControl::TType::JOYSTICKBUTTON, JoystickIndex, DropBombBtn, 0));
 }
 
-void TGame::SetupCurrentState()
-{
-	if (CurrentState == STATE_MENU)
-	{
-		InputMap.DefineInput(actionMenuJoinGame, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Space, 0));
-	}
-	else if (CurrentState == STATE_LOBBY)
-	{
-		if (IsServer)
-		{
-			Server->Start();
-
-			Client->Connect("127.0.0.1", SERVER_PORT);
-			Client->CreateGame("Don't Explode");
-		}
-
-		InputMap.DefineInput(actionLobbyPrevMap, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Left, 0));
-		InputMap.DefineInput(actionLobbyNextMap, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Right, 0));
-		InputMap.DefineInput(actionLobbyPrevSlot, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Up, 0));
-		InputMap.DefineInput(actionLobbyNextSlot, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Down, 0));
-		InputMap.DefineInput(actionLobbyAddPlayer, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Equal, 0));
-		InputMap.DefineInput(actionLobbyRemovePlayer, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Hyphen, 0));
-		InputMap.DefineInput(actionLobbyRemapPlayerControls, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Num0, 0));
-	}
-	else if (CurrentState == STATE_MATCH)
-	{
-		for (int i = 0; i < MAX_NUM_SLOTS; i++)
-		{
-			int offset = i * PlayerActionCount;
-			InputMap.SetInputActive(actionMatchPlayer1Left + offset, true);
-			InputMap.SetInputActive(actionMatchPlayer1Right + offset, true);
-			InputMap.SetInputActive(actionMatchPlayer1Up + offset, true);
-			InputMap.SetInputActive(actionMatchPlayer1Down + offset, true);
-			InputMap.SetInputActive(actionMatchPlayer1DropBomb + offset, true);
-		}
-
-		/*
-		if (GameData.Status == GAME_NONE || GameData.Status == GAME_INLOBBY)
-			Client->StartMatch();
-		else
-			Client->StartNextRound();
-		*/
-	}
-}
-
-void TGame::FinalizeCurrentState()
-{
-	if (CurrentState == STATE_LOBBY)
-	{
-		InputMap.RemoveInput(actionLobbyPrevMap);
-		InputMap.RemoveInput(actionLobbyNextMap);
-	}
-	else if (CurrentState == STATE_MATCH)
-	{
-		for (int i = 0; i < MAX_NUM_SLOTS; i++)
-		{
-			int offset = i * PlayerActionCount;
-			InputMap.SetInputActive(actionMatchPlayer1Left + offset, false);
-			InputMap.SetInputActive(actionMatchPlayer1Right + offset, false);
-			InputMap.SetInputActive(actionMatchPlayer1Up + offset, false);
-			InputMap.SetInputActive(actionMatchPlayer1Down + offset, false);
-			InputMap.SetInputActive(actionMatchPlayer1DropBomb + offset, false);
-		}
-	}
-}
-
 void TGame::ClientRoundStarted()
 {
-	SwitchToState(STATE_MATCH);
+	SwitchToState(GAMESTATE_MATCH);
 }
 
 void TGame::ClientRoundEnded()
 {
-	SwitchToState(STATE_ENDOFROUND);
+	SwitchToState(GAMESTATE_ENDOFROUND);
 }
 
 void TGame::ClientGameOptionsChanged()
 {
-	CurrentStateView->StateChanged();
+	if (CurrentState)
+		CurrentState->GameStateChanged();
 }
 
 void TGame::ClientArenaSelected(int Index, const std::string Name)
@@ -685,5 +625,6 @@ void TGame::ClientArenaSelected(int Index, const std::string Name)
 	CurrentArenaIndex = Index;
 	CurrentArenaName = Name;
 
-	CurrentStateView->StateChanged();
+	if (CurrentState)
+		CurrentState->GameStateChanged();
 }

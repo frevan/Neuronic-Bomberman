@@ -47,7 +47,7 @@ bool TEndOfRoundView::ProcessInput(TInputID InputID, float Value)
 		case actionToPreviousScreen:
 			if (Value == 1.0f)
 			{
-				Game->SwitchToState(STATE_MENU);
+				Game->SwitchToState(GAMESTATE_MENU);
 				handled = true;
 			}
 			break;
@@ -56,7 +56,7 @@ bool TEndOfRoundView::ProcessInput(TInputID InputID, float Value)
 			if (Value == 1.0f)
 			{
 				if (Game->GameData.CurrentRound >= Game->GameData.MaxRounds)
-					Game->SwitchToState(STATE_MENU);
+					Game->SwitchToState(GAMESTATE_MENU);
 				else
 					Game->Client->StartNextRound();
 				handled = true;
