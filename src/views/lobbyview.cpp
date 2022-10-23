@@ -25,18 +25,42 @@ void TLobbyView::CreateWidgets()
 	// server name
 	tgui::Label::Ptr servernamelbl = std::make_shared<tgui::Label>();
 	AddWidgetToGUI(servernamelbl);
-	servernamelbl->setText("Game name");
-	servernamelbl->setPosition(450, 25);
+	servernamelbl->setText("Name");
+	servernamelbl->setPosition(520, 25);
 	servernamelbl->getRenderer()->setTextColor(sf::Color::White);
 	servernamelbl->setTextSize(14);
 	// ---
 	GameNameEdit = std::make_shared<tgui::EditBox>();
 	AddWidgetToGUI(GameNameEdit);
 	GameNameEdit->setText(Game->GameData.GameName);
-	GameNameEdit->setPosition(550, 24);
-	GameNameEdit->setSize(180, 20);
+	GameNameEdit->setPosition(600, 25);
+	GameNameEdit->setSize(175, 20);
 	GameNameEdit->setTextSize(14);
 	GameNameEdit->connect("TextChanged", &TLobbyView::OnGameNameEditTextEntered, this);
+	// number of rounds
+	tgui::Label::Ptr roundslbl = std::make_shared<tgui::Label>();
+	AddWidgetToGUI(roundslbl);
+	roundslbl->setText("Rounds");
+	roundslbl->setPosition(520, 55);
+	roundslbl->getRenderer()->setTextColor(sf::Color::White);
+	roundslbl->setTextSize(14);
+	// ---
+	NumRoundsEdit = std::make_shared<tgui::EditBox>();
+	AddWidgetToGUI(NumRoundsEdit);
+	NumRoundsEdit->setPosition(600, 55);
+	NumRoundsEdit->setSize(175, 20);
+	NumRoundsEdit->setInputValidator(tgui::EditBox::Validator::UInt);
+	NumRoundsEdit->setText(std::to_string(Game->GameData.MaxRounds));
+	NumRoundsEdit->connect("ReturnKeyPressed", &TLobbyView::OnNumRoundsEditReturnKeyPressed, this);
+	// map combo
+	MapCombo = std::make_shared<tgui::ComboBox>();
+	AddWidgetToGUI(MapCombo);
+	MapCombo->setPosition(520, 100);
+	MapCombo->setSize(255, 25);
+	MapCombo->setItemsToDisplay(16);
+	FillMapCombo(false);
+	MapCombo->setSelectedItemByIndex(0);
+	MapCombo->connect("ItemSelected", &TLobbyView::OnMapComboItemSelected, this);
 
 	// back
 	tgui::Button::Ptr backbtn = std::make_shared<tgui::Button>();
@@ -52,7 +76,7 @@ void TLobbyView::CreateWidgets()
 		tgui::Button::Ptr startbtn = std::make_shared<tgui::Button>();
 		AddWidgetToGUI(startbtn);
 		startbtn->setText("Start!");
-		startbtn->setPosition(625, 535);
+		startbtn->setPosition(577, 535);
 		startbtn->setSize(150, 40);
 		startbtn->connect("pressed", &TLobbyView::OnStartBtnClick, this);
 	}
@@ -61,48 +85,23 @@ void TLobbyView::CreateWidgets()
 	tgui::Button::Ptr addPlayerBtn = std::make_shared<tgui::Button>();
 	AddWidgetToGUI(addPlayerBtn);
 	addPlayerBtn->setText("Add [=]");
-	addPlayerBtn->setPosition(30, 470);
+	addPlayerBtn->setPosition(50, 470);
 	addPlayerBtn->setSize(100, 30);
 	addPlayerBtn->connect("pressed", &TLobbyView::OnAddPlayerBtnClick, this);
 	// remove player
 	tgui::Button::Ptr removePlayerBtn = std::make_shared<tgui::Button>();
 	AddWidgetToGUI(removePlayerBtn);
 	removePlayerBtn->setText("Remove [-]");
-	removePlayerBtn->setPosition(140, 470);
+	removePlayerBtn->setPosition(160, 470);
 	removePlayerBtn->setSize(100, 30);
 	removePlayerBtn->connect("pressed", &TLobbyView::OnRemovePlayerBtnClick, this);
 	// remap input controls
 	tgui::Button::Ptr remapPlayerControlsBtn = std::make_shared<tgui::Button>();
 	AddWidgetToGUI(remapPlayerControlsBtn);
 	remapPlayerControlsBtn->setText("Configure [0]");
-	remapPlayerControlsBtn->setPosition(250, 470);
+	remapPlayerControlsBtn->setPosition(270, 470);
 	remapPlayerControlsBtn->setSize(100, 30);
 	remapPlayerControlsBtn->connect("pressed", &TLobbyView::OnRemapPlayerControlsBtnClick, this);
-
-	// map combo and <> buttons
-	MapCombo = std::make_shared<tgui::ComboBox>();
-	AddWidgetToGUI(MapCombo);
-	MapCombo->setPosition(450, 85);
-	MapCombo->setSize(300, 25);
-	MapCombo->setItemsToDisplay(16);
-	FillMapCombo(false);
-	MapCombo->setSelectedItemByIndex(0);
-	MapCombo->connect("ItemSelected", &TLobbyView::OnMapComboItemSelected, this);
-	/*
-	button = addButton(window, ArtworkPath + imgButton, cbMapPrevious, 420, 85, 25, 25);
-	button->setText("<");
-	button = addButton(window, ArtworkPath + imgButton, cbMapNext, 755, 85, 25, 25);
-	button->setText(">");
-	*/
-
-	// number of rounds
-	NumRoundsEdit = std::make_shared<tgui::EditBox>();
-	AddWidgetToGUI(NumRoundsEdit);
-	NumRoundsEdit->setPosition(450, 450);
-	NumRoundsEdit->setSize(180, 20);
-	NumRoundsEdit->setInputValidator(tgui::EditBox::Validator::UInt);
-	NumRoundsEdit->setText(std::to_string(Game->GameData.MaxRounds));
-	NumRoundsEdit->connect("ReturnKeyPressed", &TLobbyView::OnNumRoundsEditReturnKeyPressed, this);
 }
 
 void TLobbyView::OnBackBtnClick()
@@ -230,9 +229,21 @@ void TLobbyView::Draw(sf::RenderTarget* target)
 {
 	TTGUIView::Draw(target);
 
-	const int FIELD_SIZE = 20;
-	float MapOffsetX = 450.f;
+	const int FIELD_SIZE = 17;
+	float MapOffsetX = 520.f;
 	float MapOffsetY = 140.f;
+
+	sf::RectangleShape background(sf::Vector2f(495, 600));
+	background.setPosition(0, 0);
+	background.setFillColor(sf::Color(30, 30, 30));
+	background.setOutlineThickness(0.f);
+	target->draw(background);
+
+	background.setSize(sf::Vector2f(305, 600));
+	background.setPosition(495, 0);
+	background.setFillColor(sf::Color(60, 50, 40));
+	background.setOutlineThickness(0.f);
+	target->draw(background);
 
 	for (size_t row = 0; row < Game->GameData.Arena.Height; row++)
 	{
