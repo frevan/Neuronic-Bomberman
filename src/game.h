@@ -61,6 +61,8 @@ private:
 	void RemovePlayerInputs();
 	void DefineKeyboardForPlayer(int Slot, sf::Keyboard::Key Left, sf::Keyboard::Key Right, sf::Keyboard::Key Up, sf::Keyboard::Key Down, sf::Keyboard::Key DropBomb);
 	void DefineJoystickForPlayer(int Slot, int JoystickIndex, sf::Joystick::Axis LeftRight, sf::Joystick::Axis UpDown, int DropBombBtn);
+	void ReadSettings();
+	void StoreSettings();
 
 public:
 	TState* CurrentState;
@@ -75,6 +77,7 @@ public:
 	std::vector<std::string> ArenaNames;
 	int CurrentArenaIndex;
 	std::string CurrentArenaName;
+	std::string ChosenPlayerName;
 
 	TGame();
 	~TGame();

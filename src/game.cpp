@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <cassert>
+#include <fstream>
 
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
@@ -16,6 +17,7 @@
 #include "views/endofroundview.h"
 #include "views/connectview.h"
 #include "comms.h"
+#include "utility/stringutil.h"
 
 //#define FULLSCREEN
 #define FRAMERATE_LIMIT
@@ -48,7 +50,8 @@ TGame::TGame()
 	IsServer(false),
 	ArenaNames(),
 	CurrentArenaIndex(-1),
-	CurrentArenaName()
+	CurrentArenaName(),
+	ChosenPlayerName()
 {
 }
 
@@ -102,12 +105,16 @@ bool TGame::Initialize(const std::string& filename)
 
 	// create the logic object
 	Logic = new TClientLogic(&GameData);
+
+	ReadSettings();
 		
 	return true;
 }
 
 void TGame::Finalize()
 {
+	StoreSettings();
+
 	// finalize state
 	NextState = GAMESTATE_QUIT;
 	ActivateNextState();
@@ -138,6 +145,36 @@ void TGame::Finalize()
 	// delete the application window
 	delete Window;
 	Window = nullptr;
+}
+
+void TGame::ReadSettings()
+{
+	std::ifstream ifs;
+
+	std::string username;
+
+	std::string fname = AppPath + "username.txt";
+	ifs.open(fname, std::fstream::in);
+	if (ifs.is_open())
+	{
+		ifs >> username;
+		ifs.close();
+	}
+
+	trim(username);
+	if (username.size() > 20)
+		username.resize(20);
+	ChosenPlayerName = username;
+}
+
+void TGame::StoreSettings()
+{
+	std::ofstream ofs;
+
+	std::string fname = AppPath + "username.txt";
+	ofs.open(fname, std::fstream::out);
+	ofs << ChosenPlayerName;
+	ofs.close();
 }
 
 void TGame::Execute()
@@ -262,6 +299,9 @@ void TGame::ActivateNextState()
 
 	if (CurrentState)
 	{
+		if (NextState == CurrentState->ID)
+			return;
+
 		CurrentState->Finish();
 		delete CurrentState;
 		CurrentState = nullptr;
@@ -416,17 +456,13 @@ void TGame::ClientDisconnected()
 
 void TGame::ClientEnteredLobby()
 {
-	// add initial player(s)
-	if (IsServer)
-	{		
-		Client->AddPlayer("Steve");
-		Client->AddPlayer("Bob");
-	}
-	else
-	{
-		Client->AddPlayer("Charles");
+	std::string name = ChosenPlayerName;
+	if (ChosenPlayerName.empty())
+		name = "Player";
+	Client->AddPlayer(name);
+
+	if (!IsServer)
 		SwitchToState(GAMESTATE_LOBBY);
-	}
 }
 
 void TGame::ClientPlayerAdded(int Slot)

@@ -547,7 +547,10 @@ void TLobbyView::DoApplyRenamePlayer()
 	trim(s);
 
 	if (!s.empty() && s.size() < 20)
+	{
 		Game->Client->SetPlayerName(SelectedSlot, s);
+		Game->ChosenPlayerName = s;
+	}
 
 	RenamePlayerEdit->setVisible(false);
 	RenamePlayerApplyBtn->setVisible(false);
