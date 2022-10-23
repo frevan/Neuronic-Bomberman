@@ -195,11 +195,13 @@ void TLobbyView::LeaveLobby()
 
 bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 {
-	bool handled = false;
+	if (IsSomeEditControlFocused())
+		return false;
 
 	if (Value != 1.0f)
 		return false; // only handle key presses
 
+	bool handled = false;
 	int mapIndex;
 
 	switch (InputID)
@@ -399,7 +401,15 @@ void TLobbyView::Draw(sf::RenderTarget* target)
 		t.setCharacterSize(18);
 		target->draw(t);
 
-		s = CreatePlayerShortcutString(slot);
+		//s = CreatePlayerShortcutString(slot);
+		s = "";
+		if (player->State != PLAYER_NOTPLAYING)
+		{
+			if (player->Owned)
+				s = "local";
+			else
+				s = "remote";
+		}
 		t.setString(s);
 		t.setPosition(sf::Vector2f(xpos + 25, ypos + 24));
 		t.setFillColor(sf::Color::White);
@@ -487,12 +497,22 @@ void TLobbyView::OnRenamePlayerCancelBtnClick()
 void TLobbyView::DoAddPlayer()
 {
 	int slot = -1;
-	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
+
+	if (SelectedSlot >= 0)
 	{
-		if (Game->GameData.Players[idx].State == PLAYER_NOTPLAYING)
+		if (Game->GameData.Players[SelectedSlot].State == PLAYER_NOTPLAYING)
+			slot = SelectedSlot;
+	}
+
+	if (slot < 0)
+	{
+		for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
 		{
-			slot = idx;
-			break;
+			if (Game->GameData.Players[idx].State == PLAYER_NOTPLAYING)
+			{
+				slot = idx;
+				break;
+			}
 		}
 	}
 
@@ -539,6 +559,8 @@ void TLobbyView::DoRenamePlayer()
 
 	RenamePlayerCancelBtn->setPosition(xpos, ypos);
 	RenamePlayerCancelBtn->setVisible(true);
+
+	RenamePlayerEdit->setFocused(true);
 }
 
 void TLobbyView::DoApplyRenamePlayer()
@@ -720,6 +742,19 @@ const std::string TLobbyView::ControlToString(TInputControl::TPacked Control)
 		modifiers = "alt+";
 
 	result = modifiers + result;
+
+	return result;
+}
+
+bool TLobbyView::IsSomeEditControlFocused()
+{
+	bool result = false;
+
+	if (GameNameEdit)
+		result |= GameNameEdit->isFocused();
+
+	if (RenamePlayerEdit)
+		result |= (RenamePlayerEdit->isVisible() && RenamePlayerEdit->isFocused());
 
 	return result;
 }

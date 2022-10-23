@@ -371,7 +371,7 @@ void TGameData::Reset()
 		Players[i].State = PLAYER_NOTPLAYING;
 }
 
-bool TGameData::AddPlayer(const std::string& SetName, int SetSlot)
+bool TGameData::AddPlayer(const std::string& SetName, bool SetOwned, uint8_t SetSlot)
 {
 	// check if the slot is available
 	if (SetSlot != INVALID_SLOT && SetSlot <= MAX_NUM_SLOTS)
@@ -381,12 +381,14 @@ bool TGameData::AddPlayer(const std::string& SetName, int SetSlot)
 	}
 	// find a free slot
 	else
+	{
 		for (int i = 0; i < MAX_NUM_SLOTS; i++)
 			if (Players[i].State == PLAYER_NOTPLAYING)
 			{
 				SetSlot = i;
 				break;
 			}
+	}
 	// exit if there are no slots
 	if (SetSlot == INVALID_SLOT || SetSlot < 0 || SetSlot >= MAX_NUM_SLOTS)
 		return false;
@@ -394,6 +396,7 @@ bool TGameData::AddPlayer(const std::string& SetName, int SetSlot)
 	// initialize player
 	Players[SetSlot].State = PLAYER_ALIVE;
 	Players[SetSlot].Name = SetName;
+	Players[SetSlot].Owned = SetOwned;
 
 	return true;
 }

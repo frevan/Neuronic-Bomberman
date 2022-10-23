@@ -322,12 +322,12 @@ void TClient::ServerRoundEnded()
 		Listener->ClientRoundEnded();
 }
 
-void TClient::ServerPlayerAdded(uint8_t Slot, const std::string& PlayerName)
+void TClient::ServerPlayerAdded(uint8_t Slot, const std::string& PlayerName, uint8_t Flags)
 {
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
-	Data->AddPlayer(PlayerName, Slot);
+	Data->AddPlayer(PlayerName, (Flags & 1) == 1, Slot);
 	if (Listener)
 		Listener->ClientPlayerAdded(Slot);
 }
@@ -525,8 +525,8 @@ void TClient::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet)
 			break;
 
 		case CLN_PlayerAdded:
-			if (Packet >> u8_1 >> s_1)
-				ServerPlayerAdded(u8_1, s_1);
+			if (Packet >> u8_1 >> s_1 >> u8_2)
+				ServerPlayerAdded(u8_1, s_1, u8_2);
 			break;
 		case CLN_PlayerRemoved: 
 			if (Packet >> u8_1)

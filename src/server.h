@@ -52,7 +52,7 @@ private:
 	TClientSocket* FindSocketForConnection(TConnectionID ConnectionID);
 	void SendErrorResponse(TClientSocket* Socket, uint16_t FailedCommand);
 	bool SendPacketToSocket(TClientSocket* Socket, sf::Packet& Packet);
-	void SendPacketToAllClients(sf::Packet& Packet);
+	void SendPacketToAllClients(sf::Packet& Packet, TConnectionID SkipConnectionID = 0);
 
 	// receive input from network
 	void ListenToNetwork();

@@ -58,6 +58,7 @@ const TPlayerState PLAYER_DEAD = 2;
 
 typedef struct 
 {
+	bool Owned; // owned by this client
 	std::string Name;
 	TPlayerPosition Position;
 	TPlayerDirection Direction; // combination of one or more DIRECTION_ values
@@ -169,7 +170,7 @@ public:
 	void InitNewRound();
 
 	void SetName(const std::string& SetName);
-	bool AddPlayer(const std::string& SetName, int SetSlot = INVALID_SLOT);
+	bool AddPlayer(const std::string& SetName, bool SetOwned, uint8_t SetSlot = INVALID_SLOT);
 	bool RemovePlayer(int Slot);
 	bool SetPlayerName(int Slot, const std::string& SetName);
 

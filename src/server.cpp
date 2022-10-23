@@ -609,9 +609,20 @@ void TServer::DoNumRoundsChanged(int NumRounds)
 
 void TServer::DoPlayerAdded(uint8_t Slot, const std::string& PlayerName)
 {
+	TConnectionID id = Slots[Slot].ConnectionID;
+
+	uint8_t flags = 0;
+
 	sf::Packet packet;
-	packet << CLN_PlayerAdded << Slot << PlayerName;
-	SendPacketToAllClients(packet);
+
+	flags = 1;
+	packet << CLN_PlayerAdded << Slot << PlayerName << flags;
+	SendPacketToSocket(FindSocketForConnection(id), packet);
+
+	packet.clear();
+	flags = 0;
+	packet << CLN_PlayerAdded << Slot << PlayerName << flags;
+	SendPacketToAllClients(packet, id);
 }
 
 void TServer::DoPlayerRemoved(uint8_t Slot)
@@ -841,11 +852,14 @@ bool TServer::SendPacketToSocket(TClientSocket* Socket, sf::Packet& Packet)
 	return (status == sf::Socket::Status::Done);
 }
 
-void TServer::SendPacketToAllClients(sf::Packet& Packet)
+void TServer::SendPacketToAllClients(sf::Packet& Packet, TConnectionID SkipConnectionID)
 {
 	std::lock_guard<std::mutex> g(ClientSocketsMutex);
 	for (auto it = ClientSockets.begin(); it != ClientSockets.end(); it++)
-		SendPacketToSocket((*it), Packet);
+	{
+		if ((*it)->ID != SkipConnectionID)
+			SendPacketToSocket((*it), Packet);
+	}
 }
 
 bool TServer::ProcessConnectionRequest(TConnectionID ConnectionID, uint32_t ClientVersion)

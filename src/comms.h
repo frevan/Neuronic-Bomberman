@@ -40,7 +40,7 @@ const TCommand CLN_LobbyCreated = 1003;
 const TCommand CLN_LobbyClosed = 1004;
 const TCommand CLN_EnteredLobby = 1005; // string GameName
 // - player notifications
-const TCommand CLN_PlayerAdded = 1100; // uint8_t Slot | string PlayerName
+const TCommand CLN_PlayerAdded = 1100; // uint8_t Slot | string PlayerName | uint8_t OwnedByClient
 const TCommand CLN_PlayerRemoved = 1101; // uint8_t Slot
 const TCommand CLN_PlayerIsReady = 1102;
 const TCommand CLN_PlayerNameChanged = 1103; // uint8_t Slot | string PlayerName

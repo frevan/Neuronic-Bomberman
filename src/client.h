@@ -72,7 +72,7 @@ private:
 	void ServerGameNameChanged(const std::string& GameName);
 	void ServerArenaChanged(uint16_t ArenaIndex, const std::string& ArenaName);
 	void ServerNumRoundsChanged(int NumRounds);
-	void ServerPlayerAdded(uint8_t Slot, const std::string& PlayerName);
+	void ServerPlayerAdded(uint8_t Slot, const std::string& PlayerName, uint8_t Flags);
 	void ServerPlayerRemoved(uint8_t Slot);
 	void ServerPlayerNameChanged(uint8_t Slot, const std::string& PlayerName);
 	void ServerMatchStarted();

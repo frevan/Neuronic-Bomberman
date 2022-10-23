@@ -44,6 +44,7 @@ private:
 
 	const std::string CreatePlayerShortcutString(int Slot);
 	const std::string ControlToString(TInputControl::TPacked Control);
+	bool IsSomeEditControlFocused();
 
 protected:
 	void CreateWidgets() override;
