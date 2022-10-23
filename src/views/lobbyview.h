@@ -6,6 +6,8 @@
 class TLobbyView :	public TTGUIView
 {
 private:
+	tgui::EditBox::Ptr RenamePlayerEdit;
+	tgui::Button::Ptr RenamePlayerApplyBtn, RenamePlayerCancelBtn;
 	tgui::EditBox::Ptr GameNameEdit;
 	tgui::Label::Ptr GameNameLabel;
 	tgui::ComboBox::Ptr MapCombo;
@@ -24,6 +26,9 @@ private:
 	void OnAddPlayerBtnClick();
 	void OnRemovePlayerBtnClick();
 	void OnRemapPlayerControlsBtnClick();
+	void OnRenamePlayerBtnClick();
+	void OnRenamePlayerApplyBtnClick();
+	void OnRenamePlayerCancelBtnClick();
 	void OnNumRoundsSpinChanged(float NewValue);
 	
 	void FillMapCombo(bool KeepSelectedItem);
@@ -31,6 +36,9 @@ private:
 	void DoAddPlayer();
 	void DoRemovePlayer();
 	void DoRemapPlayerControls();
+	void DoRenamePlayer();
+	void DoApplyRenamePlayer();
+	void DoCancelRenamePlayer();
 
 	void StartMatchNow();
 

@@ -5,9 +5,17 @@
 #include <TGUI/TGUI.hpp>
 
 #include "../actions.h"
+#include "../utility/stringutil.h"
+
+const float FIRSTSLOT_POS_X = 60.f;
+const float FIRSTSLOT_POS_Y = 25.f;
+const float SLOT_HEIGHT = 40.f;
 
 TLobbyView::TLobbyView(TGame* SetGame, tgui::Gui* SetGUI)
 	: TTGUIView(SetGame, TViewType::VT_HUMANVIEW, SetGUI),
+	RenamePlayerEdit(nullptr),
+	RenamePlayerApplyBtn(nullptr),
+	RenamePlayerCancelBtn(nullptr),
 	GameNameEdit(nullptr),
 	GameNameLabel(nullptr),
 	NumRoundsSpin(nullptr),
@@ -124,23 +132,50 @@ void TLobbyView::CreateWidgets()
 	tgui::Button::Ptr addPlayerBtn = std::make_shared<tgui::Button>();
 	AddWidgetToGUI(addPlayerBtn);
 	addPlayerBtn->setText("Add [=]");
-	addPlayerBtn->setPosition(50, 470);
+	addPlayerBtn->setPosition(30, 470);
 	addPlayerBtn->setSize(100, 30);
 	addPlayerBtn->connect("pressed", &TLobbyView::OnAddPlayerBtnClick, this);
 	// remove player
 	tgui::Button::Ptr removePlayerBtn = std::make_shared<tgui::Button>();
 	AddWidgetToGUI(removePlayerBtn);
 	removePlayerBtn->setText("Remove [-]");
-	removePlayerBtn->setPosition(160, 470);
+	removePlayerBtn->setPosition(140, 470);
 	removePlayerBtn->setSize(100, 30);
 	removePlayerBtn->connect("pressed", &TLobbyView::OnRemovePlayerBtnClick, this);
 	// remap input controls
 	tgui::Button::Ptr remapPlayerControlsBtn = std::make_shared<tgui::Button>();
 	AddWidgetToGUI(remapPlayerControlsBtn);
 	remapPlayerControlsBtn->setText("Configure [0]");
-	remapPlayerControlsBtn->setPosition(270, 470);
+	remapPlayerControlsBtn->setPosition(250, 470);
 	remapPlayerControlsBtn->setSize(100, 30);
 	remapPlayerControlsBtn->connect("pressed", &TLobbyView::OnRemapPlayerControlsBtnClick, this);
+	// rename
+	tgui::Button::Ptr renamePlayerBtn = std::make_shared<tgui::Button>();
+	AddWidgetToGUI(renamePlayerBtn);
+	renamePlayerBtn->setText("Rename");
+	renamePlayerBtn->setPosition(360, 470);
+	renamePlayerBtn->setSize(100, 30);
+	renamePlayerBtn->connect("pressed", &TLobbyView::OnRenamePlayerBtnClick, this);
+
+	// rename a player - hidden until needed
+	// - edit
+	RenamePlayerEdit = std::make_shared<tgui::EditBox>();
+	AddWidgetToGUI(RenamePlayerEdit);
+	RenamePlayerEdit->setVisible(false);
+	// - apply btn
+	RenamePlayerApplyBtn = std::make_shared<tgui::Button>();
+	AddWidgetToGUI(RenamePlayerApplyBtn);
+	RenamePlayerApplyBtn->setText("OK");
+	RenamePlayerApplyBtn->setSize(30, 25);
+	RenamePlayerApplyBtn->setVisible(false);
+	RenamePlayerApplyBtn->connect("pressed", &TLobbyView::OnRenamePlayerApplyBtnClick, this);
+	// - cancel btn
+	RenamePlayerCancelBtn = std::make_shared<tgui::Button>();
+	AddWidgetToGUI(RenamePlayerCancelBtn);
+	RenamePlayerCancelBtn->setText("NO");
+	RenamePlayerCancelBtn->setSize(30, 25);
+	RenamePlayerCancelBtn->setVisible(false);
+	RenamePlayerCancelBtn->connect("pressed", &TLobbyView::OnRenamePlayerCancelBtnClick, this);
 }
 
 void TLobbyView::OnBackBtnClick()
@@ -336,8 +371,8 @@ void TLobbyView::Draw(sf::RenderTarget* target)
 		}
 	}
 
-	float xpos = 60;
-	float ypos = 25;
+	float xpos = FIRSTSLOT_POS_X;
+	float ypos = FIRSTSLOT_POS_Y;
 	sf::Font font = Game->Fonts.ByIndex(Game->Fonts.standard);
 	sf::Text t;
 	t.setFont(font);
@@ -380,7 +415,7 @@ void TLobbyView::Draw(sf::RenderTarget* target)
 			target->draw(triangle);
 		}
 
-		ypos += 40;
+		ypos += SLOT_HEIGHT;
 	}
 }
 
@@ -434,6 +469,21 @@ void TLobbyView::OnRemapPlayerControlsBtnClick()
 	DoRemapPlayerControls();
 }
 
+void TLobbyView::OnRenamePlayerBtnClick()
+{
+	DoRenamePlayer();
+}
+
+void TLobbyView::OnRenamePlayerApplyBtnClick()
+{
+	DoApplyRenamePlayer();
+}
+
+void TLobbyView::OnRenamePlayerCancelBtnClick()
+{
+	DoCancelRenamePlayer();
+}
+
 void TLobbyView::DoAddPlayer()
 {
 	int slot = -1;
@@ -463,6 +513,52 @@ void TLobbyView::DoRemovePlayer()
 
 void TLobbyView::DoRemapPlayerControls()
 {
+}
+
+void TLobbyView::DoRenamePlayer()
+{
+	if (RenamePlayerEdit->isVisible())
+		return;
+	if (SelectedSlot < 0 || SelectedSlot >= MAX_NUM_SLOTS)
+		return;
+
+	float xpos = FIRSTSLOT_POS_X + 25;
+	float ypos = FIRSTSLOT_POS_Y + (SelectedSlot * SLOT_HEIGHT);
+
+	RenamePlayerEdit->setText(Game->GameData.Players[SelectedSlot].Name);
+	RenamePlayerEdit->setPosition(xpos, ypos);
+	RenamePlayerEdit->setSize(275, 25);
+	RenamePlayerEdit->setVisible(true);
+
+	xpos += RenamePlayerEdit->getSize().x;
+
+	RenamePlayerApplyBtn->setPosition(xpos, ypos);
+	RenamePlayerApplyBtn->setVisible(true);
+
+	xpos += RenamePlayerApplyBtn->getSize().x;
+
+	RenamePlayerCancelBtn->setPosition(xpos, ypos);
+	RenamePlayerCancelBtn->setVisible(true);
+}
+
+void TLobbyView::DoApplyRenamePlayer()
+{
+	std::string s = RenamePlayerEdit->getText();
+	trim(s);
+
+	if (!s.empty() && s.size() < 20)
+		Game->Client->SetPlayerName(SelectedSlot, s);
+
+	RenamePlayerEdit->setVisible(false);
+	RenamePlayerApplyBtn->setVisible(false);
+	RenamePlayerCancelBtn->setVisible(false);
+}
+
+void TLobbyView::DoCancelRenamePlayer()
+{
+	RenamePlayerEdit->setVisible(false);
+	RenamePlayerApplyBtn->setVisible(false);
+	RenamePlayerCancelBtn->setVisible(false);
 }
 
 const std::string TLobbyView::CreatePlayerShortcutString(int Slot)
