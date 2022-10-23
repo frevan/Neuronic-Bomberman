@@ -602,7 +602,8 @@ void TServer::DoArenaChanged(TConnectionID ConnectionID)
 void TServer::DoNumRoundsChanged(int NumRounds)
 {
 	sf::Packet packet;
-	packet << CLN_NumRoundsChanged << Data.MaxRounds;
+	uint16_t rounds = Data.MaxRounds;
+	packet << CLN_NumRoundsChanged << rounds;
 	SendPacketToAllClients(packet);
 }
 

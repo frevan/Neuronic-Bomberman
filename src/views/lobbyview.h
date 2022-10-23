@@ -7,8 +7,11 @@ class TLobbyView :	public TTGUIView
 {
 private:
 	tgui::EditBox::Ptr GameNameEdit;
+	tgui::Label::Ptr GameNameLabel;
 	tgui::ComboBox::Ptr MapCombo;
-	tgui::EditBox::Ptr NumRoundsEdit;
+	tgui::Label::Ptr MapNameLabel;
+	tgui::SpinButton::Ptr NumRoundsSpin;
+	tgui::Label::Ptr NumRoundsLabel;
 	std::vector<TArena> Maps;
 	int SelectedSlot;
 
@@ -21,9 +24,10 @@ private:
 	void OnAddPlayerBtnClick();
 	void OnRemovePlayerBtnClick();
 	void OnRemapPlayerControlsBtnClick();
-	void OnNumRoundsEditReturnKeyPressed(const std::string& Text);
+	void OnNumRoundsSpinChanged(float NewValue);
 	
 	void FillMapCombo(bool KeepSelectedItem);
+	void SetMapLabelText();
 	void DoAddPlayer();
 	void DoRemovePlayer();
 	void DoRemapPlayerControls();
@@ -32,8 +36,6 @@ private:
 
 	const std::string CreatePlayerShortcutString(int Slot);
 	const std::string ControlToString(TInputControl::TPacked Control);
-
-	bool GetNumRoundsFromEdit(int& Value);
 
 protected:
 	void CreateWidgets() override;

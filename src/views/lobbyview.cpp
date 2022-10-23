@@ -8,8 +8,12 @@
 
 TLobbyView::TLobbyView(TGame* SetGame, tgui::Gui* SetGUI)
 	: TTGUIView(SetGame, TViewType::VT_HUMANVIEW, SetGUI),
-	NumRoundsEdit(nullptr),
+	GameNameEdit(nullptr),
+	GameNameLabel(nullptr),
+	NumRoundsSpin(nullptr),
+	NumRoundsLabel(nullptr),
 	MapCombo(nullptr),
+	MapNameLabel(nullptr),
 	Maps(),
 	SettingGameData(0),
 	SelectedSlot(0)
@@ -30,13 +34,25 @@ void TLobbyView::CreateWidgets()
 	servernamelbl->getRenderer()->setTextColor(sf::Color::White);
 	servernamelbl->setTextSize(14);
 	// ---
-	GameNameEdit = std::make_shared<tgui::EditBox>();
-	AddWidgetToGUI(GameNameEdit);
-	GameNameEdit->setText(Game->GameData.GameName);
-	GameNameEdit->setPosition(600, 25);
-	GameNameEdit->setSize(175, 20);
-	GameNameEdit->setTextSize(14);
-	GameNameEdit->connect("TextChanged", &TLobbyView::OnGameNameEditTextEntered, this);
+	if (Game->IsServer)
+	{
+		GameNameEdit = std::make_shared<tgui::EditBox>();
+		AddWidgetToGUI(GameNameEdit);
+		GameNameEdit->setText(Game->GameData.GameName);
+		GameNameEdit->setPosition(600, 25);
+		GameNameEdit->setSize(175, 20);
+		GameNameEdit->setTextSize(14);
+		GameNameEdit->connect("TextChanged", &TLobbyView::OnGameNameEditTextEntered, this);
+	}
+	else
+	{
+		GameNameLabel = std::make_shared<tgui::Label>();
+		AddWidgetToGUI(GameNameLabel);
+		GameNameLabel->setText(Game->GameData.GameName);
+		GameNameLabel->setPosition(600, 25);
+		GameNameLabel->getRenderer()->setTextColor(sf::Color::White);
+		GameNameLabel->setTextSize(14);
+	}
 	// number of rounds
 	tgui::Label::Ptr roundslbl = std::make_shared<tgui::Label>();
 	AddWidgetToGUI(roundslbl);
@@ -45,22 +61,45 @@ void TLobbyView::CreateWidgets()
 	roundslbl->getRenderer()->setTextColor(sf::Color::White);
 	roundslbl->setTextSize(14);
 	// ---
-	NumRoundsEdit = std::make_shared<tgui::EditBox>();
-	AddWidgetToGUI(NumRoundsEdit);
-	NumRoundsEdit->setPosition(600, 55);
-	NumRoundsEdit->setSize(175, 20);
-	NumRoundsEdit->setInputValidator(tgui::EditBox::Validator::UInt);
-	NumRoundsEdit->setText(std::to_string(Game->GameData.MaxRounds));
-	NumRoundsEdit->connect("ReturnKeyPressed", &TLobbyView::OnNumRoundsEditReturnKeyPressed, this);
+	NumRoundsLabel = std::make_shared<tgui::Label>();
+	AddWidgetToGUI(NumRoundsLabel);
+	NumRoundsLabel->setText(std::to_string(Game->GameData.MaxRounds));
+	NumRoundsLabel->setPosition(600, 55);
+	NumRoundsLabel->getRenderer()->setTextColor(sf::Color::White);
+	NumRoundsLabel->setTextSize(14);
+	if (Game->IsServer)
+	{
+		NumRoundsSpin = std::make_shared<tgui::SpinButton>();
+		AddWidgetToGUI(NumRoundsSpin);
+		NumRoundsSpin->setPosition(675, 55);
+		NumRoundsSpin->setSize(50, 20);
+		NumRoundsSpin->setMinimum(1.f);
+		NumRoundsSpin->setMaximum(MAX_NUM_ROUNDS);
+		NumRoundsSpin->setStep(1.f);
+		NumRoundsSpin->setValue(Game->GameData.MaxRounds * 1.f);
+		NumRoundsSpin->connect("ValueChanged", &TLobbyView::OnNumRoundsSpinChanged, this);
+	}
 	// map combo
-	MapCombo = std::make_shared<tgui::ComboBox>();
-	AddWidgetToGUI(MapCombo);
-	MapCombo->setPosition(520, 100);
-	MapCombo->setSize(255, 25);
-	MapCombo->setItemsToDisplay(16);
+	if (Game->IsServer)
+	{
+		MapCombo = std::make_shared<tgui::ComboBox>();
+		AddWidgetToGUI(MapCombo);
+		MapCombo->setPosition(520, 100);
+		MapCombo->setSize(255, 25);
+		MapCombo->setItemsToDisplay(16);
+		MapCombo->connect("ItemSelected", &TLobbyView::OnMapComboItemSelected, this);		
+	}
+	else
+	{
+		MapNameLabel = std::make_shared<tgui::Label>();
+		AddWidgetToGUI(MapNameLabel);
+		MapNameLabel->setPosition(520, 100);
+		MapNameLabel->getRenderer()->setTextColor(sf::Color::White);
+		MapNameLabel->setTextSize(14);
+	}
 	FillMapCombo(false);
-	MapCombo->setSelectedItemByIndex(0);
-	MapCombo->connect("ItemSelected", &TLobbyView::OnMapComboItemSelected, this);
+	if (MapCombo)
+		MapCombo->setSelectedItemByIndex(0);
 
 	// back
 	tgui::Button::Ptr backbtn = std::make_shared<tgui::Button>();
@@ -149,6 +188,7 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 				else
 					mapIndex = (int)MapCombo->getItemCount() - 1;
 				MapCombo->setSelectedItemByIndex(mapIndex);
+				SetMapLabelText();
 				Game->Client->SelectArena(mapIndex);
 			}
 			break;
@@ -162,6 +202,7 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 				else
 					mapIndex++;
 				MapCombo->setSelectedItemByIndex(mapIndex);
+				SetMapLabelText();
 				Game->Client->SelectArena(mapIndex);
 			}
 			break;
@@ -198,10 +239,16 @@ void TLobbyView::StateChanged()
 {
 	SettingGameData++;
 
-	GameNameEdit->setText(Game->GameData.GameName);
+	if (GameNameEdit)
+		GameNameEdit->setText(Game->GameData.GameName);
+	if (GameNameLabel)
+		GameNameLabel->setText(Game->GameData.GameName);
 
 	std::string s = std::to_string(Game->GameData.MaxRounds);
-	NumRoundsEdit->setText(s);
+	if (NumRoundsSpin)
+		NumRoundsSpin->setValue(Game->GameData.MaxRounds * 1.f);
+	if (NumRoundsLabel)
+		NumRoundsLabel->setText(s);
 
 	FillMapCombo(true);
 
@@ -210,19 +257,36 @@ void TLobbyView::StateChanged()
 
 void TLobbyView::FillMapCombo(bool KeepSelectedItem)
 {
-	MapCombo->removeAllItems();
-
-	for (auto it = Game->ArenaNames.begin(); it != Game->ArenaNames.end(); it++)
+	if (MapCombo)
 	{
-		std::string caption = (*it);
-		MapCombo->addItem(caption);
+		MapCombo->removeAllItems();
+
+		for (auto it = Game->ArenaNames.begin(); it != Game->ArenaNames.end(); it++)
+		{
+			std::string caption = (*it);
+			MapCombo->addItem(caption);
+		}
+
+		int currentArenaIndex = 0;
+		if (Game->CurrentArenaIndex >= 0)
+			currentArenaIndex = Game->CurrentArenaIndex;
+
+		MapCombo->setSelectedItemByIndex(currentArenaIndex);
 	}
 
-	int idx = 0;
-	if (Game->CurrentArenaIndex >= 0)
-		idx = Game->CurrentArenaIndex;
+	SetMapLabelText();
+}
 
-	MapCombo->setSelectedItemByIndex(idx);
+void TLobbyView::SetMapLabelText()
+{
+	if (!MapNameLabel)
+		return;
+
+	std::string s;
+	if (Game->CurrentArenaIndex >= 0 && Game->CurrentArenaIndex < Game->ArenaNames.size())
+		s = Game->ArenaNames[Game->CurrentArenaIndex];
+
+	MapNameLabel->setText(s);
 }
 
 void TLobbyView::Draw(sf::RenderTarget* target)
@@ -330,46 +394,14 @@ void TLobbyView::OnMapComboItemSelected(int ItemIndex)
 
 void TLobbyView::StartMatchNow()
 {
-	int rounds;
-	if (!GetNumRoundsFromEdit(rounds))
-		rounds = 1;
+	int rounds = 1;
+	if (NumRoundsSpin)
+		rounds = (int)NumRoundsSpin->getValue();
 
 	Game->Client->SetNumRounds(rounds);
 	Game->Client->SelectArena(MapCombo->getSelectedItemIndex());
 
 	Game->Client->StartMatch();
-}
-
-bool TLobbyView::GetNumRoundsFromEdit(int& Value)
-{
-	bool result = false;
-
-	int rounds = Value;
-
-	std::string s = NumRoundsEdit->getText();
-	if (!s.empty())
-	{
-		try 
-		{
-			rounds = std::stoi(s);
-
-			if (rounds <= 0)
-				rounds = 1;
-			if (rounds > MAX_NUM_ROUNDS)
-				rounds = MAX_NUM_ROUNDS;
-
-			result = true;
-		}
-		catch (const std::invalid_argument&)
-		{
-			result = false;
-		}
-	}
-
-	if (result)
-		Value = rounds;
-
-	return result;
 }
 
 void TLobbyView::OnGameNameEditTextEntered(const std::string& Text)
@@ -378,13 +410,12 @@ void TLobbyView::OnGameNameEditTextEntered(const std::string& Text)
 		Game->Client->SetGameName(Text);
 }
 
-void TLobbyView::OnNumRoundsEditReturnKeyPressed(const std::string& Text)
+void TLobbyView::OnNumRoundsSpinChanged(float NewValue)
 {
 	if (SettingGameData == 0)
 	{
-		int rounds = 1;
-		if (GetNumRoundsFromEdit(rounds))
-			Game->Client->SetNumRounds(rounds);
+		int rounds = (int)NewValue;
+		Game->Client->SetNumRounds(rounds);
 	}
 }
 

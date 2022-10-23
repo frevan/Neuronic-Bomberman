@@ -544,8 +544,8 @@ void TClient::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet)
 				ServerGameNameChanged(s_1);
 			break;
 		case CLN_NumRoundsChanged: 
-			if (Packet >> u8_1)
-				ServerNumRoundsChanged(u8_1);
+			if (Packet >> u16_1)
+				ServerNumRoundsChanged(u16_1);
 			break;
 		case CLN_ArenaChanged: 
 			if (Packet >> u16_1 >> s_1)

@@ -46,7 +46,7 @@ const TCommand CLN_PlayerIsReady = 1102;
 const TCommand CLN_PlayerNameChanged = 1103; // uint8_t Slot | string PlayerName
 // - match property notifications
 const TCommand CLN_GameNameChanged = 1200;
-const TCommand CLN_NumRoundsChanged = 1201;
+const TCommand CLN_NumRoundsChanged = 1201; // uint16_t NumRounds
 const TCommand CLN_ArenaChanged = 1202; // uint16_t Index | string Name
 const TCommand CLN_ArenaList = 1203; // uint16_t Count | uint16_t Index | string ArenaName
 // - match notifications
