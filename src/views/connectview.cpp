@@ -4,6 +4,7 @@
 
 #include "../actions.h"
 #include "../comms.h"
+#include "../utility/stringutil.h"
 
 TConnectToServerView::TConnectToServerView(TGame* SetGame, tgui::Gui* SetGUI)
 	: TTGUIView(SetGame, TViewType::VT_HUMANVIEW, SetGUI),
@@ -34,6 +35,7 @@ void TConnectToServerView::CreateWidgets()
 	AddressEdit->setPosition(80, 230);
 	AddressEdit->setSize(420, 70);
 	AddressEdit->setTextSize(50);
+	AddressEdit->setAlignment(tgui::EditBox::Alignment::Center);
 
 	// connect btn
 	ConnectBtn = std::make_shared<tgui::Button>();
@@ -79,7 +81,12 @@ void TConnectToServerView::StateChanged()
 
 void TConnectToServerView::Connect()
 {
-	sf::IpAddress address(AddressEdit->getText());
+	std::string txt = AddressEdit->getText();
+	trim(txt);
+	if (txt.empty())
+		return;
+
+	sf::IpAddress address(txt);
 	if (address == sf::IpAddress::None)
 		return;
 

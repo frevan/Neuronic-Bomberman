@@ -91,7 +91,7 @@ void TClient::Process(TGameTime Delta)
 
 	if (ConnectionStatus == CLIENT_CONNECTED && Socket.getRemoteAddress() == sf::IpAddress::None)
 	{
-		ConnectionStatus = CLIENT_CONNECTED;
+		ConnectionStatus = CLIENT_IDLE;
 		DisconnectedFromServer();
 	}
 
