@@ -51,7 +51,8 @@ TGame::TGame()
 	ArenaNames(),
 	CurrentArenaIndex(-1),
 	CurrentArenaName(),
-	ChosenPlayerName()
+	ChosenPlayerName(),
+	ChosenServerAddress()
 {
 }
 
@@ -151,8 +152,8 @@ void TGame::ReadSettings()
 {
 	std::ifstream ifs;
 
+	// USERNAME
 	std::string username;
-
 	std::string fname = AppPath + "username.txt";
 	ifs.open(fname, std::fstream::in);
 	if (ifs.is_open())
@@ -160,21 +161,47 @@ void TGame::ReadSettings()
 		ifs >> username;
 		ifs.close();
 	}
-
 	trim(username);
 	if (username.size() > 20)
 		username.resize(20);
 	ChosenPlayerName = username;
+
+	// SERVER ADDRESS
+	std::string address = "127.0.0.1";
+	fname = AppPath + "server.txt";
+	ifs.open(fname, std::fstream::in);
+	if (ifs.is_open())
+	{
+		ifs >> address;
+		ifs.close();
+	}
+	trim(address);
+	if (address.size() > 15)
+		username.resize(15);
+	ChosenServerAddress = address;
 }
 
 void TGame::StoreSettings()
 {
 	std::ofstream ofs;
 
+	// USERNAME
 	std::string fname = AppPath + "username.txt";
 	ofs.open(fname, std::fstream::out);
-	ofs << ChosenPlayerName;
-	ofs.close();
+	if (ofs.is_open())
+	{
+		ofs << ChosenPlayerName;
+		ofs.close();
+	}
+
+	// SERVER ADDRESS
+	fname = AppPath + "server.txt";
+	ofs.open(fname, std::fstream::out);
+	if (ofs.is_open())
+	{
+		ofs << ChosenServerAddress;
+		ofs.close();
+	}
 }
 
 void TGame::Execute()

@@ -6,6 +6,9 @@
 class TConnectToServerView :	public TTGUIView
 {
 private:
+	tgui::EditBox::Ptr AddressEdit;
+	tgui::Button::Ptr ConnectBtn;
+
 	// event handlers
 	void OnConnectBtnClick();
 

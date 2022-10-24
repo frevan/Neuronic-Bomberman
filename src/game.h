@@ -78,6 +78,7 @@ public:
 	int CurrentArenaIndex;
 	std::string CurrentArenaName;
 	std::string ChosenPlayerName;
+	std::string ChosenServerAddress;
 
 	TGame();
 	~TGame();

@@ -6,7 +6,9 @@
 #include "../comms.h"
 
 TConnectToServerView::TConnectToServerView(TGame* SetGame, tgui::Gui* SetGUI)
-	: TTGUIView(SetGame, TViewType::VT_HUMANVIEW, SetGUI)
+	: TTGUIView(SetGame, TViewType::VT_HUMANVIEW, SetGUI),
+	AddressEdit(nullptr),
+	ConnectBtn(nullptr)
 {
 }
 
@@ -16,21 +18,33 @@ TConnectToServerView::~TConnectToServerView()
 
 void TConnectToServerView::CreateWidgets()
 {
-	// game name label
-	tgui::Label::Ptr addresslbl = std::make_shared<tgui::Label>();
-	AddWidgetToGUI(addresslbl);
-	addresslbl->setText("127.0.0.1");
-	addresslbl->setPosition(310, 200);
-	addresslbl->getRenderer()->setTextColor(sf::Color::Red);
-	addresslbl->setTextSize(35);
+	// addess label
+	tgui::Label::Ptr addressLabel = std::make_shared<tgui::Label>();
+	AddWidgetToGUI(addressLabel);
+	addressLabel->setText("server address");
+	addressLabel->setPosition(80, 210);
+	addressLabel->setSize(100, 15);
+	addressLabel->setTextSize(12);
+	addressLabel->getRenderer()->setTextColor(sf::Color::White);
 
-	// new game
-	tgui::Button::Ptr connectbtn = std::make_shared<tgui::Button>();
-	AddWidgetToGUI(connectbtn);
-	connectbtn->setText("Connect");
-	connectbtn->setPosition(300, 260);
-	connectbtn->setSize(200, 60);
-	connectbtn->connect("pressed", &TConnectToServerView::OnConnectBtnClick, this);
+	// address input
+	AddressEdit = std::make_shared<tgui::EditBox>();
+	AddWidgetToGUI(AddressEdit);
+	AddressEdit->setText(Game->ChosenServerAddress);
+	AddressEdit->setPosition(80, 230);
+	AddressEdit->setSize(420, 70);
+	AddressEdit->setTextSize(50);
+
+	// connect btn
+	ConnectBtn = std::make_shared<tgui::Button>();
+	AddWidgetToGUI(ConnectBtn);
+	ConnectBtn->setText("Connect");
+	ConnectBtn->setPosition(520, 230);
+	ConnectBtn->setSize(190, 70);
+	ConnectBtn->setTextSize(30);
+	ConnectBtn->connect("pressed", &TConnectToServerView::OnConnectBtnClick, this);
+
+	AddressEdit->setFocused(true);
 }
 
 void TConnectToServerView::OnConnectBtnClick()
@@ -65,6 +79,12 @@ void TConnectToServerView::StateChanged()
 
 void TConnectToServerView::Connect()
 {
+	sf::IpAddress address(AddressEdit->getText());
+	if (address == sf::IpAddress::None)
+		return;
+
+	Game->ChosenServerAddress = address.toString();
+
 	Game->IsServer = false;
-	Game->Client->Connect("127.0.0.1", SERVER_PORT);
+	Game->Client->Connect(Game->ChosenServerAddress, SERVER_PORT);
 }
