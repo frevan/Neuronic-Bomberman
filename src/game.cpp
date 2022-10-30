@@ -825,3 +825,23 @@ void TGame::DefineKeyboardForInputNum(int InputNum, sf::Keyboard::Key Left, sf::
 void TGame::DefineJoystickForInputNum(int Slot, int JoystickIndex, sf::Joystick::Axis LeftRight, sf::Joystick::Axis UpDown, int DropBombBtn)
 {
 }
+
+bool TGame::SetInputForSlot(int InputIndex, uint8_t Slot)
+{
+	bool result = false;
+
+	if (InputSlots[InputIndex] == -1 || InputSlots[InputIndex] == Slot)
+	{
+		InputSlots[InputIndex] = Slot;
+		result = true;
+	}
+
+	// remove slot from other index
+	for (int i = 0; i < NUM_INPUTS; i++)
+	{
+		if (InputSlots[i] == Slot && i != InputIndex)
+			InputSlots[i] = -1;
+	}
+
+	return result;
+}

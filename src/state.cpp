@@ -66,7 +66,7 @@ void TLobbyState::Init()
 	Game->InputMap.DefineInput(actionLobbyNextSlot, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Down, 0));
 	Game->InputMap.DefineInput(actionLobbyAddPlayer, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Equal, 0));
 	Game->InputMap.DefineInput(actionLobbyRemovePlayer, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Hyphen, 0));
-	Game->InputMap.DefineInput(actionLobbyRemapPlayerControls, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Num0, 0));
+	Game->InputMap.DefineInput(actionLobbyRemapPlayerControls, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::R, 0));
 }
 
 void TLobbyState::Finish()

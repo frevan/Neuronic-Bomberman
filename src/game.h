@@ -112,6 +112,8 @@ public:
 	TView* AttachView(int NewView); // see VIEW_ constants 
 	void DetachView(TViewID ID);
 
+	bool SetInputForSlot(int InputIndex, uint8_t Slot);
+
 	// from TClientListener
 	void ClientConnected() override;
 	void ClientDisconnected() override;

@@ -145,7 +145,7 @@ void TLobbyView::CreateWidgets()
 	// remap input controls
 	tgui::Button::Ptr remapPlayerControlsBtn = std::make_shared<tgui::Button>();
 	AddWidgetToGUI(remapPlayerControlsBtn);
-	remapPlayerControlsBtn->setText("Configure [0]");
+	remapPlayerControlsBtn->setText("Set input [r]");
 	remapPlayerControlsBtn->setPosition(250, 470);
 	remapPlayerControlsBtn->setSize(100, 30);
 	remapPlayerControlsBtn->connect("pressed", &TLobbyView::OnRemapPlayerControlsBtnClick, this);
@@ -265,7 +265,7 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 			break;
 
 		case actionLobbyRemapPlayerControls:
-			DoRemapPlayerControls();
+			DoSelectNextInputForSlot(SelectedSlot);
 			break;
 	};
 
@@ -487,7 +487,7 @@ void TLobbyView::OnRemovePlayerBtnClick()
 
 void TLobbyView::OnRemapPlayerControlsBtnClick()
 {
-	DoRemapPlayerControls();
+	DoSelectNextInputForSlot(SelectedSlot);
 }
 
 void TLobbyView::OnRenamePlayerBtnClick()
@@ -540,10 +540,6 @@ void TLobbyView::DoRemovePlayer()
 		return;
 
 	Game->Client->RemovePlayer(SelectedSlot);
-}
-
-void TLobbyView::DoRemapPlayerControls()
-{
 }
 
 void TLobbyView::DoRenamePlayer()
@@ -768,4 +764,37 @@ bool TLobbyView::IsSomeEditControlFocused()
 		result |= (RenamePlayerEdit->isVisible() && RenamePlayerEdit->isFocused());
 
 	return result;
+}
+
+void TLobbyView::DoSelectNextInputForSlot(uint8_t Slot)
+{
+	int curInput = -1;
+
+	for (int i = 0; i < NUM_INPUTS; i++)
+	{
+		if (Game->InputSlots[i] == Slot)
+		{
+			curInput = i;
+			break;
+		}
+	}
+
+	if (curInput < 0)
+		return;
+
+	int idx;
+	int newInput = -1;
+
+	for (int i = 0; i < NUM_INPUTS; i++)
+	{
+		idx = (curInput + i) % NUM_INPUTS;
+		if (Game->InputSlots[idx] < 0)
+		{
+			newInput = idx;
+			break;
+		}
+	}
+
+	if (newInput >= 0)
+		Game->SetInputForSlot(newInput, Slot);
 }

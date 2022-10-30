@@ -35,10 +35,10 @@ private:
 	void SetMapLabelText();
 	void DoAddPlayer();
 	void DoRemovePlayer();
-	void DoRemapPlayerControls();
 	void DoRenamePlayer();
 	void DoApplyRenamePlayer();
 	void DoCancelRenamePlayer();
+	void DoSelectNextInputForSlot(uint8_t Slot);
 
 	void StartMatchNow();
 
