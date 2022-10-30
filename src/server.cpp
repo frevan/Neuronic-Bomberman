@@ -409,7 +409,7 @@ bool TServer::DropBomb(TConnectionID ConnectionID, uint8_t Slot)
 {
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return false;
-	if (ConnectionID != OwnerID)
+	if (ConnectionID != Slots[Slot].ConnectionID)
 		return false;
 
 	TPlayer* p = &(Data.Players[Slot]);
