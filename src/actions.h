@@ -8,6 +8,7 @@ const uint32_t actionDoDefaultAction = 2; // do whatever is the default action
 
 // menu actions
 const uint32_t actionMenuJoinGame = 300;
+const uint32_t actionMenuOptions = 301;
 // lobby actions
 const uint32_t actionLobbyPrevMap = 200;
 const uint32_t actionLobbyNextMap = 201;

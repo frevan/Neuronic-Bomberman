@@ -23,18 +23,29 @@ void TEndOfRoundView::Draw(sf::RenderTarget* target)
 	titleText.setPosition(5, 5);
 	target->draw(titleText);
 
+	unsigned int highestScore = 0;
+	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
+		if (Game->GameData.Players[idx].RoundsWon > highestScore)
+			highestScore = Game->GameData.Players[idx].RoundsWon;
+
 	// show players with score
-	int playerListTop = 100;
+	float playerListY = 100.f;
 	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
 	{
 		TPlayer* p = &Game->GameData.Players[idx];
 		if (p->State == PLAYER_NOTPLAYING)
 			continue;
 
-		s = std::to_string(idx + 1) + ". " + p->Name + " " + std::to_string(p->RoundsWon);
-		sf::Text playerText(s, Game->Fonts.ByIndex(TFontManager::standard), 30);
-		playerText.setPosition(75, playerListTop + idx * 40.f);
+		int textHeight = 30;
+		if (p->RoundsWon == highestScore)
+			textHeight = 50;
+
+		s = std::to_string(idx + 1) + ". " + p->Name + " ... " + std::to_string(p->RoundsWon);
+		sf::Text playerText(s, Game->Fonts.ByIndex(TFontManager::standard), textHeight);
+		playerText.setPosition(75, playerListY);
 		target->draw(playerText);
+
+		playerListY += textHeight + 10.f;
 	}
 }
 

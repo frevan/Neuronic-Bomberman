@@ -27,12 +27,24 @@ const int VIEW_LOBBY = 12;
 const int VIEW_MATCH = 13;
 const int VIEW_ENDOFROUND = 14;
 const int VIEW_CONNECTTOSERVER = 15;
+const int VIEW_OPTIONS = 16;
+
+const int NUM_INPUTS = 4;
 
 typedef struct
 {
 	std::string Name;
 	std::string FileName;
 } TMapInfo;
+
+typedef struct
+{
+	TInputBinding Left;
+	TInputBinding Right;
+	TInputBinding Up;
+	TInputBinding Down;
+	TInputBinding DropBomb;
+} TInputDefinition;
 
 class TGame : public TClientListener
 {
@@ -57,10 +69,15 @@ private:
 
 	//void LoadMapInfos();
 
-	void DefineDefaultPlayerInputs();
-	void RemovePlayerInputs();
-	void DefineKeyboardForPlayer(int Slot, sf::Keyboard::Key Left, sf::Keyboard::Key Right, sf::Keyboard::Key Up, sf::Keyboard::Key Down, sf::Keyboard::Key DropBomb);
-	void DefineJoystickForPlayer(int Slot, int JoystickIndex, sf::Joystick::Axis LeftRight, sf::Joystick::Axis UpDown, int DropBombBtn);
+	void InitializeInputDefinitions(); // initialize the Inputs array with some default value
+	void DefineKeyboardForInputNum(int InputNum, sf::Keyboard::Key Left, sf::Keyboard::Key Right, sf::Keyboard::Key Up, sf::Keyboard::Key Down, sf::Keyboard::Key DropBomb); // helper for InitializeInputDefinitions
+	void DefineJoystickForInputNum(int Slot, int JoystickIndex, sf::Joystick::Axis LeftRight, sf::Joystick::Axis UpDown, int DropBombBtn); // helper for InitializeInputDefinitions
+
+	//void DefineDefaultPlayerInputs();
+	//void DefineKeyboardForPlayer(int Slot, sf::Keyboard::Key Left, sf::Keyboard::Key Right, sf::Keyboard::Key Up, sf::Keyboard::Key Down, sf::Keyboard::Key DropBomb);
+	//void DefineJoystickForPlayer(int Slot, int JoystickIndex, sf::Joystick::Axis LeftRight, sf::Joystick::Axis UpDown, int DropBombBtn);
+	void AddPlayerInputs(); // add assigned inputs from the Inputs array to the InputMap
+	void RemovePlayerInputs(); // remove all player inputs from the InputMap
 	void ReadSettings();
 	void StoreSettings();
 
@@ -79,6 +96,8 @@ public:
 	std::string CurrentArenaName;
 	std::string ChosenPlayerName;
 	std::string ChosenServerAddress;
+	TInputDefinition Inputs[NUM_INPUTS];
+	int InputSlots[NUM_INPUTS];
 
 	TGame();
 	~TGame();

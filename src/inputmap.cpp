@@ -88,15 +88,24 @@ void TInputMap::DefineInput(TInputID setID, TInputControl::TPacked setDefaultCon
 	binding.Threshold = 0.f;
 	binding.Inverted = false;
 
+	DefineInput(setID, binding);
+}
+
+void TInputMap::DefineInput(TInputID setID, const TInputBinding& SetBinding)
+{
+	TInputBinding binding = SetBinding;
+	binding.InputID = setID;
+	binding.Active = true;
+
 	auto it = Bindings.find(setID);
 	if (it == Bindings.end())
-		Bindings.insert( std::pair<TInputID,TInputBinding>(setID, binding) );		
+		Bindings.insert(std::pair<TInputID, TInputBinding>(setID, binding));
 	else
 		it->second = binding;
 
 	auto it2 = Values.find(setID);
 	if (it2 == Values.end())
-		Values.insert( std::pair<TInputID, float>(setID, setDefaultValue) );
+		Values.insert(std::pair<TInputID, float>(setID, binding.DefaultValue));
 }
 
 void TInputMap::RemoveInput(TInputID inputID)
@@ -181,9 +190,12 @@ bool TInputMap::TranslateEventToControlAndValue(const sf::Event& event, TInputCo
 		control.ControllerIndex = 0;
 		control.Button = event.key.code;
 		control.Flags = 0;
-		if (event.key.alt)		control.Flags |= TInputControl::TFlags::ALT;
-		if (event.key.control)	control.Flags |= TInputControl::TFlags::CTRL;
-		if (event.key.shift)	control.Flags |= TInputControl::TFlags::SHIFT;
+		if (event.key.alt && control.Button != sf::Keyboard::LAlt && control.Button != sf::Keyboard::RAlt)
+			control.Flags |= TInputControl::TFlags::ALT;
+		if (event.key.control && control.Button != sf::Keyboard::LControl && control.Button != sf::Keyboard::RControl)
+			control.Flags |= TInputControl::TFlags::CTRL;
+		if (event.key.shift && control.Button != sf::Keyboard::LShift && control.Button != sf::Keyboard::RShift)
+			control.Flags |= TInputControl::TFlags::SHIFT;
 
 		value = 1.f;
 		if (event.type == sf::Event::KeyReleased)

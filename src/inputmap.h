@@ -79,6 +79,7 @@ public:
 
 	// add and remove inputs
 	void DefineInput(TInputID setID, TInputControl::TPacked setDefaultControl, float setDefaultValue = 1.0f);
+	void DefineInput(TInputID setID, const TInputBinding& SetBinding);
 	void ResetInput(TInputID inputID);
 	void RemoveInput(TInputID inputID);
 	bool GetControlForInput(TInputID inputID, TInputControl::TPacked& result);

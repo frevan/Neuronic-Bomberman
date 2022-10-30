@@ -89,18 +89,7 @@ void TMenuView::OnJoinGameBtnClick()
 
 void TMenuView::OnOptionsBtnClick()
 {
-	tgui::MessageBox::Ptr msgbox = std::make_shared<tgui::MessageBox>();
-	AddWidgetToGUI(msgbox);
-	msgbox->setText("Not implemented yet");
-	msgbox->setPosition(350, 275);
-	msgbox->addButton("OK");
-	msgbox->connect("ButtonPressed", [=](const std::string& button) {
-		if (button == "OK")
-			msgbox->hideWithEffect(tgui::ShowAnimationType::Fade, sf::Time::Zero);
-		});
-	msgbox->showWithEffect(tgui::ShowAnimationType::Fade, sf::Time::Zero);
-
-	//StateMachine->SetNextState(SID_Options);
+	Game->SwitchToState(GAMESTATE_OPTIONS);
 }
 
 void TMenuView::OnQuitBtnClick()
@@ -128,6 +117,10 @@ bool TMenuView::ProcessInput(TInputID InputID, float Value)
 
 		case actionMenuJoinGame:
 			Game->SwitchToState(GAMESTATE_CONNECTTOSERVER);
+			break;
+
+		case actionMenuOptions:
+			Game->SwitchToState(GAMESTATE_OPTIONS);
 			break;
 	};
 

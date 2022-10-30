@@ -60,6 +60,9 @@
     <ClCompile Include="..\..\src\views\connectview.cpp">
       <Filter>source\views</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\views\optionsview.cpp">
+      <Filter>source\views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\game.h">

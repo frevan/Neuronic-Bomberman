@@ -13,6 +13,7 @@ const int GAMESTATE_MATCH = 4;
 const int GAMESTATE_ENDOFROUND = 5;
 const int GAMESTATE_ENDOFMATCH = 6;
 const int GAMESTATE_CONNECTTOSERVER = 7;
+const int GAMESTATE_OPTIONS = 8;
 const int GAMESTATE_QUIT = 1000;
 
 class TState
@@ -82,6 +83,14 @@ class TConnectToServerState : public TState
 {
 public:
 	TConnectToServerState(TGame* SetGame) : TState(SetGame, GAMESTATE_CONNECTTOSERVER) {};
+	virtual void Init() override;
+	virtual void Finish() override;
+};
+
+class TOptionsState : public TState
+{
+public:
+	TOptionsState(TGame* SetGame) : TState(SetGame, GAMESTATE_OPTIONS) {};
 	virtual void Init() override;
 	virtual void Finish() override;
 };

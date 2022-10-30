@@ -147,7 +147,7 @@ bool TMatchView::ProcessInput(TInputID InputID, float Value)
 			break;
 
 		case actionMatchPlayer1DropBomb:
-			Game->Client->DropBomb(playerIndex);
+ 			Game->Client->DropBomb(playerIndex);
 			break;
 	};
 

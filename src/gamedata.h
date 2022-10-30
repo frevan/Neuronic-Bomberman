@@ -58,8 +58,11 @@ const TPlayerState PLAYER_DEAD = 2;
 
 typedef struct 
 {
+	// properties + settings
 	bool Owned; // owned by this client
 	std::string Name;
+	int InputNum;
+	// in-game status
 	TPlayerPosition Position;
 	TPlayerDirection Direction; // combination of one or more DIRECTION_ values
 	TPlayerSpeed Speed;

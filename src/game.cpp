@@ -16,6 +16,7 @@
 #include "views/matchview.h"
 #include "views/endofroundview.h"
 #include "views/connectview.h"
+#include "views/optionsview.h"
 #include "comms.h"
 #include "utility/stringutil.h"
 
@@ -54,6 +55,9 @@ TGame::TGame()
 	ChosenPlayerName(),
 	ChosenServerAddress()
 {
+	InitializeInputDefinitions();
+	for (int i = 0; i < NUM_INPUTS; i++)
+		InputSlots[i] = -1;
 }
 
 TGame::~TGame()
@@ -88,10 +92,12 @@ bool TGame::Initialize(const std::string& filename)
 	//AttachView(GUIView);
 	SystemGUIView = AttachView(VIEW_TGUISYSTEM);
 
+	// define inputs
+	InitializeInputDefinitions();
 	// map some inputs
 	InputMap.DefineInput(actionToPreviousScreen, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Escape, 0));
 	InputMap.DefineInput(actionDoDefaultAction, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Return, 0));
-	DefineDefaultPlayerInputs();
+	//DefineDefaultPlayerInputs();
 
 	// set next state
 	NextState = GAMESTATE_MENU;
@@ -344,6 +350,7 @@ void TGame::ActivateNextState()
 		case GAMESTATE_ENDOFROUND: CurrentState = new TEndOfRoundState(this); break;
 		case GAMESTATE_ENDOFMATCH: CurrentState = new TEndOfMatchState(this); break;
 		case GAMESTATE_CONNECTTOSERVER: CurrentState = new TConnectToServerState(this); break;
+		case GAMESTATE_OPTIONS: CurrentState = new TOptionsState(this); break;
 		case GAMESTATE_QUIT: break;
 	};
 
@@ -411,6 +418,7 @@ TView* TGame::AttachView(int NewView)
 		case VIEW_MATCH: view = new TMatchView(this); break;
 		case VIEW_ENDOFROUND: view = new TEndOfRoundView(this); break;
 		case VIEW_CONNECTTOSERVER: view = new TConnectToServerView(this, GUI); break;
+		case VIEW_OPTIONS: view = new TOptionsView(this, GUI); break;
 	};
 	assert(view);
 
@@ -477,6 +485,7 @@ void TGame::ClientDisconnected()
 
 	CurrentArenaIndex = -1;
 	CurrentArenaName = "";
+	RemovePlayerInputs();
 
 	SwitchToState(GAMESTATE_MENU);
 }
@@ -494,6 +503,17 @@ void TGame::ClientEnteredLobby()
 
 void TGame::ClientPlayerAdded(int Slot)
 {
+	TPlayer* player = &GameData.Players[Slot];
+	if (player->Owned)
+	{
+		for (int i = 0; i < NUM_INPUTS; i++)
+			if (InputSlots[i] == -1)
+			{
+				InputSlots[i] = Slot;
+				break;
+			}
+	}
+
 	if (CurrentState)
 		CurrentState->GameStateChanged();
 }
@@ -506,6 +526,17 @@ void TGame::ClientPlayerNotAdded(int Slot)
 
 void TGame::ClientPlayerRemoved(int Slot)
 {
+	TPlayer* player = &GameData.Players[Slot];
+	if (player->Owned)
+	{
+		for (int i = 0; i < NUM_INPUTS; i++)
+			if (InputSlots[i] == Slot)
+			{
+				InputSlots[i] = -1;
+				break;
+			}
+	}
+
 	if (CurrentState)
 		CurrentState->GameStateChanged();
 }
@@ -518,6 +549,8 @@ void TGame::ClientPlayerInfoChanged(int Slot)
 
 void TGame::ClientMatchStarting()
 {
+	AddPlayerInputs();
+
 	if (CurrentState)
 		CurrentState->GameStateChanged();
 }
@@ -540,18 +573,19 @@ void TGame::ClientArenaName(int Count, int Index, const std::string Name)
 			CurrentState->GameStateChanged();
 }
 
+/*
 void TGame::DefineDefaultPlayerInputs()
 {
 	DefineKeyboardForPlayer(0, sf::Keyboard::Key::Left, sf::Keyboard::Key::Right, sf::Keyboard::Key::Up, sf::Keyboard::Key::Down, sf::Keyboard::Key::RControl);
-	DefineJoystickForPlayer(1, 0, sf::Joystick::PovX, sf::Joystick::PovY, 1);
-	DefineKeyboardForPlayer(2, sf::Keyboard::Key::A, sf::Keyboard::Key::D, sf::Keyboard::Key::W, sf::Keyboard::Key::S, sf::Keyboard::Key::LControl);
-	DefineKeyboardForPlayer(3, sf::Keyboard::Key::G, sf::Keyboard::Key::J, sf::Keyboard::Key::Y, sf::Keyboard::Key::H, sf::Keyboard::Key::LShift);
-	DefineKeyboardForPlayer(4, sf::Keyboard::Key::L, sf::Keyboard::Key::Quote, sf::Keyboard::Key::P, sf::Keyboard::Key::SemiColon, sf::Keyboard::Key::RShift);
-	DefineKeyboardForPlayer(5, sf::Keyboard::Key::E, sf::Keyboard::Key::T, sf::Keyboard::Key::Num4, sf::Keyboard::Key::R, sf::Keyboard::Key::Num3);
-	DefineKeyboardForPlayer(6, sf::Keyboard::Key::U, sf::Keyboard::Key::O, sf::Keyboard::Key::Num8, sf::Keyboard::Key::I, sf::Keyboard::Key::Num7);
-	DefineKeyboardForPlayer(7, sf::Keyboard::Key::C, sf::Keyboard::Key::B, sf::Keyboard::Key::F, sf::Keyboard::Key::V, sf::Keyboard::Key::X);
-	DefineKeyboardForPlayer(8, sf::Keyboard::Key::M, sf::Keyboard::Key::Period, sf::Keyboard::Key::K, sf::Keyboard::Key::Comma, sf::Keyboard::Key::N);
-	DefineJoystickForPlayer(9, 1, sf::Joystick::PovX, sf::Joystick::PovY, 1);
+	//DefineJoystickForPlayer(1, 0, sf::Joystick::PovX, sf::Joystick::PovY, 1);
+	DefineKeyboardForPlayer(1, sf::Keyboard::Key::A, sf::Keyboard::Key::D, sf::Keyboard::Key::W, sf::Keyboard::Key::S, sf::Keyboard::Key::Space);
+	DefineKeyboardForPlayer(2, sf::Keyboard::Key::G, sf::Keyboard::Key::J, sf::Keyboard::Key::Y, sf::Keyboard::Key::H, sf::Keyboard::Key::LShift);
+	DefineKeyboardForPlayer(3, sf::Keyboard::Key::L, sf::Keyboard::Key::Quote, sf::Keyboard::Key::P, sf::Keyboard::Key::SemiColon, sf::Keyboard::Key::RShift);
+	DefineKeyboardForPlayer(4, sf::Keyboard::Key::E, sf::Keyboard::Key::T, sf::Keyboard::Key::Num4, sf::Keyboard::Key::R, sf::Keyboard::Key::Num3);
+	DefineKeyboardForPlayer(5, sf::Keyboard::Key::U, sf::Keyboard::Key::O, sf::Keyboard::Key::Num8, sf::Keyboard::Key::I, sf::Keyboard::Key::Num7);
+	DefineKeyboardForPlayer(6, sf::Keyboard::Key::C, sf::Keyboard::Key::B, sf::Keyboard::Key::F, sf::Keyboard::Key::V, sf::Keyboard::Key::X);
+	DefineKeyboardForPlayer(7, sf::Keyboard::Key::M, sf::Keyboard::Key::Period, sf::Keyboard::Key::K, sf::Keyboard::Key::Comma, sf::Keyboard::Key::N);
+	DefineJoystickForPlayer(8, 1, sf::Joystick::PovX, sf::Joystick::PovY, 1);
 
 	for (int i = 0; i < MAX_NUM_SLOTS; i++)
 	{
@@ -561,6 +595,25 @@ void TGame::DefineDefaultPlayerInputs()
 		InputMap.SetInputActive(actionMatchPlayer1Up + offset, false);
 		InputMap.SetInputActive(actionMatchPlayer1Down + offset, false);
 		InputMap.SetInputActive(actionMatchPlayer1DropBomb + offset, false);
+	}
+}
+*/
+
+void TGame::AddPlayerInputs()
+{
+	// TODO
+	for (int i = 0; i < NUM_INPUTS; i++)
+	{
+		if (InputSlots[i] >= 0 && InputSlots[i] < MAX_NUM_SLOTS)
+		{
+			int offset = InputSlots[i] * PlayerActionCount;
+
+			InputMap.DefineInput(offset + actionMatchPlayer1Left, Inputs[i].Left);
+			InputMap.DefineInput(offset + actionMatchPlayer1Right, Inputs[i].Right);
+			InputMap.DefineInput(offset + actionMatchPlayer1Up, Inputs[i].Up);
+			InputMap.DefineInput(offset + actionMatchPlayer1Down, Inputs[i].Down);
+			InputMap.DefineInput(offset + actionMatchPlayer1DropBomb, Inputs[i].DropBomb);
+		}
 	}
 }
 
@@ -626,8 +679,13 @@ void TGame::RemovePlayerInputs()
 	InputMap.RemoveInput(actionMatchPlayer10Up);
 	InputMap.RemoveInput(actionMatchPlayer10Down);
 	InputMap.RemoveInput(actionMatchPlayer10DropBomb);
+
+	// also: remove the input <> slot assignments
+	for (int i = 0; i < NUM_INPUTS; i++)
+		InputSlots[i] = -1;
 }
 
+/*
 void TGame::DefineKeyboardForPlayer(int Slot, sf::Keyboard::Key Left, sf::Keyboard::Key Right, sf::Keyboard::Key Up, sf::Keyboard::Key Down, sf::Keyboard::Key DropBomb)
 {
 	int offset = Slot * PlayerActionCount;
@@ -666,6 +724,7 @@ void TGame::DefineJoystickForPlayer(int Slot, int JoystickIndex, sf::Joystick::A
 	id = actionMatchPlayer1DropBomb + offset;
 	InputMap.DefineInput(id, TInputControl::Pack(TInputControl::TType::JOYSTICKBUTTON, JoystickIndex, DropBombBtn, 0));
 }
+*/
 
 void TGame::ClientRoundStarted()
 {
@@ -690,4 +749,79 @@ void TGame::ClientArenaSelected(int Index, const std::string Name)
 
 	if (CurrentState)
 		CurrentState->GameStateChanged();
+}
+
+void TGame::InitializeInputDefinitions()
+{
+	DefineKeyboardForInputNum(0, sf::Keyboard::Key::Left, sf::Keyboard::Key::Right, sf::Keyboard::Key::Up, sf::Keyboard::Key::Down, sf::Keyboard::Key::RControl);
+	DefineKeyboardForInputNum(1, sf::Keyboard::Key::A, sf::Keyboard::Key::D, sf::Keyboard::Key::W, sf::Keyboard::Key::S, sf::Keyboard::Key::LControl);
+	DefineKeyboardForInputNum(2, sf::Keyboard::Key::G, sf::Keyboard::Key::J, sf::Keyboard::Key::Y, sf::Keyboard::Key::H, sf::Keyboard::Key::B);
+	DefineKeyboardForInputNum(3, sf::Keyboard::Key::L, sf::Keyboard::Key::Quote, sf::Keyboard::Key::P, sf::Keyboard::Key::SemiColon, sf::Keyboard::Key::RShift);
+}
+
+void TGame::DefineKeyboardForInputNum(int InputNum, sf::Keyboard::Key Left, sf::Keyboard::Key Right, sf::Keyboard::Key Up, sf::Keyboard::Key Down, sf::Keyboard::Key DropBomb)
+{
+	// left
+	Inputs[InputNum].Left.Active = false;
+	Inputs[InputNum].Left.InputID = 0;
+	Inputs[InputNum].Left.DefaultControl = TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, Left, 0);
+	Inputs[InputNum].Left.Control = Inputs[InputNum].Left.DefaultControl;
+	Inputs[InputNum].Left.Scale = 1.f;
+	Inputs[InputNum].Left.RangeStart = 0.f;
+	Inputs[InputNum].Left.RangeEnd = 1.f;
+	Inputs[InputNum].Left.DefaultValue = 0.f;
+	Inputs[InputNum].Left.Threshold = 0.f;
+	Inputs[InputNum].Left.Inverted = false;
+
+	// right
+	Inputs[InputNum].Right.Active = false;
+	Inputs[InputNum].Right.InputID = 0;
+	Inputs[InputNum].Right.DefaultControl = TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, Right, 0);
+	Inputs[InputNum].Right.Control = Inputs[InputNum].Right.DefaultControl;
+	Inputs[InputNum].Right.Scale = 1.f;
+	Inputs[InputNum].Right.RangeStart = 0.f;
+	Inputs[InputNum].Right.RangeEnd = 1.f;
+	Inputs[InputNum].Right.DefaultValue = 0.f;
+	Inputs[InputNum].Right.Threshold = 0.f;
+	Inputs[InputNum].Right.Inverted = false;
+
+	// up
+	Inputs[InputNum].Up.Active = false;
+	Inputs[InputNum].Up.InputID = 0;
+	Inputs[InputNum].Up.DefaultControl = TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, Up, 0);
+	Inputs[InputNum].Up.Control = Inputs[InputNum].Up.DefaultControl;
+	Inputs[InputNum].Up.Scale = 1.f;
+	Inputs[InputNum].Up.RangeStart = 0.f;
+	Inputs[InputNum].Up.RangeEnd = 1.f;
+	Inputs[InputNum].Up.DefaultValue = 0.f;
+	Inputs[InputNum].Up.Threshold = 0.f;
+	Inputs[InputNum].Up.Inverted = false;
+
+	// down
+	Inputs[InputNum].Down.Active = false;
+	Inputs[InputNum].Down.InputID = 0;
+	Inputs[InputNum].Down.DefaultControl = TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, Down, 0);
+	Inputs[InputNum].Down.Control = Inputs[InputNum].Down.DefaultControl;
+	Inputs[InputNum].Down.Scale = 1.f;
+	Inputs[InputNum].Down.RangeStart = 0.f;
+	Inputs[InputNum].Down.RangeEnd = 1.f;
+	Inputs[InputNum].Down.DefaultValue = 0.f;
+	Inputs[InputNum].Down.Threshold = 0.f;
+	Inputs[InputNum].Down.Inverted = false;
+
+	// drop bomb
+	Inputs[InputNum].DropBomb.Active = false;
+	Inputs[InputNum].DropBomb.InputID = 0;
+	Inputs[InputNum].DropBomb.DefaultControl = TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, DropBomb, 0);
+	Inputs[InputNum].DropBomb.Control = Inputs[InputNum].DropBomb.DefaultControl;
+	Inputs[InputNum].DropBomb.Scale = 1.f;
+	Inputs[InputNum].DropBomb.RangeStart = 0.f;
+	Inputs[InputNum].DropBomb.RangeEnd = 1.f;
+	Inputs[InputNum].DropBomb.DefaultValue = 0.f;
+	Inputs[InputNum].DropBomb.Threshold = 0.f;
+	Inputs[InputNum].DropBomb.Inverted = false;
+}
+
+void TGame::DefineJoystickForInputNum(int Slot, int JoystickIndex, sf::Joystick::Axis LeftRight, sf::Joystick::Axis UpDown, int DropBombBtn)
+{
 }

@@ -416,6 +416,17 @@ void TLobbyView::Draw(sf::RenderTarget* target)
 		t.setCharacterSize(12);
 		target->draw(t);
 
+		for (int inputidx = 0; inputidx < NUM_INPUTS; inputidx++)
+			if (Game->InputSlots[inputidx] == slot)
+			{
+				s = "[input" + std::to_string(inputidx + 1) + "]";
+				t.setString(s);
+				t.setPosition(sf::Vector2f(xpos + 75, ypos + 24));
+				t.setFillColor(sf::Color::White);
+				t.setCharacterSize(12);
+				target->draw(t);
+			}
+
 		if (slot == SelectedSlot)
 		{
 			sf::CircleShape triangle(7, 3);

@@ -27,6 +27,7 @@ void TMenuState::Init()
 	View = Game->AttachView(VIEW_MENU);
 
 	Game->InputMap.DefineInput(actionMenuJoinGame, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::Space, 0));
+	Game->InputMap.DefineInput(actionMenuOptions, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::O, 0));
 }
 
 void TMenuState::Finish()
@@ -140,6 +141,18 @@ void TConnectToServerState::Init()
 }
 
 void TConnectToServerState::Finish()
+{
+	TState::Finish();
+}
+
+// ----------
+
+void TOptionsState::Init()
+{
+	View = Game->AttachView(VIEW_OPTIONS);
+}
+
+void TOptionsState::Finish()
 {
 	TState::Finish();
 }
