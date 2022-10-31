@@ -49,3 +49,35 @@ static inline std::string trim_copy(std::string s)
     trim(s);
     return s;
 }
+
+static inline int string_to_int(const std::string& s, int def)
+{
+    int result;
+
+    try
+    {
+        result = std::stoi(s);
+    }
+    catch(...)
+    {
+        result = def;
+    };
+
+    return result;
+}
+
+static inline float string_to_float(const std::string& s, float def)
+{
+    float result;
+
+    try
+    {
+        result = std::stof(s);
+    }
+    catch (...)
+    {
+        result = def;
+    };
+
+    return result;
+}

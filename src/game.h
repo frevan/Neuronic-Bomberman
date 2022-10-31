@@ -81,7 +81,9 @@ private:
 	void ReadSettings();
 	void StoreSettings();
 
+	void SetInputFromValues(int Index, const TInputBinding& Left, const TInputBinding& Right, const TInputBinding& Up, const TInputBinding& Down, const TInputBinding& DropBomb);
 	std::string InputBindingToString(const TInputBinding& Binding);
+	void StringToInputBinding(const std::string& String, TInputBinding& Binding);
 
 public:
 	TState* CurrentState;

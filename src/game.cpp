@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cassert>
 #include <fstream>
+#include <sstream>
 
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
@@ -187,6 +188,41 @@ void TGame::ReadSettings()
 	if (address.size() > 15)
 		username.resize(15);
 	ChosenServerAddress = address;
+
+	// INPUT BINDINGS
+	CSimpleIniA ini;
+	fname = AppPath + "inputs.txt";
+	ini.LoadFile(fname.c_str());
+	std::string value, section;
+	TInputBinding left, right, up, down, dropbomb;
+	for (int i = 0; i < NUM_INPUTS; i++)
+	{
+		section = std::to_string(i);
+
+		left = Inputs[i].Left;
+		right = Inputs[i].Right;
+		up = Inputs[i].Up;
+		down = Inputs[i].Down;
+		dropbomb = Inputs[i].DropBomb;
+
+		value = ini.GetValue(section.c_str(), "left", "");
+		if (!value.empty())
+			StringToInputBinding(value, left);
+		value = ini.GetValue(section.c_str(), "right", "");
+		if (!value.empty())
+			StringToInputBinding(value, right);
+		value = ini.GetValue(section.c_str(), "up", "");
+		if (!value.empty())
+			StringToInputBinding(value, up);
+		value = ini.GetValue(section.c_str(), "down", "");
+		if (!value.empty())
+			StringToInputBinding(value, down);
+		value = ini.GetValue(section.c_str(), "dropbomb", "");
+		if (!value.empty())
+			StringToInputBinding(value, dropbomb);
+
+		SetInputFromValues(i, left, right, up, down, dropbomb);
+	}
 }
 
 void TGame::StoreSettings()
@@ -211,7 +247,7 @@ void TGame::StoreSettings()
 		ofs.close();
 	}
 
-	// SETTINGS
+	// INPUT BINDINGS
 	CSimpleIniA ini;
 	std::string value, section;
 	for (int i = 0; i < NUM_INPUTS; i++)
@@ -877,4 +913,77 @@ std::string TGame::InputBindingToString(const TInputBinding& Binding)
 	result += "|" + std::to_string(Binding.Scale) + "|" + std::to_string(Binding.RangeStart) + "|" + std::to_string(Binding.RangeEnd) + "|" + std::to_string(Binding.Threshold) + "|" + std::to_string(Binding.Inverted);
 
 	return result;
+}
+
+void TGame::StringToInputBinding(const std::string& String, TInputBinding& Binding)
+{
+	std::stringstream ss(String);
+	std::string s;
+
+	int intvalue;
+
+	int idx = 0;
+	while (std::getline(ss, s, '|'))
+	{
+		switch (idx)
+		{
+			case 0: 
+				intvalue = string_to_int(s, Binding.Control.Type); 
+				if (intvalue == 0)
+					Binding.Control.Type = TInputControl::TType::INVALID;
+				else if (intvalue == 1)
+					Binding.Control.Type = TInputControl::TType::KEYBOARD;
+				else if (intvalue == 2)
+					Binding.Control.Type = TInputControl::TType::MOUSE;
+				else if (intvalue == 0)
+					Binding.Control.Type = TInputControl::TType::MOUSEWHEEL;
+				else if (intvalue == 0)
+					Binding.Control.Type = TInputControl::TType::JOYSTICKAXIS;
+				else if (intvalue == 0)
+					Binding.Control.Type = TInputControl::TType::JOYSTICKBUTTON;
+				break;
+			case 1: 
+				Binding.Control.ControllerIndex = string_to_int(s, Binding.Control.ControllerIndex); 
+				break;
+			case 2: 
+				Binding.Control.Button = string_to_int(s, Binding.Control.Button);
+				break;
+			case 3: 
+				Binding.Control.Flags = string_to_int(s, Binding.Control.Flags);
+				break;
+			case 4: 
+				Binding.Scale = string_to_float(s, Binding.Scale);
+				break;
+			case 5: 
+				Binding.RangeStart = string_to_float(s, Binding.RangeStart);
+				break;
+			case 6: 
+				Binding.RangeEnd = string_to_float(s, Binding.RangeEnd);
+				break;
+			case 7: 
+				Binding.Threshold = string_to_float(s, Binding.Threshold);
+				break;
+			case 8: 
+				Binding.Inverted = string_to_int(s, Binding.Inverted) != 0;
+				break;
+		};
+		idx++;
+	}
+}
+
+void TGame::SetInputFromValues(int Index, const TInputBinding& Left, const TInputBinding& Right, const TInputBinding& Up, const TInputBinding& Down, const TInputBinding& DropBomb)
+{
+	if (Index < 0 || Index >= NUM_INPUTS)
+		return;
+
+	if (Left.Control.Type != TInputControl::TType::INVALID)
+		Inputs[Index].Left = Left;
+	if (Right.Control.Type != TInputControl::TType::INVALID)
+		Inputs[Index].Right = Right;
+	if (Up.Control.Type != TInputControl::TType::INVALID)
+		Inputs[Index].Up = Up;
+	if (Down.Control.Type != TInputControl::TType::INVALID)
+		Inputs[Index].Down = Down;
+	if (DropBomb.Control.Type != TInputControl::TType::INVALID)
+		Inputs[Index].DropBomb = DropBomb;
 }
