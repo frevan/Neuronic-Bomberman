@@ -20,6 +20,8 @@
 #include "comms.h"
 #include "utility/stringutil.h"
 
+#include "utility/simpleini/SimpleIni.h"
+
 //#define FULLSCREEN
 #define FRAMERATE_LIMIT
 //#define USE_OVERLAY
@@ -208,6 +210,27 @@ void TGame::StoreSettings()
 		ofs << ChosenServerAddress;
 		ofs.close();
 	}
+
+	// SETTINGS
+	CSimpleIniA ini;
+	std::string value, section;
+	for (int i = 0; i < NUM_INPUTS; i++)
+	{
+		section = std::to_string(i);
+
+		value = InputBindingToString(Inputs[i].Left);
+		ini.SetValue(section.c_str(), "left", value.c_str());
+		value = InputBindingToString(Inputs[i].Right);
+		ini.SetValue(section.c_str(), "right", value.c_str());
+		value = InputBindingToString(Inputs[i].Up);
+		ini.SetValue(section.c_str(), "up", value.c_str());
+		value = InputBindingToString(Inputs[i].Down);
+		ini.SetValue(section.c_str(), "down", value.c_str());
+		value = InputBindingToString(Inputs[i].DropBomb);
+		ini.SetValue(section.c_str(), "dropbomb", value.c_str());
+	}
+	fname = AppPath + "inputs.txt";
+	ini.SaveFile(fname.c_str());
 }
 
 void TGame::Execute()
@@ -842,6 +865,16 @@ bool TGame::SetInputForSlot(int InputIndex, uint8_t Slot)
 		if (InputSlots[i] == Slot && i != InputIndex)
 			InputSlots[i] = -1;
 	}
+
+	return result;
+}
+
+std::string TGame::InputBindingToString(const TInputBinding& Binding)
+{
+	std::string result = "";
+
+	result += std::to_string(Binding.Control.Type) + "|" + std::to_string(Binding.Control.ControllerIndex) + "|" + std::to_string(Binding.Control.Button) + "|" + std::to_string(Binding.Control.Flags);
+	result += "|" + std::to_string(Binding.Scale) + "|" + std::to_string(Binding.RangeStart) + "|" + std::to_string(Binding.RangeEnd) + "|" + std::to_string(Binding.Threshold) + "|" + std::to_string(Binding.Inverted);
 
 	return result;
 }

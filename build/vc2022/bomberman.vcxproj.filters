@@ -13,6 +13,9 @@
     <Filter Include="source\states">
       <UniqueIdentifier>{c273794f-9172-4dfe-b821-e86c3d0855e2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\utility\simpleini">
+      <UniqueIdentifier>{cf08f4e1-b7e6-476f-9bc8-715607f6d784}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -63,6 +66,9 @@
     <ClCompile Include="..\..\src\views\optionsview.cpp">
       <Filter>source\views</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\utility\simpleini\ConvertUTF.c">
+      <Filter>source\utility\simpleini</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\game.h">
@@ -75,5 +81,11 @@
       <Filter>source\utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\comms.h" />
+    <ClInclude Include="..\..\src\utility\simpleini\ConvertUTF.h">
+      <Filter>source\utility\simpleini</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\utility\simpleini\SimpleIni.h">
+      <Filter>source\utility\simpleini</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

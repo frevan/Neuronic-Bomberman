@@ -81,6 +81,8 @@ private:
 	void ReadSettings();
 	void StoreSettings();
 
+	std::string InputBindingToString(const TInputBinding& Binding);
+
 public:
 	TState* CurrentState;
 	bool ShouldQuit;
