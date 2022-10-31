@@ -56,7 +56,7 @@ void TLobbyState::Init()
 	{
 		Game->Server->Start();
 
-		Game->Client->Connect("127.0.0.1", SERVER_PORT);
+		Game->Client->Connect(sf::IpAddress::getLocalAddress().toString(), SERVER_PORT);
 		Game->Client->CreateGame("Don't Explode");
 	}
 
