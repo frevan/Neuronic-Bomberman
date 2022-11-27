@@ -41,7 +41,7 @@ void TOptionsView::Draw(sf::RenderTarget* target)
 		t.setString(s);
 		t.setPosition(sf::Vector2f(xpos, ypos));
 		t.setFillColor(sf::Color::White);
-		t.setCharacterSize(15);
+		t.setCharacterSize(16);
 		target->draw(t);
 
 		// label: left

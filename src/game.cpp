@@ -56,7 +56,7 @@ TGame::TGame()
 	CurrentArenaIndex(-1),
 	CurrentArenaName(),
 	ChosenPlayerName(),
-	ChosenServerAddress()
+	ServerAddresses()
 {
 	InitializeInputDefinitions();
 	for (int i = 0; i < NUM_INPUTS; i++)
@@ -176,18 +176,26 @@ void TGame::ReadSettings()
 	ChosenPlayerName = username;
 
 	// SERVER ADDRESS
-	std::string address = "127.0.0.1";
+	ServerAddresses.clear();
 	fname = AppPath + "server.txt";
 	ifs.open(fname, std::fstream::in);
 	if (ifs.is_open())
 	{
-		ifs >> address;
+		std::string address;
+		do
+		{	
+			address = "";
+			ifs >> address;
+			trim(address);
+			if (!address.empty())
+			{
+				if (address.size() > 15)
+					address.resize(15);
+				ServerAddresses.push_back(address);
+			}
+		} while (!address.empty());
 		ifs.close();
 	}
-	trim(address);
-	if (address.size() > 15)
-		username.resize(15);
-	ChosenServerAddress = address;
 
 	// INPUT BINDINGS
 	CSimpleIniA ini;
@@ -243,7 +251,14 @@ void TGame::StoreSettings()
 	ofs.open(fname, std::fstream::out);
 	if (ofs.is_open())
 	{
-		ofs << ChosenServerAddress;
+		int idx = 0;
+		for (auto it = ServerAddresses.begin(); it != ServerAddresses.end(); it++)
+		{
+			ofs << *it << std::endl;
+			idx++;
+			if (idx > 5)
+				break;
+		}
 		ofs.close();
 	}
 
@@ -986,4 +1001,45 @@ void TGame::SetInputFromValues(int Index, const TInputBinding& Left, const TInpu
 		Inputs[Index].Down = Down;
 	if (DropBomb.Control.Type != TInputControl::TType::INVALID)
 		Inputs[Index].DropBomb = DropBomb;
+}
+
+void TGame::SetChosenServerAddress(const std::string& Address)
+{
+	// remove address from the list
+	for (auto it = ServerAddresses.begin(); it != ServerAddresses.end(); )
+	{
+		if (*it == Address)
+			it = ServerAddresses.erase(it);
+		else
+			++it;
+	}
+
+	ServerAddresses.insert(ServerAddresses.begin(), Address);
+}
+
+std::string TGame::GetChosenServerAddress()
+{
+	std::string result = "127.0.0.1";
+	if (ServerAddresses.size() >= 1)
+		result = ServerAddresses[0];
+
+	return result;
+}
+
+std::string TGame::GetPreviousServerAddress(int Index)
+{
+	std::string result = "";
+
+	int cur = 0;
+	for (auto it = ServerAddresses.begin(); it != ServerAddresses.end(); it++)
+	{
+		if (cur == Index)
+		{
+			result = *it;
+			break;
+		}
+		cur++;
+	}
+
+	return result;
 }

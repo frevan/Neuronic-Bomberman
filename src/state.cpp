@@ -138,6 +138,12 @@ void TEndOfMatchState::Finish()
 void TConnectToServerState::Init()
 {
 	View = Game->AttachView(VIEW_CONNECTTOSERVER);
+
+	Game->InputMap.DefineInput(actionConnectPrevious1, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::F1, 0));
+	Game->InputMap.DefineInput(actionConnectPrevious2, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::F2, 0));
+	Game->InputMap.DefineInput(actionConnectPrevious3, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::F3, 0));
+	Game->InputMap.DefineInput(actionConnectPrevious4, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::F4, 0));
+	Game->InputMap.DefineInput(actionConnectPrevious5, TInputControl::Pack(TInputControl::KEYBOARD, 0, sf::Keyboard::F5, 0));
 }
 
 void TConnectToServerState::Finish()

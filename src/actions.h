@@ -17,6 +17,12 @@ const uint32_t actionLobbyNextSlot = 203;
 const uint32_t actionLobbyAddPlayer = 204;
 const uint32_t actionLobbyRemovePlayer = 205;
 const uint32_t actionLobbyRemapPlayerControls = 206;
+// connect view actions
+const uint32_t actionConnectPrevious1 = 270;
+const uint32_t actionConnectPrevious2 = 271;
+const uint32_t actionConnectPrevious3 = 272;
+const uint32_t actionConnectPrevious4 = 273;
+const uint32_t actionConnectPrevious5 = 274;
 
 // action definitions during a match
 const uint32_t PlayerActionCount = 6;

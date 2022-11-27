@@ -56,6 +56,7 @@ private:
 	std::vector<TView*> Views;
 	std::mutex ViewsMutex;
 	TClientLogic* Logic;
+	std::vector<std::string> ServerAddresses; // list of previously used server addresses. Most recent one at the start.
 
 	void DetermineAppPath(const std::string& Filename);
 	std::string GetResourceSubPath();
@@ -99,7 +100,6 @@ public:
 	int CurrentArenaIndex;
 	std::string CurrentArenaName;
 	std::string ChosenPlayerName;
-	std::string ChosenServerAddress;
 	TInputDefinition Inputs[NUM_INPUTS];
 	int InputSlots[NUM_INPUTS];
 
@@ -117,6 +117,10 @@ public:
 	void DetachView(TViewID ID);
 
 	bool SetInputForSlot(int InputIndex, uint8_t Slot);
+
+	void SetChosenServerAddress(const std::string& Address);
+	std::string GetChosenServerAddress();
+	std::string GetPreviousServerAddress(int Index);
 
 	// from TClientListener
 	void ClientConnected() override;
