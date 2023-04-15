@@ -111,6 +111,19 @@ typedef struct
 	bool Taken;
 } TStartPosition;
 
+/*
+class TFullMatchUpdateInfo
+{
+public:
+	TPlayerPosition PlayerPositions[MAX_NUM_SLOTS];
+	TPlayerDirection PlayerDirections[MAX_NUM_SLOTS];
+	TFieldType* FieldTypes;
+public:
+	TFullMatchUpdateInfo(size_t ArenaWidth, size_t ArenaHeight);
+	~TFullMatchUpdateInfo();
+};
+*/
+
 class TArena
 {
 private:
@@ -180,4 +193,5 @@ public:
 	bool BombInField(uint8_t X, uint8_t Y, bool OnlyUnexploded);
 
 	void UpdateGameFrom(TGameData* Source);
+	//void UpdateGameFrom(uint32_t FrameIndex, TFullMatchUpdateInfo* Info);
 };

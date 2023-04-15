@@ -58,6 +58,7 @@ private:
 	TGameData* Data;
 	sf::TcpSocket Socket;
 	std::queue<TClientCommand> Commands;
+	uint32_t FrameIndex; // increased for some packets that are sent out, server will send this back with game updates so we know what messages the server has received
 
 	void ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet);
 	void ConnectedToServer(); // socket was connected
@@ -83,6 +84,7 @@ private:
 	void ServerPlayerDirectionChanged(uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
 	void ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, uint16_t TimeUntilExplosion);
 	void ServerFullUpdate(TGameData* Data);
+	//void ServerFullUpdate(sf::Packet& Packet);
 	void ServerPlayerInfo(uint8_t Slot, uint8_t state, std::string Name);
 	void ServerPlayerPositionChanged(uint8_t Slot, float X, float Y);
 	void ServerBombExploding(const TFieldPosition& Position, TGameTime TimeUntilExploded);

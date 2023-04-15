@@ -537,19 +537,32 @@ TFieldPosition TGameLogic::CalculatePlayerField(TPlayer* Player)
 // TClientLogic
 
 TClientLogic::TClientLogic(TGameData* SetData)
-:	Data(SetData)
+:	Data(SetData),
+	GameLogic(SetData, this)
 {
 }
 
 void TClientLogic::Process(TGameTime Delta)
 {
-	if (Data->Status != GAME_PLAYING)
-		return;
+	GameLogic.Process(Delta);
+}
 
-	//UpdatePlayerPositions(Delta);
-	//UpdateBombs(Delta);
-	//CheckForExplodedPlayers();
-	//UpdateDyingPlayers(Delta);
+void TClientLogic::LogicBombExploding(const TFieldPosition& FieldPosition)
+{
+}
 
-	Data->CurrentTime += Delta;
+void TClientLogic::LogicBombExploded(const TFieldPosition& FieldPosition)
+{
+}
+
+void TClientLogic::LogicPlayerDying(uint8_t Slot)
+{
+}
+
+void TClientLogic::LogicPlayerDied(uint8_t Slot)
+{
+}
+
+void TClientLogic::LogicRoundEnded()
+{
 }

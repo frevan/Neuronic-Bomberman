@@ -35,10 +35,17 @@ public:
 	void Process(TGameTime Delta);
 };
 
-class TClientLogic
+class TClientLogic: public TLogicListener
 {
 private:
 	TGameData* Data;
+	TGameLogic GameLogic;
+private:
+	void LogicBombExploding(const TFieldPosition& FieldPosition) override;
+	void LogicBombExploded(const TFieldPosition& FieldPosition) override;
+	void LogicPlayerDying(uint8_t Slot) override;
+	void LogicPlayerDied(uint8_t Slot) override;
+	void LogicRoundEnded() override;
 public:
 	TClientLogic(TGameData* SetData);
 	void Process(TGameTime Delta);

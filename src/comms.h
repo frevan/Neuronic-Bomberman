@@ -28,8 +28,8 @@ const TCommand SRV_SetArena = 202; // string ArenaName
 // - match
 const TCommand SRV_StartMatch = 300;
 const TCommand SRV_StartNextRound = 301;
-const TCommand SRV_UpdatePlayerMovement = 302; // uint8_t Slot | uint8_t Direction (bitfield, see DIR_ constants))
-const TCommand SRV_DropBomb = 303; // uint8_t Slot
+const TCommand SRV_UpdatePlayerMovement = 302; // uint32_t FrameIndex | uint8_t Slot | uint8_t Direction (bitfield, see DIR_ constants))
+const TCommand SRV_DropBomb = 303; // uint32_t FrameIndex | uint8_t Slot
 
 // client commands (sent by server)
 // - connection responses
@@ -60,6 +60,11 @@ const TCommand CLN_BombExploding = 1306; // uint8_t FieldX | uint8_t FieldY | ui
 const TCommand CLN_BombExploded = 1307; // uint8_t FieldX | uint8_t FieldY
 const TCommand CLN_PlayerDying = 1308; // uint8_t Slot | uint16_t TimeUntilDeath (milliseconds)
 const TCommand CLN_PlayerDied = 1309; // uint8_t Slot
-const TCommand CLN_ArenaInfo = 1310; // uint8_t Widdth | uint8_t Height | Field Type (x=0,y=0), Field Type (x=1,y=0) .. Fieldt Type (x=width-1,y=height-1)
+const TCommand CLN_ArenaInfo = 1310; // uint8_t Width | uint8_t Height | Field Type (x=0,y=0), Field Type (x=1,y=0) .. Field Type (x=width-1,y=height-1)
 const TCommand CLN_PlayerScore = 1311; // uint8_t Slot | uint8_t Score
 const TCommand CLN_PlayerInfo = 1312; // uint8_t Slot | uint8_t State | string Name
+
+const TCommand CLN_FullMatchUpdate = 1313;	
+	// uint32_t LastFrameIndex
+	// for each slot: uint8_t Direction | float X | float Y | 
+	// for each field (x=0,y=0) (x=1,y=0) .. (x=max,y=max): uint8_t type

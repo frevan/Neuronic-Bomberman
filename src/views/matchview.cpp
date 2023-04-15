@@ -116,7 +116,7 @@ void TMatchView::Process(TGameTime Delta)
 	for (int slot = 0; slot < MAX_NUM_SLOTS; slot++)
 	{
 		TPlayer* p = &Game->GameData.Players[slot];
-		if (p->State != PLAYER_ALIVE)
+		if (!p->Owned || p->State != PLAYER_ALIVE)
 			continue;
 
 		bool left = Game->InputMap.GetValueOfInput(actionMatchPlayer1Left + (slot * PlayerActionCount));

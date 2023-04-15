@@ -2,6 +2,8 @@
 
 #include <functional>
 #include "comms.h"
+
+const TGameTime FULL_UPDATE_INTERVAL = 100;
 	
 TServer::TServer()
 :	TLogicListener(),
@@ -15,7 +17,9 @@ TServer::TServer()
 	ClientSocketsMutex(),
 	ThreadsShouldStop(false),
 	OwnerID(0),
-	CurrentMapIndex(0)
+	CurrentMapIndex(0),
+	CurrentTime(0),
+	NextFullUpdate(0)
 {
 	Logic = new TGameLogic(&Data, this);
 
@@ -317,8 +321,16 @@ void TServer::Process(TGameTime Delta)
 	{
 		Logic->Process(Delta);
 
-		DoFullUpdate();
+		bool sendFullUpdate = CurrentTime >= NextFullUpdate;
+		if (sendFullUpdate)
+			DoFullUpdate();
+
+		CurrentTime += Delta;
+		if (sendFullUpdate)
+			NextFullUpdate = (CurrentTime / FULL_UPDATE_INTERVAL) * FULL_UPDATE_INTERVAL + FULL_UPDATE_INTERVAL;
 	}
+	else
+		CurrentTime = 0;
 }
 
 void TServer::LogicBombExploding(const TFieldPosition& FieldPosition)
@@ -716,6 +728,49 @@ void TServer::DoFullUpdate(TConnectionID ConnectionID)
 {
 	DoArenaUpdate(ConnectionID);
 	DoPlayerPositionUpdate(ConnectionID);
+
+	/*
+	sf::Packet packet;
+
+	// can't use SendPacketToAllClients for this as the packet contains the frame index for each socket 
+	std::lock_guard<std::mutex> g(ClientSocketsMutex);
+	for (auto it = ClientSockets.begin(); it != ClientSockets.end(); it++)
+	{
+		TClientSocket* client = *it;
+
+		packet.clear();
+
+		// write command + last processed frame index to packet
+		packet << CLN_FullMatchUpdate << client->FrameIndex;
+
+		// write player state to packet
+		for (uint8_t slot = 0; slot < MAX_NUM_SLOTS; slot++)
+		{
+			TPlayer* p = &Data.Players[slot];
+
+			uint8_t direction = p->Direction;
+			float fieldX = p->Position.X;
+			float fieldY = p->Position.Y;
+			
+			packet << slot << direction << fieldX << fieldY;
+		}
+
+		// write arena info to packet
+		uint8_t width = (uint8_t)Data.Arena.Width;
+		uint8_t height = (uint8_t)Data.Arena.Height;
+		TField field{};
+		uint8_t fieldType;
+		for (int y = 0; y < height; y++)
+			for (int x = 0; x < width; x++)
+			{
+				fieldType = Data.Arena.At(x, y).Type;
+				packet << fieldType;
+			}
+
+		// send
+		SendPacketToSocket(client, packet);
+	}
+	*/
 }
 
 void TServer::DoArenaUpdate(TConnectionID ConnectionID)
@@ -756,6 +811,7 @@ void TServer::ProcessReceivedPacket(TConnectionID ConnectionID, sf::Packet& Pack
 	bool success = false;
 	uint8_t u8_1, u8_2;
 	uint16_t u16_1;
+	uint32_t u32_1;
 	std::string s_1;
 
 	switch (cmd)
@@ -822,12 +878,22 @@ void TServer::ProcessReceivedPacket(TConnectionID ConnectionID, sf::Packet& Pack
 			break;
 
 		case SRV_UpdatePlayerMovement:
-			if (Packet >> u8_1 >> u8_2)
+			if (Packet >> u32_1 >> u8_1 >> u8_2)
+			{
+				TClientSocket* socket = FindSocketForConnection(ConnectionID);
+				if (socket)
+					socket->FrameIndex = u32_1;
 				success = ProcessUpdatePlayerMovement(ConnectionID, u8_1, u8_2);
+			}
 			break;
 		case SRV_DropBomb:
-			if (Packet >> u8_1)
+			if (Packet >> u32_1 >> u8_1)
+			{
+				TClientSocket* socket = FindSocketForConnection(ConnectionID);
+				if (socket)
+					socket->FrameIndex = u32_1;
 				success = DropBomb(ConnectionID, u8_1);
+			}
 			break;
 	};
 

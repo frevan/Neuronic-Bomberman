@@ -668,3 +668,39 @@ void TGameData::UpdateGameFrom(TGameData* Source)
 
 	CurrentTime = Source->CurrentTime;
 }
+
+/*
+void TGameData::UpdateGameFrom(uint32_t FrameIndex, TFullMatchUpdateInfo* Info)
+{
+	for (uint8_t slot = 0; slot < MAX_NUM_SLOTS; slot++)
+	{
+		TPlayer* p = &Players[slot];
+
+		p->Position = Info->PlayerPositions[slot];
+		p->Direction = Info->PlayerDirections[slot];
+	}
+
+	for (uint8_t y = 0; y < Arena.Height; y++)
+		for (uint8_t x = 0; x < Arena.Width; x++)		
+		{
+			TFieldType type = Info->FieldTypes[y * Arena.Width + x];
+
+			TField* field{};
+			Arena.At(x, y, field);
+			field->Type = type;
+		}
+}
+
+// --- 	TFullMatchUpdateInfo ---
+TFullMatchUpdateInfo::TFullMatchUpdateInfo(size_t ArenaWidth, size_t ArenaHeight)
+:	PlayerDirections(),
+	PlayerPositions()
+{
+	FieldTypes = (TFieldType*)malloc(ArenaWidth * ArenaHeight * sizeof(TFieldType));
+}
+
+TFullMatchUpdateInfo::~TFullMatchUpdateInfo()
+{
+	free(FieldTypes);
+}
+*/

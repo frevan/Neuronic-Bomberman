@@ -14,6 +14,7 @@ class TClientSocket : public sf::TcpSocket
 {
 public:
 	TConnectionID ID;
+	uint32_t FrameIndex;
 };
 
 typedef struct 
@@ -39,6 +40,7 @@ private:
 	uint16_t CurrentMapIndex;
 	TConnectionID OwnerID;
 	TSlotInfo Slots[MAX_NUM_SLOTS];
+	TGameTime CurrentTime, NextFullUpdate;
 
 	bool ThreadsShouldStop;
 
