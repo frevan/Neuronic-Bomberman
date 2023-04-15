@@ -2,9 +2,10 @@
 
 #include <functional>
 #include "comms.h"
-
+	
 TServer::TServer()
-:	State(INACTIVE),
+:	TLogicListener(),
+	State(INACTIVE),
 	Data(),
 	Maps(),
 	NetworkListenerThread(nullptr),
@@ -13,7 +14,8 @@ TServer::TServer()
 	ClientSockets(),
 	ClientSocketsMutex(),
 	ThreadsShouldStop(false),
-	OwnerID(0)
+	OwnerID(0),
+	CurrentMapIndex(0)
 {
 	Logic = new TGameLogic(&Data, this);
 
