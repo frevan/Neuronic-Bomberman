@@ -6,7 +6,8 @@
 
 TMatchView::TMatchView(TGame* SetGame)
 :	TView(SetGame, TViewType::VT_HUMANVIEW),
-	BombAnimation()
+	BombAnimation(),
+	ActionsExecuted(0)
 {
 }
 
@@ -124,7 +125,7 @@ void TMatchView::Process(TGameTime Delta)
 		bool up = Game->InputMap.GetValueOfInput(actionMatchPlayer1Up + (slot * PlayerActionCount));
 		bool down = Game->InputMap.GetValueOfInput(actionMatchPlayer1Down + (slot * PlayerActionCount));
 
-		Game->Client->UpdatePlayerMovement(slot, left, right, up, down);
+		Game->Client->UpdatePlayerMovement(ActionsExecuted++, slot, left, right, up, down);
 	}
 }
 
@@ -147,7 +148,7 @@ bool TMatchView::ProcessInput(TInputID InputID, float Value)
 			break;
 
 		case actionMatchPlayer1DropBomb:
- 			Game->Client->DropBomb(playerIndex);
+ 			Game->Client->DropBomb(ActionsExecuted++, playerIndex);
 			break;
 	};
 

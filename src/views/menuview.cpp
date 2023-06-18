@@ -56,6 +56,16 @@ void TMenuView::CreateWidgets()
 	quitbtn->setPosition(675, 535);
 	quitbtn->setSize(100, 40);
 	quitbtn->connect("pressed", &TMenuView::OnQuitBtnClick, this);
+
+	#ifdef _DEBUG
+	// open other instance
+	tgui::Button::Ptr newinstancebtn = std::make_shared<tgui::Button>();
+	AddWidgetToGUI(newinstancebtn);
+	newinstancebtn->setText("New instance");
+	newinstancebtn->setPosition(675, 25);
+	newinstancebtn->setSize(100, 40);
+	newinstancebtn->connect("pressed", &TMenuView::OnNewInstanceBtnClick, this);
+	#endif
 }
 
 void TMenuView::StartNewGame()
@@ -96,6 +106,13 @@ void TMenuView::OnQuitBtnClick()
 {
 	Game->RequestQuit();
 }
+
+#ifdef _DEBUG
+void TMenuView::OnNewInstanceBtnClick()
+{
+	Game->StartNewInstance();
+}
+#endif
 
 bool TMenuView::ProcessInput(TInputID InputID, float Value)
 {

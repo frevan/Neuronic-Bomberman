@@ -43,6 +43,9 @@ TGame::TGame()
 	NextState(GAMESTATE_NONE),
 	GUI(nullptr),
 	SystemGUIView(nullptr),
+	#ifdef _DEBUG
+	AppFileName(),
+	#endif
 	AppPath(),
 	Views(),
 	ViewsMutex(),
@@ -71,6 +74,9 @@ TGame::~TGame()
 bool TGame::Initialize(const std::string& filename)
 {
 	// initialize some data
+	#ifdef _DEBUG
+	AppFileName = filename;
+	#endif
 	DetermineAppPath(filename);
 	Fonts.SetFontPath(AppPath + GetResourceSubPath() + GetFontSubPath());
 	Fonts.LoadFonts();
@@ -438,6 +444,13 @@ void TGame::RequestQuit()
 {
 	ShouldQuit = true;
 }
+
+#ifdef _DEBUG
+void TGame::StartNewInstance()
+{
+	ShellExecuteA(0, "", AppFileName.c_str(), "", "", SW_SHOW);
+}
+#endif
 
 void TGame::DetermineAppPath(const std::string& filename)
 {
@@ -1042,4 +1055,9 @@ std::string TGame::GetPreviousServerAddress(int Index)
 	}
 
 	return result;
+}
+
+void TGame::ClientFullMatchUpdate(uint64_t LastReceivedTime, const TFullMatchUpdateInfo& Info)
+{
+	GameData.ApplyFullMatchUpdate(LastReceivedTime, Info);
 }

@@ -13,6 +13,9 @@ private:
 	void OnJoinGameBtnClick();
 	void OnOptionsBtnClick();
 	void OnQuitBtnClick();
+	#ifdef _DEBUG
+	void OnNewInstanceBtnClick();
+	#endif
 
 	void StartNewGame();
 

@@ -111,7 +111,6 @@ typedef struct
 	bool Taken;
 } TStartPosition;
 
-/*
 class TFullMatchUpdateInfo
 {
 public:
@@ -122,7 +121,6 @@ public:
 	TFullMatchUpdateInfo(size_t ArenaWidth, size_t ArenaHeight);
 	~TFullMatchUpdateInfo();
 };
-*/
 
 class TArena
 {
@@ -162,6 +160,17 @@ public:
 	bool LoadFromFile(const std::string& FileName, int FileType = 0);
 };
 
+const int GA_PlayerMovement = 1;
+const int GA_DropBomb = 2;
+
+struct TGameAction
+{
+	int Action;
+	uint64_t Time;
+	int Slot;
+	uint32_t Data;
+};
+
 class TGameData
 {
 private:
@@ -178,6 +187,7 @@ public:
 	TArena Arena;
 	TGameTime CurrentTime;
 	sf::Color PlayerColors[MAX_NUM_SLOTS];
+	std::vector<TGameAction> ActionHistory;
 
 	TGameData();
 
@@ -192,6 +202,7 @@ public:
 
 	bool BombInField(uint8_t X, uint8_t Y, bool OnlyUnexploded);
 
-	void UpdateGameFrom(TGameData* Source);
-	//void UpdateGameFrom(uint32_t FrameIndex, TFullMatchUpdateInfo* Info);
+	void AddActionToHistory(int Action, uint64_t Time, int Slot, uint32_t Data);
+	void UpdateGameFromData(TGameData* Source);
+	void ApplyFullMatchUpdate(uint64_t lastReceivedTime, const TFullMatchUpdateInfo& Info);
 };

@@ -1,6 +1,7 @@
 #include "server.h"
 
 #include <functional>
+
 #include "comms.h"
 
 const TGameTime FULL_UPDATE_INTERVAL = 100;
@@ -70,6 +71,7 @@ void TServer::Stop()
 	SocketSelector.clear();
 	NetworkListener.close();
 
+	std::lock_guard<std::mutex> g(ClientSocketsMutex);
 	for (auto it = ClientSockets.begin(); it != ClientSockets.end(); it++)
 	{
 		TClientSocket* client = *it;
@@ -161,6 +163,7 @@ bool TServer::StartRound(TConnectionID ConnectionID)
 
 	Data.InitNewRound();
 
+	ResetSocketReceivedTimes();
 	DoFullUpdate();
 
 	Data.Status = GAME_PLAYING;
@@ -726,22 +729,27 @@ void TServer::DoPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Position, 
 
 void TServer::DoFullUpdate(TConnectionID ConnectionID)
 {
-	DoArenaUpdate(ConnectionID);
-	DoPlayerPositionUpdate(ConnectionID);
+	// OLD OLD OLD
+	//DoArenaUpdate(ConnectionID);
+	//DoPlayerPositionUpdate(ConnectionID);
 
-	/*
+	// NEW NEW NEW
+
 	sf::Packet packet;
 
-	// can't use SendPacketToAllClients for this as the packet contains the frame index for each socket 
+	// can't use SendPacketToAllClients for this as the packet contains the individual "last received time" for each socket 
 	std::lock_guard<std::mutex> g(ClientSocketsMutex);
 	for (auto it = ClientSockets.begin(); it != ClientSockets.end(); it++)
 	{
 		TClientSocket* client = *it;
 
+		if (ConnectionID != 0 && client->ID != ConnectionID)
+			continue;
+
 		packet.clear();
 
 		// write command + last processed frame index to packet
-		packet << CLN_FullMatchUpdate << client->FrameIndex;
+		packet << CLN_FullMatchUpdate << client->LastReceivedTime;
 
 		// write player state to packet
 		for (uint8_t slot = 0; slot < MAX_NUM_SLOTS; slot++)
@@ -752,7 +760,7 @@ void TServer::DoFullUpdate(TConnectionID ConnectionID)
 			float fieldX = p->Position.X;
 			float fieldY = p->Position.Y;
 			
-			packet << slot << direction << fieldX << fieldY;
+			packet << direction << fieldX << fieldY;
 		}
 
 		// write arena info to packet
@@ -760,8 +768,8 @@ void TServer::DoFullUpdate(TConnectionID ConnectionID)
 		uint8_t height = (uint8_t)Data.Arena.Height;
 		TField field{};
 		uint8_t fieldType;
-		for (int y = 0; y < height; y++)
-			for (int x = 0; x < width; x++)
+		for (uint8_t y = 0; y < height; y++)
+			for (uint8_t x = 0; x < width; x++)
 			{
 				fieldType = Data.Arena.At(x, y).Type;
 				packet << fieldType;
@@ -770,7 +778,6 @@ void TServer::DoFullUpdate(TConnectionID ConnectionID)
 		// send
 		SendPacketToSocket(client, packet);
 	}
-	*/
 }
 
 void TServer::DoArenaUpdate(TConnectionID ConnectionID)
@@ -811,7 +818,7 @@ void TServer::ProcessReceivedPacket(TConnectionID ConnectionID, sf::Packet& Pack
 	bool success = false;
 	uint8_t u8_1, u8_2;
 	uint16_t u16_1;
-	uint32_t u32_1;
+	uint64_t u64_1;
 	std::string s_1;
 
 	switch (cmd)
@@ -878,20 +885,20 @@ void TServer::ProcessReceivedPacket(TConnectionID ConnectionID, sf::Packet& Pack
 			break;
 
 		case SRV_UpdatePlayerMovement:
-			if (Packet >> u32_1 >> u8_1 >> u8_2)
+			if (Packet >> u64_1 >> u8_1 >> u8_2)
 			{
 				TClientSocket* socket = FindSocketForConnection(ConnectionID);
 				if (socket)
-					socket->FrameIndex = u32_1;
+					socket->LastReceivedTime = u64_1;
 				success = ProcessUpdatePlayerMovement(ConnectionID, u8_1, u8_2);
 			}
 			break;
 		case SRV_DropBomb:
-			if (Packet >> u32_1 >> u8_1)
+			if (Packet >> u64_1 >> u8_1)
 			{
 				TClientSocket* socket = FindSocketForConnection(ConnectionID);
 				if (socket)
-					socket->FrameIndex = u32_1;
+					socket->LastReceivedTime = u64_1;
 				success = DropBomb(ConnectionID, u8_1);
 			}
 			break;
@@ -1078,5 +1085,15 @@ void TServer::ClientDisconnected(TConnectionID ConnectionID)
 	else
 	{
 
+	}
+}
+
+void TServer::ResetSocketReceivedTimes()
+{
+	std::lock_guard<std::mutex> g(ClientSocketsMutex);
+	for (auto it = ClientSockets.begin(); it != ClientSockets.end(); it++)
+	{
+		TClientSocket* client = *it;
+		client->LastReceivedTime = 0;
 	}
 }

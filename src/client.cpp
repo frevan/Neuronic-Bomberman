@@ -11,8 +11,7 @@ TClient::TClient(TGameData* SetData)
 	Listener(nullptr),
 	Commands(),
 	Socket(),
-	ConnectionStatus(CLIENT_IDLE),
-	FrameIndex(0)
+	ConnectionStatus(CLIENT_IDLE)
 {
 }
 
@@ -169,7 +168,7 @@ void TClient::SelectArena(uint16_t Index)
 	Commands.push(cmd);
 }
 
-void TClient::UpdatePlayerMovement(uint8_t Slot, bool Left, bool Right, bool Up, bool Down)
+void TClient::UpdatePlayerMovement(uint64_t Time, uint8_t Slot, bool Left, bool Right, bool Up, bool Down)
 {
 	if (Slot < 0 || Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
@@ -186,21 +185,24 @@ void TClient::UpdatePlayerMovement(uint8_t Slot, bool Left, bool Right, bool Up,
 
 	if (direction != Data->Players[Slot].Direction)
 	{
+		// update local data now
+		Data->AddActionToHistory(GA_PlayerMovement, Time, Slot, direction);
 		Data->Players[Slot].Direction = direction;
 
+		// send to server
 		sf::Packet packet;
-		packet << SRV_UpdatePlayerMovement << FrameIndex++ << Slot << direction;
+		packet << SRV_UpdatePlayerMovement << Time << Slot << direction;
 		Socket.send(packet);
 	}
 }
 
-void TClient::DropBomb(uint8_t Slot)
+void TClient::DropBomb(uint64_t Time, uint8_t Slot)
 {
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
 	sf::Packet packet;
-	packet << SRV_DropBomb << FrameIndex++ << Slot;
+	packet << SRV_DropBomb << Time << Slot;
 	Socket.send(packet);
 }
 
@@ -403,27 +405,25 @@ void TClient::ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Positi
 	}
 }
 
-void TClient::ServerFullUpdate(TGameData* Data)
-{
-	Data->UpdateGameFrom(Data);
-}
-
-/*
 void TClient::ServerFullUpdate(sf::Packet& Packet)
 {
-	uint32_t lastFrameIndex;
-	TFullMatchUpdateInfo* info = new TFullMatchUpdateInfo(Data->Arena.Width, Data->Arena.Height);
+	uint64_t lastReceivedTime;
+	TFullMatchUpdateInfo info(Data->Arena.Width, Data->Arena.Height);
 	
 	// read the frame index
-	Packet >> lastFrameIndex;
+	Packet >> lastReceivedTime;
 
 	// read the player states
 	for (uint8_t slot = 0; slot < MAX_NUM_SLOTS; slot++)
 	{
 		uint8_t direction;
 		float fieldX, fieldY;
+
 		Packet >> direction >> fieldX >> fieldY;
-		// TODO: write to temp structure
+
+		info.PlayerDirections[slot] = direction;
+		info.PlayerPositions[slot].X = fieldX;
+		info.PlayerPositions[slot].Y = fieldY;
 	}
 
 	// read arena info
@@ -434,16 +434,12 @@ void TClient::ServerFullUpdate(sf::Packet& Packet)
 		for (int x = 0; x < width; x++)
 		{
 			Packet >> fieldType;
-			// TODO: write to temp structure
+			assert(fieldType <= 2);
+			info.FieldTypes[(y * width) + x] = fieldType;
 		}
 
-	// TODO: notify game logic or data of change
-	Data->UpdateGameFrom(lastFrameIndex, info);
-
-	// clean up
-	delete info;
+	Listener->ClientFullMatchUpdate(lastReceivedTime, info);
 }
-*/
 
 void TClient::ServerBombExploding(const TFieldPosition& Position, TGameTime TimeUntilExploded)
 {
@@ -663,11 +659,10 @@ void TClient::ProcessReceivedPacket(sf::Socket* Source, sf::Packet& Packet)
 			if (Packet >> u8_1 >> u8_2 >> s_1)
 				ServerPlayerInfo(u8_1, u8_2, s_1);
 			break;
-		/*
+		
 		case CLN_FullMatchUpdate:
 			ServerFullUpdate(Packet);
 			break;
-		*/
 	};
 }
 

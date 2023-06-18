@@ -6,6 +6,7 @@ class TMatchView : public TView
 {
 private:
 	TAnimation BombAnimation;
+	uint64_t ActionsExecuted;
 	void DeterminePlayerActionFromInput(TInputID& InputID, float& Value, int& PlayerIndex);
 public:
 	TMatchView(TGame* SetGame);

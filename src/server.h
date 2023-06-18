@@ -14,7 +14,7 @@ class TClientSocket : public sf::TcpSocket
 {
 public:
 	TConnectionID ID;
-	uint32_t FrameIndex;
+	uint64_t LastReceivedTime;
 };
 
 typedef struct 
@@ -55,6 +55,7 @@ private:
 	void SendErrorResponse(TClientSocket* Socket, uint16_t FailedCommand);
 	bool SendPacketToSocket(TClientSocket* Socket, sf::Packet& Packet);
 	void SendPacketToAllClients(sf::Packet& Packet, TConnectionID SkipConnectionID = 0);
+	void ResetSocketReceivedTimes();
 
 	// receive input from network
 	void ListenToNetwork();

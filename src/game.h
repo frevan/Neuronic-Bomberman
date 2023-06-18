@@ -95,6 +95,9 @@ public:
 	TServer* Server;
 	TGameData GameData;
 	TFontManager Fonts;
+	#ifdef _DEBUG
+	std::string AppFileName;
+	#endif
 	std::string AppPath;
 	std::vector<std::string> ArenaNames;
 	int CurrentArenaIndex;
@@ -113,6 +116,9 @@ public:
 
 	void SwitchToState(int NewState); // see STATE_ constants
 	void RequestQuit();
+	#ifdef _DEBUG
+	void StartNewInstance();
+	#endif
 	TView* AttachView(int NewView); // see VIEW_ constants 
 	void DetachView(TViewID ID);
 
@@ -137,4 +143,5 @@ public:
 	void ClientRoundEnded() override;
 	void ClientArenaSelected(int Index, const std::string Name) override;
 	void ClientArenaName(int Count, int Index, const std::string Name) override;
+	void ClientFullMatchUpdate(uint64_t LastReceivedTime, const TFullMatchUpdateInfo& Info) override;
 };
