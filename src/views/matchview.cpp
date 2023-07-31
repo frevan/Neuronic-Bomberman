@@ -7,7 +7,7 @@
 TMatchView::TMatchView(TGame* SetGame)
 :	TView(SetGame, TViewType::VT_HUMANVIEW),
 	BombAnimation(),
-	ActionsExecuted(0)
+	SequenceID(1)
 {
 }
 
@@ -120,12 +120,21 @@ void TMatchView::Process(TGameTime Delta)
 		if (!p->Owned || p->State != PLAYER_ALIVE)
 			continue;
 
-		bool left = Game->InputMap.GetValueOfInput(actionMatchPlayer1Left + (slot * PlayerActionCount));
-		bool right = Game->InputMap.GetValueOfInput(actionMatchPlayer1Right + (slot * PlayerActionCount));
-		bool up = Game->InputMap.GetValueOfInput(actionMatchPlayer1Up + (slot * PlayerActionCount));
-		bool down = Game->InputMap.GetValueOfInput(actionMatchPlayer1Down + (slot * PlayerActionCount));
+		uint8_t direction = DIRECTION_NONE;
+		if (Game->InputMap.GetValueOfInput(actionMatchPlayer1Left + (slot * PlayerActionCount)))
+			direction |= DIRECTION_LEFT;
+		if (Game->InputMap.GetValueOfInput(actionMatchPlayer1Right + (slot * PlayerActionCount)))
+			direction |= DIRECTION_RIGHT;
+		if (Game->InputMap.GetValueOfInput(actionMatchPlayer1Up + (slot * PlayerActionCount)))
+			direction |= DIRECTION_UP;
+		if (Game->InputMap.GetValueOfInput(actionMatchPlayer1Down + (slot * PlayerActionCount)))
+			direction |= DIRECTION_DOWN;
 
-		Game->Client->UpdatePlayerMovement(ActionsExecuted++, slot, left, right, up, down);
+		if (direction != p->Direction)
+		{
+			Game->Logic->GameLogic.AddPlayerAction(SequenceID++, slot, actionMovement, direction);
+			Game->Client->UpdatePlayerMovement(SequenceID, slot, direction);
+		}
 	}
 }
 
@@ -148,7 +157,11 @@ bool TMatchView::ProcessInput(TInputID InputID, float Value)
 			break;
 
 		case actionMatchPlayer1DropBomb:
- 			Game->Client->DropBomb(ActionsExecuted++, playerIndex);
+			if (playerIndex >= 0)
+			{
+				Game->Logic->GameLogic.AddPlayerAction(SequenceID++, playerIndex, actionDropBomb, 0);
+				Game->Client->DropBomb(SequenceID, playerIndex);
+			}
 			break;
 	};
 

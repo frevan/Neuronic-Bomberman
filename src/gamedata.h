@@ -62,6 +62,7 @@ typedef struct
 	bool Owned; // owned by this client
 	std::string Name;
 	int InputNum;
+	uint64_t LastProcessedSequenceID;
 	// in-game status
 	TPlayerPosition Position;
 	TPlayerDirection Direction; // combination of one or more DIRECTION_ values
@@ -116,7 +117,8 @@ class TFullMatchUpdateInfo
 public:
 	TPlayerPosition PlayerPositions[MAX_NUM_SLOTS];
 	TPlayerDirection PlayerDirections[MAX_NUM_SLOTS];
-	TFieldType* FieldTypes;
+	uint8_t PlayerActiveBombs[MAX_NUM_SLOTS];
+	TField* Fields;
 public:
 	TFullMatchUpdateInfo(size_t ArenaWidth, size_t ArenaHeight);
 	~TFullMatchUpdateInfo();
@@ -163,6 +165,7 @@ public:
 const int GA_PlayerMovement = 1;
 const int GA_DropBomb = 2;
 
+/*
 struct TGameAction
 {
 	int Action;
@@ -170,6 +173,7 @@ struct TGameAction
 	int Slot;
 	uint32_t Data;
 };
+*/
 
 class TGameData
 {
@@ -187,7 +191,7 @@ public:
 	TArena Arena;
 	TGameTime CurrentTime;
 	sf::Color PlayerColors[MAX_NUM_SLOTS];
-	std::vector<TGameAction> ActionHistory;
+	//std::vector<TGameAction> ActionHistory;
 
 	TGameData();
 
@@ -202,7 +206,7 @@ public:
 
 	bool BombInField(uint8_t X, uint8_t Y, bool OnlyUnexploded);
 
-	void AddActionToHistory(int Action, uint64_t Time, int Slot, uint32_t Data);
+	//void AddActionToHistory(int Action, uint64_t Time, int Slot, uint32_t Data);
 	void UpdateGameFromData(TGameData* Source);
-	void ApplyFullMatchUpdate(uint64_t lastReceivedTime, const TFullMatchUpdateInfo& Info);
+	void ApplyFullMatchUpdate(uint64_t SequenceID, const TFullMatchUpdateInfo& Info);
 };

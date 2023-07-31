@@ -168,41 +168,24 @@ void TClient::SelectArena(uint16_t Index)
 	Commands.push(cmd);
 }
 
-void TClient::UpdatePlayerMovement(uint64_t Time, uint8_t Slot, bool Left, bool Right, bool Up, bool Down)
+void TClient::UpdatePlayerMovement(uint64_t SequenceID, uint8_t Slot, uint8_t Direction)
 {
 	if (Slot < 0 || Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
-	uint8_t direction = 0;
-	if (Left)
-		direction |= DIRECTION_LEFT;
-	if (Right)
-		direction |= DIRECTION_RIGHT;
-	if (Up)
-		direction |= DIRECTION_UP;
-	if (Down)
-		direction |= DIRECTION_DOWN;
-
-	if (direction != Data->Players[Slot].Direction)
-	{
-		// update local data now
-		Data->AddActionToHistory(GA_PlayerMovement, Time, Slot, direction);
-		Data->Players[Slot].Direction = direction;
-
-		// send to server
-		sf::Packet packet;
-		packet << SRV_UpdatePlayerMovement << Time << Slot << direction;
-		Socket.send(packet);
-	}
+	// send to server
+	sf::Packet packet;
+	packet << SRV_UpdatePlayerMovement << SequenceID << Slot << Direction;
+	Socket.send(packet);
 }
 
-void TClient::DropBomb(uint64_t Time, uint8_t Slot)
+void TClient::DropBomb(uint64_t SequenceID, uint8_t Slot)
 {
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 
 	sf::Packet packet;
-	packet << SRV_DropBomb << Time << Slot;
+	packet << SRV_DropBomb << SequenceID << Slot;
 	Socket.send(packet);
 }
 
@@ -407,38 +390,48 @@ void TClient::ServerPlayerDroppedBomb(uint8_t Slot, const TFieldPosition& Positi
 
 void TClient::ServerFullUpdate(sf::Packet& Packet)
 {
-	uint64_t lastReceivedTime;
+	uint64_t sequenceid;
 	TFullMatchUpdateInfo info(Data->Arena.Width, Data->Arena.Height);
 	
 	// read the frame index
-	Packet >> lastReceivedTime;
+	Packet >> sequenceid;
 
 	// read the player states
 	for (uint8_t slot = 0; slot < MAX_NUM_SLOTS; slot++)
 	{
-		uint8_t direction;
+		uint8_t direction, activeBombs;
 		float fieldX, fieldY;
 
-		Packet >> direction >> fieldX >> fieldY;
+		Packet >> direction >> fieldX >> fieldY >> activeBombs;
 
 		info.PlayerDirections[slot] = direction;
 		info.PlayerPositions[slot].X = fieldX;
 		info.PlayerPositions[slot].Y = fieldY;
+		info.PlayerActiveBombs[slot] = activeBombs;
 	}
 
 	// read arena info
 	uint8_t width = (uint8_t)Data->Arena.Width;
 	uint8_t height = (uint8_t)Data->Arena.Height;
-	uint8_t fieldType;
+	uint8_t fieldType, bombState, bombRange, bombDroppedBy;
+	uint32_t bombTimeUntilNextState;
 	for (int y = 0; y < height; y++)
 		for (int x = 0; x < width; x++)
 		{
-			Packet >> fieldType;
+			Packet >> fieldType >> bombState >> bombTimeUntilNextState >> bombRange >> bombDroppedBy;
 			assert(fieldType <= 2);
-			info.FieldTypes[(y * width) + x] = fieldType;
+
+			int idx = (y * width) + x;
+			info.Fields[idx].Type = fieldType;
+			info.Fields[idx].Position.X = x;
+			info.Fields[idx].Position.Y = y;
+			info.Fields[idx].Bomb.DroppedByPlayer = bombDroppedBy;
+			info.Fields[idx].Bomb.Range = bombRange;
+			info.Fields[idx].Bomb.State = bombState;
+			info.Fields[idx].Bomb.TimeUntilNextState = bombTimeUntilNextState;
 		}
 
-	Listener->ClientFullMatchUpdate(lastReceivedTime, info);
+	Listener->ClientFullMatchUpdate(sequenceid, info);
 }
 
 void TClient::ServerBombExploding(const TFieldPosition& Position, TGameTime TimeUntilExploded)

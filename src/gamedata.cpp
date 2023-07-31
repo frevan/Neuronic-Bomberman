@@ -344,12 +344,15 @@ TGameData::TGameData()
 	Status(GAME_NONE),
 	Players(),
 	Arena(),
-	ActionHistory(),
+	//ActionHistory(),
 	CurrentRound(0),
 	CurrentTime(0)
 {
 	for (int i = 0; i < MAX_NUM_SLOTS; i++)
+	{
+		Players[i].LastProcessedSequenceID = 0;
 		Players[i].State = PLAYER_NOTPLAYING;
+	}
 
 	PlayerColors[0] = sf::Color::Blue;
 	PlayerColors[1] = sf::Color::Magenta;
@@ -373,7 +376,7 @@ void TGameData::Reset()
 	for (int i = 0; i < MAX_NUM_SLOTS; i++)
 		Players[i].State = PLAYER_NOTPLAYING;
 
-	ActionHistory.clear();
+	//ActionHistory.clear();
 }
 
 bool TGameData::AddPlayer(const std::string& SetName, bool SetOwned, uint8_t SetSlot)
@@ -428,7 +431,7 @@ void TGameData::InitNewGame()
 		Players[idx].RoundsWon = 0;
 
 	//InitNewRound();
-	ActionHistory.clear();
+	//ActionHistory.clear();
 }
 
 void TGameData::InitNewRound()
@@ -462,7 +465,7 @@ void TGameData::InitNewRound()
 	ApplyBrickDensity();
 	PositionPlayers();
 
-	ActionHistory.clear();
+	//ActionHistory.clear();
 }
 
 void TGameData::ApplyBrickDensity()
@@ -677,6 +680,7 @@ void TGameData::UpdateGameFromData(TGameData* Source)
 	CurrentTime = Source->CurrentTime;
 }
 
+/*
 void TGameData::AddActionToHistory(int Action, uint64_t Time, int Slot, uint32_t Data)
 {
 	TGameAction info;
@@ -686,8 +690,9 @@ void TGameData::AddActionToHistory(int Action, uint64_t Time, int Slot, uint32_t
 	info.Data = Data;
 	ActionHistory.push_back(info);
 }
+*/
 
-void TGameData::ApplyFullMatchUpdate(uint64_t lastReceivedTime, const TFullMatchUpdateInfo& Info)
+void TGameData::ApplyFullMatchUpdate(uint64_t SequenceID, const TFullMatchUpdateInfo& Info)
 {
 	// update player positions
 	for (uint8_t slot = 0; slot < MAX_NUM_SLOTS; slot++)
@@ -696,19 +701,25 @@ void TGameData::ApplyFullMatchUpdate(uint64_t lastReceivedTime, const TFullMatch
 
 		p->Position = Info.PlayerPositions[slot];
 		p->Direction = Info.PlayerDirections[slot];
+		p->ActiveBombs = Info.PlayerActiveBombs[slot];
 	}
 
 	// update the field
 	for (uint8_t y = 0; y < Arena.Height; y++)
 		for (uint8_t x = 0; x < Arena.Width; x++)		
 		{
-			TFieldType type = Info.FieldTypes[y * Arena.Width + x];
-
 			TField* field{};
 			Arena.At((uint8_t)x, (uint8_t)y, field);
-			field->Type = type;
+
+			int idx = y * Arena.Width + x;
+			field->Type = Info.Fields[idx].Type;
+			field->Bomb.DroppedByPlayer = Info.Fields[idx].Bomb.DroppedByPlayer;
+			field->Bomb.State = Info.Fields[idx].Bomb.State;
+			field->Bomb.Range = Info.Fields[idx].Bomb.Range;
+			field->Bomb.TimeUntilNextState = Info.Fields[idx].Bomb.TimeUntilNextState;
 		}
 
+	/*
 	// remove actions we no longer need from the history
 	for (auto it = ActionHistory.begin(); it != ActionHistory.end(); )
 	{
@@ -717,6 +728,7 @@ void TGameData::ApplyFullMatchUpdate(uint64_t lastReceivedTime, const TFullMatch
 		else
 			break;
 	}
+	*/
 }
 
 // --- 	TFullMatchUpdateInfo ---
@@ -725,10 +737,10 @@ TFullMatchUpdateInfo::TFullMatchUpdateInfo(size_t ArenaWidth, size_t ArenaHeight
 :	PlayerDirections(),
 	PlayerPositions()
 {
-	FieldTypes = (TFieldType*)malloc(ArenaWidth * ArenaHeight * sizeof(TFieldType));
+	Fields = (TField*)malloc(ArenaWidth * ArenaHeight * sizeof(TField));
 }
 
 TFullMatchUpdateInfo::~TFullMatchUpdateInfo()
 {
-	free(FieldTypes);
+	free(Fields);
 }

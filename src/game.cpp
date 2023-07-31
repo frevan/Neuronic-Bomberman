@@ -1057,7 +1057,7 @@ std::string TGame::GetPreviousServerAddress(int Index)
 	return result;
 }
 
-void TGame::ClientFullMatchUpdate(uint64_t LastReceivedTime, const TFullMatchUpdateInfo& Info)
+void TGame::ClientFullMatchUpdate(uint64_t SequenceID, const TFullMatchUpdateInfo& Info)
 {
-	GameData.ApplyFullMatchUpdate(LastReceivedTime, Info);
+	GameData.ApplyFullMatchUpdate(SequenceID, Info);
 }

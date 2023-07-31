@@ -163,7 +163,6 @@ bool TServer::StartRound(TConnectionID ConnectionID)
 
 	Data.InitNewRound();
 
-	ResetSocketReceivedTimes();
 	DoFullUpdate();
 
 	Data.Status = GAME_PLAYING;
@@ -326,9 +325,10 @@ void TServer::Process(TGameTime Delta)
 
 		bool sendFullUpdate = CurrentTime >= NextFullUpdate;
 		if (sendFullUpdate)
-			DoFullUpdate();
+			DoFullUpdate();			
 
 		CurrentTime += Delta;
+
 		if (sendFullUpdate)
 			NextFullUpdate = (CurrentTime / FULL_UPDATE_INTERVAL) * FULL_UPDATE_INTERVAL + FULL_UPDATE_INTERVAL;
 	}
@@ -391,74 +391,34 @@ void TServer::LogicRoundEnded()
 	}
 }
 
-void TServer::SetPlayerDirections(TConnectionID ConnectionID, uint8_t Slot, bool Left, bool Right, bool Up, bool Down)
+void TServer::SetPlayerDirections(TConnectionID ConnectionID, uint64_t SequenceID, uint8_t Slot, bool Left, bool Right, bool Up, bool Down)
 {
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
 	if (ConnectionID != Slots[Slot].ConnectionID)
 		return;
 
-	TPlayer* p = &(Data.Players[Slot]);
-	if (p->State == PLAYER_NOTPLAYING)
-		return;
-
+	uint32_t direction = 0;
 	if (Left)
-		p->Direction |= DIRECTION_LEFT;
-	else
-		p->Direction &= ~DIRECTION_LEFT;
+		direction |= DIRECTION_LEFT;
 	if (Right)
-		p->Direction |= DIRECTION_RIGHT;
-	else
-		p->Direction &= ~DIRECTION_RIGHT;
+		direction |= DIRECTION_RIGHT;
 	if (Up)
-		p->Direction |= DIRECTION_UP;
-	else
-		p->Direction &= ~DIRECTION_UP;
+		direction |= DIRECTION_UP;
 	if (Down)
-		p->Direction |= DIRECTION_DOWN;
-	else
-		p->Direction &= ~DIRECTION_DOWN;
+		direction |= DIRECTION_DOWN;
 
-	DoPlayerDirectionChanged(Slot, Left, Right, Up, Down);
+	Logic->AddPlayerAction(SequenceID, Slot, actionMovement, direction);
 }
 
-bool TServer::DropBomb(TConnectionID ConnectionID, uint8_t Slot)
+bool TServer::DropBomb(TConnectionID ConnectionID, uint64_t SequenceID, uint8_t Slot)
 {
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return false;
 	if (ConnectionID != Slots[Slot].ConnectionID)
 		return false;
 
-	TPlayer* p = &(Data.Players[Slot]);
-	if (p->State == PLAYER_NOTPLAYING)
-		return false;
-	if (p->ActiveBombs == p->MaxActiveBombs)
-		return false;
-
-	// determine the exact position where to drop it (top left pos of the field)
-	TFieldPosition pos;
-	pos.X = static_cast<int>(trunc(p->Position.X));
-	pos.Y = static_cast<int>(trunc(p->Position.Y));
-
-	// check if there's already a bomb at this position
-	if (Data.BombInField(pos.X, pos.Y, false))
-		return false;
-
-	// add the new bomb
-	TField* field{};
-	Data.Arena.At(pos, field);
-	if (!field)
-		return false;
-
-	field->Bomb.State = BOMB_TICKING;
-	field->Bomb.DroppedByPlayer = Slot;
-	field->Bomb.TimeUntilNextState = 2000; // 2 seconds
-	field->Bomb.Range = p->BombRange;
-
-	// update the player
-	p->ActiveBombs++;
-
-	DoPlayerDroppedBomb(Slot, pos, field->Bomb.TimeUntilNextState);
+	Logic->AddPlayerAction(SequenceID, Slot, actionDropBomb, 0);
 
 	return true;
 }
@@ -749,30 +709,51 @@ void TServer::DoFullUpdate(TConnectionID ConnectionID)
 		packet.clear();
 
 		// write command + last processed frame index to packet
-		packet << CLN_FullMatchUpdate << client->LastReceivedTime;
+		packet << CLN_FullMatchUpdate;
+
+		// discover the most recent sequence id for this client
+		uint64_t sequenceID = -1;
+		for (uint8_t slot = 0; slot < MAX_NUM_SLOTS; slot++)
+		{
+			if (Slots[slot].ConnectionID != client->ID)
+				continue;
+			TPlayer* p = &Data.Players[slot];
+			if (p->LastProcessedSequenceID > sequenceID)
+				sequenceID = p->LastProcessedSequenceID;
+		}
+		packet << sequenceID;
 
 		// write player state to packet
 		for (uint8_t slot = 0; slot < MAX_NUM_SLOTS; slot++)
 		{
 			TPlayer* p = &Data.Players[slot];
 
+			uint64_t sequenceid = p->LastProcessedSequenceID;
 			uint8_t direction = p->Direction;
 			float fieldX = p->Position.X;
 			float fieldY = p->Position.Y;
+			uint8_t activeBombs = p->ActiveBombs;
 			
-			packet << direction << fieldX << fieldY;
+			packet << direction << fieldX << fieldY << activeBombs;
 		}
 
 		// write arena info to packet
 		uint8_t width = (uint8_t)Data.Arena.Width;
 		uint8_t height = (uint8_t)Data.Arena.Height;
 		TField field{};
-		uint8_t fieldType;
+		uint8_t fieldType, bombState, bombRange, bombDroppedBy;
+		uint32_t bombTimeUntilNextState;
 		for (uint8_t y = 0; y < height; y++)
 			for (uint8_t x = 0; x < width; x++)
 			{
-				fieldType = Data.Arena.At(x, y).Type;
-				packet << fieldType;
+				TField* field;
+				Data.Arena.At(x, y, field);
+				fieldType = field->Type;
+				bombState = field->Bomb.State;
+				bombRange = field->Bomb.Range;
+				bombTimeUntilNextState = field->Bomb.TimeUntilNextState;
+				bombDroppedBy = field->Bomb.DroppedByPlayer;
+				packet << fieldType << bombState << bombTimeUntilNextState << bombRange << bombDroppedBy;
 			}
 
 		// send
@@ -888,18 +869,14 @@ void TServer::ProcessReceivedPacket(TConnectionID ConnectionID, sf::Packet& Pack
 			if (Packet >> u64_1 >> u8_1 >> u8_2)
 			{
 				TClientSocket* socket = FindSocketForConnection(ConnectionID);
-				if (socket)
-					socket->LastReceivedTime = u64_1;
-				success = ProcessUpdatePlayerMovement(ConnectionID, u8_1, u8_2);
+				success = ProcessUpdatePlayerMovement(ConnectionID, u64_1, u8_1, u8_2);
 			}
 			break;
 		case SRV_DropBomb:
 			if (Packet >> u64_1 >> u8_1)
 			{
 				TClientSocket* socket = FindSocketForConnection(ConnectionID);
-				if (socket)
-					socket->LastReceivedTime = u64_1;
-				success = DropBomb(ConnectionID, u8_1);
+				success = DropBomb(ConnectionID, u64_1, u8_1);
 			}
 			break;
 	};
@@ -957,7 +934,7 @@ bool TServer::ProcessConnectionRequest(TConnectionID ConnectionID, uint32_t Clie
 	return result;
 }
 
-bool TServer::ProcessUpdatePlayerMovement(TConnectionID ConnectionID, uint8_t Slot, uint8_t Direction)
+bool TServer::ProcessUpdatePlayerMovement(TConnectionID ConnectionID, uint64_t SequenceID, uint8_t Slot, uint8_t Direction)
 {
 	bool result = false;
 
@@ -968,7 +945,7 @@ bool TServer::ProcessUpdatePlayerMovement(TConnectionID ConnectionID, uint8_t Sl
 		bool up = Direction & DIRECTION_UP;
 		bool down = Direction & DIRECTION_DOWN;
 
-		SetPlayerDirections(ConnectionID, Slot, left, right, up, down);
+		SetPlayerDirections(ConnectionID, SequenceID, Slot, left, right, up, down);
 
 		result = true;
 	}
@@ -1085,15 +1062,5 @@ void TServer::ClientDisconnected(TConnectionID ConnectionID)
 	else
 	{
 
-	}
-}
-
-void TServer::ResetSocketReceivedTimes()
-{
-	std::lock_guard<std::mutex> g(ClientSocketsMutex);
-	for (auto it = ClientSockets.begin(); it != ClientSockets.end(); it++)
-	{
-		TClientSocket* client = *it;
-		client->LastReceivedTime = 0;
 	}
 }

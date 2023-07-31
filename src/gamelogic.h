@@ -2,6 +2,8 @@
 
 #include "gamedata.h"
 
+#include <mutex>
+
 class TLogicListener
 {
 public:
@@ -12,11 +14,24 @@ public:
 	virtual void LogicRoundEnded() = 0;
 };
 
+typedef enum { actionMovement, actionDropBomb, actionKick } TPlayerActionType;
+
+typedef struct
+{
+	uint64_t SequenceID;
+	uint8_t Slot;
+	TPlayerActionType Type;
+	uint32_t Data;
+} TPlayerAction;
+
 class TGameLogic
 {
 private:
 	TGameData* Data;
 	TLogicListener* Listener;
+	TGameTime CurrentTime;
+	std::vector<TPlayerAction> PlayerActions;
+	std::mutex PlayerActionsMutex;
 
 	float MovePlayer(TPlayer* Player, TPlayerDirection Direction, float Distance, bool Recurse = true);
 	float CanMove(TPlayer* Player, TPlayerDirection Direction, float Distance, TPlayerDirection& OtherDirection);
@@ -30,16 +45,20 @@ private:
 	void UpdateDyingPlayers(TGameTime Delta);
 	void EndRound();
 	TFieldPosition CalculatePlayerField(TPlayer* Player);
+		
+	void ApplyPlayerActionToData(const TPlayerAction PlayerAction); // updates the data based on a player action
+
 public:
 	TGameLogic(TGameData* SetData, TLogicListener* SetListener);
 	void Process(TGameTime Delta);
+
+	void AddPlayerAction(uint64_t SequenceID, uint8_t Slot, TPlayerActionType Type, uint32_t Data); // adds a new player action to the list to be processed.
 };
 
 class TClientLogic: public TLogicListener
 {
 private:
-	TGameData* Data;
-	TGameLogic GameLogic;
+	TGameData* Data;	
 private:
 	void LogicBombExploding(const TFieldPosition& FieldPosition) override;
 	void LogicBombExploded(const TFieldPosition& FieldPosition) override;
@@ -47,6 +66,8 @@ private:
 	void LogicPlayerDied(uint8_t Slot) override;
 	void LogicRoundEnded() override;
 public:
+	TGameLogic GameLogic;
+
 	TClientLogic(TGameData* SetData);
 	void Process(TGameTime Delta);
 };

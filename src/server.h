@@ -14,7 +14,6 @@ class TClientSocket : public sf::TcpSocket
 {
 public:
 	TConnectionID ID;
-	uint64_t LastReceivedTime;
 };
 
 typedef struct 
@@ -55,7 +54,6 @@ private:
 	void SendErrorResponse(TClientSocket* Socket, uint16_t FailedCommand);
 	bool SendPacketToSocket(TClientSocket* Socket, sf::Packet& Packet);
 	void SendPacketToAllClients(sf::Packet& Packet, TConnectionID SkipConnectionID = 0);
-	void ResetSocketReceivedTimes();
 
 	// receive input from network
 	void ListenToNetwork();
@@ -63,7 +61,7 @@ private:
 	void ProcessReceivedPacket(TConnectionID ConnectionID, sf::Packet& Packet);
 	// process received network communication
 	bool ProcessConnectionRequest(TConnectionID ConnectionID, uint32_t ClientVersion);
-	bool ProcessUpdatePlayerMovement(TConnectionID ConnectionID, uint8_t Slot, uint8_t Direction);
+	bool ProcessUpdatePlayerMovement(TConnectionID ConnectionID, uint64_t SequenceID, uint8_t Slot, uint8_t Direction);
 
 	// notify connected clients
 	void DoGameCreated(TConnectionID ConnectionID);
@@ -102,8 +100,8 @@ private:
 	bool SetPlayerName(TConnectionID ConnectionID, int Slot, const std::string& Name); // change a player's name
 	bool SelectArena(TConnectionID ConnectionID, uint16_t Index); // set the arena
 	bool SetNumRounds(TConnectionID ConnectionID, int Value); // set the number of rounds to be played
-	void SetPlayerDirections(TConnectionID ConnectionID, uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
-	bool DropBomb(TConnectionID ConnectionID, uint8_t Slot);
+	void SetPlayerDirections(TConnectionID ConnectionID, uint64_t SequenceID, uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
+	bool DropBomb(TConnectionID ConnectionID, uint64_t SequenceID, uint8_t Slot);
 	void ClientDisconnected(TConnectionID ConnectionID);
 	
 public:

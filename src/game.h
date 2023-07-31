@@ -54,8 +54,7 @@ private:
 	TView* SystemGUIView;
 	tgui::Gui* GUI;	
 	std::vector<TView*> Views;
-	std::mutex ViewsMutex;
-	TClientLogic* Logic;
+	std::mutex ViewsMutex;	
 	std::vector<std::string> ServerAddresses; // list of previously used server addresses. Most recent one at the start.
 
 	void DetermineAppPath(const std::string& Filename);
@@ -92,6 +91,7 @@ public:
 	bool IsServer;
 	TInputMap InputMap;
 	TClient* Client;
+	TClientLogic* Logic;
 	TServer* Server;
 	TGameData GameData;
 	TFontManager Fonts;
@@ -143,5 +143,5 @@ public:
 	void ClientRoundEnded() override;
 	void ClientArenaSelected(int Index, const std::string Name) override;
 	void ClientArenaName(int Count, int Index, const std::string Name) override;
-	void ClientFullMatchUpdate(uint64_t LastReceivedTime, const TFullMatchUpdateInfo& Info) override;
+	void ClientFullMatchUpdate(uint64_t SequenceID, const TFullMatchUpdateInfo& Info) override;
 };

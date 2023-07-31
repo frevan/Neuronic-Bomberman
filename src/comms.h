@@ -28,8 +28,8 @@ const TCommand SRV_SetArena = 202; // string ArenaName
 // - match
 const TCommand SRV_StartMatch = 300;
 const TCommand SRV_StartNextRound = 301;
-const TCommand SRV_UpdatePlayerMovement = 302; // uint64_t Time | uint8_t Slot | uint8_t Direction (bitfield, see DIR_ constants))
-const TCommand SRV_DropBomb = 303; // uint64_t Time | uint8_t Slot
+const TCommand SRV_UpdatePlayerMovement = 302; // uint64_t SequenceID | uint8_t Slot | uint8_t Direction (bitfield, see DIR_ constants))
+const TCommand SRV_DropBomb = 303; // uint64_t SequenceID | uint8_t Slot
 
 // client commands (sent by server)
 // - connection responses
@@ -65,6 +65,8 @@ const TCommand CLN_PlayerScore = 1311; // uint8_t Slot | uint8_t Score
 const TCommand CLN_PlayerInfo = 1312; // uint8_t Slot | uint8_t State | string Name
 
 const TCommand CLN_FullMatchUpdate = 1313;	
-	// uint64_t LastReceivedTime
-	// for each slot: uint8_t Direction | float X | float Y | 
-	// for each field (x=0,y=0) (x=1,y=0) .. (x=max,y=max): uint8_t type
+	// uint64_t MostRecentSequenceID
+	// for each slot: uint8_t Direction | float X | float Y | uint8_t Active Bombs 
+	// for each field (x=0,y=0) (x=1,y=0) .. (x=max,y=max): 
+	//		uint8_t Type |
+	//		uint8_t BombState | uint32_t TimeUntilNextState | uint8_t Range | uint8_t DroppedByPlayer

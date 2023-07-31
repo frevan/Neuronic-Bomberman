@@ -123,6 +123,6 @@ public:
 	void SetNumRounds(int Value); // set the number of rounds to be played
 
 	// during the match
-	void UpdatePlayerMovement(uint64_t Time, uint8_t Slot, bool Left, bool Right, bool Up, bool Down);
-	void DropBomb(uint64_t Time, uint8_t Slot);
+	void UpdatePlayerMovement(uint64_t SequenceID, uint8_t Slot, uint8_t Direction);
+	void DropBomb(uint64_t SequenceID, uint8_t Slot);
 };

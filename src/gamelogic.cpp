@@ -9,7 +9,10 @@ const float CornerAnimationIncConst = 0.05f;
 
 TGameLogic::TGameLogic(TGameData* SetData, TLogicListener* SetListener)
 :	Data(SetData),
-	Listener(SetListener)
+	Listener(SetListener),
+	CurrentTime(0),
+	PlayerActions(),
+	PlayerActionsMutex()
 {
 }
 
@@ -18,12 +21,79 @@ void TGameLogic::Process(TGameTime Delta)
 	if (Data->Status != GAME_PLAYING)
 		return;
 
+	// apply actions to data
+	{
+		std::lock_guard<std::mutex> g(PlayerActionsMutex);
+		for (auto it = PlayerActions.begin(); it != PlayerActions.end(); it++)
+			ApplyPlayerActionToData(*it);
+		PlayerActions.clear();
+	}
+
+	// calculate updates
 	UpdatePlayerPositions(Delta);
 	UpdateBombs(Delta);
 	CheckForExplodedPlayers();
 	UpdateDyingPlayers(Delta);
 
-	Data->CurrentTime += Delta;
+	// move time forward
+	CurrentTime += Delta;
+	Data->CurrentTime = CurrentTime;
+}
+
+void TGameLogic::ApplyPlayerActionToData(const TPlayerAction PlayerAction)
+{
+	TPlayer* p = &(Data->Players[PlayerAction.Slot]);	
+
+	if (PlayerAction.Type == actionMovement)
+	{
+		if (p->State == PLAYER_NOTPLAYING)
+			return;
+
+		p->Direction = PlayerAction.Data;
+	}
+	else if (PlayerAction.Type == actionDropBomb)
+	{
+		if (p->State == PLAYER_NOTPLAYING)
+			return;
+		if (p->ActiveBombs == p->MaxActiveBombs)
+			return;
+
+		// determine the exact position where to drop it (top left pos of the field)
+		TFieldPosition pos;
+		pos.X = static_cast<int>(trunc(p->Position.X));
+		pos.Y = static_cast<int>(trunc(p->Position.Y));
+
+		// check if there's already a bomb at this position
+		if (Data->BombInField(pos.X, pos.Y, false))
+			return;
+
+		// add the new bomb
+		TField* field{};
+		Data->Arena.At(pos, field);
+		if (!field)
+			return;
+
+		field->Bomb.State = BOMB_TICKING;
+		field->Bomb.DroppedByPlayer = PlayerAction.Slot;
+		field->Bomb.TimeUntilNextState = 2000; // 2 seconds
+		field->Bomb.Range = p->BombRange;
+
+		// update the player
+		p->ActiveBombs++;
+	}
+
+	p->LastProcessedSequenceID = PlayerAction.SequenceID;
+}
+
+void TGameLogic::AddPlayerAction(uint64_t SequenceID, uint8_t Slot, TPlayerActionType Type, uint32_t Data)
+{
+	// create new item
+	TPlayerAction item { SequenceID, Slot, Type, Data };
+
+	std::lock_guard<std::mutex> g(PlayerActionsMutex);
+
+	// add to the list
+	PlayerActions.push_back(item);
 }
 
 float TGameLogic::MovePlayer(TPlayer* Player, TPlayerDirection Direction, float Distance, bool Recurse)
