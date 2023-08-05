@@ -408,7 +408,7 @@ void TServer::SetPlayerDirections(TConnectionID ConnectionID, uint64_t SequenceI
 	if (Down)
 		direction |= DIRECTION_DOWN;
 
-	Logic->AddPlayerAction(SequenceID, Slot, actionMovement, direction);
+	Logic->AddPlayerAction(SequenceID, Slot, actionChangeDirection, direction);
 }
 
 bool TServer::DropBomb(TConnectionID ConnectionID, uint64_t SequenceID, uint8_t Slot)

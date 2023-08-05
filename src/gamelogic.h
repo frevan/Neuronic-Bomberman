@@ -14,7 +14,7 @@ public:
 	virtual void LogicRoundEnded() = 0;
 };
 
-typedef enum { actionMovement, actionDropBomb, actionKick } TPlayerActionType;
+typedef enum { actionChangeDirection, actionDropBomb, actionKick } TPlayerActionType;
 
 typedef struct
 {

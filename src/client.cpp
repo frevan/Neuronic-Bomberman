@@ -168,7 +168,7 @@ void TClient::SelectArena(uint16_t Index)
 	Commands.push(cmd);
 }
 
-void TClient::UpdatePlayerMovement(uint64_t SequenceID, uint8_t Slot, uint8_t Direction)
+void TClient::SendPlayerDirectionToServer(uint64_t SequenceID, uint8_t Slot, uint8_t Direction)
 {
 	if (Slot < 0 || Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;
@@ -179,7 +179,7 @@ void TClient::UpdatePlayerMovement(uint64_t SequenceID, uint8_t Slot, uint8_t Di
 	Socket.send(packet);
 }
 
-void TClient::DropBomb(uint64_t SequenceID, uint8_t Slot)
+void TClient::SendDropBombToServer(uint64_t SequenceID, uint8_t Slot)
 {
 	if (Slot >= MAX_NUM_SLOTS || Slot == INVALID_SLOT)
 		return;

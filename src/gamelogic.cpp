@@ -44,7 +44,7 @@ void TGameLogic::ApplyPlayerActionToData(const TPlayerAction PlayerAction)
 {
 	TPlayer* p = &(Data->Players[PlayerAction.Slot]);	
 
-	if (PlayerAction.Type == actionMovement)
+	if (PlayerAction.Type == actionChangeDirection)
 	{
 		if (p->State == PLAYER_NOTPLAYING)
 			return;

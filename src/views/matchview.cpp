@@ -132,8 +132,8 @@ void TMatchView::Process(TGameTime Delta)
 
 		if (direction != p->Direction)
 		{
-			Game->Logic->GameLogic.AddPlayerAction(SequenceID++, slot, actionMovement, direction);
-			Game->Client->UpdatePlayerMovement(SequenceID, slot, direction);
+			Game->Logic->GameLogic.AddPlayerAction(SequenceID++, slot, actionChangeDirection, direction);
+			Game->Client->SendPlayerDirectionToServer(SequenceID, slot, direction);
 		}
 	}
 }
@@ -160,7 +160,7 @@ bool TMatchView::ProcessInput(TInputID InputID, float Value)
 			if (playerIndex >= 0)
 			{
 				Game->Logic->GameLogic.AddPlayerAction(SequenceID++, playerIndex, actionDropBomb, 0);
-				Game->Client->DropBomb(SequenceID, playerIndex);
+				Game->Client->SendDropBombToServer(SequenceID, playerIndex);
 			}
 			break;
 	};
