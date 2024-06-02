@@ -344,7 +344,6 @@ TGameData::TGameData()
 	Status(GAME_NONE),
 	Players(),
 	Arena(),
-	//ActionHistory(),
 	CurrentRound(0),
 	CurrentTime(0)
 {
@@ -375,8 +374,6 @@ void TGameData::Reset()
 
 	for (int i = 0; i < MAX_NUM_SLOTS; i++)
 		Players[i].State = PLAYER_NOTPLAYING;
-
-	//ActionHistory.clear();
 }
 
 bool TGameData::AddPlayer(const std::string& SetName, bool SetOwned, uint8_t SetSlot)
@@ -429,9 +426,6 @@ void TGameData::InitNewGame()
 
 	for (int idx = 0; idx < MAX_NUM_SLOTS; idx++)
 		Players[idx].RoundsWon = 0;
-
-	//InitNewRound();
-	//ActionHistory.clear();
 }
 
 void TGameData::InitNewRound()
@@ -464,8 +458,6 @@ void TGameData::InitNewRound()
 
 	ApplyBrickDensity();
 	PositionPlayers();
-
-	//ActionHistory.clear();
 }
 
 void TGameData::ApplyBrickDensity()
@@ -680,18 +672,6 @@ void TGameData::UpdateGameFromData(TGameData* Source)
 	CurrentTime = Source->CurrentTime;
 }
 
-/*
-void TGameData::AddActionToHistory(int Action, uint64_t Time, int Slot, uint32_t Data)
-{
-	TGameAction info;
-	info.Action = Action;
-	info.Time = Time;
-	info.Slot = Slot;
-	info.Data = Data;
-	ActionHistory.push_back(info);
-}
-*/
-
 void TGameData::ApplyFullMatchUpdate(uint64_t SequenceID, const TFullMatchUpdateInfo& Info)
 {
 	// update player positions
@@ -718,17 +698,6 @@ void TGameData::ApplyFullMatchUpdate(uint64_t SequenceID, const TFullMatchUpdate
 			field->Bomb.Range = Info.Fields[idx].Bomb.Range;
 			field->Bomb.TimeUntilNextState = Info.Fields[idx].Bomb.TimeUntilNextState;
 		}
-
-	/*
-	// remove actions we no longer need from the history
-	for (auto it = ActionHistory.begin(); it != ActionHistory.end(); )
-	{
-		if (it->Time <= lastReceivedTime)
-			it = ActionHistory.erase(it);
-		else
-			break;
-	}
-	*/
 }
 
 // --- 	TFullMatchUpdateInfo ---

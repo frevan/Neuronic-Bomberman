@@ -18,6 +18,7 @@
 #include "views/endofroundview.h"
 #include "views/connectview.h"
 #include "views/optionsview.h"
+#include "views/overlayview.h"
 #include "comms.h"
 #include "utility/stringutil.h"
 
@@ -43,6 +44,7 @@ TGame::TGame()
 	NextState(GAMESTATE_NONE),
 	GUI(nullptr),
 	SystemGUIView(nullptr),
+	OverlayView(nullptr),
 	#ifdef _DEBUG
 	AppFileName(),
 	#endif
@@ -59,7 +61,8 @@ TGame::TGame()
 	CurrentArenaIndex(-1),
 	CurrentArenaName(),
 	ChosenPlayerName(),
-	ServerAddresses()
+	ServerAddresses(),
+	OverlayIsVisible(false)
 {
 	InitializeInputDefinitions();
 	for (int i = 0; i < NUM_INPUTS; i++)
@@ -101,11 +104,15 @@ bool TGame::Initialize(const std::string& filename)
 	//AttachView(GUIView);
 	SystemGUIView = AttachView(VIEW_TGUISYSTEM);
 
+	// attach overlay view
+	OverlayView = (TOverlayView*)AttachView(VIEW_OVERLAY);
+
 	// define inputs
 	InitializeInputDefinitions();
 	// map some inputs
 	InputMap.DefineInput(actionToPreviousScreen, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Escape, 0));
 	InputMap.DefineInput(actionDoDefaultAction, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Return, 0));
+	InputMap.DefineInput(actionToggleOverlay, TInputControl::Pack(TInputControl::TType::KEYBOARD, 0, sf::Keyboard::Key::Tab, 0));
 	//DefineDefaultPlayerInputs();
 
 	// set next state
@@ -151,6 +158,9 @@ void TGame::Finalize()
 	delete Server;
 	Server = nullptr;
 
+	// detach overlay view
+	DetachView(OverlayView->ID);
+	OverlayView = nullptr;
 	// detach our TGUI system view
 	DetachView(SystemGUIView->ID);
 	SystemGUIView = nullptr;
@@ -445,6 +455,11 @@ void TGame::RequestQuit()
 	ShouldQuit = true;
 }
 
+void TGame::ToggleOverlay()
+{
+	OverlayIsVisible = !OverlayIsVisible;
+}
+
 #ifdef _DEBUG
 void TGame::StartNewInstance()
 {
@@ -506,6 +521,7 @@ TView* TGame::AttachView(int NewView)
 		case VIEW_ENDOFROUND: view = new TEndOfRoundView(this); break;
 		case VIEW_CONNECTTOSERVER: view = new TConnectToServerView(this, GUI); break;
 		case VIEW_OPTIONS: view = new TOptionsView(this, GUI); break;
+		case VIEW_OVERLAY: view = new TOverlayView(this, GUI); break;
 	};
 	assert(view);
 
@@ -1059,5 +1075,8 @@ std::string TGame::GetPreviousServerAddress(int Index)
 
 void TGame::ClientFullMatchUpdate(uint64_t SequenceID, const TFullMatchUpdateInfo& Info)
 {
+	Logic->GameLogic.ServerSequenceID = SequenceID;
+	Logic->GameLogic.LastProcessedSequenceID = SequenceID;
+
 	GameData.ApplyFullMatchUpdate(SequenceID, Info);
 }

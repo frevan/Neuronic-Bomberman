@@ -70,19 +70,17 @@ void TConnectToServerView::OnConnectBtnClick()
 }
 bool TConnectToServerView::ProcessInput(TInputID InputID, float Value)
 {
-	bool handled = false;
-
-	if (Value != 1.0f)
-		return false; // only handle key presses
+	if (!IsInputPressed(Value))  // only handle key presses
+		return false;
 
 	int idx;
 	std::string address;
 
+	bool handled = true;
 	switch (InputID)
 	{
 		case actionToPreviousScreen:
 			Game->SwitchToState(GAMESTATE_MENU);
-			handled = true;
 			break;
 
 		case actionDoDefaultAction:
@@ -101,6 +99,10 @@ bool TConnectToServerView::ProcessInput(TInputID InputID, float Value)
 			address = Game->GetPreviousServerAddress(idx);
 			if (!address.empty())
 				Connect(address);
+			break;
+
+		default:
+			handled = false;
 			break;
 	};
 

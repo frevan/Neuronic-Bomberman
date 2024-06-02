@@ -24,6 +24,8 @@ enum class TViewType
 class TView
 {
 private:
+protected:
+	bool IsInputPressed(float Value) { return Value >= 1.0f; };
 public:
 	bool Visible;
 	TGame* Game;

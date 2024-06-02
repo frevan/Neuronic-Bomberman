@@ -191,7 +191,6 @@ public:
 	TArena Arena;
 	TGameTime CurrentTime;
 	sf::Color PlayerColors[MAX_NUM_SLOTS];
-	//std::vector<TGameAction> ActionHistory;
 
 	TGameData();
 

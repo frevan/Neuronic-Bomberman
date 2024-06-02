@@ -198,18 +198,18 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 	if (IsSomeEditControlFocused())
 		return false;
 
-	if (Value != 1.0f)
-		return false; // only handle key presses
+	// only handle key presses
+	if (!IsInputPressed(Value))
+		return false;
 
-	bool handled = false;
 	int mapIndex;
 
+	bool handled = true;
 	switch (InputID)
 	{
 		case actionToPreviousScreen:
 			Game->Client->CloseGame();
 			Game->SwitchToState(GAMESTATE_MENU);
-			handled = true;
 			break;
 
 		case actionDoDefaultAction:
@@ -266,6 +266,10 @@ bool TLobbyView::ProcessInput(TInputID InputID, float Value)
 
 		case actionLobbyRemapPlayerControls:
 			DoSelectNextInputForSlot(SelectedSlot);
+			break;
+
+		default:
+			handled = false;
 			break;
 	};
 

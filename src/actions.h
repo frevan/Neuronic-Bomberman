@@ -5,6 +5,7 @@
 // action definitions (used with the input map)
 const uint32_t actionToPreviousScreen = 1;	// go to the previous screen
 const uint32_t actionDoDefaultAction = 2; // do whatever is the default action
+const uint32_t actionToggleOverlay = 3; // toggle the overlay view on and off
 
 // menu actions
 const uint32_t actionMenuJoinGame = 300;

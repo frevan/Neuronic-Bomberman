@@ -116,16 +116,15 @@ void TMenuView::OnNewInstanceBtnClick()
 
 bool TMenuView::ProcessInput(TInputID InputID, float Value)
 {
-	bool handled = false;
+	// only handle key presses
+	if (!IsInputPressed(Value))
+		return false;
 
-	if (Value != 1.0f)
-		return false; // only handle key presses
-
+	bool handled = true;
 	switch (InputID)
 	{
 		case actionToPreviousScreen:
 			Game->RequestQuit();
-			handled = true;
 			break;
 
 		case actionDoDefaultAction:
@@ -138,6 +137,10 @@ bool TMenuView::ProcessInput(TInputID InputID, float Value)
 
 		case actionMenuOptions:
 			Game->SwitchToState(GAMESTATE_OPTIONS);
+			break;
+
+		default:
+			handled = false;
 			break;
 	};
 

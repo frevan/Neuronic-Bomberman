@@ -51,27 +51,26 @@ void TEndOfRoundView::Draw(sf::RenderTarget* target)
 
 bool TEndOfRoundView::ProcessInput(TInputID InputID, float Value)
 {
-	bool handled = false;
-
+	bool handled = true;
 	switch (InputID)
 	{
 		case actionToPreviousScreen:
-			if (Value == 1.0f)
-			{
+			if (IsInputPressed(Value))
 				Game->SwitchToState(GAMESTATE_MENU);
-				handled = true;
-			}
 			break;
 
 		case actionDoDefaultAction:
-			if (Value == 1.0f)
+			if (IsInputPressed(Value))
 			{
 				if (Game->GameData.CurrentRound >= Game->GameData.MaxRounds)
 					Game->SwitchToState(GAMESTATE_MENU);
 				else
 					Game->Client->StartNextRound();
-				handled = true;
 			}
+			break;
+
+		default:
+			handled = false;
 			break;
 	};
 

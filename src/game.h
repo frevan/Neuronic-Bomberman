@@ -52,6 +52,7 @@ private:
 	sf::RenderWindow* Window;
 	int NextState;
 	TView* SystemGUIView;
+	TView* OverlayView;
 	tgui::Gui* GUI;	
 	std::vector<TView*> Views;
 	std::mutex ViewsMutex;	
@@ -105,6 +106,7 @@ public:
 	std::string ChosenPlayerName;
 	TInputDefinition Inputs[NUM_INPUTS];
 	int InputSlots[NUM_INPUTS];
+	bool OverlayIsVisible;
 
 	TGame();
 	~TGame();
@@ -121,6 +123,7 @@ public:
 	#endif
 	TView* AttachView(int NewView); // see VIEW_ constants 
 	void DetachView(TViewID ID);
+	void ToggleOverlay();
 
 	bool SetInputForSlot(int InputIndex, uint8_t Slot);
 

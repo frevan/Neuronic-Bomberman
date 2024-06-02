@@ -6,8 +6,7 @@
 
 TMatchView::TMatchView(TGame* SetGame)
 :	TView(SetGame, TViewType::VT_HUMANVIEW),
-	BombAnimation(),
-	SequenceID(1)
+	BombAnimation()
 {
 }
 
@@ -132,36 +131,40 @@ void TMatchView::Process(TGameTime Delta)
 
 		if (direction != p->Direction)
 		{
-			Game->Logic->GameLogic.AddPlayerAction(SequenceID++, slot, actionChangeDirection, direction);
-			Game->Client->SendPlayerDirectionToServer(SequenceID, slot, direction);
+			Game->Logic->GameLogic.SequenceID++;
+			Game->Logic->GameLogic.AddPlayerAction(Game->Logic->GameLogic.SequenceID, slot, actionChangeDirection, direction);
+			Game->Client->SendPlayerDirectionToServer(Game->Logic->GameLogic.SequenceID, slot, direction);
 		}
 	}
 }
 
 bool TMatchView::ProcessInput(TInputID InputID, float Value)
 {
-	bool handled = false;
-
 	int playerIndex = -1;
 	DeterminePlayerActionFromInput(InputID, Value, playerIndex);
 
+	bool handled = true;
 	switch (InputID)
 	{
 		case actionToPreviousScreen:
-			if (Value == 1.0f)
+			if (IsInputPressed(Value))
 			{
 				Game->Client->CloseGame();
 				Game->SwitchToState(GAMESTATE_MENU);
-				handled = true;
 			}
 			break;
 
 		case actionMatchPlayer1DropBomb:
 			if (playerIndex >= 0)
 			{
-				Game->Logic->GameLogic.AddPlayerAction(SequenceID++, playerIndex, actionDropBomb, 0);
-				Game->Client->SendDropBombToServer(SequenceID, playerIndex);
+				Game->Logic->GameLogic.SequenceID++;
+				Game->Logic->GameLogic.AddPlayerAction(Game->Logic->GameLogic.SequenceID, playerIndex, actionDropBomb, 0);
+				Game->Client->SendDropBombToServer(Game->Logic->GameLogic.SequenceID, playerIndex);
 			}
+			break;
+
+		default:
+			handled = false;
 			break;
 	};
 

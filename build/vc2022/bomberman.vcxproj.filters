@@ -69,6 +69,9 @@
     <ClCompile Include="..\..\src\utility\simpleini\ConvertUTF.c">
       <Filter>source\utility\simpleini</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\views\overlayview.cpp">
+      <Filter>source\views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\game.h">

@@ -33,7 +33,7 @@ private:
 	std::vector<TPlayerAction> PlayerActions;
 	std::mutex PlayerActionsMutex;
 
-	float MovePlayer(TPlayer* Player, TPlayerDirection Direction, float Distance, bool Recurse = true);
+	float MovePlayer(TPlayer* Player, TPlayerDirection Direction, float Distance, bool Recurse = true); // updates a player's position in a certain direction for a certain distance
 	float CanMove(TPlayer* Player, TPlayerDirection Direction, float Distance, TPlayerDirection& OtherDirection);
 	void AdjustPlayerPos(TPlayer* Player, TPlayerDirection Direction, float Distance);
 	bool CheckMoveAgainstCell(TPlayer* Player, int CellX, int CellY, TPlayerDirection& Direction, TPlayerDirection& OtherDirection, bool Recurse);
@@ -49,6 +49,10 @@ private:
 	void ApplyPlayerActionToData(const TPlayerAction PlayerAction); // updates the data based on a player action
 
 public:
+	uint64_t SequenceID; // last ID value sent to the server
+	uint64_t ServerSequenceID; // ID value of last full server update
+	uint64_t LastProcessedSequenceID; // last sequence ID that was processed
+
 	TGameLogic(TGameData* SetData, TLogicListener* SetListener);
 	void Process(TGameTime Delta);
 

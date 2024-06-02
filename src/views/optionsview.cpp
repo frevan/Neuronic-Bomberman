@@ -141,16 +141,19 @@ void TOptionsView::Draw(sf::RenderTarget* target)
 
 bool TOptionsView::ProcessInput(TInputID InputID, float Value)
 {
-	bool handled = false;
+	// only handle key presses
+	if (!IsInputPressed(Value))
+		return false;
 
-	if (Value != 1.0f)
-		return false; // only handle key presses
-
+	bool handled = true;
 	switch (InputID)
 	{
 		case actionToPreviousScreen:
 			Game->SwitchToState(GAMESTATE_MENU);
-			handled = true;
+			break;
+
+		default:
+			handled = false;
 			break;
 	};
 

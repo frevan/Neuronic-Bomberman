@@ -12,7 +12,10 @@ TGameLogic::TGameLogic(TGameData* SetData, TLogicListener* SetListener)
 	Listener(SetListener),
 	CurrentTime(0),
 	PlayerActions(),
-	PlayerActionsMutex()
+	PlayerActionsMutex(),
+	SequenceID(1),
+	ServerSequenceID(0),
+	LastProcessedSequenceID(0)
 {
 }
 
@@ -25,7 +28,10 @@ void TGameLogic::Process(TGameTime Delta)
 	{
 		std::lock_guard<std::mutex> g(PlayerActionsMutex);
 		for (auto it = PlayerActions.begin(); it != PlayerActions.end(); it++)
+		{
 			ApplyPlayerActionToData(*it);
+			LastProcessedSequenceID = (*it).SequenceID;
+		}
 		PlayerActions.clear();
 	}
 

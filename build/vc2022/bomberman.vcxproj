@@ -28,6 +28,7 @@
     <ClCompile Include="..\..\src\views\matchview.cpp" />
     <ClCompile Include="..\..\src\views\menuview.cpp" />
     <ClCompile Include="..\..\src\views\optionsview.cpp" />
+    <ClCompile Include="..\..\src\views\overlayview.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\actions.h" />
