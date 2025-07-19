@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://bx32n2ieoxv6a"]
+
+[ext_resource type="Script" uid="uid://nfs7o0pa1bav" path="res://main.gd" id="1_ig7tw"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_ig7tw")
+
+[node name="NewLobbyBtn" type="Button" parent="."]
+offset_left = 46.0
+offset_top = 47.0
+offset_right = 196.0
+offset_bottom = 97.0
+text = "NEW"
+
+[node name="LeaveLobbyBtn" type="Button" parent="."]
+offset_left = 46.0
+offset_top = 118.0
+offset_right = 196.0
+offset_bottom = 168.0
+text = "STOP"
+
+[connection signal="pressed" from="NewLobbyBtn" to="." method="_on_new_lobby_btn_pressed"]
+[connection signal="pressed" from="LeaveLobbyBtn" to="." method="_on_leave_lobby_btn_pressed"]
