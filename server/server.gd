@@ -19,16 +19,14 @@ func Start() -> bool:
 	if IsConnected():
 		return false
 	
-	var tempPeer = ENetMultiplayerPeer.new()
+	var _peer = ENetMultiplayerPeer.new()
 
-	var error = tempPeer.create_server(Network.PORT, Network.MAX_CLIENTS)
+	var error = _peer.create_server(Network.PORT, Network.MAX_CLIENTS)
 	if error != OK:
 		print("failed to start server: error=" + str(error))
 		return false
 		
-	multiplayer.multiplayer_peer = tempPeer
-	Network.Peer = tempPeer
-	assert(is_instance_valid(Network.Peer))
+	Network.SetPeerTo(_peer)
 	
 	print(str(multiplayer.get_unique_id()) + " - server started")
 	return true
@@ -40,10 +38,8 @@ func Stop() -> bool:
 	if !IsRunning():
 		return false
 	
-	var id = multiplayer.get_unique_id()
-	multiplayer.multiplayer_peer.close()
-	Network.Peer = null
-	assert(!is_instance_valid(Network.Peer))
+	var id = Network.PeerID
+	Network.ResetPeer()
 	
 	print(str(id) + " - server stopped")
 	return true
