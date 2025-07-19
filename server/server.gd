@@ -6,12 +6,19 @@ const MAX_CLIENTS = 10
 var peer = null
 
 
-func IsServerRunning() -> bool:
+func IsConnected() -> bool:
 	return is_instance_valid(peer)
 
 
+func IsServerRunning() -> bool:
+	if IsConnected():
+		return multiplayer.is_server()
+	else:
+		return false
+
+
 func StartServer() -> void:
-	assert(!is_instance_valid(peer))
+	assert(!IsConnected())
 	
 	peer = ENetMultiplayerPeer.new()
 	peer.create_server(PORT, MAX_CLIENTS)
@@ -22,11 +29,35 @@ func StartServer() -> void:
 
 
 func StopServer() -> void:
-	assert(is_instance_valid(peer))
+	assert(IsServerRunning())
 	
 	var id = multiplayer.get_unique_id()
 	multiplayer.multiplayer_peer.close()
 	peer = null
 	
 	print(str(id) + " - server stopped")
+	pass
+
+
+func Connect(Address: String) -> void:
+	assert(!IsConnected())
+	
+	peer = ENetMultiplayerPeer.new()	
+	peer.create_client(Address, PORT)
+	peer.get_peer(1).set_timeout(0, 0, 3000)
+	multiplayer.multiplayer_peer = peer
+	
+	print(str(multiplayer.get_unique_id()) + " - connect to server")
+	pass
+
+
+func Disconnect() -> void:
+	assert(IsConnected())
+	assert(!IsServerRunning())
+	
+	var id = multiplayer.get_unique_id()
+	multiplayer.multiplayer_peer.close()
+	peer = null
+	
+	print(str(id) + " - disconnected from the server")
 	pass
