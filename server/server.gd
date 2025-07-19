@@ -1,6 +1,7 @@
 extends Node
 
 const PORT = 15063
+const MAX_CLIENTS = 10
 
 var peer = null
 
@@ -13,7 +14,7 @@ func StartServer() -> void:
 	assert(!is_instance_valid(peer))
 	
 	peer = ENetMultiplayerPeer.new()
-	peer.create_server(PORT, 10)
+	peer.create_server(PORT, MAX_CLIENTS)
 	multiplayer.multiplayer_peer = peer
 	
 	print(str(multiplayer.get_unique_id()) + " - server started")
