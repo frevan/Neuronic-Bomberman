@@ -4,15 +4,14 @@ extends Node
 signal OnConnectedToServer
 signal OnDisconnectedFromServer
 signal OnConnectionToServerFailed
-
-
-func _ready() -> void:
-	pass
+signal OnLobbyJoined
+signal OnLobbyRefused
 
 
 func _connected_to_server() -> void:
 	print(str(Network.PeerID) + " - connected to server")
 	OnConnectedToServer.emit()
+	Network.JoinLobby.rpc_id(1)
 	pass
 	
 	
@@ -27,6 +26,17 @@ func _server_disconnected() -> void:
 	print(str(Network.PeerID) + " - disconnected from server")
 	Disconnect()
 	OnDisconnectedFromServer.emit()
+	pass
+
+
+func _network_response_to_join_lobby(Accepted: bool) -> void:
+	if Accepted:
+		OnLobbyJoined.emit()
+		print(str(Network.PeerID) + " - joined lobby")
+	else:
+		Disconnect()
+		OnLobbyRefused.emit()
+		print(str(Network.PeerID) + " - couldn't get into lobby")
 	pass
 
 
@@ -49,6 +59,7 @@ func Connect(Address: String) -> bool:
 	multiplayer.connected_to_server.connect(_connected_to_server)
 	multiplayer.connection_failed.connect(_connection_failed)
 	multiplayer.server_disconnected.connect(_server_disconnected)
+	Network.OnResponseToJoinLobby.connect(_network_response_to_join_lobby)
 	
 	print(str(Network.PeerID) + " - connect to server")
 	return true
