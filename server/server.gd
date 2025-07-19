@@ -13,7 +13,7 @@ func IsConnected() -> bool:
 
 
 func IsRunning() -> bool:
-	if IsConnected() && (is_instance_valid(multiplayer)):
+	if IsConnected():
 		return multiplayer.is_server()
 	else:
 		return false
