@@ -40,6 +40,21 @@ func _network_response_to_join_lobby(Accepted: bool) -> void:
 	pass
 
 
+func ConnectToSignalsOnConnect() -> void:
+	multiplayer.connected_to_server.connect(_connected_to_server)
+	multiplayer.connection_failed.connect(_connection_failed)
+	multiplayer.server_disconnected.connect(_server_disconnected)
+	Network.OnResponseToJoinLobby.connect(_network_response_to_join_lobby)
+	pass
+
+
+func DisconnectFromSignalsOnDisconnect() -> void:
+	multiplayer.connected_to_server.disconnect(_connected_to_server)
+	multiplayer.connection_failed.disconnect(_connection_failed)
+	multiplayer.server_disconnected.disconnect(_server_disconnected)
+	pass
+
+
 func Connect(Address: String) -> bool:
 	assert(!Server.IsConnected())
 	if (Server.IsConnected()):
@@ -55,11 +70,7 @@ func Connect(Address: String) -> bool:
 		return false
 		
 	Network.SetPeerTo(_peer)
-	
-	multiplayer.connected_to_server.connect(_connected_to_server)
-	multiplayer.connection_failed.connect(_connection_failed)
-	multiplayer.server_disconnected.connect(_server_disconnected)
-	Network.OnResponseToJoinLobby.connect(_network_response_to_join_lobby)
+	ConnectToSignalsOnConnect()
 	
 	print(str(Network.PeerID) + " - connect to server")
 	return true
@@ -75,10 +86,7 @@ func Disconnect() -> bool:
 	
 	var id = Network.PeerID
 	Network.ResetPeer()
-	
-	multiplayer.connected_to_server.disconnect(_connected_to_server)
-	multiplayer.connection_failed.disconnect(_connection_failed)
-	multiplayer.server_disconnected.disconnect(_server_disconnected)
+	DisconnectFromSignalsOnDisconnect()
 	
 	print(str(id) + " - disconnected from the server")
 	return true
