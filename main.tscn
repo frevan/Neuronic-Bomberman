@@ -6,31 +6,31 @@
 script = ExtResource("1_ig7tw")
 
 [node name="NewLobbyBtn" type="Button" parent="."]
-offset_left = 46.0
-offset_top = 47.0
-offset_right = 196.0
-offset_bottom = 97.0
+offset_left = 25.0
+offset_top = 25.0
+offset_right = 175.0
+offset_bottom = 75.0
 text = "NEW"
 
 [node name="StopLobbyBtn" type="Button" parent="."]
-offset_left = 46.0
-offset_top = 118.0
-offset_right = 196.0
-offset_bottom = 168.0
+offset_left = 25.0
+offset_top = 100.0
+offset_right = 175.0
+offset_bottom = 150.0
 text = "STOP"
 
 [node name="JoinLobbyBtn" type="Button" parent="."]
-offset_left = 608.0
-offset_top = 45.0
-offset_right = 758.0
-offset_bottom = 95.0
+offset_left = 625.0
+offset_top = 25.0
+offset_right = 775.0
+offset_bottom = 75.0
 text = "JOIN"
 
 [node name="LeaveLobbyBtn" type="Button" parent="."]
-offset_left = 606.0
-offset_top = 123.0
-offset_right = 756.0
-offset_bottom = 173.0
+offset_left = 625.0
+offset_top = 100.0
+offset_right = 775.0
+offset_bottom = 150.0
 text = "LEAVE"
 
 [connection signal="pressed" from="NewLobbyBtn" to="." method="_on_new_lobby_btn_pressed"]
