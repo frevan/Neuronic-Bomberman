@@ -14,12 +14,12 @@ func _on_stop_lobby_btn_pressed() -> void:
 
 
 func _on_leave_lobby_btn_pressed() -> void:
-	if !Server.Disconnect():
+	if !Client.Disconnect():
 		Tools.ShowAlert("Can't leave lobby")
 	pass
 
 
 func _on_join_lobby_btn_pressed() -> void:
-	if !Server.Connect("127.0.0.1"):
+	if !Client.Connect("127.0.0.1"):
 		Tools.ShowAlert("Can't join lobby")
 	pass
