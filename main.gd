@@ -2,12 +2,12 @@ extends Node2D
 
 
 func _on_new_lobby_btn_pressed() -> void:
-	Server.StartServer()
+	Server.Start()
 	pass
 
 
 func _on_stop_lobby_btn_pressed() -> void:
-	Server.StopServer()
+	Server.Stop()
 	pass
 
 

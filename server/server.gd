@@ -10,14 +10,14 @@ func IsConnected() -> bool:
 	return is_instance_valid(peer)
 
 
-func IsServerRunning() -> bool:
+func IsRunning() -> bool:
 	if IsConnected():
 		return multiplayer.is_server()
 	else:
 		return false
 
 
-func StartServer() -> void:
+func Start() -> void:
 	assert(!IsConnected())
 	
 	peer = ENetMultiplayerPeer.new()
@@ -28,8 +28,8 @@ func StartServer() -> void:
 	pass
 
 
-func StopServer() -> void:
-	assert(IsServerRunning())
+func Stop() -> void:
+	assert(IsRunning())
 	
 	var id = multiplayer.get_unique_id()
 	multiplayer.multiplayer_peer.close()
@@ -53,7 +53,7 @@ func Connect(Address: String) -> void:
 
 func Disconnect() -> void:
 	assert(IsConnected())
-	assert(!IsServerRunning())
+	assert(!IsRunning())
 	
 	var id = multiplayer.get_unique_id()
 	multiplayer.multiplayer_peer.close()
