@@ -3,9 +3,18 @@ extends Node
 class_name TServer
 
 
+var TServerData = preload("res://server/server_data.gd")
+var Data: TServerData
+
+
 func _network_request_join_lobby(SenderID: int) -> void:
-	Network.RespondToJoinLobby.rpc_id(SenderID, true)
 	print(str(Network.PeerID) + " - request to join by: " + str(SenderID))
+	var success: bool = false
+	var slot_idx: int = Data.FindFreeSlotIndex()
+	if slot_idx >= 0: 
+		success = true
+		Data.Slots[slot_idx].Player.PeerID = SenderID
+	Network.RespondToJoinLobby.rpc_id(SenderID, success)
 	pass
 
 
@@ -41,6 +50,9 @@ func Start() -> bool:
 		print("failed to start server: error=" + str(error))
 		return false
 	
+	Data = TServerData.new()
+	Data.InitSlots()
+	
 	ConnectToSignalsOnStart()
 	Network.SetPeerTo(_peer)
 	
@@ -57,6 +69,9 @@ func Stop() -> bool:
 	var id = Network.PeerID
 	Network.ResetPeer()
 	DisconnectFromSignalsOnStop()
+	
+	Data.queue_free()
+	Data = null
 	
 	print(str(id) + " - server stopped")
 	return true

@@ -23,6 +23,7 @@ Server="*res://server/server.gd"
 Tools="*res://misc/tools.gd"
 Client="*res://client/client.gd"
 Network="*res://network/network.gd"
+Types="*res://data/types.gd"
 
 [display]
 

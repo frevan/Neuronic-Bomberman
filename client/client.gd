@@ -13,15 +13,15 @@ func _connected_to_server() -> void:
 	OnConnectedToServer.emit()
 	Network.JoinLobby.rpc_id(1)
 	pass
-	
-	
+
+
 func _connection_failed() -> void:
 	print(str(Network.PeerID) + " - failed to connect")
 	Disconnect()
 	OnConnectionToServerFailed.emit()
 	pass
-	
-	
+
+
 func _server_disconnected() -> void:
 	print(str(Network.PeerID) + " - disconnected from server")
 	Disconnect()
