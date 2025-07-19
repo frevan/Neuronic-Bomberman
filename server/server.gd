@@ -3,7 +3,7 @@ extends Node
 const PORT = 15063
 const MAX_CLIENTS = 10
 
-var peer = null
+var peer: ENetMultiplayerPeer = null
 
 
 func IsConnected() -> bool:
@@ -17,47 +17,68 @@ func IsRunning() -> bool:
 		return false
 
 
-func Start() -> void:
+func Start() -> bool:
 	assert(!IsConnected())
+	if IsConnected():
+		return false
 	
-	peer = ENetMultiplayerPeer.new()
-	peer.create_server(PORT, MAX_CLIENTS)
-	multiplayer.multiplayer_peer = peer
-	
+	var tempPeer = ENetMultiplayerPeer.new()
+
+	var error = tempPeer.create_server(PORT, MAX_CLIENTS)
+	if error != OK:
+		print("failed to start server: error=" + str(error))
+		return false
+		
+	multiplayer.multiplayer_peer = tempPeer
+	peer = tempPeer
 	print(str(multiplayer.get_unique_id()) + " - server started")
-	pass
+	return true
 
 
-func Stop() -> void:
+
+func Stop() -> bool:
 	assert(IsRunning())
+	if !IsRunning():
+		return false
 	
 	var id = multiplayer.get_unique_id()
 	multiplayer.multiplayer_peer.close()
 	peer = null
 	
 	print(str(id) + " - server stopped")
-	pass
+	return true
 
 
-func Connect(Address: String) -> void:
+func Connect(Address: String) -> bool:
 	assert(!IsConnected())
+	if (IsConnected()):
+		return false
 	
-	peer = ENetMultiplayerPeer.new()	
-	peer.create_client(Address, PORT)
-	peer.get_peer(1).set_timeout(0, 0, 3000)
-	multiplayer.multiplayer_peer = peer
+	var tempPeer = ENetMultiplayerPeer.new()
+	
+	var error = tempPeer.create_client(Address, PORT)
+	if error != OK:
+		return false
+		
+	tempPeer.get_peer(1).set_timeout(0, 0, 3000)
+	multiplayer.multiplayer_peer = tempPeer
+	peer = tempPeer
 	
 	print(str(multiplayer.get_unique_id()) + " - connect to server")
-	pass
+	return true
 
 
-func Disconnect() -> void:
+func Disconnect() -> bool:
 	assert(IsConnected())
+	if !IsConnected():
+		return false
 	assert(!IsRunning())
+	if IsRunning():
+		return false
 	
 	var id = multiplayer.get_unique_id()
 	multiplayer.multiplayer_peer.close()
 	peer = null
 	
 	print(str(id) + " - disconnected from the server")
-	pass
+	return true

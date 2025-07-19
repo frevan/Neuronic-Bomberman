@@ -2,20 +2,24 @@ extends Node2D
 
 
 func _on_new_lobby_btn_pressed() -> void:
-	Server.Start()
+	if !Server.Start():
+		Tools.ShowAlert("Can't start server")
 	pass
 
 
 func _on_stop_lobby_btn_pressed() -> void:
-	Server.Stop()
+	if !Server.Stop():
+		Tools.ShowAlert("Can't stop server")
 	pass
 
 
 func _on_leave_lobby_btn_pressed() -> void:
-	Server.Disconnect()
+	if !Server.Disconnect():
+		Tools.ShowAlert("Can't leave lobby")
 	pass
 
 
 func _on_join_lobby_btn_pressed() -> void:
-	Server.Connect("127.0.0.1")
+	if !Server.Connect("127.0.0.1"):
+		Tools.ShowAlert("Can't join lobby")
 	pass
