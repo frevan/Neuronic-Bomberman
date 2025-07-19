@@ -6,31 +6,25 @@ signal OnDisconnectedFromServer
 signal OnConnectionToServerFailed
 
 
-var PeerID = 0
-
-
 func _ready() -> void:
-	multiplayer.connected_to_server.connect(_connected_to_server)
-	multiplayer.connection_failed.connect(_connection_failed)
-	multiplayer.server_disconnected.connect(_server_disconnected)
 	pass
 
 
 func _connected_to_server() -> void:
-	print(str(PeerID) + " - connected to server")
+	print(str(Network.PeerID) + " - connected to server")
 	OnConnectedToServer.emit()
 	pass
 	
 	
 func _connection_failed() -> void:
-	print(str(PeerID) + " - failed to connect")
+	print(str(Network.PeerID) + " - failed to connect")
 	Disconnect()
 	OnConnectionToServerFailed.emit()
 	pass
 	
 	
 func _server_disconnected() -> void:
-	print(str(PeerID) + " - disconnected from server")
+	print(str(Network.PeerID) + " - disconnected from server")
 	Disconnect()
 	OnDisconnectedFromServer.emit()
 	pass
@@ -46,17 +40,21 @@ func Connect(Address: String) -> bool:
 	
 	var tempPeer = ENetMultiplayerPeer.new()
 	
-	var error = tempPeer.create_client(Address, Server.PORT)
+	var error = tempPeer.create_client(Address, Network.PORT)
 	if error != OK:
 		return false
 		
 	tempPeer.get_peer(1).set_timeout(0, 0, 3000)
 	multiplayer.multiplayer_peer = tempPeer
-	Server.Peer = tempPeer
+	Network.Peer = tempPeer
+	assert(is_instance_valid(Network.Peer))
+	Network.PeerID = Network.Peer.get_unique_id()
 	
-	PeerID = Server.Peer.get_unique_id()
+	multiplayer.connected_to_server.connect(_connected_to_server)
+	multiplayer.connection_failed.connect(_connection_failed)
+	multiplayer.server_disconnected.connect(_server_disconnected)
 	
-	print(str(PeerID) + " - connect to server")
+	print(str(Network.PeerID) + " - connect to server")
 	return true
 
 
@@ -68,10 +66,15 @@ func Disconnect() -> bool:
 	if Server.IsRunning():
 		return false
 	
-	var id = PeerID
+	var id = Network.PeerID
 	multiplayer.multiplayer_peer.close()
-	Server.Peer = null
-	PeerID = 0
+	Network.Peer = null
+	assert(!is_instance_valid(Network.Peer))
+	Network.PeerID = 0
+	
+	multiplayer.connected_to_server.disconnect(_connected_to_server)
+	multiplayer.connection_failed.disconnect(_connection_failed)
+	multiplayer.server_disconnected.disconnect(_server_disconnected)
 	
 	print(str(id) + " - disconnected from the server")
 	return true

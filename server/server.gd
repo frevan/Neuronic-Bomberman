@@ -2,14 +2,9 @@ extends Node
 
 class_name TServer
 
-const PORT = 15063
-const MAX_CLIENTS = 10
-
-var Peer: ENetMultiplayerPeer = null
-
 
 func IsConnected() -> bool:
-	return is_instance_valid(Peer)
+	return is_instance_valid(Network.Peer)
 
 
 func IsRunning() -> bool:
@@ -26,13 +21,15 @@ func Start() -> bool:
 	
 	var tempPeer = ENetMultiplayerPeer.new()
 
-	var error = tempPeer.create_server(PORT, MAX_CLIENTS)
+	var error = tempPeer.create_server(Network.PORT, Network.MAX_CLIENTS)
 	if error != OK:
 		print("failed to start server: error=" + str(error))
 		return false
 		
 	multiplayer.multiplayer_peer = tempPeer
-	Peer = tempPeer
+	Network.Peer = tempPeer
+	assert(is_instance_valid(Network.Peer))
+	
 	print(str(multiplayer.get_unique_id()) + " - server started")
 	return true
 
@@ -45,7 +42,8 @@ func Stop() -> bool:
 	
 	var id = multiplayer.get_unique_id()
 	multiplayer.multiplayer_peer.close()
-	Peer = null
+	Network.Peer = null
+	assert(!is_instance_valid(Network.Peer))
 	
 	print(str(id) + " - server stopped")
 	return true

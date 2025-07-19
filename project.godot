@@ -22,6 +22,7 @@ config/icon="uid://c48kdaut4xv5v"
 Server="*res://server/server.gd"
 Tools="*res://misc/tools.gd"
 Client="*res://client/client.gd"
+Network="*res://network/network.gd"
 
 [display]
 
