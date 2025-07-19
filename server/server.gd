@@ -1,5 +1,7 @@
 extends Node
 
+class_name TServer
+
 const PORT = 15063
 const MAX_CLIENTS = 10
 
