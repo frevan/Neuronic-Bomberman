@@ -28,6 +28,10 @@ Client="*res://client/client.gd"
 window/size/viewport_width=800
 window/size/viewport_height=600
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
