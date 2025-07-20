@@ -44,6 +44,9 @@ func MovePlayerToSlot(PlayerID, SlotIndex) -> bool:
 	if (SlotIndex < 0) || (SlotIndex >= Network.MAX_CLIENTS):
 		return false
 	
+	if (Slots[SlotIndex].Player.PeerID != 0) && (Slots[SlotIndex].Player.PeerID != PlayerID):
+		return false
+	
 	ClearSlotForPlayer(PlayerID)
 	Slots[SlotIndex].Player.PeerID = PlayerID
 	

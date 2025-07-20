@@ -54,7 +54,7 @@ func SendJoinLobby() -> void:
 	pass
 
 
-@rpc("reliable", "call_local", "authority")
+@rpc("reliable", "call_local", "any_peer")
 func SendMovePlayerToSlot(SlotIndex: int) -> void:
 	var id = multiplayer.get_remote_sender_id()
 	OnRequestMoveToSlot.emit(id, SlotIndex)
