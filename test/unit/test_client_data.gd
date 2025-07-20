@@ -35,3 +35,13 @@ func test_DontClearSlotForOtherPlayers() -> void:
 	o.Slots[1].Player.PeerID = 2
 	o.ClearSlotForPlayer(2)
 	assert_eq(o.Slots[0].Player.PeerID, 1)
+
+
+func test_FindSlotForUnknownPlayer() -> void:
+	var idx = o.FindSlotForPlayer(123)
+	assert_eq(idx, Types.INVALID_SLOT)
+
+func test_FindSlotForKnownPlayer() -> void:
+	o.Slots[1].Player.PeerID = 2
+	var idx = o.FindSlotForPlayer(2)
+	assert_eq(idx, 1)

@@ -31,6 +31,16 @@ func _on_join_lobby_btn_pressed() -> void:
 	pass
 
 
+func _on_move_to_next_slot_btn_pressed() -> void:
+	var idx: int = Client.Data.FindSlotForPlayer(Network.PeerID)
+	if idx != Types.INVALID_SLOT:
+		var new_idx = (idx + 1) % Client.Data.Slots.size()
+		#if new_idx >= Client.Data.Slots.size():
+		#	new_idx = 0
+		Client.MovePlayerToSlot(new_idx)
+	pass
+
+
 func _client_disconnected_from_server() -> void:
 	Tools.ShowAlert("Disconnected")
 	pass

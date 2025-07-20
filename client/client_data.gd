@@ -21,3 +21,10 @@ func ClearSlotForPlayer(PlayerID: int) -> void:
 		if Slots[i].Player.PeerID == PlayerID:
 			ClearSlot(i)
 	pass
+
+
+func FindSlotForPlayer(PlayerID: int) -> int:
+	for i in Slots.size():
+		if Slots[i].Player.PeerID == PlayerID:
+			return i
+	return Types.INVALID_SLOT

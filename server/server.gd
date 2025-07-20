@@ -31,14 +31,27 @@ func _network_request_join_lobby(SenderID: int) -> void:
 	pass
 
 
+func _network_request_move_to_slot(SenderID: int, SlotIndex: int) -> void:
+	print(str(Network.PeerID) + " - request to move " + str(SenderID) + " to slot " + str(SlotIndex))
+	var idx: int = SlotIndex
+	if !Data.MovePlayerToSlot(SenderID, idx):
+		idx = Data.FindSlotForPlayer(SenderID)
+	Network.SendPlayerMovedToSlot(SenderID, idx)
+	pass
+
+
 func _ConnectToSignalsOnStart() -> void:
 	multiplayer.peer_connected.connect(_peer_connected)
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
 	Network.OnRequestJoinLobby.connect(_network_request_join_lobby)
+	Network.OnRequestMoveToSlot.connect(_network_request_move_to_slot)
 	pass
 
 func _DisconnectFromSignalsOnStop() -> void:
+	multiplayer.peer_connected.disconnect(_peer_connected)
+	multiplayer.peer_disconnected.disconnect(_peer_disconnected)
 	Network.OnRequestJoinLobby.disconnect(_network_request_join_lobby)
+	Network.OnRequestMoveToSlot.disconnect(_network_request_move_to_slot)
 	pass
 
 

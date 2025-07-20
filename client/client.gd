@@ -45,13 +45,13 @@ func _network_response_to_join_lobby(Accepted: bool) -> void:
 
 func _network_player_moved_to_slot(PlayerID: int, SlotIndex: int) -> void:
 	assert(PlayerID != 0)
-	assert(SlotIndex >= 0)
 	assert(SlotIndex < Data.Slots.size())
 	
 	print(str(Network.PeerID) + " - player " + str(PlayerID) + " moved to slot " + str(SlotIndex))
 	
-	Data.ClearSlotForPlayer(PlayerID) # clear old slot
-	Data.Slots[SlotIndex].Player.PeerID = PlayerID # set new slot
+	if SlotIndex != Types.INVALID_SLOT:
+		Data.ClearSlotForPlayer(PlayerID) # clear old slot
+		Data.Slots[SlotIndex].Player.PeerID = PlayerID # set new slot
 	pass
 
 
@@ -141,4 +141,16 @@ func Disconnect() -> bool:
 	if !Network.IsServer():
 		if !_DisconnectFromServer():
 			return false
+	return true
+
+
+func MovePlayerToSlot(SlotIndex: int) -> bool:
+	print(str(Network.PeerID) + " - move to slot: " + str(SlotIndex))
+	
+	assert(Network.IsConnected())
+	if !Network.IsConnected():
+		return false
+	
+	Network.SendMovePlayerToSlot.rpc_id(1, SlotIndex)
+	
 	return true

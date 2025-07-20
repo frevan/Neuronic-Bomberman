@@ -33,7 +33,15 @@ offset_right = 775.0
 offset_bottom = 150.0
 text = "LEAVE"
 
+[node name="MoveToNextSlotBtn" type="Button" parent="."]
+offset_left = 625.0
+offset_top = 175.0
+offset_right = 775.0
+offset_bottom = 225.0
+text = "NEXT SLOT"
+
 [connection signal="pressed" from="NewLobbyBtn" to="." method="_on_new_lobby_btn_pressed"]
 [connection signal="pressed" from="StopLobbyBtn" to="." method="_on_stop_lobby_btn_pressed"]
 [connection signal="pressed" from="JoinLobbyBtn" to="." method="_on_join_lobby_btn_pressed"]
 [connection signal="pressed" from="LeaveLobbyBtn" to="." method="_on_leave_lobby_btn_pressed"]
+[connection signal="pressed" from="MoveToNextSlotBtn" to="." method="_on_move_to_next_slot_btn_pressed"]

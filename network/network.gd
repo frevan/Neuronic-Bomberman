@@ -5,6 +5,7 @@ class_name TNetwork
 
 # received by server only
 signal OnRequestJoinLobby # params: sender_id (int)
+signal OnRequestMoveToSlot # params: sender_id (int), slot_idx (int)
 # received by clients
 signal OnResponseToJoinLobby # params: accepted (bool)
 signal OnPlayerMovedToSlot # params: player_id (int), slot_index (int)
@@ -50,6 +51,13 @@ func ResetPeer() -> void:
 func SendJoinLobby() -> void:
 	var id = multiplayer.get_remote_sender_id()
 	OnRequestJoinLobby.emit(id)
+	pass
+
+
+@rpc("reliable", "call_local", "authority")
+func SendMovePlayerToSlot(SlotIndex: int) -> void:
+	var id = multiplayer.get_remote_sender_id()
+	OnRequestMoveToSlot.emit(id, SlotIndex)
 	pass
 
 
