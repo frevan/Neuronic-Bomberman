@@ -10,8 +10,7 @@ signal OnLobbyRefused
 
 func _connected_to_server() -> void:
 	print(str(Network.PeerID) + " - connected to server")
-	OnConnectedToServer.emit()
-	Network.SendJoinLobby.rpc_id(1)
+	_DoStuffWhenConnected()
 	pass
 
 
@@ -31,16 +30,16 @@ func _server_disconnected() -> void:
 
 func _network_response_to_join_lobby(Accepted: bool) -> void:
 	if Accepted:
-		OnLobbyJoined.emit()
 		print(str(Network.PeerID) + " - joined lobby")
+		OnLobbyJoined.emit()
 	else:
+		print(str(Network.PeerID) + " - couldn't get into lobby")
 		Disconnect()
 		OnLobbyRefused.emit()
-		print(str(Network.PeerID) + " - couldn't get into lobby")
 	pass
 
 
-func ConnectToSignalsOnConnect() -> void:
+func _ConnectToSignals() -> void:
 	multiplayer.connected_to_server.connect(_connected_to_server)
 	multiplayer.connection_failed.connect(_connection_failed)
 	multiplayer.server_disconnected.connect(_server_disconnected)
@@ -48,14 +47,15 @@ func ConnectToSignalsOnConnect() -> void:
 	pass
 
 
-func DisconnectFromSignalsOnDisconnect() -> void:
+func _DisconnectFromSignals() -> void:
 	multiplayer.connected_to_server.disconnect(_connected_to_server)
 	multiplayer.connection_failed.disconnect(_connection_failed)
 	multiplayer.server_disconnected.disconnect(_server_disconnected)
+	Network.OnResponseToJoinLobby.disconnect(_network_response_to_join_lobby)
 	pass
 
 
-func Connect(Address: String) -> bool:
+func _ConnectToServer(Address: String) -> bool:
 	assert(!Server.IsConnected())
 	if (Server.IsConnected()):
 		return false
@@ -70,23 +70,52 @@ func Connect(Address: String) -> bool:
 		return false
 		
 	Network.SetPeerTo(_peer)
-	ConnectToSignalsOnConnect()
-	
-	print(str(Network.PeerID) + " - connect to server")
 	return true
 
 
-func Disconnect() -> bool:
-	assert(Server.IsConnected())
-	if !Server.IsConnected():
-		return false
+func _DisconnectFromServer() -> bool:
 	assert(!Server.IsRunning())
 	if Server.IsRunning():
 		return false
 	
-	var id = Network.PeerID
 	Network.ResetPeer()
-	DisconnectFromSignalsOnDisconnect()
+	return true
+
+
+func _DoStuffWhenConnected() -> void:
+	OnConnectedToServer.emit()
+	Network.SendJoinLobby.rpc_id(1)
+	pass
+
+
+func Connect(Address: String) -> bool:
+	if Network.IsServer():
+		if Address != "127.0.0.1":
+			return false
+	else:
+		if !_ConnectToServer(Address):
+			return false
 	
-	print(str(id) + " - disconnected from the server")
+	print(str(Network.PeerID) + " - connect to server")
+	
+	_ConnectToSignals()
+	
+	if Network.IsServer():
+		_DoStuffWhenConnected()
+	
+	return true
+
+
+func Disconnect() -> bool:
+	print(str(Network.PeerID) + " - disconnect from the server")
+	
+	assert(Server.IsConnected())
+	if !Server.IsConnected():
+		return false
+	
+	_DisconnectFromSignals()
+	
+	if !Network.IsServer():
+		if !_DisconnectFromServer():
+			return false
 	return true

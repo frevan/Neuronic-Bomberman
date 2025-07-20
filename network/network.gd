@@ -15,6 +15,10 @@ var Peer: ENetMultiplayerPeer
 var PeerID: int
 
 
+func IsServer() -> bool:
+	return PeerID == 1
+
+
 func SetPeerTo(NewValue: ENetMultiplayerPeer) -> void:
 	assert(is_instance_valid(NewValue))
 	
