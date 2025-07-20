@@ -34,7 +34,8 @@ func _server_disconnected() -> void:
 
 func _peer_disconnected(SenderID: int) -> void:
 	print(str(Network.PeerID) + " - peer disconnected: " + str(SenderID))
-	Data.ClearSlotForPlayer(SenderID)
+	if is_instance_valid(Data):
+		Data.ClearSlotForPlayer(SenderID)
 	pass
 
 
