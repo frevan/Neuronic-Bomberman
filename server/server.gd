@@ -57,9 +57,7 @@ func _DisconnectFromSignalsOnStop() -> void:
 
 
 func _ClientDisconnected(SenderID) -> void:
-	for i in Data.Slots.size():
-		if Data.Slots[i].Player.PeerID == SenderID:
-			Data.ClearSlot(i)
+	Data.ClearSlotForPlayer(SenderID)
 	pass
 
 

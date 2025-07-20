@@ -28,7 +28,13 @@ func _connection_failed() -> void:
 func _server_disconnected() -> void:
 	print(str(Network.PeerID) + " - disconnected from server")
 	Disconnect()
-	OnDisconnectedFromServer.emit()
+	_DoStuffWhenConnected()
+	pass
+
+
+func _peer_disconnected(SenderID: int) -> void:
+	print(str(Network.PeerID) + " - peer disconnected: " + str(SenderID))
+	Data.ClearSlotForPlayer(SenderID)
 	pass
 
 
@@ -58,6 +64,7 @@ func _ConnectToSignals() -> void:
 	multiplayer.connected_to_server.connect(_connected_to_server)
 	multiplayer.connection_failed.connect(_connection_failed)
 	multiplayer.server_disconnected.connect(_server_disconnected)
+	multiplayer.peer_disconnected.connect(_peer_disconnected)
 	Network.OnResponseToJoinLobby.connect(_network_response_to_join_lobby)
 	Network.OnPlayerMovedToSlot.connect(_network_player_moved_to_slot)
 	pass
@@ -67,6 +74,7 @@ func _DisconnectFromSignals() -> void:
 	multiplayer.connected_to_server.disconnect(_connected_to_server)
 	multiplayer.connection_failed.disconnect(_connection_failed)
 	multiplayer.server_disconnected.disconnect(_server_disconnected)
+	multiplayer.peer_disconnected.disconnect(_peer_disconnected)
 	Network.OnResponseToJoinLobby.disconnect(_network_response_to_join_lobby)
 	Network.OnPlayerMovedToSlot.disconnect(_network_player_moved_to_slot)
 	pass
@@ -107,6 +115,14 @@ func _DoStuffWhenConnected() -> void:
 	pass
 
 
+func _DoStuffWhenDisconnected() -> void:
+	OnDisconnectedFromServer.emit()
+	if Network.IsServer():
+		Server._peer_disconnected(1)
+		_peer_disconnected(1)
+	pass
+
+
 func Connect(Address: String) -> bool:
 	if Network.IsServer():
 		if Address != "127.0.0.1":
@@ -137,7 +153,9 @@ func Disconnect() -> bool:
 	_DisconnectFromSignals()
 	Data = null
 	
-	if !Network.IsServer():
+	if Network.IsServer():
+		_DoStuffWhenDisconnected()
+	else:
 		if !_DisconnectFromServer():
 			return false
 	return true
