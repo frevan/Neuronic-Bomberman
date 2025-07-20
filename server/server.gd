@@ -26,6 +26,8 @@ func _network_request_join_lobby(SenderID: int) -> void:
 		success = true
 		Data.Slots[slot_idx].Player.PeerID = SenderID
 	Network.SendJoinLobbyResponse.rpc_id(SenderID, success)
+	if success:
+		Network.SendPlayerMovedToSlot.rpc(SenderID, slot_idx)
 	pass
 
 

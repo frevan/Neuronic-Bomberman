@@ -39,11 +39,17 @@ func _network_response_to_join_lobby(Accepted: bool) -> void:
 	pass
 
 
+func _network_player_moved_to_slot(PlayerID: int, SlotIndex: int) -> void:
+	print(str(Network.PeerID) + " - player " + str(PlayerID) + " moved to slot " + str(SlotIndex))
+	pass
+
+
 func _ConnectToSignals() -> void:
 	multiplayer.connected_to_server.connect(_connected_to_server)
 	multiplayer.connection_failed.connect(_connection_failed)
 	multiplayer.server_disconnected.connect(_server_disconnected)
 	Network.OnResponseToJoinLobby.connect(_network_response_to_join_lobby)
+	Network.OnPlayerMovedToSlot.connect(_network_player_moved_to_slot)
 	pass
 
 
@@ -52,6 +58,7 @@ func _DisconnectFromSignals() -> void:
 	multiplayer.connection_failed.disconnect(_connection_failed)
 	multiplayer.server_disconnected.disconnect(_server_disconnected)
 	Network.OnResponseToJoinLobby.disconnect(_network_response_to_join_lobby)
+	Network.OnPlayerMovedToSlot.disconnect(_network_player_moved_to_slot)
 	pass
 
 
