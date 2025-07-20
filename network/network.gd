@@ -1,5 +1,7 @@
 extends Node
 
+class_name TNetwork
+
 
 # received by server only
 signal OnRequestJoinLobby # params: sender_id (int)
