@@ -9,6 +9,8 @@ var Data: TGameData
 var TMaps = preload("res://data/maps.gd")
 var Maps: TMaps
 
+var CurrentMapName: String
+
 
 func _peer_connected(SenderID: int) -> void:
 	print(str(Network.PeerID) + " - peer connected: " + str(SenderID))
@@ -89,6 +91,8 @@ func Start() -> bool:
 	
 	Maps = TMaps.new()
 	Maps.FindMapFiles()
+	if Maps.MapNames.size() > 0:
+		CurrentMapName = Maps.MapNames[0]
 	
 	_ConnectToSignalsOnStart()
 	Network.SetPeerTo(_peer)
