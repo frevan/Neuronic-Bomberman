@@ -6,6 +6,9 @@ class_name TServer
 var TGameData = preload("res://data/gamedata.gd")
 var Data: TGameData
 
+var TMaps = preload("res://data/maps.gd")
+var Maps: TMaps
+
 
 func _peer_connected(SenderID: int) -> void:
 	print(str(Network.PeerID) + " - peer connected: " + str(SenderID))
@@ -84,6 +87,9 @@ func Start() -> bool:
 	Data = TGameData.new()
 	Data.InitSlots()
 	
+	Maps = TMaps.new()
+	Maps.FindMapFiles()
+	
 	_ConnectToSignalsOnStart()
 	Network.SetPeerTo(_peer)
 	
@@ -103,6 +109,8 @@ func Stop() -> bool:
 	
 	Data.queue_free()
 	Data = null
+	Maps.queue_free()
+	Maps = null
 	
 	print(str(id) + " - server stopped")
 	return true
