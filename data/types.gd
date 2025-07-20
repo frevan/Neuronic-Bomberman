@@ -1,5 +1,7 @@
 extends Node
 
+class_name TTypes
+
 class TPlayer:
 	var PeerID: int
 	func _init() -> void:
