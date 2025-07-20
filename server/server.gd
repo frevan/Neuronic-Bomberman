@@ -7,6 +7,17 @@ var TServerData = preload("res://server/server_data.gd")
 var Data: TServerData
 
 
+func _peer_connected(SenderID: int) -> void:
+	print(str(Network.PeerID) + " - peer connected: " + str(SenderID))
+	pass
+
+
+func _peer_disconnected(SenderID: int) -> void:
+	print(str(Network.PeerID) + " - peer disconnected: " + str(SenderID))
+	_ClientDisconnected(SenderID)
+	pass
+
+
 func _network_request_join_lobby(SenderID: int) -> void:
 	print(str(Network.PeerID) + " - request to join by: " + str(SenderID))
 	var success: bool = false
@@ -29,12 +40,21 @@ func IsRunning() -> bool:
 		return false
 
 
-func ConnectToSignalsOnStart() -> void:
+func _ConnectToSignalsOnStart() -> void:
+	multiplayer.peer_connected.connect(_peer_connected)
+	multiplayer.peer_disconnected.connect(_peer_disconnected)
 	Network.OnRequestJoinLobby.connect(_network_request_join_lobby)
 	pass
 
-func DisconnectFromSignalsOnStop() -> void:
+func _DisconnectFromSignalsOnStop() -> void:
 	Network.OnRequestJoinLobby.disconnect(_network_request_join_lobby)
+	pass
+
+
+func _ClientDisconnected(SenderID) -> void:
+	for i in Data.Slots.size():
+		if Data.Slots[i].Player.PeerID == SenderID:
+			Data.ClearSlot(i)
 	pass
 
 
@@ -53,7 +73,7 @@ func Start() -> bool:
 	Data = TServerData.new()
 	Data.InitSlots()
 	
-	ConnectToSignalsOnStart()
+	_ConnectToSignalsOnStart()
 	Network.SetPeerTo(_peer)
 	
 	print(str(Network.PeerID) + " - server started")
@@ -68,7 +88,7 @@ func Stop() -> bool:
 	
 	var id = Network.PeerID
 	Network.ResetPeer()
-	DisconnectFromSignalsOnStop()
+	_DisconnectFromSignalsOnStop()
 	
 	Data.queue_free()
 	Data = null

@@ -15,3 +15,7 @@ func FindFreeSlotIndex() -> int:
 		if Slots[i].Player.PeerID == 0:
 			return i
 	return -1
+
+func ClearSlot(Index: int) -> void:
+	Slots[Index].Player.PeerID = 0
+	pass
