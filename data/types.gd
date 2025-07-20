@@ -2,6 +2,8 @@ extends Node
 
 class_name TTypes
 
+const INVALID_SLOT = -1
+
 class TPlayer:
 	var PeerID: int
 	func _init() -> void:
@@ -10,7 +12,7 @@ class TPlayer:
 class TSlot:
 	var Index: int
 	var Player: TPlayer
-	func _init(SetIndex: int = -1) -> void:
+	func _init(SetIndex: int = INVALID_SLOT) -> void:
 		Index = SetIndex
 		Player = TPlayer.new()
 		pass
