@@ -8,6 +8,10 @@ signal OnLobbyJoined
 signal OnLobbyRefused
 
 
+var TClientData = preload("res://client/client_data.gd")
+var Data: TClientData
+
+
 func _connected_to_server() -> void:
 	print(str(Network.PeerID) + " - connected to server")
 	_DoStuffWhenConnected()
@@ -40,7 +44,14 @@ func _network_response_to_join_lobby(Accepted: bool) -> void:
 
 
 func _network_player_moved_to_slot(PlayerID: int, SlotIndex: int) -> void:
+	assert(PlayerID != 0)
+	assert(SlotIndex >= 0)
+	assert(SlotIndex < Data.Slots.size())
+	
 	print(str(Network.PeerID) + " - player " + str(PlayerID) + " moved to slot " + str(SlotIndex))
+	
+	Data.ClearSlotForPlayer(PlayerID) # clear old slot
+	Data.Slots[SlotIndex].Player.PeerID = PlayerID # set new slot
 	pass
 
 
@@ -107,11 +118,13 @@ func Connect(Address: String) -> bool:
 	
 	print(str(Network.PeerID) + " - connect to server")
 	
+	Data = TClientData.new()
+	Data.InitSlots()
+	
 	_ConnectToSignals()
 	
 	if Network.IsServer():
 		_DoStuffWhenConnected()
-	
 	return true
 
 
@@ -123,6 +136,7 @@ func Disconnect() -> bool:
 		return false
 	
 	_DisconnectFromSignals()
+	Data = null
 	
 	if !Network.IsServer():
 		if !_DisconnectFromServer():
