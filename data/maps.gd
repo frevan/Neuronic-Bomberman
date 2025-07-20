@@ -155,8 +155,24 @@ func LoadMap(mapname: String) -> Types.TMap:
 	return map
 
 
+func _IsValidFieldPos(Map: Types.TMap, Pos: Vector2i) -> bool:
+	return (Pos.x >= 0) && (Pos.x < Map.Width) && (Pos.y >= 0) && (Pos.y < Map.Height)
+
+
+func SetFieldTypeTo(Map: Types.TMap, Pos: Vector2i, Value: int) -> void:
+	if _IsValidFieldPos(Map, Pos):
+		Map.Fields[Pos.y][Pos.x] = Value
+	pass
+	
+
+func GetFieldType(Map: Types.TMap, Pos: Vector2i) -> int:
+	if _IsValidFieldPos(Map, Pos):
+		return Map.Fields[Pos.y][Pos.x]
+	return -1
+
+
 func ClearField(Map: Types.TMap, Pos: Vector2i) -> void:
-	if Pos.x >= 0 && Pos.x < Types.MAP_WIDTH && Pos.y >= 0 && Pos.y < Types.MAP_HEIGHT:
+	if _IsValidFieldPos(Map, Pos):
 		if Map.Fields[Pos.y][Pos.x] == Types.FIELD_BRICK:
 			Map.Fields[Pos.y][Pos.x] = Types.FIELD_EMPTY
 	pass

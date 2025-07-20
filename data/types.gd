@@ -50,10 +50,14 @@ class TMap:
 	var StartPositions: Dictionary
 	var PowerUps: Dictionary
 	var Fields: Array
+	var Width: int
+	var Height: int
 	func _init(SetName: String = "", SetColumns: int = MAP_WIDTH, SetRows: int = MAP_HEIGHT) -> void:
 		Name = SetName
-		for y in SetRows:
+		Width = SetColumns
+		Height = SetRows
+		for y in Height:
 			Fields.append([])
-			for x in SetColumns:
+			for x in Width:
 				Fields[y].append(FIELD_EMPTY)
 		pass
