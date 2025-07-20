@@ -1,6 +1,6 @@
 extends Node
 
-class_name TServerData
+class_name TGameData
 
 var Slots: Array
 
@@ -10,7 +10,7 @@ func InitSlots() -> void:
 	for i in Slots.size():
 		Slots[i] = Types.TSlot.new(i)
 	pass
-
+	
 
 func FindFreeSlotIndex() -> int:
 	for i in Slots.size():
@@ -38,7 +38,7 @@ func FindSlotForPlayer(PlayerID: int) -> int:
 	return Types.INVALID_SLOT
 
 
-func MovePlayerToSlot(PlayerID, SlotIndex) -> bool:
+func MovePlayerToSlotIfFree(PlayerID, SlotIndex) -> bool:
 	if PlayerID <= 0:
 		return false
 	if (SlotIndex < 0) || (SlotIndex >= Network.MAX_CLIENTS):
@@ -47,7 +47,16 @@ func MovePlayerToSlot(PlayerID, SlotIndex) -> bool:
 	if (Slots[SlotIndex].Player.PeerID != 0) && (Slots[SlotIndex].Player.PeerID != PlayerID):
 		return false
 	
+	MovePlayerToSlot(PlayerID, SlotIndex)
+	return true
+
+
+func MovePlayerToSlot(PlayerID, SlotIndex) -> void:
+	if PlayerID <= 0:
+		pass
+	if (SlotIndex < 0) || (SlotIndex >= Network.MAX_CLIENTS):
+		pass
+	
 	ClearSlotForPlayer(PlayerID)
 	Slots[SlotIndex].Player.PeerID = PlayerID
-	
-	return true
+	pass

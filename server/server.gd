@@ -3,8 +3,8 @@ extends Node
 class_name TServer
 
 
-var TServerData = preload("res://server/server_data.gd")
-var Data: TServerData
+var TGameData = preload("res://data/gamedata.gd")
+var Data: TGameData
 
 
 func _peer_connected(SenderID: int) -> void:
@@ -35,7 +35,7 @@ func _network_request_join_lobby(SenderID: int) -> void:
 func _network_request_move_to_slot(SenderID: int, SlotIndex: int) -> void:
 	print(str(Network.PeerID) + " - request to move " + str(SenderID) + " to slot " + str(SlotIndex))
 	var idx: int = SlotIndex
-	if !Data.MovePlayerToSlot(SenderID, idx):
+	if !Data.MovePlayerToSlotIfFree(SenderID, idx):
 		idx = Data.FindSlotForPlayer(SenderID)
 	Network.SendPlayerMovedToSlot.rpc(SenderID, idx)
 	pass
@@ -81,7 +81,7 @@ func Start() -> bool:
 		print("failed to start server: error=" + str(error))
 		return false
 	
-	Data = TServerData.new()
+	Data = TGameData.new()
 	Data.InitSlots()
 	
 	_ConnectToSignalsOnStart()

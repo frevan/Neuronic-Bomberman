@@ -8,8 +8,8 @@ signal OnLobbyJoined
 signal OnLobbyRefused
 
 
-var TClientData = preload("res://client/client_data.gd")
-var Data: TClientData
+var TGameData = preload("res://data/gamedata.gd")
+var Data: TGameData
 
 
 func _connected_to_server() -> void:
@@ -133,7 +133,7 @@ func Connect(Address: String) -> bool:
 	
 	print(str(Network.PeerID) + " - connect to server")
 	
-	Data = TClientData.new()
+	Data = TGameData.new()
 	Data.InitSlots()
 	
 	_ConnectToSignals()

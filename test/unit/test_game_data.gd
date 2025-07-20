@@ -1,11 +1,11 @@
 extends GutTest
 
-var TClientData = preload("res://client/client_data.gd")
-var o: TClientData
+var TGameData = preload("res://data/gamedata.gd")
+var o: TGameData
 
 
 func before_each():
-	o = TClientData.new()
+	o = TGameData.new()
 	o.InitSlots()
 
 func after_each():
@@ -18,6 +18,19 @@ func test_SlotsAreInitialized() -> void:
 func test_SlotsAreNotNull() -> void:
 	for i in o.Slots.size():
 		assert_not_null(o.Slots[i])
+
+
+func test_FindFreeSlotIndexWhenNotFull() -> void:
+	o.Slots[0].Player.PeerID = 1 # one occupied slot
+	var index: int = o.FindFreeSlotIndex()
+	assert_ne(index, Types.INVALID_SLOT)
+
+func test_FindFreeSlotIndexWhenFull() -> void:
+	for i in o.Slots.size():
+		o.Slots[i].Player.PeerID = 1
+	var index: int = o.FindFreeSlotIndex()
+	assert_eq(index, Types.INVALID_SLOT)
+
 
 
 func test_ClearSlot() -> void:
