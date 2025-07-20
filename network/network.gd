@@ -36,13 +36,13 @@ func ResetPeer() -> void:
 
 
 @rpc("reliable", "call_local", "any_peer")
-func JoinLobby() -> void:
+func SendJoinLobby() -> void:
 	var id = multiplayer.get_remote_sender_id()
 	OnRequestJoinLobby.emit(id)
 	pass
 
 
 @rpc("reliable", "call_local", "authority")
-func RespondToJoinLobby(Accepted: bool) -> void:
+func SendJoinLobbyResponse(Accepted: bool) -> void:
 	OnResponseToJoinLobby.emit(Accepted)
 	pass

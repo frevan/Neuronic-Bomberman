@@ -11,7 +11,7 @@ signal OnLobbyRefused
 func _connected_to_server() -> void:
 	print(str(Network.PeerID) + " - connected to server")
 	OnConnectedToServer.emit()
-	Network.JoinLobby.rpc_id(1)
+	Network.SendJoinLobby.rpc_id(1)
 	pass
 
 
