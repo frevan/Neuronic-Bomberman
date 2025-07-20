@@ -50,8 +50,7 @@ func _network_player_moved_to_slot(PlayerID: int, SlotIndex: int) -> void:
 	print(str(Network.PeerID) + " - player " + str(PlayerID) + " moved to slot " + str(SlotIndex))
 	
 	if SlotIndex != Types.INVALID_SLOT:
-		Data.ClearSlotForPlayer(PlayerID) # clear old slot
-		Data.Slots[SlotIndex].Player.PeerID = PlayerID # set new slot
+		Data.MovePlayerToSlot(PlayerID, SlotIndex)
 	pass
 
 

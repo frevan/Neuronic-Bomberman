@@ -28,3 +28,15 @@ func FindSlotForPlayer(PlayerID: int) -> int:
 		if Slots[i].Player.PeerID == PlayerID:
 			return i
 	return Types.INVALID_SLOT
+
+
+func MovePlayerToSlot(PlayerID, SlotIndex) -> bool:
+	if PlayerID <= 0:
+		return false
+	if (SlotIndex < 0) || (SlotIndex >= Network.MAX_CLIENTS):
+		return false
+	
+	ClearSlotForPlayer(PlayerID)
+	Slots[SlotIndex].Player.PeerID = PlayerID
+	
+	return true

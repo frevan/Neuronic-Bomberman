@@ -28,6 +28,7 @@ func _network_request_join_lobby(SenderID: int) -> void:
 	Network.SendJoinLobbyResponse.rpc_id(SenderID, success)
 	if success:
 		Network.SendPlayerMovedToSlot.rpc(SenderID, slot_idx)
+		_SendInfoForAllPlayersToPlayer(SenderID)
 	pass
 
 
@@ -36,7 +37,7 @@ func _network_request_move_to_slot(SenderID: int, SlotIndex: int) -> void:
 	var idx: int = SlotIndex
 	if !Data.MovePlayerToSlot(SenderID, idx):
 		idx = Data.FindSlotForPlayer(SenderID)
-	Network.SendPlayerMovedToSlot(SenderID, idx)
+	Network.SendPlayerMovedToSlot.rpc(SenderID, idx)
 	pass
 
 
@@ -59,6 +60,14 @@ func _ClientDisconnected(SenderID) -> void:
 	for i in Data.Slots.size():
 		if Data.Slots[i].Player.PeerID == SenderID:
 			Data.ClearSlot(i)
+	pass
+
+
+func _SendInfoForAllPlayersToPlayer(SenderID: int) -> void:
+	for i in Data.Slots.size():
+		var other_peerid: int = Data.Slots[i].Player.PeerID
+		if (other_peerid != 0) && (other_peerid != SenderID):
+			Network.SendPlayerMovedToSlot.rpc_id(SenderID, other_peerid, i)
 	pass
 
 
