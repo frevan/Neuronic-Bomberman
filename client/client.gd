@@ -56,11 +56,11 @@ func _DisconnectFromSignals() -> void:
 
 
 func _ConnectToServer(Address: String) -> bool:
-	assert(!Server.IsConnected())
-	if (Server.IsConnected()):
+	assert(!Network.IsConnected())
+	if (Network.IsConnected()):
 		return false
-	assert(!Server.IsRunning())
-	if Server.IsRunning():
+	assert(!Network.IsServer())
+	if Network.IsServer():
 		return false
 	
 	var _peer = ENetMultiplayerPeer.new()
@@ -74,8 +74,10 @@ func _ConnectToServer(Address: String) -> bool:
 
 
 func _DisconnectFromServer() -> bool:
-	assert(!Server.IsRunning())
-	if Server.IsRunning():
+	assert(Network.IsConnected())
+	assert(!Network.IsServer())
+	
+	if !Network.IsConnected():
 		return false
 	
 	Network.ResetPeer()
@@ -109,8 +111,8 @@ func Connect(Address: String) -> bool:
 func Disconnect() -> bool:
 	print(str(Network.PeerID) + " - disconnect from the server")
 	
-	assert(Server.IsConnected())
-	if !Server.IsConnected():
+	assert(Network.IsConnected())
+	if !Network.IsConnected():
 		return false
 	
 	_DisconnectFromSignals()

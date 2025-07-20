@@ -29,17 +29,6 @@ func _network_request_join_lobby(SenderID: int) -> void:
 	pass
 
 
-func IsConnected() -> bool:
-	return is_instance_valid(Network.Peer)
-
-
-func IsRunning() -> bool:
-	if IsConnected():
-		return multiplayer.is_server()
-	else:
-		return false
-
-
 func _ConnectToSignalsOnStart() -> void:
 	multiplayer.peer_connected.connect(_peer_connected)
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
@@ -59,8 +48,8 @@ func _ClientDisconnected(SenderID) -> void:
 
 
 func Start() -> bool:
-	assert(!IsConnected())
-	if IsConnected():
+	assert(!Network.IsConnected())
+	if Network.IsConnected():
 		return false
 	
 	var _peer = ENetMultiplayerPeer.new()
@@ -82,8 +71,8 @@ func Start() -> bool:
 
 
 func Stop() -> bool:
-	assert(IsRunning())
-	if !IsRunning():
+	assert(Network.IsServer())
+	if !Network.IsServer():
 		return false
 	
 	var id = Network.PeerID

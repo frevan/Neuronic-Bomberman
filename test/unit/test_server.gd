@@ -11,11 +11,11 @@ func after_each():
 	_server.queue_free()
 
 
-func test_IsNotConnected():
-	assert_eq(_server.IsConnected(), false)
-	pass
+#func test_IsNotConnected():
+#	assert_eq(_server.IsConnected(), false)
+#	pass
 
 
-func test_IsNotRunning():
-	assert_eq(_server.IsRunning(), false)
-	pass
+#func test_IsNotRunning():
+#	assert_eq(_server.IsRunning(), false)
+#	pass
