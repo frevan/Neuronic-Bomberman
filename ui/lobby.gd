@@ -38,15 +38,15 @@ func _client_disconnected_from_server() -> void:
 	pass
 
 
-func _client_player_joined(PlayerID: int) -> void:
+func _client_player_joined(_PlayerID: int) -> void:
 	_UpdatePlayerInfo()
 	pass
 	
-func _client_player_left(PlayerID: int) -> void:
+func _client_player_left(_PlayerID: int) -> void:
 	_UpdatePlayerInfo()
 	pass
 	
-func _client_player_moved_to_slot(PlayerID: int, SlotIndex: int) -> void:
+func _client_player_moved_to_slot(_PlayerID: int, _SlotIndex: int) -> void:
 	_UpdatePlayerInfo()
 	pass
 
