@@ -11,19 +11,24 @@ enum TState {IDLE, LOBBY, MATCH, ROUND}
 var State: TState = TState.IDLE
 
 
+func _log(Text: String) -> void:
+	print(str(Network.PeerID) + " [srv] " + Text)
+	pass
+
+
 func _peer_connected(SenderID: int) -> void:
-	print(str(Network.PeerID) + " - peer connected: " + str(SenderID))
+	_log("peer connected: " + str(SenderID))
 	pass
 
 
 func _peer_disconnected(SenderID: int) -> void:
-	print(str(Network.PeerID) + " - peer disconnected: " + str(SenderID))
+	_log("peer disconnected: " + str(SenderID))
 	_ClientDisconnected(SenderID)
 	pass
 
 
 func _network_request_join_lobby(SenderID: int) -> void:
-	print(str(Network.PeerID) + " - request to join by: " + str(SenderID))
+	_log("request to join by: " + str(SenderID))
 	
 	var success: bool = false
 	var slot_idx: int = Types.INVALID_SLOT
@@ -42,13 +47,13 @@ func _network_request_join_lobby(SenderID: int) -> void:
 
 
 func _network_leave_lobby(SenderID: int) -> void:
-	print(str(Network.PeerID) + " - player " + str(SenderID) + " left the lobby")
+	_log("player " + str(SenderID) + " left the lobby")
 	_ClientDisconnected(SenderID)
 	pass
 
 
 func _network_request_move_to_slot(SenderID: int, SlotIndex: int) -> void:
-	print(str(Network.PeerID) + " - request to move " + str(SenderID) + " to slot " + str(SlotIndex))
+	_log("request to move " + str(SenderID) + " to slot " + str(SlotIndex))
 	
 	var idx: int = Data.FindSlotForPlayer(SenderID)
 	if State == TState.LOBBY:
@@ -60,14 +65,14 @@ func _network_request_move_to_slot(SenderID: int, SlotIndex: int) -> void:
 
 
 func _network_request_start_match(SenderID: int) -> void:
-	print(str(Network.PeerID) + " - request to start the match from " + str(SenderID))
+	_log("request to start the match from " + str(SenderID))
 	if (State == TState.LOBBY) && (SenderID == 1):
 		_StartMatch()
 	pass
 
 
 func _network_player_ready(SenderID: int, Ready: bool) -> void:
-	print(str(Network.PeerID) + " - player " + str(SenderID) + " is ready: " + str(Ready))
+	_log("player " + str(SenderID) + " is ready: " + str(Ready))
 	if (State == TState.LOBBY) || (State == TState.MATCH):
 		Data.SetPlayerReady(SenderID, Ready)
 		Network.SendPlayerBecameReady.rpc(SenderID, Ready)
@@ -139,7 +144,7 @@ func Start() -> bool:
 
 	var error = _peer.create_server(Network.PORT, Network.MAX_CLIENTS)
 	if error != OK:
-		print("failed to start server: error=" + str(error))
+		_log("failed to start server: error=" + str(error))
 		return false
 	
 	Data = TGameData.new()
@@ -155,7 +160,7 @@ func Start() -> bool:
 	
 	State = TState.LOBBY
 	
-	print(str(Network.PeerID) + " - server started")
+	_log("server started")
 	return true
 
 
@@ -169,7 +174,6 @@ func Stop() -> bool:
 	if State == TState.IDLE:
 		return false
 	
-	var id = Network.PeerID
 	Network.ResetPeer()
 	_DisconnectFromSignalsOnStop()
 	
@@ -181,5 +185,5 @@ func Stop() -> bool:
 	
 	State = TState.IDLE
 	
-	print(str(id) + " - server stopped")
+	_log("server stopped")
 	return true

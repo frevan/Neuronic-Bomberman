@@ -17,15 +17,20 @@ enum TState {IDLE, CONNECTING, LOBBY, MATCH}
 var State: TState = TState.IDLE
 
 
+func _log(Text: String) -> void:
+	print(str(Network.PeerID) + " [client] " + Text)
+	pass
+
+
 func _connected_to_server() -> void:
-	print(str(Network.PeerID) + " - connected to server")
+	_log("connected to server")
 	if State == TState.CONNECTING:
 		_DoStuffWhenConnected()
 	pass
 
 
 func _connection_failed() -> void:
-	print(str(Network.PeerID) + " - failed to connect")
+	_log("failed to connect")
 	if State == TState.CONNECTING:
 		_DoStuffWhenDisconnected()
 		OnConnectionToServerFailed.emit()
@@ -33,14 +38,14 @@ func _connection_failed() -> void:
 
 
 func _server_disconnected() -> void:
-	print(str(Network.PeerID) + " - disconnected from server")
+	_log("disconnected from server")
 	if State != TState.IDLE:
 		_DoStuffWhenDisconnected()
 	pass
 
 
 func _peer_disconnected(SenderID: int) -> void:
-	print(str(Network.PeerID) + " - peer disconnected: " + str(SenderID))
+	_log("peer disconnected: " + str(SenderID))
 	if (State != TState.IDLE) && is_instance_valid(Data):
 		Data.ClearSlotForPlayer(SenderID)
 	pass
@@ -49,18 +54,18 @@ func _peer_disconnected(SenderID: int) -> void:
 func _network_response_to_join_lobby(Accepted: bool) -> void:
 	if State == TState.CONNECTING:
 		if Accepted:
-			print(str(Network.PeerID) + " - joined lobby")
+			_log("joined lobby")
 			State = TState.LOBBY
 			OnLobbyJoined.emit()
 		else:
-			print(str(Network.PeerID) + " - couldn't get into lobby")
+			_log("couldn't get into lobby")
 			Disconnect()
 			OnLobbyRefused.emit()
 	pass
 
 
 func _network_player_left_lobby(PlayerID: int) -> void:
-	print(str(Network.PeerID) + " - player " + str(PlayerID) + " left the lobby")
+	_log("player " + str(PlayerID) + " left the lobby")
 	if State != TState.IDLE:
 		Data.ClearSlotForPlayer(PlayerID)
 	pass
@@ -70,7 +75,7 @@ func _network_player_moved_to_slot(PlayerID: int, SlotIndex: int) -> void:
 	assert(PlayerID != 0)
 	assert(SlotIndex < Data.Slots.size())
 	
-	print(str(Network.PeerID) + " - player " + str(PlayerID) + " moved to slot " + str(SlotIndex))
+	_log("player " + str(PlayerID) + " moved to slot " + str(SlotIndex))
 	
 	if (State != TState.IDLE) && (SlotIndex != Types.INVALID_SLOT):
 		Data.MovePlayerToSlot(PlayerID, SlotIndex)
@@ -78,27 +83,27 @@ func _network_player_moved_to_slot(PlayerID: int, SlotIndex: int) -> void:
 
 
 func _network_map_changed(MapName: String) -> void:
-	print(str(Network.PeerID) + " - map changed to " + MapName)
+	_log("map changed to " + MapName)
 	if State != TState.IDLE:
 		CurrentMapName = MapName
 	pass
 
 
 func _network_match_started() -> void:
-	print(str(Network.PeerID) + " - match started")
+	_log("match started")
 	State = TState.MATCH
 	pass
 	
 	
 func _network_new_round(MapName: String) -> void:
-	print(str(Network.PeerID) + " - new round: " + MapName)
+	_log("new round: " + MapName)
 	# TODO: load map
 	Network.SendPlayerReady(true)
 	pass
 
 
 func _network_player_became_ready(PlayerID: int, Ready: bool) -> void:
-	print(str(Network.PeerID) + " - player " + str(PlayerID) + " is ready: " + str(Ready))
+	_log("player " + str(PlayerID) + " is ready: " + str(Ready))
 	pass
 
 
@@ -139,7 +144,7 @@ func _DoStuffWhenConnected() -> void:
 
 
 func _DoStuffWhenDisconnected() -> void:
-	State = TState.IDLE	
+	State = TState.IDLE
 	Network.SendLeaveLobby.rpc_id(1)
 	OnDisconnectedFromServer.emit()
 	
@@ -160,7 +165,7 @@ func Connect(Address: String) -> bool:
 		if !Network.ConnectToServerAsClient(Address):
 			return false
 	
-	print(str(Network.PeerID) + " - connect to server")
+	_log("connect to server")
 	
 	Data = TGameData.new()
 	Data.InitSlots()
@@ -175,7 +180,7 @@ func Connect(Address: String) -> bool:
 
 
 func Disconnect() -> bool:
-	print(str(Network.PeerID) + " - disconnect from the server")
+	_log("disconnect from the server")
 	
 	assert(Network.IsConnected())
 	if !Network.IsConnected():
@@ -195,7 +200,7 @@ func Disconnect() -> bool:
 
 
 func MovePlayerToSlot(SlotIndex: int) -> bool:
-	print(str(Network.PeerID) + " - move to slot: " + str(SlotIndex))
+	_log("move to slot: " + str(SlotIndex))
 	
 	assert(Network.IsConnected())
 	if !Network.IsConnected():
