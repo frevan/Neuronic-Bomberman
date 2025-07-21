@@ -108,24 +108,6 @@ func _DisconnectFromSignals() -> void:
 	pass
 
 
-func _ConnectToServer(Address: String) -> bool:
-	assert(!Network.IsConnected())
-	if (Network.IsConnected()):
-		return false
-	assert(!Network.IsServer())
-	if Network.IsServer():
-		return false
-	
-	var _peer = ENetMultiplayerPeer.new()
-	
-	var error = _peer.create_client(Address, Network.PORT)
-	if error != OK:
-		return false
-		
-	Network.SetPeerTo(_peer)
-	return true
-
-
 func _DoStuffWhenConnected() -> void:
 	OnConnectedToServer.emit()
 	Network.SendJoinLobby.rpc_id(1)
@@ -151,7 +133,7 @@ func Connect(Address: String) -> bool:
 		if Address != "127.0.0.1":
 			return false
 	else:
-		if !_ConnectToServer(Address):
+		if !Network.ConnectToServerAsClient(Address):
 			return false
 	
 	print(str(Network.PeerID) + " - connect to server")

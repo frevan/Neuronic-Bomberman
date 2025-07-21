@@ -50,6 +50,24 @@ func ResetPeer() -> void:
 	pass
 
 
+func ConnectToServerAsClient(Address: String) -> bool:
+	assert(!IsConnected())
+	if (IsConnected()):
+		return false
+	assert(!IsServer())
+	if IsServer():
+		return false
+	
+	var _peer = ENetMultiplayerPeer.new()
+	
+	var error = _peer.create_client(Address, PORT)
+	if error != OK:
+		return false
+		
+	SetPeerTo(_peer)
+	return true
+
+
 @rpc("reliable", "call_local", "any_peer")
 func SendJoinLobby() -> void:
 	var id = multiplayer.get_remote_sender_id()
