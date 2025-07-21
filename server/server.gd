@@ -7,6 +7,9 @@ var Data: TGameData
 var Maps: TMaps
 var CurrentMapName: String
 
+enum TState {IDLE, LOBBY, MATCH, ROUND}
+var State: TState = TState.IDLE
+
 
 func _peer_connected(SenderID: int) -> void:
 	print(str(Network.PeerID) + " - peer connected: " + str(SenderID))
@@ -21,12 +24,17 @@ func _peer_disconnected(SenderID: int) -> void:
 
 func _network_request_join_lobby(SenderID: int) -> void:
 	print(str(Network.PeerID) + " - request to join by: " + str(SenderID))
+	
 	var success: bool = false
-	var slot_idx: int = Data.FindFreeSlotIndex()
-	if slot_idx >= 0: 
-		success = true
-		Data.Slots[slot_idx].Player.PeerID = SenderID
-	Network.SendJoinLobbyResponse.rpc_id(SenderID, success)
+	var slot_idx: int = Types.INVALID_SLOT
+	
+	if State == TState.LOBBY:
+		slot_idx = Data.FindFreeSlotIndex()
+		if slot_idx >= 0: 
+			success = true
+			Data.Slots[slot_idx].Player.PeerID = SenderID
+		Network.SendJoinLobbyResponse.rpc_id(SenderID, success)
+		
 	if success:
 		Network.SendPlayerMovedToSlot.rpc(SenderID, slot_idx)
 		_SendLobbyInfoToPlayer(SenderID)
@@ -41,9 +49,12 @@ func _network_leave_lobby(SenderID: int) -> void:
 
 func _network_request_move_to_slot(SenderID: int, SlotIndex: int) -> void:
 	print(str(Network.PeerID) + " - request to move " + str(SenderID) + " to slot " + str(SlotIndex))
-	var idx: int = SlotIndex
-	if !Data.MovePlayerToSlotIfFree(SenderID, idx):
-		idx = Data.FindSlotForPlayer(SenderID)
+	
+	var idx: int = Data.FindSlotForPlayer(SenderID)
+	if State == TState.LOBBY:
+		if Data.MovePlayerToSlotIfFree(SenderID, idx):
+			idx = SlotIndex
+	
 	Network.SendPlayerMovedToSlot.rpc(SenderID, idx)
 	pass
 
@@ -72,17 +83,22 @@ func _ClientDisconnected(SenderID) -> void:
 
 
 func _SendLobbyInfoToPlayer(PlayerID: int) -> void:
-	for i in Data.Slots.size():
-		var other_peerid: int = Data.Slots[i].Player.PeerID
-		if (other_peerid != 0) && (other_peerid != PlayerID):
-			Network.SendPlayerMovedToSlot.rpc_id(PlayerID, other_peerid, i)
-	Network.SendMapName.rpc_id(PlayerID, CurrentMapName)
+	if State == TState.LOBBY:
+		for i in Data.Slots.size():
+			var other_peerid: int = Data.Slots[i].Player.PeerID
+			if (other_peerid != 0) && (other_peerid != PlayerID):
+				Network.SendPlayerMovedToSlot.rpc_id(PlayerID, other_peerid, i)
+		Network.SendMapName.rpc_id(PlayerID, CurrentMapName)
 	pass
 
 
 func Start() -> bool:
 	assert(!Network.IsConnected())
 	if Network.IsConnected():
+		return false
+	
+	assert(State == TState.IDLE)
+	if State != TState.IDLE:
 		return false
 	
 	var _peer = ENetMultiplayerPeer.new()
@@ -103,6 +119,8 @@ func Start() -> bool:
 	_ConnectToSignalsOnStart()
 	Network.SetPeerTo(_peer)
 	
+	State = TState.LOBBY
+	
 	print(str(Network.PeerID) + " - server started")
 	return true
 
@@ -111,6 +129,10 @@ func Start() -> bool:
 func Stop() -> bool:
 	assert(Network.IsServer())
 	if !Network.IsServer():
+		return false
+	
+	assert(State != TState.IDLE)
+	if State == TState.IDLE:
 		return false
 	
 	var id = Network.PeerID
@@ -122,6 +144,8 @@ func Stop() -> bool:
 	Maps.queue_free()
 	Maps = null
 	CurrentMapName = ""
+	
+	State = TState.IDLE
 	
 	print(str(id) + " - server stopped")
 	return true
