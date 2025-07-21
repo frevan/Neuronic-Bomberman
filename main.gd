@@ -40,6 +40,11 @@ func _on_join_lobby_btn_pressed() -> void:
 	pass
 
 
+func _on_start_match_btn_pressed() -> void:
+	Network.SendStartMatch.rpc_id(1)
+	pass
+
+
 func _on_move_to_next_slot_btn_pressed() -> void:
 	assert(is_instance_valid(Client.Data))
 	var idx: int = Client.Data.FindSlotForPlayer(Network.PeerID)

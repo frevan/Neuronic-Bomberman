@@ -59,12 +59,20 @@ func _network_request_move_to_slot(SenderID: int, SlotIndex: int) -> void:
 	pass
 
 
+func _network_request_start_match(SenderID: int) -> void:
+	print(str(Network.PeerID) + " - request to start the match from " + str(SenderID))
+	if (State == TState.LOBBY) && (SenderID == 1):
+		_StartMatch()
+	pass
+
+
 func _ConnectToSignalsOnStart() -> void:
 	multiplayer.peer_connected.connect(_peer_connected)
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
 	Network.OnRequestJoinLobby.connect(_network_request_join_lobby)
 	Network.OnLeaveLobby.connect(_network_leave_lobby)
 	Network.OnRequestMoveToSlot.connect(_network_request_move_to_slot)
+	Network.OnRequestStartMatch.connect(_network_request_start_match)
 	pass
 
 func _DisconnectFromSignalsOnStop() -> void:
@@ -73,6 +81,7 @@ func _DisconnectFromSignalsOnStop() -> void:
 	Network.OnRequestJoinLobby.disconnect(_network_request_join_lobby)
 	Network.OnLeaveLobby.disconnect(_network_leave_lobby)
 	Network.OnRequestMoveToSlot.disconnect(_network_request_move_to_slot)
+	Network.OnRequestStartMatch.disconnect(_network_request_start_match)
 	pass
 
 
@@ -89,6 +98,13 @@ func _SendLobbyInfoToPlayer(PlayerID: int) -> void:
 			if (other_peerid != 0) && (other_peerid != PlayerID):
 				Network.SendPlayerMovedToSlot.rpc_id(PlayerID, other_peerid, i)
 		Network.SendMapName.rpc_id(PlayerID, CurrentMapName)
+	pass
+
+
+func _StartMatch() -> void:
+	State = TState.MATCH
+	Network.SendMatchStarted.rpc()
+	Network.SendNewRound.rpc(CurrentMapName)
 	pass
 
 
