@@ -1,6 +1,5 @@
 extends GutTest
 
-var TGameData = preload("res://data/gamedata.gd")
 var o: TGameData
 
 

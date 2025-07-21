@@ -1,6 +1,5 @@
 extends GutTest
 
-var TMaps = preload("res://data/maps.gd")
 var o: TMaps
 var m: Types.TMap
 

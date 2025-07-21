@@ -1,6 +1,5 @@
 extends GutTest
 
-var TTypes = preload("res://data/types.gd")
 var _types: TTypes
 
 

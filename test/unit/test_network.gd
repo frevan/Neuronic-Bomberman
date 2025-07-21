@@ -1,6 +1,5 @@
 extends GutTest
 
-var TNetwork = preload("res://network/network.gd")
 var _network: TNetwork
 
 
