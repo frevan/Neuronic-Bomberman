@@ -54,7 +54,7 @@ class TMap:
 	var Fields: Array
 	var Width: int
 	var Height: int
-	func _init(SetName: String = "", SetColumns: int = MAP_WIDTH, SetRows: int = MAP_HEIGHT) -> void:
+	func initialize(SetName: String, SetColumns: int = MAP_WIDTH, SetRows: int = MAP_HEIGHT) -> void:
 		Name = SetName
 		Width = SetColumns
 		Height = SetRows

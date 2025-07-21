@@ -88,7 +88,7 @@ func _ProcessMapFields(Params: Array, Map: Types.TMap) -> bool:
 			'.': type = Types.FIELD_EMPTY
 			':': type = Types.FIELD_BRICK
 			'#': type = Types.FIELD_SOLID
-		Map.fields[row][col] = type
+		Map.Fields[row][col] = type
 		col += 1
 	return true
 
@@ -118,7 +118,7 @@ func _ProcessMapPowerups(Params: Array, Map: Types.TMap):
 	pu.HasOverride = Params[2].to_int() != 0
 	pu.OverrideValue = Params[3].to_int()
 	pu.Forbidden = Params[4].to_int() != 0
-	Map.PowerUps[pu.number] = pu
+	Map.PowerUps[pu.Number] = pu
 	return true
 
 

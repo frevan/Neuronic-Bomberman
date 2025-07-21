@@ -12,6 +12,7 @@ signal OnLobbyRefused
 
 var Data: TGameData
 var CurrentMapName: String = ""
+@onready var Maps: TMaps = TMaps.new()
 
 enum TState {IDLE, CONNECTING, LOBBY, MATCH}
 var State: TState = TState.IDLE
@@ -97,7 +98,12 @@ func _network_match_started() -> void:
 	
 func _network_new_round(MapName: String) -> void:
 	_log("new round: " + MapName)
-	# TODO: load map
+	Data.Map = Maps.LoadMap(MapName)
+	if is_instance_valid(Data.Map):
+		_log("Loaded map " + Data.Map.Name + " with caption: " + Data.Map.Caption)
+	else:
+		# TODO: handle errors loading the map
+		_log("failed to load map: " + MapName)
 	Network.SendPlayerReady.rpc_id(1, true)
 	pass
 

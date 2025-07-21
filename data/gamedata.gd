@@ -3,6 +3,7 @@ extends Node
 class_name TGameData
 
 var Slots: Array
+var Map: Types.TMap = null
 
 
 func InitSlots() -> void:
