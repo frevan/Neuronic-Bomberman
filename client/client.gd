@@ -13,7 +13,7 @@ signal OnLobbyRefused
 var Data: TGameData
 var CurrentMapName: String = ""
 
-enum TState {IDLE, CONNECTING, LOBBY}
+enum TState {IDLE, CONNECTING, LOBBY, MATCH}
 var State: TState = TState.IDLE
 
 
@@ -86,6 +86,7 @@ func _network_map_changed(MapName: String) -> void:
 
 func _network_match_started() -> void:
 	print(str(Network.PeerID) + " - match started")
+	State = TState.MATCH
 	pass
 	
 	
