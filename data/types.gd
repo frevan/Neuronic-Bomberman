@@ -17,9 +17,11 @@ const MAP_HEIGHT = 11
 class TPlayer:
 	var PeerID: int
 	var Ready: bool
+	var Position: Vector2
 	func _init() -> void:
 		PeerID = 0
 		Ready = false
+		Position = Vector2(-1, -1)
 
 class TSlot:
 	var Index: int

@@ -78,8 +78,7 @@ func _network_player_ready(SenderID: int, Ready: bool) -> void:
 		Network.SendPlayerBecameReady.rpc(SenderID, Ready)
 		if State == TState.MATCH:
 			if Data.AreAllPlayersReady():
-				State = TState.ROUND
-				Network.SendRoundStarted.rpc()
+				_StartRoundNow()
 	pass
 
 
@@ -131,6 +130,21 @@ func _StartMatch() -> void:
 				Network.SendPlayerBecameReady.rpc(Data.Slots[i].Player.PeerID, false)
 	
 	Network.SendNewRound.rpc(CurrentMapName)
+	pass
+
+
+func _StartRoundNow() -> void:
+	Data.Map = Maps.LoadMap(CurrentMapName)
+	
+	Data.SetPlayersToStartPositions()
+	for i in Data.Slots.size():
+		if is_instance_valid(Data.Slots[i].Player):
+			var p: Types.TPlayer = Data.Slots[i].Player
+			if p.PeerID != 0:
+				Network.SendPlayerPosition.rpc(p.PeerID, p.Position)
+	
+	State = TState.ROUND
+	Network.SendRoundStarted.rpc()
 	pass
 
 

@@ -83,3 +83,13 @@ func SetPlayerReady(PlayerID: int, Ready: bool) -> void:
 	if idx != Types.INVALID_SLOT:
 		Slots[idx].Player.Ready = Ready
 	pass
+
+
+func SetPlayersToStartPositions() -> void:
+	assert(is_instance_valid(Map))
+	for i in Slots.size():
+		var p: Types.TPlayer = Slots[i].Player
+		if p.PeerID != 0:
+			if Map.StartPositions.has(i):
+				p.Position = Map.StartPositions[i].Pos
+	pass

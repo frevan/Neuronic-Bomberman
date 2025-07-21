@@ -18,6 +18,7 @@ signal OnMatchStarted
 signal OnNewRound # params: map_name (string)
 signal OnPlayerBecameReady # params: player_id (int), ready (bool)
 signal OnRoundStarted
+signal OnPlayerPositionReceived # params: player_id (int), field (vector2)
 
 
 const PORT = 15063
@@ -131,3 +132,7 @@ func SendRoundStarted() -> void:
 @rpc("reliable", "call_local", "authority")
 func SendPlayerBecameReady(ID: int, Ready: bool) -> void:
 	OnPlayerBecameReady.emit(ID, Ready)
+
+@rpc("reliable", "call_local", "authority")
+func SendPlayerPosition(ID: int, Field: Vector2) -> void:
+	OnPlayerPositionReceived.emit(ID, Field)

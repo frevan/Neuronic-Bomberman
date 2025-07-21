@@ -98,9 +98,11 @@ func _network_match_started() -> void:
 	
 func _network_new_round(MapName: String) -> void:
 	_log("new round: " + MapName)
+	
 	Data.Map = Maps.LoadMap(MapName)
 	if is_instance_valid(Data.Map):
 		_log("Loaded map " + Data.Map.Name + " with caption: " + Data.Map.Caption)
+		CurrentMapName = MapName
 	else:
 		# TODO: handle errors loading the map
 		_log("failed to load map: " + MapName)
@@ -118,6 +120,11 @@ func _network_round_started() -> void:
 	pass
 
 
+func _network_player_position_received(PlayerID: int, Position: Vector2) -> void:
+	_log("player " + str(PlayerID) + " is at: (" + str(Position.x) + "," + str(Position.y) + ")")
+	pass
+
+
 func _ConnectToSignals() -> void:
 	multiplayer.connected_to_server.connect(_connected_to_server)
 	multiplayer.connection_failed.connect(_connection_failed)
@@ -131,6 +138,7 @@ func _ConnectToSignals() -> void:
 	Network.OnNewRound.connect(_network_new_round)
 	Network.OnPlayerBecameReady.connect(_network_player_became_ready)
 	Network.OnRoundStarted.connect(_network_round_started)
+	Network.OnPlayerPositionReceived.connect(_network_player_position_received)
 	pass
 
 
@@ -147,6 +155,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnNewRound.disconnect(_network_new_round)
 	Network.OnPlayerBecameReady.disconnect(_network_player_became_ready)
 	Network.OnRoundStarted.disconnect(_network_round_started)
+	Network.OnPlayerPositionReceived.disconnect(_network_player_position_received)
 	pass
 
 
