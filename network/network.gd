@@ -17,6 +17,7 @@ signal OnMapChanged # params: map_name (string)
 signal OnMatchStarted
 signal OnNewRound # params: map_name (string)
 signal OnPlayerBecameReady # params: player_id (int), ready (bool)
+signal OnRoundStarted
 
 
 const PORT = 15063
@@ -122,6 +123,10 @@ func SendMatchStarted() -> void:
 @rpc("reliable", "call_local", "authority")
 func SendNewRound(MapName: String) -> void:
 	OnNewRound.emit(MapName)
+
+@rpc("reliable", "call_local", "authority")
+func SendRoundStarted() -> void:
+	OnRoundStarted.emit()
 
 @rpc("reliable", "call_local", "authority")
 func SendPlayerBecameReady(ID: int, Ready: bool) -> void:

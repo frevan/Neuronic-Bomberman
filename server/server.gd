@@ -76,7 +76,10 @@ func _network_player_ready(SenderID: int, Ready: bool) -> void:
 	if (State == TState.LOBBY) || (State == TState.MATCH):
 		Data.SetPlayerReady(SenderID, Ready)
 		Network.SendPlayerBecameReady.rpc(SenderID, Ready)
-		#TODO: send a round started if we're waiting to start one
+		if State == TState.MATCH:
+			if Data.AreAllPlayersReady():
+				State = TState.ROUND
+				Network.SendRoundStarted.rpc()
 	pass
 
 
@@ -162,7 +165,6 @@ func Start() -> bool:
 	
 	_log("server started")
 	return true
-
 
 
 func Stop() -> bool:

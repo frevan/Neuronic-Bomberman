@@ -98,12 +98,17 @@ func _network_match_started() -> void:
 func _network_new_round(MapName: String) -> void:
 	_log("new round: " + MapName)
 	# TODO: load map
-	Network.SendPlayerReady(true)
+	Network.SendPlayerReady.rpc_id(1, true)
 	pass
 
 
 func _network_player_became_ready(PlayerID: int, Ready: bool) -> void:
 	_log("player " + str(PlayerID) + " is ready: " + str(Ready))
+	pass
+
+
+func _network_round_started() -> void:
+	_log("round started")
 	pass
 
 
@@ -119,6 +124,7 @@ func _ConnectToSignals() -> void:
 	Network.OnMatchStarted.connect(_network_match_started)
 	Network.OnNewRound.connect(_network_new_round)
 	Network.OnPlayerBecameReady.connect(_network_player_became_ready)
+	Network.OnRoundStarted.connect(_network_round_started)
 	pass
 
 
@@ -134,6 +140,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnMatchStarted.disconnect(_network_match_started)
 	Network.OnNewRound.disconnect(_network_new_round)
 	Network.OnPlayerBecameReady.disconnect(_network_player_became_ready)
+	Network.OnRoundStarted.disconnect(_network_round_started)
 	pass
 
 

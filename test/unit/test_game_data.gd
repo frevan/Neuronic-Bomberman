@@ -59,6 +59,13 @@ func test_FindSlotForKnownPlayer() -> void:
 	assert_eq(idx, 1)
 
 
+func test_AreAllPlayersReady() -> void:
+	for i in o.Slots.size():
+		if i % 2 == 0:
+			o.Slots[i].Player.PeerID = 123
+			o.Slots[i].Player.Ready = true
+	assert_true(o.AreAllPlayersReady())
+
 func test_SetAllPlayersUnready() -> void:
 	o.Slots[1].Player.PeerID = 123
 	o.Slots[1].Player.Ready = false
