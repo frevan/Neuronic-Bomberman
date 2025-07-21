@@ -95,6 +95,11 @@ func _network_new_round(MapName: String) -> void:
 	pass
 
 
+func _network_player_became_ready(PlayerID: int, Ready: bool) -> void:
+	print(str(Network.PeerID) + " - player " + str(PlayerID) + " is ready: " + str(Ready))
+	pass
+
+
 func _ConnectToSignals() -> void:
 	multiplayer.connected_to_server.connect(_connected_to_server)
 	multiplayer.connection_failed.connect(_connection_failed)
@@ -106,6 +111,7 @@ func _ConnectToSignals() -> void:
 	Network.OnMapChanged.connect(_network_map_changed)
 	Network.OnMatchStarted.connect(_network_match_started)
 	Network.OnNewRound.connect(_network_new_round)
+	Network.OnPlayerBecameReady.connect(_network_player_became_ready)
 	pass
 
 
@@ -120,6 +126,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnMapChanged.disconnect(_network_map_changed)
 	Network.OnMatchStarted.disconnect(_network_match_started)
 	Network.OnNewRound.disconnect(_network_new_round)
+	Network.OnPlayerBecameReady.disconnect(_network_player_became_ready)
 	pass
 
 

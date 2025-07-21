@@ -45,6 +45,11 @@ func _on_start_match_btn_pressed() -> void:
 	pass
 
 
+func _on_ready_box_toggled(toggled_on: bool) -> void:
+	Network.SendPlayerReady.rpc_id(1, toggled_on)
+	pass
+
+
 func _on_move_to_next_slot_btn_pressed() -> void:
 	assert(is_instance_valid(Client.Data))
 	var idx: int = Client.Data.FindSlotForPlayer(Network.PeerID)

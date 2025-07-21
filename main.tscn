@@ -47,9 +47,17 @@ offset_right = 175.0
 offset_bottom = 225.0
 text = "START MATCH"
 
+[node name="ReadyBox" type="CheckBox" parent="."]
+offset_left = 625.0
+offset_top = 250.0
+offset_right = 704.0
+offset_bottom = 281.0
+text = "READY"
+
 [connection signal="pressed" from="NewLobbyBtn" to="." method="_on_new_lobby_btn_pressed"]
 [connection signal="pressed" from="StopLobbyBtn" to="." method="_on_stop_lobby_btn_pressed"]
 [connection signal="pressed" from="JoinLobbyBtn" to="." method="_on_join_lobby_btn_pressed"]
 [connection signal="pressed" from="LeaveLobbyBtn" to="." method="_on_leave_lobby_btn_pressed"]
 [connection signal="pressed" from="MoveToNextSlotBtn" to="." method="_on_move_to_next_slot_btn_pressed"]
 [connection signal="pressed" from="StartMatchBtn" to="." method="_on_start_match_btn_pressed"]
+[connection signal="toggled" from="ReadyBox" to="." method="_on_ready_box_toggled"]

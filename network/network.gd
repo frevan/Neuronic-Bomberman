@@ -8,6 +8,7 @@ signal OnRequestJoinLobby # params: sender_id (int)
 signal OnLeaveLobby # params: sender_id (int)
 signal OnRequestMoveToSlot # params: sender_id (int), slot_idx (int)
 signal OnRequestStartMatch # params: sender_id (int)
+signal OnPlayerReady # params: sender_id (int), ready (bool)
 # received by clients
 signal OnResponseToJoinLobby # params: accepted (bool)
 signal OnPlayerLeftLobby # params: player_id (int)
@@ -15,6 +16,7 @@ signal OnPlayerMovedToSlot # params: player_id (int), slot_index (int)
 signal OnMapChanged # params: map_name (string)
 signal OnMatchStarted
 signal OnNewRound # params: map_name (string)
+signal OnPlayerBecameReady # params: player_id (int), ready (bool)
 
 
 const PORT = 15063
@@ -91,6 +93,11 @@ func SendStartMatch() -> void:
 	var id = multiplayer.get_remote_sender_id()
 	OnRequestStartMatch.emit(id)
 
+@rpc("reliable", "call_local", "any_peer")
+func SendPlayerReady(Ready: bool) -> void:
+	var id = multiplayer.get_remote_sender_id()
+	OnPlayerReady.emit(id, Ready)
+
 
 @rpc("reliable", "call_local", "authority")
 func SendJoinLobbyResponse(Accepted: bool) -> void:
@@ -115,3 +122,7 @@ func SendMatchStarted() -> void:
 @rpc("reliable", "call_local", "authority")
 func SendNewRound(MapName: String) -> void:
 	OnNewRound.emit(MapName)
+
+@rpc("reliable", "call_local", "authority")
+func SendPlayerBecameReady(ID: int, Ready: bool) -> void:
+	OnPlayerBecameReady.emit(ID, Ready)

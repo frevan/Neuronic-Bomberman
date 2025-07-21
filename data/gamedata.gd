@@ -60,3 +60,17 @@ func MovePlayerToSlot(PlayerID, SlotIndex) -> void:
 	ClearSlotForPlayer(PlayerID)
 	Slots[SlotIndex].Player.PeerID = PlayerID
 	pass
+
+
+func SetAllPlayersUnready() -> void:
+	for i in Slots.size():
+		if is_instance_valid(Slots[i].Player):
+			Slots[i].Player.Ready = false
+	pass
+
+
+func SetPlayerReady(PlayerID: int, Ready: bool) -> void:
+	var idx = FindSlotForPlayer(PlayerID)
+	if idx != Types.INVALID_SLOT:
+		Slots[idx].Player.Ready = Ready
+	pass

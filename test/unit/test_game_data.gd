@@ -57,3 +57,23 @@ func test_FindSlotForKnownPlayer() -> void:
 	o.Slots[1].Player.PeerID = 2
 	var idx = o.FindSlotForPlayer(2)
 	assert_eq(idx, 1)
+
+
+func test_SetAllPlayersUnready() -> void:
+	o.Slots[1].Player.PeerID = 123
+	o.Slots[1].Player.Ready = false
+	o.Slots[2].Player.PeerID = 456
+	o.Slots[2].Player.Ready = true
+	o.SetAllPlayersUnready()
+	assert_false(o.Slots[1].Player.Ready)
+	assert_false(o.Slots[2].Player.Ready)
+	
+func test_SetPlayerReady() -> void:
+	o.Slots[1].Player.PeerID = 123
+	o.Slots[1].Player.Ready = false
+	o.Slots[2].Player.PeerID = 456
+	o.Slots[2].Player.Ready = true
+	o.SetPlayerReady(123, true)
+	o.SetPlayerReady(456, false)
+	assert_true(o.Slots[1].Player.Ready)
+	assert_false(o.Slots[2].Player.Ready)

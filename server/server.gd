@@ -66,6 +66,15 @@ func _network_request_start_match(SenderID: int) -> void:
 	pass
 
 
+func _network_player_ready(SenderID: int, Ready: bool) -> void:
+	print(str(Network.PeerID) + " - player " + str(SenderID) + " is ready: " + str(Ready))
+	if (State == TState.LOBBY) || (State == TState.MATCH):
+		Data.SetPlayerReady(SenderID, Ready)
+		Network.SendPlayerBecameReady.rpc(SenderID, Ready)
+		#TODO: send a round started if we're waiting to start one
+	pass
+
+
 func _ConnectToSignalsOnStart() -> void:
 	multiplayer.peer_connected.connect(_peer_connected)
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
@@ -73,6 +82,7 @@ func _ConnectToSignalsOnStart() -> void:
 	Network.OnLeaveLobby.connect(_network_leave_lobby)
 	Network.OnRequestMoveToSlot.connect(_network_request_move_to_slot)
 	Network.OnRequestStartMatch.connect(_network_request_start_match)
+	Network.OnPlayerReady.connect(_network_player_ready)
 	pass
 
 func _DisconnectFromSignalsOnStop() -> void:
@@ -82,6 +92,7 @@ func _DisconnectFromSignalsOnStop() -> void:
 	Network.OnLeaveLobby.disconnect(_network_leave_lobby)
 	Network.OnRequestMoveToSlot.disconnect(_network_request_move_to_slot)
 	Network.OnRequestStartMatch.disconnect(_network_request_start_match)
+	Network.OnPlayerReady.disconnect(_network_player_ready)
 	pass
 
 
