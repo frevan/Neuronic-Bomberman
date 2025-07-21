@@ -41,6 +41,7 @@ func _network_request_join_lobby(SenderID: int) -> void:
 		Network.SendJoinLobbyResponse.rpc_id(SenderID, success)
 		
 	if success:
+		Network.SendPlayerJoinedLobby.rpc(SenderID)
 		Network.SendPlayerMovedToSlot.rpc(SenderID, slot_idx)
 		_SendLobbyInfoToPlayer(SenderID)
 	pass

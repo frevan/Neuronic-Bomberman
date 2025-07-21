@@ -7,11 +7,17 @@ signal OnLeaveLobby
 func BeforeShow() -> void:
 	super()
 	Client.OnDisconnectedFromServer.connect(_client_disconnected_from_server)
+	Client.OnPlayerJoined.connect(_client_player_joined)
+	Client.OnPlayerLeft.connect(_client_player_left)
+	Client.OnPlayerMovedToSlot.connect(_client_player_moved_to_slot)
 	pass
 
 func AfterHide() -> void:
 	super()
 	Client.OnDisconnectedFromServer.disconnect(_client_disconnected_from_server)
+	Client.OnPlayerJoined.disconnect(_client_player_joined)
+	Client.OnPlayerLeft.disconnect(_client_player_left)
+	Client.OnPlayerMovedToSlot.disconnect(_client_player_moved_to_slot)	
 	pass
 
 
@@ -30,7 +36,20 @@ func _HandleUserInput() -> void:
 func _client_disconnected_from_server() -> void:
 	OnLeaveLobby.emit()
 	pass
+
+
+func _client_player_joined(PlayerID: int) -> void:
+	_UpdatePlayerInfo()
+	pass
 	
+func _client_player_left(PlayerID: int) -> void:
+	_UpdatePlayerInfo()
+	pass
+	
+func _client_player_moved_to_slot(PlayerID: int, SlotIndex: int) -> void:
+	_UpdatePlayerInfo()
+	pass
+
 
 func _UpdateControlVisibility() -> void:
 	if visible && Network.IsConnected():
@@ -47,37 +66,33 @@ func _LeaveLobby() -> void:
 	pass
 
 
-#func _FindPlayerNameLabel(slot: int):
-	#var node = $PlayerInfo.find_child(str(slot + 1))
-	#if node:
-		#var c = node.find_child("NameLabel")
-		#if c:
-			#return c
-	#return null
-#
-#
-#func _FindPlayerForSlot(slot: int):
-	#var main = get_tree().get_root().get_node("Main")
-	#if !main:
-		#return null
-	#for id in context.players:
-		#var p = context.players[id]
-		#if !p:
-			#continue
-			#
-		#if p.slot == slot:
-			#return p
-	#return null
-#
-#
-#func UpdatePlayerInfo() -> void:
-	#for i in 10:
-		#var label = _FindPlayerNameLabel(i)
-		#label.text = "..."
-		#var player = _FindPlayerForSlot(i)
-		#if player:
-			#label.text = str(player.id)
-	#pass
+func _FindPlayerNameLabel(Slot: int) -> Node:
+	var node = $PlayerInfo.find_child(str(Slot + 1))
+	if node:
+		var c = node.find_child("NameLabel")
+		if c:
+			return c
+	return null
+
+
+func _FindPlayerForSlot(SlotIndex: int) -> Types.TPlayer:
+	var main = get_tree().get_root().get_node("Main")
+	if !main:
+		return null
+	if (SlotIndex < 0) || (SlotIndex >= Network.MAX_CLIENTS):
+		return null
+	return Client.Data.Slots[SlotIndex].Player
+
+
+func _UpdatePlayerInfo() -> void:
+	for i in 10:
+		var label = _FindPlayerNameLabel(i)
+		label.text = "..."
+		var player: Types.TPlayer = _FindPlayerForSlot(i)
+		if player:
+			if player.PeerID != 0:
+				label.text = str(player.PeerID)
+	pass
 
 
 func _UpdateClientInfo() -> void:
@@ -118,7 +133,7 @@ func _on_start_button_pressed() -> void:
 func _on_visibility_changed() -> void:
 	if visible:
 		_UpdateControlVisibility()
-		#UpdatePlayerInfo()
+		_UpdatePlayerInfo()
 		_UpdateClientInfo()
 		#if context.map:
 			#SelectMap(context.map.name) # reload map when returning to lobby

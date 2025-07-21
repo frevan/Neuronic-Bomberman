@@ -11,6 +11,7 @@ signal OnRequestStartMatch # params: sender_id (int)
 signal OnPlayerReady # params: sender_id (int), ready (bool)
 # received by clients
 signal OnResponseToJoinLobby # params: accepted (bool)
+signal OnPlayerJoinedLobby # params: player_id (int)
 signal OnPlayerLeftLobby # params: player_id (int)
 signal OnPlayerMovedToSlot # params: player_id (int), slot_index (int)
 signal OnMapChanged # params: map_name (string)
@@ -104,6 +105,10 @@ func SendPlayerReady(Ready: bool) -> void:
 @rpc("reliable", "call_local", "authority")
 func SendJoinLobbyResponse(Accepted: bool) -> void:
 	OnResponseToJoinLobby.emit(Accepted)
+
+@rpc("reliable", "call_local", "authority")
+func SendPlayerJoinedLobby(ID: int) -> void:
+	OnPlayerJoinedLobby.emit(ID)
 
 @rpc("reliable", "call_local", "authority")
 func SendPlayerLeftLobby(ID: int) -> void:

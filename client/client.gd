@@ -8,6 +8,9 @@ signal OnDisconnectedFromServer
 signal OnConnectionToServerFailed
 signal OnLobbyJoined
 signal OnLobbyRefused
+signal OnPlayerJoined # params: player_id (int)
+signal OnPlayerLeft # params: player_id (int)
+signal OnPlayerMovedToSlot # params: player_id (int), slot_index (int)
 
 
 var Data: TGameData
@@ -65,10 +68,18 @@ func _network_response_to_join_lobby(Accepted: bool) -> void:
 	pass
 
 
+func _network_player_joined_lobby(PlayerID: int) -> void:
+	_log("player " + str(PlayerID) + " joined the lobby")
+	if State != TState.IDLE:
+		OnPlayerJoined.emit(PlayerID)
+	pass
+
+
 func _network_player_left_lobby(PlayerID: int) -> void:
 	_log("player " + str(PlayerID) + " left the lobby")
 	if State != TState.IDLE:
 		Data.ClearSlotForPlayer(PlayerID)
+		OnPlayerLeft.emit(PlayerID)
 	pass
 
 
@@ -80,6 +91,7 @@ func _network_player_moved_to_slot(PlayerID: int, SlotIndex: int) -> void:
 	
 	if (State != TState.IDLE) && (SlotIndex != Types.INVALID_SLOT):
 		Data.MovePlayerToSlot(PlayerID, SlotIndex)
+		OnPlayerMovedToSlot.emit(PlayerID, SlotIndex)
 	pass
 
 
@@ -131,6 +143,7 @@ func _ConnectToSignals() -> void:
 	multiplayer.server_disconnected.connect(_server_disconnected)
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
 	Network.OnResponseToJoinLobby.connect(_network_response_to_join_lobby)
+	Network.OnPlayerJoinedLobby.connect(_network_player_joined_lobby)
 	Network.OnPlayerLeftLobby.connect(_network_player_left_lobby)
 	Network.OnPlayerMovedToSlot.connect(_network_player_moved_to_slot)
 	Network.OnMapChanged.connect(_network_map_changed)
@@ -148,6 +161,7 @@ func _DisconnectFromSignals() -> void:
 	multiplayer.server_disconnected.disconnect(_server_disconnected)
 	multiplayer.peer_disconnected.disconnect(_peer_disconnected)
 	Network.OnResponseToJoinLobby.disconnect(_network_response_to_join_lobby)
+	Network.OnPlayerJoinedLobby.disconnect(_network_player_joined_lobby)
 	Network.OnPlayerLeftLobby.disconnect(_network_player_left_lobby)
 	Network.OnPlayerMovedToSlot.disconnect(_network_player_moved_to_slot)
 	Network.OnMapChanged.disconnect(_network_map_changed)
