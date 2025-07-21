@@ -5,8 +5,8 @@ func ShowAlert(text: String, title: String = "") -> void:
 	
 	dlg.dialog_text = text
 	dlg.title = title
-	dlg.connect("confirmed", queue_free)
-	dlg.connect("canceled", queue_free)
+	dlg.connect("confirmed", dlg.queue_free)
+	dlg.connect("canceled", dlg.queue_free)
 	
 	var scene_tree = Engine.get_main_loop()
 	scene_tree.current_scene.add_child(dlg)
