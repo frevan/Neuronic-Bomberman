@@ -115,6 +115,13 @@ func _SendLobbyInfoToPlayer(PlayerID: int) -> void:
 func _StartMatch() -> void:
 	State = TState.MATCH
 	Network.SendMatchStarted.rpc()
+	
+	Data.SetAllPlayersUnready()
+	for i in Data.Slots.size():
+		if is_instance_valid(Data.Slots[i].Player):
+			if Data.Slots[i].Player.PeerID != 0:
+				Network.SendPlayerBecameReady.rpc(Data.Slots[i].Player.PeerID, false)
+	
 	Network.SendNewRound.rpc(CurrentMapName)
 	pass
 

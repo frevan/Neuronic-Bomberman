@@ -91,7 +91,8 @@ func _network_match_started() -> void:
 	
 func _network_new_round(MapName: String) -> void:
 	print(str(Network.PeerID) + " - new round: " + MapName)
-	# TODO: load map and send a ready signal to the server
+	# TODO: load map
+	Network.SendPlayerReady(true)
 	pass
 
 
