@@ -245,5 +245,16 @@ func MovePlayerToSlot(SlotIndex: int) -> bool:
 		return false
 	
 	Network.SendMovePlayerToSlot.rpc_id(1, SlotIndex)
-	
 	return true
+
+
+func RequestMapChange(MapName: String) -> void:
+	if Network.IsServer() && (State == TState.LOBBY):
+		Network.SendRequestMapChange.rpc_id(1, MapName)
+	pass
+
+
+func RequestStartMatch() -> void:
+	if Network.IsServer() && (State == TState.LOBBY):
+		Network.SendStartMatch.rpc_id(1)
+	pass

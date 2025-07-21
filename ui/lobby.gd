@@ -146,7 +146,7 @@ func _on_leave_button_pressed() -> void:
 
 
 func _on_start_button_pressed() -> void:
-	Network.SendStartMatch.rpc_id(1)
+	Client.RequestStartMatch()
 	pass
 
 
@@ -187,5 +187,5 @@ func _draw() -> void:
 
 func _on_maps_list_item_selected(Index: int) -> void:
 	var mapname = $MapsList.get_item_text(Index)
-	Network.SendRequestMapChange.rpc_id(1, mapname)
+	Client.RequestMapChange(mapname)
 	pass
