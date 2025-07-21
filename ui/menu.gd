@@ -4,6 +4,9 @@ extends TScene
 signal OnConnecting
 
 
+var Server: TServer
+
+
 func BeforeShow() -> void:
 	super()
 	Client.OnConnectionToServerFailed.connect(_client_connection_to_server_failed)

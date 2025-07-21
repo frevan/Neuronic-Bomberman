@@ -1,7 +1,7 @@
 extends TScene
 
 
-signal OnLeaveLobby
+signal OnDisconnectAndStop
 
 
 var Map: Types.TMap
@@ -10,7 +10,6 @@ var Map: Types.TMap
 
 func BeforeShow() -> void:
 	super()
-	Client.OnDisconnectedFromServer.connect(_client_disconnected_from_server)
 	Client.OnPlayerJoined.connect(_client_player_joined)
 	Client.OnPlayerLeft.connect(_client_player_left)
 	Client.OnPlayerMovedToSlot.connect(_client_player_moved_to_slot)
@@ -19,7 +18,6 @@ func BeforeShow() -> void:
 
 func AfterHide() -> void:
 	super()
-	Client.OnDisconnectedFromServer.disconnect(_client_disconnected_from_server)
 	Client.OnPlayerJoined.disconnect(_client_player_joined)
 	Client.OnPlayerLeft.disconnect(_client_player_left)
 	Client.OnPlayerMovedToSlot.disconnect(_client_player_moved_to_slot)
@@ -36,11 +34,6 @@ func _process(_delta: float) -> void:
 func _HandleUserInput() -> void:
 	if Input.is_action_just_pressed("ui_cancel"):
 		_LeaveLobby()
-	pass
-
-
-func _client_disconnected_from_server() -> void:
-	OnLeaveLobby.emit()
 	pass
 
 
@@ -70,10 +63,7 @@ func _UpdateControlVisibility() -> void:
 
 
 func _LeaveLobby() -> void:
-	if Network.IsConnected():
-		Client.Disconnect()
-		if Network.IsServer():
-			Server.Stop()
+	OnDisconnectAndStop.emit()
 	pass
 
 
@@ -87,8 +77,9 @@ func _FindPlayerNameLabel(Slot: int) -> Node:
 
 
 func _FindPlayerForSlot(SlotIndex: int) -> Types.TPlayer:
-	var main = get_tree().get_root().get_node("Main")
-	if !main:
+	if !Client:
+		return null
+	if !Client.Data:
 		return null
 	if (SlotIndex < 0) || (SlotIndex >= Network.MAX_CLIENTS):
 		return null

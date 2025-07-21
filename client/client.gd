@@ -12,6 +12,8 @@ signal OnPlayerJoined # params: player_id (int)
 signal OnPlayerLeft # params: player_id (int)
 signal OnPlayerMovedToSlot # params: player_id (int), slot_index (int)
 signal OnMapNameChanged # params: map_name (string)
+signal OnMatchStarted
+signal OnNewRound
 
 
 var Data: TGameData
@@ -107,6 +109,7 @@ func _network_map_changed(MapName: String) -> void:
 func _network_match_started() -> void:
 	_log("match started")
 	State = TState.MATCH
+	OnMatchStarted.emit()
 	pass
 	
 	
@@ -120,6 +123,8 @@ func _network_new_round(MapName: String) -> void:
 	else:
 		# TODO: handle errors loading the map
 		_log("failed to load map: " + MapName)
+	
+	OnNewRound.emit()
 	Network.SendPlayerReady.rpc_id(1, true)
 	pass
 

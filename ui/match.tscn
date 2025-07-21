@@ -1,0 +1,83 @@
+[gd_scene load_steps=8 format=3 uid="uid://4nnysadoodsc"]
+
+[ext_resource type="Script" uid="uid://bdb75rw33pcmy" path="res://ui/match.gd" id="1_gh88m"]
+[ext_resource type="Texture2D" uid="uid://cdqrwtfiee0uw" path="res://assets/back.png" id="2_gavrd"]
+[ext_resource type="Texture2D" uid="uid://blhq3dbcvb8qf" path="res://assets/field.png" id="3_mbs0m"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jcqty"]
+size = Vector2(20, 517)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_t8g0u"]
+size = Vector2(726, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3v8o5"]
+size = Vector2(20, 516)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vt7kf"]
+size = Vector2(741, 20)
+
+[node name="Match" type="Node2D"]
+script = ExtResource("1_gh88m")
+
+[node name="BackgroundSprite" type="Sprite2D" parent="."]
+position = Vector2(400, 300)
+texture = ExtResource("2_gavrd")
+
+[node name="FieldRect" type="TextureRect" parent="BackgroundSprite"]
+offset_left = -360.0
+offset_top = -220.0
+offset_right = 360.0
+offset_bottom = 275.0
+texture = ExtResource("3_mbs0m")
+stretch_mode = 1
+
+[node name="ClientInfoLabel" type="Label" parent="."]
+offset_left = 580.0
+offset_top = 20.0
+offset_right = 780.0
+offset_bottom = 43.0
+text = "..."
+horizontal_alignment = 2
+
+[node name="PlayerPosLabel" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 25.0
+offset_right = 56.0
+offset_bottom = 48.0
+
+[node name="Tiles" type="Node2D" parent="."]
+
+[node name="Border" type="Node2D" parent="."]
+
+[node name="Left" type="StaticBody2D" parent="Border"]
+position = Vector2(30, 80)
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Border/Left"]
+position = Vector2(0, 248.5)
+shape = SubResource("RectangleShape2D_jcqty")
+
+[node name="Top" type="StaticBody2D" parent="Border"]
+position = Vector2(50, 70)
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Border/Top"]
+position = Vector2(353, 0)
+shape = SubResource("RectangleShape2D_t8g0u")
+
+[node name="Right" type="StaticBody2D" parent="Border"]
+position = Vector2(770, 80)
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Border/Right"]
+position = Vector2(0, 248)
+shape = SubResource("RectangleShape2D_3v8o5")
+
+[node name="Bottom" type="StaticBody2D" parent="Border"]
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Border/Bottom"]
+position = Vector2(400.5, 585)
+shape = SubResource("RectangleShape2D_vt7kf")
+
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
