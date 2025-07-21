@@ -1,7 +1,14 @@
 extends Node2D
 
 
+var TServer = preload("res://server/server.gd")
+var Server: TServer
+
+
 func _ready() -> void:
+	Server = TServer.new()
+	add_child(Server)
+	
 	Client.OnDisconnectedFromServer.connect(_client_disconnected_from_server)
 	Client.OnConnectionToServerFailed.connect(_client_connection_failed)
 	pass
