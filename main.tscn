@@ -1,10 +1,17 @@
-[gd_scene load_steps=3 format=3 uid="uid://bx32n2ieoxv6a"]
+[gd_scene load_steps=4 format=3 uid="uid://bx32n2ieoxv6a"]
 
 [ext_resource type="Script" uid="uid://nfs7o0pa1bav" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://c0pu41tigjecp" path="res://ui/menu.tscn" id="2_0xm2m"]
+[ext_resource type="PackedScene" uid="uid://djjfectrmrx13" path="res://ui/lobby.tscn" id="3_h2yge"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_ig7tw")
 
 [node name="Menu" parent="." instance=ExtResource("2_0xm2m")]
 visible = false
+
+[node name="Lobby" parent="." instance=ExtResource("3_h2yge")]
+visible = false
+
+[connection signal="OnSwitchToLobby" from="Menu" to="." method="_on_menu_on_switch_to_lobby"]
+[connection signal="OnLeaveLobby" from="Lobby" to="." method="_on_lobby_on_leave_lobby"]
