@@ -10,7 +10,6 @@ signal OnLobbyJoined
 signal OnLobbyRefused
 
 
-var TGameData = preload("res://data/gamedata.gd")
 var Data: TGameData
 
 var CurrentMapName: String = ""

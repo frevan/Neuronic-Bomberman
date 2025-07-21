@@ -3,12 +3,8 @@ extends Node
 class_name TServer
 
 
-var TGameData = preload("res://data/gamedata.gd")
 var Data: TGameData
-
-var TMaps = preload("res://data/maps.gd")
 var Maps: TMaps
-
 var CurrentMapName: String
 
 

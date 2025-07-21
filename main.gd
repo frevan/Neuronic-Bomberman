@@ -1,10 +1,7 @@
 extends Node2D
 
 
-var TServer = preload("res://server/server.gd")
 var Server: TServer
-
-var TClient = preload("res://client/client.gd")
 var Client: TClient
 
 
