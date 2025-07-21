@@ -12,13 +12,5 @@ func _ready() -> void:
 	add_child(Client)
 	
 	$Menu.Initialize(Server, Client)
-	SwitchToScene($Menu)
-	pass
-
-
-func SwitchToScene(Scene: Node) -> void:
-	$Menu.hide()
-	#$Lobby.hide()
-	#$Match.hide()
-	Scene.show()
+	Tools.SwitchToScene($Menu)
 	pass

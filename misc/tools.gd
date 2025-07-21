@@ -1,5 +1,8 @@
 extends Node
 
+var CurrentScene: TScene
+
+
 func ShowAlert(text: String, title: String = "") -> void:
 	var dlg = AcceptDialog.new()
 	
@@ -12,4 +15,14 @@ func ShowAlert(text: String, title: String = "") -> void:
 	scene_tree.current_scene.add_child(dlg)
 	
 	dlg.popup_centered()
+	pass
+
+
+func SwitchToScene(Scene: TScene) -> void:
+	if is_instance_valid(CurrentScene):
+		CurrentScene.hide()
+		CurrentScene.AfterHide()
+	CurrentScene = Scene
+	CurrentScene.BeforeShow()
+	CurrentScene.show()
 	pass

@@ -11,3 +11,11 @@ func Initialize(aServer: TServer, aClient: TClient) -> void:
 	Server = aServer
 	Client = aClient
 	pass
+
+
+func BeforeShow() -> void:
+	pass
+
+
+func AfterHide() -> void:
+	pass
