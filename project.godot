@@ -14,6 +14,7 @@ config/name="Neuronic Bomberman"
 config/version="0.2"
 run/main_scene="uid://bx32n2ieoxv6a"
 config/features=PackedStringArray("4.4", "GL Compatibility")
+boot_splash/bg_color=Color(0, 0, 0, 1)
 boot_splash/show_image=false
 config/icon="uid://c48kdaut4xv5v"
 
@@ -36,3 +37,4 @@ enabled=PackedStringArray("res://addons/gut/plugin.cfg")
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0, 0, 0, 1)
