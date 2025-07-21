@@ -127,10 +127,6 @@ func _DoStuffWhenDisconnected() -> void:
 	
 	OnDisconnectedFromServer.emit()
 	
-	if Network.IsServer():
-		Server._peer_disconnected(1)
-		_peer_disconnected(1)
-	
 	if !Network.IsServer():
 		Network.ResetPeer()
 	pass
