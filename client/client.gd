@@ -22,15 +22,14 @@ func _connected_to_server() -> void:
 
 func _connection_failed() -> void:
 	print(str(Network.PeerID) + " - failed to connect")
-	Disconnect()
+	_DoStuffWhenDisconnected()
 	OnConnectionToServerFailed.emit()
 	pass
 
 
 func _server_disconnected() -> void:
 	print(str(Network.PeerID) + " - disconnected from server")
-	Disconnect()
-	_DoStuffWhenConnected()
+	_DoStuffWhenDisconnected()
 	pass
 
 
@@ -49,6 +48,12 @@ func _network_response_to_join_lobby(Accepted: bool) -> void:
 		print(str(Network.PeerID) + " - couldn't get into lobby")
 		Disconnect()
 		OnLobbyRefused.emit()
+	pass
+
+
+func _network_player_left_lobby(PlayerID: int) -> void:
+	print(str(Network.PeerID) + " - player " + str(PlayerID) + " left the lobby")
+	Data.ClearSlotForPlayer(PlayerID)
 	pass
 
 
@@ -75,6 +80,7 @@ func _ConnectToSignals() -> void:
 	multiplayer.server_disconnected.connect(_server_disconnected)
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
 	Network.OnResponseToJoinLobby.connect(_network_response_to_join_lobby)
+	Network.OnPlayerLeftLobby.connect(_network_player_left_lobby)
 	Network.OnPlayerMovedToSlot.connect(_network_player_moved_to_slot)
 	Network.OnMapChanged.connect(_network_map_changed)
 	pass
@@ -86,6 +92,7 @@ func _DisconnectFromSignals() -> void:
 	multiplayer.server_disconnected.disconnect(_server_disconnected)
 	multiplayer.peer_disconnected.disconnect(_peer_disconnected)
 	Network.OnResponseToJoinLobby.disconnect(_network_response_to_join_lobby)
+	Network.OnPlayerLeftLobby.disconnect(_network_player_left_lobby)
 	Network.OnPlayerMovedToSlot.disconnect(_network_player_moved_to_slot)
 	Network.OnMapChanged.disconnect(_network_map_changed)
 	pass
@@ -109,17 +116,6 @@ func _ConnectToServer(Address: String) -> bool:
 	return true
 
 
-func _DisconnectFromServer() -> bool:
-	assert(Network.IsConnected())
-	assert(!Network.IsServer())
-	
-	if !Network.IsConnected():
-		return false
-	
-	Network.ResetPeer()
-	return true
-
-
 func _DoStuffWhenConnected() -> void:
 	OnConnectedToServer.emit()
 	Network.SendJoinLobby.rpc_id(1)
@@ -127,10 +123,16 @@ func _DoStuffWhenConnected() -> void:
 
 
 func _DoStuffWhenDisconnected() -> void:
+	Network.SendLeaveLobby.rpc_id(1)
+	
 	OnDisconnectedFromServer.emit()
+	
 	if Network.IsServer():
 		Server._peer_disconnected(1)
 		_peer_disconnected(1)
+	
+	if !Network.IsServer():
+		Network.ResetPeer()
 	pass
 
 
@@ -164,11 +166,7 @@ func Disconnect() -> bool:
 	_DisconnectFromSignals()
 	Data = null
 	
-	if Network.IsServer():
-		_DoStuffWhenDisconnected()
-	else:
-		if !_DisconnectFromServer():
-			return false
+	_DoStuffWhenDisconnected()
 	return true
 
 

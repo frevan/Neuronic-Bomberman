@@ -37,6 +37,12 @@ func _network_request_join_lobby(SenderID: int) -> void:
 	pass
 
 
+func _network_leave_lobby(SenderID: int) -> void:
+	print(str(Network.PeerID) + " - player " + str(SenderID) + " left the lobby")
+	_ClientDisconnected(SenderID)
+	pass
+
+
 func _network_request_move_to_slot(SenderID: int, SlotIndex: int) -> void:
 	print(str(Network.PeerID) + " - request to move " + str(SenderID) + " to slot " + str(SlotIndex))
 	var idx: int = SlotIndex
@@ -50,6 +56,7 @@ func _ConnectToSignalsOnStart() -> void:
 	multiplayer.peer_connected.connect(_peer_connected)
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
 	Network.OnRequestJoinLobby.connect(_network_request_join_lobby)
+	Network.OnLeaveLobby.connect(_network_leave_lobby)
 	Network.OnRequestMoveToSlot.connect(_network_request_move_to_slot)
 	pass
 
@@ -57,12 +64,14 @@ func _DisconnectFromSignalsOnStop() -> void:
 	multiplayer.peer_connected.disconnect(_peer_connected)
 	multiplayer.peer_disconnected.disconnect(_peer_disconnected)
 	Network.OnRequestJoinLobby.disconnect(_network_request_join_lobby)
+	Network.OnLeaveLobby.disconnect(_network_leave_lobby)
 	Network.OnRequestMoveToSlot.disconnect(_network_request_move_to_slot)
 	pass
 
 
 func _ClientDisconnected(SenderID) -> void:
 	Data.ClearSlotForPlayer(SenderID)
+	Network.SendPlayerLeftLobby.rpc(SenderID)
 	pass
 
 
