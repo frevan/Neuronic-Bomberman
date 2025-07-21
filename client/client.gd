@@ -11,50 +11,58 @@ signal OnLobbyRefused
 
 
 var Data: TGameData
-
 var CurrentMapName: String = ""
+
+enum TState {IDLE, CONNECTING, LOBBY}
+var State: TState = TState.IDLE
 
 
 func _connected_to_server() -> void:
 	print(str(Network.PeerID) + " - connected to server")
-	_DoStuffWhenConnected()
+	if State == TState.CONNECTING:
+		_DoStuffWhenConnected()
 	pass
 
 
 func _connection_failed() -> void:
 	print(str(Network.PeerID) + " - failed to connect")
-	_DoStuffWhenDisconnected()
-	OnConnectionToServerFailed.emit()
+	if State == TState.CONNECTING:
+		_DoStuffWhenDisconnected()
+		OnConnectionToServerFailed.emit()
 	pass
 
 
 func _server_disconnected() -> void:
 	print(str(Network.PeerID) + " - disconnected from server")
-	_DoStuffWhenDisconnected()
+	if State != TState.IDLE:
+		_DoStuffWhenDisconnected()
 	pass
 
 
 func _peer_disconnected(SenderID: int) -> void:
 	print(str(Network.PeerID) + " - peer disconnected: " + str(SenderID))
-	if is_instance_valid(Data):
+	if (State != TState.IDLE) && is_instance_valid(Data):
 		Data.ClearSlotForPlayer(SenderID)
 	pass
 
 
 func _network_response_to_join_lobby(Accepted: bool) -> void:
-	if Accepted:
-		print(str(Network.PeerID) + " - joined lobby")
-		OnLobbyJoined.emit()
-	else:
-		print(str(Network.PeerID) + " - couldn't get into lobby")
-		Disconnect()
-		OnLobbyRefused.emit()
+	if State == TState.CONNECTING:
+		if Accepted:
+			print(str(Network.PeerID) + " - joined lobby")
+			State = TState.LOBBY
+			OnLobbyJoined.emit()
+		else:
+			print(str(Network.PeerID) + " - couldn't get into lobby")
+			Disconnect()
+			OnLobbyRefused.emit()
 	pass
 
 
 func _network_player_left_lobby(PlayerID: int) -> void:
 	print(str(Network.PeerID) + " - player " + str(PlayerID) + " left the lobby")
-	Data.ClearSlotForPlayer(PlayerID)
+	if State != TState.IDLE:
+		Data.ClearSlotForPlayer(PlayerID)
 	pass
 
 
@@ -64,14 +72,15 @@ func _network_player_moved_to_slot(PlayerID: int, SlotIndex: int) -> void:
 	
 	print(str(Network.PeerID) + " - player " + str(PlayerID) + " moved to slot " + str(SlotIndex))
 	
-	if SlotIndex != Types.INVALID_SLOT:
+	if (State != TState.IDLE) && (SlotIndex != Types.INVALID_SLOT):
 		Data.MovePlayerToSlot(PlayerID, SlotIndex)
 	pass
 
 
 func _network_map_changed(MapName: String) -> void:
 	print(str(Network.PeerID) + " - map changed to " + MapName)
-	CurrentMapName = MapName
+	if State != TState.IDLE:
+		CurrentMapName = MapName
 	pass
 
 
@@ -124,8 +133,8 @@ func _DoStuffWhenConnected() -> void:
 
 
 func _DoStuffWhenDisconnected() -> void:
+	State = TState.IDLE	
 	Network.SendLeaveLobby.rpc_id(1)
-	
 	OnDisconnectedFromServer.emit()
 	
 	if !Network.IsServer():
@@ -134,6 +143,10 @@ func _DoStuffWhenDisconnected() -> void:
 
 
 func Connect(Address: String) -> bool:
+	assert(State == TState.IDLE)
+	if State != TState.IDLE:
+		return false
+	
 	if Network.IsServer():
 		if Address != "127.0.0.1":
 			return false
@@ -148,6 +161,8 @@ func Connect(Address: String) -> bool:
 	
 	_ConnectToSignals()
 	
+	State = TState.CONNECTING
+	
 	if Network.IsServer():
 		_DoStuffWhenConnected()
 	return true
@@ -160,8 +175,14 @@ func Disconnect() -> bool:
 	if !Network.IsConnected():
 		return false
 	
+	assert(State != TState.IDLE)
+	if State == TState.IDLE:
+		return false
+	
 	_DisconnectFromSignals()
+	
 	Data = null
+	CurrentMapName = ""
 	
 	_DoStuffWhenDisconnected()
 	return true
