@@ -9,6 +9,7 @@ signal OnRequestMoveToSlot # params: sender_id (int), slot_idx (int)
 # received by clients
 signal OnResponseToJoinLobby # params: accepted (bool)
 signal OnPlayerMovedToSlot # params: player_id (int), slot_index (int)
+signal OnMapChanged # params: map_name (string)
 
 
 const PORT = 15063
@@ -70,4 +71,10 @@ func SendJoinLobbyResponse(Accepted: bool) -> void:
 @rpc("reliable", "call_local", "authority")
 func SendPlayerMovedToSlot(ID: int, SlotIndex: int) -> void:
 	OnPlayerMovedToSlot.emit(ID, SlotIndex)
+	pass
+
+
+@rpc("reliable", "call_local", "authority")
+func SendMapName(MapName: String) -> void:
+	OnMapChanged.emit(MapName)
 	pass

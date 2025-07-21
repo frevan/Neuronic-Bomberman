@@ -33,7 +33,7 @@ func _network_request_join_lobby(SenderID: int) -> void:
 	Network.SendJoinLobbyResponse.rpc_id(SenderID, success)
 	if success:
 		Network.SendPlayerMovedToSlot.rpc(SenderID, slot_idx)
-		_SendInfoForAllPlayersToPlayer(SenderID)
+		_SendLobbyInfoToPlayer(SenderID)
 	pass
 
 
@@ -66,11 +66,12 @@ func _ClientDisconnected(SenderID) -> void:
 	pass
 
 
-func _SendInfoForAllPlayersToPlayer(SenderID: int) -> void:
+func _SendLobbyInfoToPlayer(PlayerID: int) -> void:
 	for i in Data.Slots.size():
 		var other_peerid: int = Data.Slots[i].Player.PeerID
-		if (other_peerid != 0) && (other_peerid != SenderID):
-			Network.SendPlayerMovedToSlot.rpc_id(SenderID, other_peerid, i)
+		if (other_peerid != 0) && (other_peerid != PlayerID):
+			Network.SendPlayerMovedToSlot.rpc_id(PlayerID, other_peerid, i)
+	Network.SendMapName.rpc_id(PlayerID, CurrentMapName)
 	pass
 
 
@@ -115,6 +116,7 @@ func Stop() -> bool:
 	Data = null
 	Maps.queue_free()
 	Maps = null
+	CurrentMapName = ""
 	
 	print(str(id) + " - server stopped")
 	return true

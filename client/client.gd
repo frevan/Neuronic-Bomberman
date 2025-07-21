@@ -11,6 +11,8 @@ signal OnLobbyRefused
 var TGameData = preload("res://data/gamedata.gd")
 var Data: TGameData
 
+var CurrentMapName: String = ""
+
 
 func _connected_to_server() -> void:
 	print(str(Network.PeerID) + " - connected to server")
@@ -61,6 +63,12 @@ func _network_player_moved_to_slot(PlayerID: int, SlotIndex: int) -> void:
 	pass
 
 
+func _network_map_changed(MapName: String) -> void:
+	print(str(Network.PeerID) + " - map changed to " + MapName)
+	CurrentMapName = MapName
+	pass
+
+
 func _ConnectToSignals() -> void:
 	multiplayer.connected_to_server.connect(_connected_to_server)
 	multiplayer.connection_failed.connect(_connection_failed)
@@ -68,6 +76,7 @@ func _ConnectToSignals() -> void:
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
 	Network.OnResponseToJoinLobby.connect(_network_response_to_join_lobby)
 	Network.OnPlayerMovedToSlot.connect(_network_player_moved_to_slot)
+	Network.OnMapChanged.connect(_network_map_changed)
 	pass
 
 
@@ -78,6 +87,7 @@ func _DisconnectFromSignals() -> void:
 	multiplayer.peer_disconnected.disconnect(_peer_disconnected)
 	Network.OnResponseToJoinLobby.disconnect(_network_response_to_join_lobby)
 	Network.OnPlayerMovedToSlot.disconnect(_network_player_moved_to_slot)
+	Network.OnMapChanged.disconnect(_network_map_changed)
 	pass
 
 
