@@ -1,10 +1,6 @@
 extends TScene
 
 
-func Initialize(aServer: TServer, aClient: TClient) -> void:
-	super(aServer, aClient)
-	pass
-
 func BeforeShow() -> void:
 	super()
 	Client.OnConnectedToServer.connect(_client_connected_to_server)
