@@ -145,10 +145,15 @@ func _DoStuffWhenConnected() -> void:
 
 func _DoStuffWhenDisconnected() -> void:
 	_DisconnectFromSignals()
+	
 	State = TState.IDLE
 	OnDisconnectedFromServer.emit()
+	
 	if !Network.IsServer():
 		Network.ResetPeer()
+		
+	Data = null
+	CurrentMapName = ""
 	pass
 
 
@@ -188,9 +193,6 @@ func Disconnect() -> bool:
 	assert(State != TState.IDLE)
 	if State == TState.IDLE:
 		return false
-	
-	Data = null
-	CurrentMapName = ""
 	
 	Network.SendLeaveLobby.rpc_id(1)
 	_DoStuffWhenDisconnected()

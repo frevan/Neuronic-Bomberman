@@ -23,6 +23,8 @@ func _on_new_lobby_btn_pressed() -> void:
 
 
 func _on_stop_lobby_btn_pressed() -> void:
+	if Client.State != Client.TState.IDLE:
+		Client.Disconnect()
 	if !Server.Stop():
 		Tools.ShowAlert("Can't stop server")
 	pass
