@@ -32,11 +32,11 @@ func _client_disconnected_from_server() -> void:
 	pass
 	
 
-#func UpdateControlVisibility() -> void:
-	#if visible && multiplayer:
-		#$StartButton.visible = Variables.IsServer
-		#$MapsList.visible = Variables.IsServer
-	#pass
+func _UpdateControlVisibility() -> void:
+	if visible && Network.IsConnected():
+		$StartButton.visible = Network.IsServer()
+		$MapsList.visible = Network.IsServer()
+	pass
 
 
 func _LeaveLobby() -> void:
@@ -78,19 +78,16 @@ func _LeaveLobby() -> void:
 		#if player:
 			#label.text = str(player.id)
 	#pass
-#
-#
-#func UpdateClientInfo() -> void:
-	#var s = "..."
-	#if multiplayer:
-		#s = "id: " + str(multiplayer.get_unique_id())
-		##for address in IP.get_local_addresses():
-			##if address.split('.').size() == 4:
-				##s = s + " - " + address
-	#$ClientInfoLabel.text = s
-	#pass
-#
-#
+
+
+func _UpdateClientInfo() -> void:
+	var s = "..."
+	if multiplayer:
+		s = "id: " + str(multiplayer.get_unique_id())
+	$ClientInfoLabel.text = s
+	pass
+
+
 #func FillMapsList() -> void:
 	#$MapsList.clear()
 	#var selname = ""
@@ -119,10 +116,10 @@ func _on_start_button_pressed() -> void:
 
 
 func _on_visibility_changed() -> void:
-	#if visible:
-		#UpdateControlVisibility()
+	if visible:
+		_UpdateControlVisibility()
 		#UpdatePlayerInfo()
-		#UpdateClientInfo()
+		_UpdateClientInfo()
 		#if context.map:
 			#SelectMap(context.map.name) # reload map when returning to lobby
 		#FillMapsList()
