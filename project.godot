@@ -20,7 +20,6 @@ config/icon="uid://c48kdaut4xv5v"
 [autoload]
 
 Tools="*res://misc/tools.gd"
-Client="*res://client/client.gd"
 Network="*res://network/network.gd"
 Types="*res://data/types.gd"
 

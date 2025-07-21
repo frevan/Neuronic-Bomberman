@@ -1,5 +1,7 @@
 extends Node
 
+class_name TClient
+
 
 signal OnConnectedToServer
 signal OnDisconnectedFromServer
