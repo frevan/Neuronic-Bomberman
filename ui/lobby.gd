@@ -59,7 +59,6 @@ func _client_player_moved_to_slot(_PlayerID: int, _SlotIndex: int) -> void:
 
 func _client_map_name_changed(MapName: String) -> void:
 	_SelectMap(MapName)
-	_UpdateMapInfo()
 	pass
 
 
@@ -123,19 +122,22 @@ func _UpdateMapInfo() -> void:
 	pass
 
 
-#func FillMapsList() -> void:
-	#$MapsList.clear()
-	#var selname = ""
-	#if context.map:
-		#selname = context.map.name
-		#
-	#var selidx = 0
-	#for s in Variables.MapNames:
-		#var idx = $MapsList.add_item(s)
-		#if s == selname:
-			#selidx = idx
-		#$MapsList.select(selidx)
-	#pass
+func _FillMapsList() -> void:
+	Maps.FindMapFiles()
+	
+	var selname = ""
+	if Map:
+		selname = Map.Name
+	var selidx = 0
+	
+	$MapsList.clear()
+	for s in Maps.MapNames:
+		var idx = $MapsList.add_item(s)
+		if s == selname:
+			selidx = idx
+			
+	$MapsList.select(selidx)
+	pass
 
 
 func _on_leave_button_pressed() -> void:
@@ -156,6 +158,7 @@ func _on_visibility_changed() -> void:
 		_UpdatePlayerInfo()
 		_UpdateClientInfo()
 		_UpdateMapInfo()
+		_FillMapsList()
 	pass
 
 
@@ -184,7 +187,7 @@ func _draw() -> void:
 	pass
 
 
-func _on_maps_list_item_selected(_index: int) -> void:
-	#var mapname = $MapsList.get_item_text(index)
-	#OnMapChanged.emit(mapname)
+func _on_maps_list_item_selected(Index: int) -> void:
+	var mapname = $MapsList.get_item_text(Index)
+	Network.SendRequestMapChange.rpc_id(1, mapname)
 	pass

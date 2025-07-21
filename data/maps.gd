@@ -24,6 +24,14 @@ func FindMapFiles() -> void:
 	pass
 
 
+func MapExists(MapName: String) -> bool:
+	var dir = DirAccess.open(MapsPathConst)
+	if !dir:
+		print("ERROR: maps folder not found")
+		return false
+	return dir.file_exists(MapName)
+
+
 func _ReadMapFileContents(MapName: String):
 	var fname = MapsPathConst + "/" + MapName
 	if !FileAccess.file_exists(fname):

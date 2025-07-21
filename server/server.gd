@@ -53,6 +53,14 @@ func _network_leave_lobby(SenderID: int) -> void:
 	pass
 
 
+func _network_request_map_change(MapName: String) -> void:
+	_log("request to change the map to: " + MapName)
+	if Maps.MapExists(MapName):
+		CurrentMapName = MapName
+		Network.SendMapName.rpc(CurrentMapName)
+	pass
+
+
 func _network_request_move_to_slot(SenderID: int, SlotIndex: int) -> void:
 	_log("request to move " + str(SenderID) + " to slot " + str(SlotIndex))
 	
@@ -88,6 +96,7 @@ func _ConnectToSignalsOnStart() -> void:
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
 	Network.OnRequestJoinLobby.connect(_network_request_join_lobby)
 	Network.OnLeaveLobby.connect(_network_leave_lobby)
+	Network.OnRequestMapChange.connect(_network_request_map_change)
 	Network.OnRequestMoveToSlot.connect(_network_request_move_to_slot)
 	Network.OnRequestStartMatch.connect(_network_request_start_match)
 	Network.OnPlayerReady.connect(_network_player_ready)
@@ -98,6 +107,7 @@ func _DisconnectFromSignalsOnStop() -> void:
 	multiplayer.peer_disconnected.disconnect(_peer_disconnected)
 	Network.OnRequestJoinLobby.disconnect(_network_request_join_lobby)
 	Network.OnLeaveLobby.disconnect(_network_leave_lobby)
+	Network.OnRequestMapChange.disconnect(_network_request_map_change)
 	Network.OnRequestMoveToSlot.disconnect(_network_request_move_to_slot)
 	Network.OnRequestStartMatch.disconnect(_network_request_start_match)
 	Network.OnPlayerReady.disconnect(_network_player_ready)

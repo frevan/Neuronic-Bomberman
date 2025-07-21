@@ -7,6 +7,7 @@ class_name TNetwork
 signal OnRequestJoinLobby # params: sender_id (int)
 signal OnLeaveLobby # params: sender_id (int)
 signal OnRequestMoveToSlot # params: sender_id (int), slot_idx (int)
+signal OnRequestMapChange # params: map_nake (string)
 signal OnRequestStartMatch # params: sender_id (int)
 signal OnPlayerReady # params: sender_id (int), ready (bool)
 # received by clients
@@ -90,6 +91,10 @@ func SendLeaveLobby() -> void:
 func SendMovePlayerToSlot(SlotIndex: int) -> void:
 	var id = multiplayer.get_remote_sender_id()
 	OnRequestMoveToSlot.emit(id, SlotIndex)
+
+@rpc("reliable", "call_local", "authority")
+func SendRequestMapChange(MapName: String) -> void:
+	OnRequestMapChange.emit(MapName)
 
 @rpc("reliable", "call_local", "authority")
 func SendStartMatch() -> void:
