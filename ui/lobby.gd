@@ -146,9 +146,7 @@ func _on_leave_button_pressed() -> void:
 
 
 func _on_start_button_pressed() -> void:
-	#if Variables.IsServer:
-		#if context.map:
-			#OnStartMatch.emit(context.map.name)
+	Network.SendStartMatch.rpc_id(1)
 	pass
 
 
