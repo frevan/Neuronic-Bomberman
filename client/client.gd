@@ -11,6 +11,7 @@ signal OnLobbyRefused
 signal OnPlayerJoined # params: player_id (int)
 signal OnPlayerLeft # params: player_id (int)
 signal OnPlayerMovedToSlot # params: player_id (int), slot_index (int)
+signal OnMapNameChanged # params: map_name (string)
 
 
 var Data: TGameData
@@ -99,6 +100,7 @@ func _network_map_changed(MapName: String) -> void:
 	_log("map changed to " + MapName)
 	if State != TState.IDLE:
 		CurrentMapName = MapName
+		OnMapNameChanged.emit(CurrentMapName)
 	pass
 
 

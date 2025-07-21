@@ -4,12 +4,17 @@ extends TScene
 signal OnLeaveLobby
 
 
+var Map: Types.TMap
+@onready var Maps: TMaps = TMaps.new()
+
+
 func BeforeShow() -> void:
 	super()
 	Client.OnDisconnectedFromServer.connect(_client_disconnected_from_server)
 	Client.OnPlayerJoined.connect(_client_player_joined)
 	Client.OnPlayerLeft.connect(_client_player_left)
 	Client.OnPlayerMovedToSlot.connect(_client_player_moved_to_slot)
+	Client.OnMapNameChanged.connect(_client_map_name_changed)
 	pass
 
 func AfterHide() -> void:
@@ -17,7 +22,8 @@ func AfterHide() -> void:
 	Client.OnDisconnectedFromServer.disconnect(_client_disconnected_from_server)
 	Client.OnPlayerJoined.disconnect(_client_player_joined)
 	Client.OnPlayerLeft.disconnect(_client_player_left)
-	Client.OnPlayerMovedToSlot.disconnect(_client_player_moved_to_slot)	
+	Client.OnPlayerMovedToSlot.disconnect(_client_player_moved_to_slot)
+	Client.OnMapNameChanged.disconnect(_client_map_name_changed)
 	pass
 
 
@@ -48,6 +54,12 @@ func _client_player_left(_PlayerID: int) -> void:
 	
 func _client_player_moved_to_slot(_PlayerID: int, _SlotIndex: int) -> void:
 	_UpdatePlayerInfo()
+	pass
+
+
+func _client_map_name_changed(MapName: String) -> void:
+	_SelectMap(MapName)
+	_UpdateMapInfo()
 	pass
 
 
@@ -103,6 +115,14 @@ func _UpdateClientInfo() -> void:
 	pass
 
 
+func _UpdateMapInfo() -> void:
+	$MapNameLabel.text = Client.CurrentMapName
+	#if context.map:
+		#SelectMap(context.map.name) # reload map when returning to lobby
+	#FillMapsList()
+	pass
+
+
 #func FillMapsList() -> void:
 	#$MapsList.clear()
 	#var selname = ""
@@ -135,35 +155,32 @@ func _on_visibility_changed() -> void:
 		_UpdateControlVisibility()
 		_UpdatePlayerInfo()
 		_UpdateClientInfo()
-		#if context.map:
-			#SelectMap(context.map.name) # reload map when returning to lobby
-		#FillMapsList()
+		_UpdateMapInfo()
 	pass
 
 
-func SelectMap(_mapname: String) -> void:
-	#print(str(multiplayer.get_unique_id()) + " - map changed to: " + mapname)
-	#context.map = Maps.LoadMap(mapname)
-	#$MapNameLabel.text = mapname
-	#queue_redraw()
+func _SelectMap(MapName: String) -> void:
+	Map = Maps.LoadMap(MapName)
+	_UpdateMapInfo()
+	queue_redraw()
 	pass
 
 
 func _draw() -> void:
-	#if context.map:
-		#var offset = Vector2($MapNameLabel.position.x, $MapNameLabel.position.y + $MapNameLabel.size.y + 10)
-		#const FIELDWIDTH = 16
-		#const FIELDHEIGHT = 15
-		#for row in context.map.fields.size():
-			#for col in context.map.fields[row].size():
-				#var type = context.map.fields[row][col]
-				#var color: Color
-				#match type:
-					#Types.FIELD_EMPTY: color = Color.GREEN
-					#Types.FIELD_SOLID: color = Color.WEB_GRAY
-					#Types.FIELD_BRICK: color = Color.RED
-				#var r = Rect2(col * FIELDWIDTH + offset.x, row * FIELDHEIGHT + offset.y, FIELDWIDTH, FIELDHEIGHT)
-				#draw_rect(r, color)
+	if Map:
+		var offset = Vector2($MapNameLabel.position.x, $MapNameLabel.position.y + $MapNameLabel.size.y + 10)
+		const FIELDWIDTH = 16
+		const FIELDHEIGHT = 15
+		for row in Map.Fields.size():
+			for col in Map.Fields[row].size():
+				var type = Map.Fields[row][col]
+				var color: Color
+				match type:
+					Types.FIELD_EMPTY: color = Color.GREEN
+					Types.FIELD_SOLID: color = Color.WEB_GRAY
+					Types.FIELD_BRICK: color = Color.RED
+				var r = Rect2(col * FIELDWIDTH + offset.x, row * FIELDHEIGHT + offset.y, FIELDWIDTH, FIELDHEIGHT)
+				draw_rect(r, color)
 	pass
 
 
