@@ -10,6 +10,11 @@ func before_each():
 func after_each():
 	o.queue_free()
 
+func LoadTestMap() -> void:
+	var Maps: TMaps = TMaps.new()
+	o.Slots[1].Player.PeerID = 5
+	o.Map = Maps.LoadMap("test.sch")
+
 
 func test_SlotsAreInitialized() -> void:
 	assert_ne(o.Slots.size(), 0)
@@ -84,3 +89,12 @@ func test_SetPlayerReady() -> void:
 	o.SetPlayerReady(456, false)
 	assert_true(o.Slots[1].Player.Ready)
 	assert_false(o.Slots[2].Player.Ready)
+
+
+func test_SetPlayersToStartPositions() -> void:
+	LoadTestMap()
+	assert_not_null(o.Map)
+	o.Slots[1].Player.PeerID = 5
+	o.SetPlayersToStartPositions()
+	assert_almost_eq(o.Slots[1].Player.Position.x, 14, 0.1)
+	assert_almost_eq(o.Slots[1].Player.Position.y, 10, 0.1)
