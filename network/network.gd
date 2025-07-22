@@ -21,6 +21,7 @@ signal OnNewRound # params: map_name (string)
 signal OnPlayerBecameReady # params: player_id (int), ready (bool)
 signal OnRoundStarted
 signal OnPlayerPositionReceived # params: player_id (int), field (vector2)
+signal OnMapTileChanged # params: field (vector2i), type (int)
 
 
 const PORT = 15063
@@ -146,3 +147,7 @@ func SendPlayerBecameReady(ID: int, Ready: bool) -> void:
 @rpc("reliable", "call_local", "authority")
 func SendPlayerPosition(ID: int, Field: Vector2) -> void:
 	OnPlayerPositionReceived.emit(ID, Field)
+
+@rpc("reliable", "call_local", "authority")
+func SendMapTileChanged(Field: Vector2i, Type: int) -> void:
+	OnMapTileChanged.emit(Field, Type)

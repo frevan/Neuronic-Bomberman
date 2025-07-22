@@ -12,12 +12,14 @@ func BeforeShow() -> void:
 	super()
 	Client.OnNewRound.connect(_client_new_round)
 	Client.OnPlayerPositionChanged.connect(_client_player_position_changed)
+	Client.OnMapTileChanged.connect(_client_map_tile_changed)
 	pass
 
 func AfterHide() -> void:
 	super()
 	Client.OnNewRound.disconnect(_client_new_round)
 	Client.OnPlayerPositionChanged.disconnect(_client_player_position_changed)
+	Client.OnMapTileChanged.disconnect(_client_map_tile_changed)
 	pass
 
 
@@ -49,6 +51,10 @@ func _client_new_round() -> void:
 
 func _client_player_position_changed(_PlayerID: int) -> void:
 	_SetPlayerPositions()
+	pass
+
+func _client_map_tile_changed(_Field: Vector2i, _Type: int) -> void:
+	_CreateTiles()
 	pass
 
 

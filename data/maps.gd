@@ -163,6 +163,20 @@ func LoadMap(mapname: String) -> Types.TMap:
 	return map
 
 
+func CopyMap(Source: Types.TMap) -> Types.TMap:
+	var map = Types.TMap.new()
+	map.initialize(Source.Name, Source.Width, Source.Height)
+	map.Caption = Source.Caption
+	map.Version = Source.Version
+	map.BrickDensity = Source.BrickDensity
+	map.StartPositions.assign(Source.StartPositions)
+	map.PowerUps.assign(Source.PowerUps)
+	for y in Source.Height:
+		for x in Source.Width:
+			map.Fields[y][x] = Source.Fields[y][x]
+	return map
+
+
 func _IsValidFieldPos(Map: Types.TMap, Pos: Vector2i) -> bool:
 	return (Pos.x >= 0) && (Pos.x < Map.Width) && (Pos.y >= 0) && (Pos.y < Map.Height)
 

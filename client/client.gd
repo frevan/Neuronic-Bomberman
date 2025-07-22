@@ -15,6 +15,7 @@ signal OnMapNameChanged # params: map_name (string)
 signal OnMatchStarted
 signal OnNewRound
 signal OnPlayerPositionChanged # params: player_id (int)
+signal OnMapTileChanged # params: field (vector2i), type (int)
 
 
 var Data: TGameData
@@ -150,6 +151,13 @@ func _network_player_position_received(PlayerID: int, Position: Vector2) -> void
 	pass
 
 
+func _network_map_tile_changed(Field: Vector2i, Type: int) -> void:
+	_log("map tile " + str(Field) + " changed to " + str(Type))
+	Maps.SetFieldTypeTo(Data.Map, Field, Type)
+	OnMapTileChanged.emit(Field, Type)
+	pass
+
+
 func _ConnectToSignals() -> void:
 	multiplayer.connected_to_server.connect(_connected_to_server)
 	multiplayer.connection_failed.connect(_connection_failed)
@@ -165,6 +173,7 @@ func _ConnectToSignals() -> void:
 	Network.OnPlayerBecameReady.connect(_network_player_became_ready)
 	Network.OnRoundStarted.connect(_network_round_started)
 	Network.OnPlayerPositionReceived.connect(_network_player_position_received)
+	Network.OnMapTileChanged.connect(_network_map_tile_changed)
 	pass
 
 
@@ -183,6 +192,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnPlayerBecameReady.disconnect(_network_player_became_ready)
 	Network.OnRoundStarted.disconnect(_network_round_started)
 	Network.OnPlayerPositionReceived.disconnect(_network_player_position_received)
+	Network.OnMapTileChanged.disconnect(_network_map_tile_changed)
 	pass
 
 

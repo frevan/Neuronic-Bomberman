@@ -146,6 +146,7 @@ func _StartMatch() -> void:
 
 func _StartRoundNow() -> void:
 	Data.Map = Maps.LoadMap(CurrentMapName)
+	var tempMap: Types.TMap = Maps.CopyMap(Data.Map)
 	
 	Data.SetPlayersToStartPositions()
 	for i in Data.Slots.size():
@@ -153,6 +154,13 @@ func _StartRoundNow() -> void:
 			var p: Types.TPlayer = Data.Slots[i].Player
 			if p.PeerID != 0:
 				Network.SendPlayerPosition.rpc(p.PeerID, p.Position)
+				Maps.ClearFieldsAround(Data.Map, p.Position)
+	
+	for y in Data.Map.Height:
+		for x in Data.Map.Width:
+			var type = Data.Map.Fields[y][x]
+			if tempMap.Fields[y][x] != type:
+				Network.SendMapTileChanged.rpc(Vector2i(x, y), type)
 	
 	State = TState.ROUND
 	Network.SendRoundStarted.rpc()
