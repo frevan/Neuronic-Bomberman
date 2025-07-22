@@ -1,0 +1,11 @@
+extends MultiplayerSynchronizer
+
+
+@export var direction = Vector2()
+
+
+func _process(_delta: float) -> void:
+	if !get_parent().visible:
+		return
+	direction = Input.get_vector("player_left", "player_right", "player_up", "player_down")
+	pass
