@@ -67,4 +67,32 @@ func _CreateTiles() -> void:
 
 func UpdateAll() -> void:
 	_CreateTiles()
+	_ShowPlayers()
+	_SetPlayerPositions()
+	pass
+
+
+func _FindPlayerNodeForSlot(SlotIndex: int) -> Node2D:
+	var nodeName = "Player" + str(SlotIndex)
+	return $Players.get_node(nodeName)
+
+
+func _ShowPlayers() -> void:
+	for i in Client.Data.Slots.size():
+		var scene: Node2D = _FindPlayerNodeForSlot(i)
+		assert(scene)
+		var p: Types.TPlayer = Client.Data.Slots[i].Player
+		if p.PeerID == 0:
+			scene.show()
+		else:
+			scene.hide()
+	pass
+
+
+func _SetPlayerPositions() -> void:
+	for i in Client.Data.Slots.size():
+		var node = _FindPlayerNodeForSlot(i)
+		assert(node)
+		if node.visible:
+			node.position = Tools.FieldToPosition(Vector2i(i + 1, 1))
 	pass
