@@ -69,6 +69,7 @@ func _client_match_started() -> void:
 
 func _client_new_round() -> void:
 	Tools.SwitchToScene($Match)
+	$Match.UpdateAll()
 	pass
 
 
