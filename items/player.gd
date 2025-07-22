@@ -12,8 +12,8 @@ signal CheckForCollisions(Sender: Node2D, NewPosition: Vector2)
 
 func _ready():
 	# only process physics for the local player	
-	#if get_multiplayer_authority() != multiplayer.get_unique_id():
-	#	set_physics_process(false)
+	if get_multiplayer_authority() != multiplayer.get_unique_id():
+		set_physics_process(false)
 	pass
 
 

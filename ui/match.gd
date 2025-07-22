@@ -83,6 +83,7 @@ func UpdateAll() -> void:
 	_CreateTiles()
 	_ShowPlayers()
 	_SetPlayerPositions()
+	_SetPlayerAuthorities()
 	pass
 
 
@@ -107,6 +108,17 @@ func _SetPlayerPositions() -> void:
 		if node.visible:
 			var p: Types.TPlayer = Client.Data.Slots[i].Player
 			node.position = Tools.FieldPositionToScreen(p.Position)
+	pass
+
+
+func _SetPlayerAuthorities() -> void:
+	for i in Client.Data.Slots.size():
+		var node = _FindPlayerNodeForSlot(i)
+		assert(node)
+		if node.visible:
+			var p: Types.TPlayer = Client.Data.Slots[i].Player
+			node.set_multiplayer_authority(p.PeerID)
+			node.set_physics_process(p.PeerID == Network.PeerID)
 	pass
 
 
