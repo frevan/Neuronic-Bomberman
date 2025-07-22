@@ -1,9 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://4nnysadoodsc"]
+[gd_scene load_steps=8 format=3 uid="uid://4nnysadoodsc"]
 
 [ext_resource type="Script" uid="uid://bdb75rw33pcmy" path="res://ui/match.gd" id="1_gh88m"]
 [ext_resource type="Texture2D" uid="uid://cdqrwtfiee0uw" path="res://assets/back.png" id="2_gavrd"]
 [ext_resource type="Texture2D" uid="uid://blhq3dbcvb8qf" path="res://assets/field.png" id="3_mbs0m"]
-[ext_resource type="PackedScene" uid="uid://3gxr7c32joun" path="res://items/player.tscn" id="4_hudsj"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jcqty"]
 size = Vector2(20, 517)
@@ -80,8 +79,5 @@ collision_layer = 2
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Border/Bottom"]
 position = Vector2(400.5, 585)
 shape = SubResource("RectangleShape2D_vt7kf")
-
-[node name="Player" parent="." instance=ExtResource("4_hudsj")]
-position = Vector2(272, 305)
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
