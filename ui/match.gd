@@ -67,7 +67,7 @@ func _CreateTiles() -> void:
 					Types.FIELD_BRICK: node = brickscene.instantiate()
 				if node:
 					$Tiles.add_child(node, true)
-					node.position = Tools.FieldPositionToMap(Vector2(col, row))
+					node.position = Tools.FieldPositionToScreen(Vector2(col, row))
 	pass
 
 
@@ -98,5 +98,5 @@ func _SetPlayerPositions() -> void:
 		assert(node)
 		if node.visible:
 			var p: Types.TPlayer = Client.Data.Slots[i].Player
-			node.position = Tools.FieldPositionToMap(p.Position)
+			node.position = Tools.FieldPositionToScreen(p.Position)
 	pass

@@ -29,17 +29,10 @@ func SwitchToScene(Scene: TScene) -> void:
 
 
 const FIELD_SIZE = Vector2(48, 45)
-const FIELD_WIDTH = 48
-const FIELD_HEIGHT = 45
 const FIELD_OFFSET = Vector2(64, 125)
 
-func FieldPositionToMap(Position: Vector2) -> Vector2:
+func FieldPositionToScreen(Position: Vector2) -> Vector2:
 	return (Position * FIELD_SIZE) + FIELD_OFFSET
 
-func FieldToPosition(pos: Vector2i) -> Vector2:
-	return  Vector2(FIELD_OFFSET.x + (pos.x * FIELD_WIDTH), FIELD_OFFSET.y + (pos.y * FIELD_HEIGHT))
-	
-func PositionToField(pos: Vector2) -> Vector2i:
-	var x: float = (pos.x - FIELD_OFFSET.x) / FIELD_WIDTH
-	var y: float = (pos.y - FIELD_OFFSET.y) / FIELD_HEIGHT
-	return Vector2i(round(x), round(y))
+func ScreenPositionToField(Position: Vector2) -> Vector2i:
+	return (Position - FIELD_OFFSET) / FIELD_SIZE
