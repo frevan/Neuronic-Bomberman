@@ -23,6 +23,7 @@ class TPlayer:
 		Ready = false
 		Position = Vector2(-1, -1)
 
+
 class TSlot:
 	var Index: int
 	var Player: TPlayer

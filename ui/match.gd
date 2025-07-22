@@ -11,11 +11,13 @@ const solidscene = preload("res://items/solidblock.tscn")
 func BeforeShow() -> void:
 	super()
 	Client.OnNewRound.connect(_client_new_round)
+	Client.OnPlayerPositionChanged.connect(_client_player_position_changed)
 	pass
 
 func AfterHide() -> void:
 	super()
 	Client.OnNewRound.disconnect(_client_new_round)
+	Client.OnPlayerPositionChanged.disconnect(_client_player_position_changed)
 	pass
 
 
@@ -45,6 +47,10 @@ func _client_new_round() -> void:
 	_CreateTiles()
 	pass
 
+func _client_player_position_changed(_PlayerID: int) -> void:
+	_SetPlayerPositions()
+	pass
+
 
 func _CreateTiles() -> void:
 	for node in $Tiles.get_children():
@@ -61,7 +67,7 @@ func _CreateTiles() -> void:
 					Types.FIELD_BRICK: node = brickscene.instantiate()
 				if node:
 					$Tiles.add_child(node, true)
-					node.position = Tools.FieldToPosition(Vector2i(col, row))
+					node.position = Tools.FieldPositionToMap(Vector2(col, row))
 	pass
 
 
@@ -82,10 +88,7 @@ func _ShowPlayers() -> void:
 		var scene: Node2D = _FindPlayerNodeForSlot(i)
 		assert(scene)
 		var p: Types.TPlayer = Client.Data.Slots[i].Player
-		if p.PeerID == 0:
-			scene.show()
-		else:
-			scene.hide()
+		scene.visible = p.PeerID != 0
 	pass
 
 
@@ -94,5 +97,6 @@ func _SetPlayerPositions() -> void:
 		var node = _FindPlayerNodeForSlot(i)
 		assert(node)
 		if node.visible:
-			node.position = Tools.FieldToPosition(Vector2i(i + 1, 1))
+			var p: Types.TPlayer = Client.Data.Slots[i].Player
+			node.position = Tools.FieldPositionToMap(p.Position)
 	pass

@@ -14,6 +14,7 @@ signal OnPlayerMovedToSlot # params: player_id (int), slot_index (int)
 signal OnMapNameChanged # params: map_name (string)
 signal OnMatchStarted
 signal OnNewRound
+signal OnPlayerPositionChanged # params: player_id (int)
 
 
 var Data: TGameData
@@ -141,6 +142,11 @@ func _network_round_started() -> void:
 
 func _network_player_position_received(PlayerID: int, Position: Vector2) -> void:
 	_log("player " + str(PlayerID) + " is at: (" + str(Position.x) + "," + str(Position.y) + ")")
+	var idx = Data.FindSlotForPlayer(PlayerID)
+	if idx != Types.INVALID_SLOT:
+		var p: Types.TPlayer = Data.Slots[idx].Player 
+		p.Position = Position
+		OnPlayerPositionChanged.emit(PlayerID)
 	pass
 
 
