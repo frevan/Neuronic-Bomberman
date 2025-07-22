@@ -6,6 +6,8 @@ var Client: TClient
 
 
 func _ready() -> void:
+	_PositionWindowForDebug()
+	
 	_InitializeServer()
 	_InitializeClient()
 	
@@ -22,6 +24,17 @@ func _ready() -> void:
 func _on_lobby_on_leave_lobby() -> void:
 	Tools.SwitchToScene($Menu)
 	pass
+
+
+func _PositionWindowForDebug() -> void:
+	var args: PackedStringArray = OS.get_cmdline_args()
+	var window: Window = get_window()
+	for s: String in args:
+		match s:
+			#"--inst1": window.position = window.position - Vector2i(200, 0)
+			"--inst2": window.position = window.position + Vector2i(400, 200)
+	pass
+
 
 func _InitializeServer() -> void:
 	Server = TServer.new()
