@@ -36,7 +36,8 @@ func FieldPositionToScreen(Position: Vector2) -> Vector2:
 	return (Position * FIELD_SIZE) + FIELD_OFFSET
 
 func ScreenPositionToField(Position: Vector2) -> Vector2i:
-	return (Position - FIELD_OFFSET) / FIELD_SIZE
+	var v: Vector2 = (Position - FIELD_OFFSET) / FIELD_SIZE
+	return Vector2i(round(v.x), round(v.y))
 
 func FieldToRect(Field: Vector2i) -> Rect2:
 	var r: Rect2
