@@ -4,6 +4,9 @@ extends CharacterBody2D
 const SPEED = 400.0
 
 
+signal CheckForCollisions(Sender: Node2D, NewPosition: Vector2)
+
+
 @export var animation = ""
 
 
@@ -58,6 +61,7 @@ func _Move(delta: float) -> void:
 	var newpos: Vector2 = Vector2(position.x + (velocity.x * delta),  position.y + (velocity.y * delta))
 	position = newpos
 	#position = Rules.ApplyObstaclesToPlayerMove(context, position, newpos)
+	CheckForCollisions.emit(self, newpos)
 	pass
 
 func _UpdateSpriteAnimation() -> void:

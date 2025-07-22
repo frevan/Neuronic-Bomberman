@@ -30,9 +30,19 @@ func SwitchToScene(Scene: TScene) -> void:
 
 const FIELD_SIZE = Vector2(48, 45)
 const FIELD_OFFSET = Vector2(64, 125)
+const PLAYER_SIZE = Vector2(48, 45)
 
 func FieldPositionToScreen(Position: Vector2) -> Vector2:
 	return (Position * FIELD_SIZE) + FIELD_OFFSET
 
 func ScreenPositionToField(Position: Vector2) -> Vector2i:
 	return (Position - FIELD_OFFSET) / FIELD_SIZE
+
+func FieldToRect(Field: Vector2i) -> Rect2:
+	var r: Rect2
+	r.position = FieldPositionToScreen(Field)
+	r.size = FIELD_SIZE
+	return r
+
+func PlayerPositionToRect(Position: Vector2) -> Rect2:
+	return Rect2(Position.x, Position.y, PLAYER_SIZE.x, PLAYER_SIZE.y)

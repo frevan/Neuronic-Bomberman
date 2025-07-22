@@ -114,3 +114,13 @@ visible = false
 visible = false
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
+[connection signal="CheckForCollisions" from="Players/Player0" to="." method="_on_player_check_for_collisions"]
+[connection signal="CheckForCollisions" from="Players/Player1" to="." method="_on_player_check_for_collisions"]
+[connection signal="CheckForCollisions" from="Players/Player2" to="." method="_on_player_check_for_collisions"]
+[connection signal="CheckForCollisions" from="Players/Player3" to="." method="_on_player_check_for_collisions"]
+[connection signal="CheckForCollisions" from="Players/Player4" to="." method="_on_player_check_for_collisions"]
+[connection signal="CheckForCollisions" from="Players/Player5" to="." method="_on_player_check_for_collisions"]
+[connection signal="CheckForCollisions" from="Players/Player6" to="." method="_on_player_check_for_collisions"]
+[connection signal="CheckForCollisions" from="Players/Player7" to="." method="_on_player_check_for_collisions"]
+[connection signal="CheckForCollisions" from="Players/Player8" to="." method="_on_player_check_for_collisions"]
+[connection signal="CheckForCollisions" from="Players/Player9" to="." method="_on_player_check_for_collisions"]
