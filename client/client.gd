@@ -16,6 +16,7 @@ signal OnMatchStarted
 signal OnNewRound
 signal OnPlayerPositionChanged # params: player_id (int)
 signal OnMapTileChanged # params: field (vector2i), type (int)
+signal OnBombDropped # params: field (vector2i)
 
 
 var Data: TGameData
@@ -160,6 +161,13 @@ func _network_map_tile_changed(Field: Vector2i, Type: int) -> void:
 	pass
 
 
+func _network_bomb_dropped(Field: Vector2i)-> void:
+	_log("bomb dropped on field " + str(Field))
+	# TODO: add bomb to data
+	OnBombDropped.emit(Field)
+	pass
+
+
 func _ConnectToSignals() -> void:
 	multiplayer.connected_to_server.connect(_connected_to_server)
 	multiplayer.connection_failed.connect(_connection_failed)
@@ -176,6 +184,7 @@ func _ConnectToSignals() -> void:
 	Network.OnRoundStarted.connect(_network_round_started)
 	Network.OnPlayerPositionReceived.connect(_network_player_position_received)
 	Network.OnMapTileChanged.connect(_network_map_tile_changed)
+	Network.OnBombDropped.connect(_network_bomb_dropped)
 	pass
 
 
@@ -195,6 +204,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnRoundStarted.disconnect(_network_round_started)
 	Network.OnPlayerPositionReceived.disconnect(_network_player_position_received)
 	Network.OnMapTileChanged.disconnect(_network_map_tile_changed)
+	Network.OnBombDropped.disconnect(_network_bomb_dropped)
 	pass
 
 

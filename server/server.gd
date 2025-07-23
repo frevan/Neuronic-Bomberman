@@ -91,6 +91,25 @@ func _network_player_ready(SenderID: int, Ready: bool) -> void:
 	pass
 
 
+func _network_player_is_dropping_bomb(PlayerID: int, Value: bool) -> void:
+	var idx = Data.FindSlotForPlayer(PlayerID)
+	if idx != Types.INVALID_SLOT:
+		var p: Types.TPlayer = Data.Slots[idx].Player
+		p.DroppingBombs = Value
+		if p.DroppingBombs:
+			_DropBomb(p)
+	pass
+
+
+func _DropBomb(Player: Types.TPlayer) -> void:
+	if Player.TotalBombs - Player.DroppedBombs == 0:
+		pass
+	Player.DroppedBombs += 1
+	# TODO: add bomb to data
+	Network.SendBombDropped.rpc(Vector2i(Player.Position))
+	pass
+
+
 func _ConnectToSignalsOnStart() -> void:
 	multiplayer.peer_connected.connect(_peer_connected)
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
@@ -100,6 +119,7 @@ func _ConnectToSignalsOnStart() -> void:
 	Network.OnRequestMoveToSlot.connect(_network_request_move_to_slot)
 	Network.OnRequestStartMatch.connect(_network_request_start_match)
 	Network.OnPlayerReady.connect(_network_player_ready)
+	Network.OnPlayerIsDroppingBombs.connect(_network_player_is_dropping_bomb)
 	pass
 
 func _DisconnectFromSignalsOnStop() -> void:
@@ -111,6 +131,7 @@ func _DisconnectFromSignalsOnStop() -> void:
 	Network.OnRequestMoveToSlot.disconnect(_network_request_move_to_slot)
 	Network.OnRequestStartMatch.disconnect(_network_request_start_match)
 	Network.OnPlayerReady.disconnect(_network_player_ready)
+	Network.OnPlayerIsDroppingBombs.disconnect(_network_player_is_dropping_bomb)
 	pass
 
 
@@ -140,6 +161,12 @@ func _StartMatch() -> void:
 			if Data.Slots[i].Player.PeerID != 0:
 				Network.SendPlayerBecameReady.rpc(Data.Slots[i].Player.PeerID, false)
 	
+	_StartNewRound()
+	pass
+
+
+func _StartNewRound() -> void:
+	Data.ResetPlayersBeforeRound()
 	Network.SendNewRound.rpc(CurrentMapName)
 	pass
 
