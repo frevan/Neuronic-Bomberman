@@ -103,7 +103,9 @@ func test_SetPlayersToStartPositions() -> void:
 func test_ResetPlayersBeforeRound() -> void:
 	o.Slots[1].Player.TotalBombs = 5
 	o.Slots[1].Player.DroppedBombs = 4
+	o.Slots[1].Player.DroppingBombs = true
 	o.ResetPlayersBeforeRound()
 	assert_eq(o.Slots[1].Player.TotalBombs, 1)
 	assert_eq(o.Slots[1].Player.DroppedBombs, 0)
+	assert_false(o.Slots[1].Player.DroppingBombs)
 	pass

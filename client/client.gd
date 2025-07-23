@@ -126,6 +126,8 @@ func _network_new_round(MapName: String) -> void:
 		# TODO: handle errors loading the map
 		_log("failed to load map: " + MapName)
 	
+	Data.ResetPlayersBeforeRound()
+	
 	OnNewRound.emit()
 	Network.SendPlayerReady.rpc_id(1, true)
 	pass
@@ -278,4 +280,9 @@ func RequestMapChange(MapName: String) -> void:
 func RequestStartMatch() -> void:
 	if Network.IsServer() && (State == TState.LOBBY):
 		Network.SendStartMatch.rpc_id(1)
+	pass
+
+
+func DropBombs(IsDropping: bool) -> void:
+	Network.SendDroppingBombs.rpc_id(1, IsDropping)
 	pass

@@ -10,6 +10,7 @@ signal OnRequestMoveToSlot # params: sender_id (int), slot_idx (int)
 signal OnRequestMapChange # params: map_nake (string)
 signal OnRequestStartMatch # params: sender_id (int)
 signal OnPlayerReady # params: sender_id (int), ready (bool)
+signal OnPlayerIsDroppingBombs # params: sender_id (int), value (bool)
 # received by clients
 signal OnResponseToJoinLobby # params: accepted (bool)
 signal OnPlayerJoinedLobby # params: player_id (int)
@@ -106,6 +107,11 @@ func SendStartMatch() -> void:
 func SendPlayerReady(Ready: bool) -> void:
 	var id = multiplayer.get_remote_sender_id()
 	OnPlayerReady.emit(id, Ready)
+
+@rpc("reliable", "call_local", "any_peer")
+func SendDroppingBombs(Value: bool) -> void:
+	var id = multiplayer.get_remote_sender_id()
+	OnPlayerIsDroppingBombs.emit(id, Value)
 
 
 @rpc("reliable", "call_local", "authority")
