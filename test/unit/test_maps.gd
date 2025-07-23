@@ -14,22 +14,26 @@ func after_each():
 
 
 func test_IsValidFieldPos_Valid() -> void:
+	m.initialize("test", Types.MAP_WIDTH, Types.MAP_HEIGHT)
 	var pos: Vector2i = Vector2i(3, 3)
 	assert_true(o._IsValidFieldPos(m, pos))
 
 
 func test_IsValidFieldPos_Invalid() -> void:
+	m.initialize("test", Types.MAP_WIDTH, Types.MAP_HEIGHT)
 	var pos: Vector2i = Vector2i(-1, 500)
 	assert_false(o._IsValidFieldPos(m, pos))
 
 
 func test_SetFieldTypeTo() -> void:
+	m.initialize("test", Types.MAP_WIDTH, Types.MAP_HEIGHT)
 	var pos: Vector2i = Vector2i(5, 5)
 	o.SetFieldTypeTo(m, pos, Types.FIELD_SOLID)
 	assert_eq(m.Fields[pos.y][pos.x], Types.FIELD_SOLID)
 
 
 func test_GetFieldType() -> void:
+	m.initialize("test", Types.MAP_WIDTH, Types.MAP_HEIGHT)
 	var pos: Vector2i = Vector2i(5, 5)
 	m.Fields[pos.y][pos.x] = Types.FIELD_BRICK
 	var v: int = o.GetFieldType(m, pos)
@@ -37,12 +41,14 @@ func test_GetFieldType() -> void:
 
 
 func test_ClearField() -> void:
+	m.initialize("test", Types.MAP_WIDTH, Types.MAP_HEIGHT)
 	var pos: Vector2i = Vector2i(5, 5)
 	o.ClearField(m, pos)
 	assert_eq(o.GetFieldType(m, pos), Types.FIELD_EMPTY)
 
 
 func test_ClearFieldsAround() -> void:
+	m.initialize("test", Types.MAP_WIDTH, Types.MAP_HEIGHT)
 	for y in m.Height:
 		for x in m.Width:
 			o.SetFieldTypeTo(m, Vector2i(x, y), Types.FIELD_BRICK)
