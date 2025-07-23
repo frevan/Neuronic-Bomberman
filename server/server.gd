@@ -249,3 +249,10 @@ func Stop() -> bool:
 	
 	_log("server stopped")
 	return true
+
+
+func UpdatePlayerPosition(ID: int, Position: Vector2) -> void:
+	var idx = Data.FindSlotForPlayer(ID)
+	if idx != Types.INVALID_SLOT:
+		Data.Slots[idx].Player.Position = Position
+	pass

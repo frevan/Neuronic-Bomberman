@@ -18,6 +18,8 @@ signal OnPlayerPositionChanged # params: player_id (int)
 signal OnMapTileChanged # params: field (vector2i), type (int)
 signal OnBombDropped # params: field (vector2i)
 
+signal OnPlayerPositionUpdated # [for the server object] param: id (int), position (vector2)
+
 
 var Data: TGameData
 var CurrentMapName: String = ""
@@ -295,4 +297,13 @@ func RequestStartMatch() -> void:
 
 func DropBombs(IsDropping: bool) -> void:
 	Network.SendDroppingBombs.rpc_id(1, IsDropping)
+	pass
+
+
+func UpdatePlayerPosition(ID: int, Position: Vector2) -> void:
+	var idx = Data.FindSlotForPlayer(ID)
+	if idx != Types.INVALID_SLOT:
+		Data.Slots[idx].Player.Position = Position
+		if Network.PeerID == 1:
+			OnPlayerPositionUpdated.emit(ID, Position)
 	pass

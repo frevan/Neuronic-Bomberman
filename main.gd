@@ -50,6 +50,7 @@ func _InitializeClient() -> void:
 	Client.OnDisconnectedFromServer.connect(_client_disconnected_from_server)
 	Client.OnMatchStarted.connect(_client_match_started)
 	Client.OnNewRound.connect(_client_new_round)
+	Client.OnPlayerPositionUpdated.connect(_client_player_position_updated)
 	pass
 
 func _InitializeLobbyScene() -> void:
@@ -83,6 +84,11 @@ func _client_match_started() -> void:
 func _client_new_round() -> void:
 	Tools.SwitchToScene($Match)
 	$Match.UpdateAll()
+	pass
+
+func _client_player_position_updated(ID: int, Position: Vector2) -> void:
+	if Server:
+		Server.UpdatePlayerPosition(ID, Position)
 	pass
 
 

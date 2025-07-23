@@ -28,7 +28,7 @@ func AfterHide() -> void:
 func _process(_delta: float) -> void:
 	if visible:
 		_HandleUserInput()
-		#UpdatePlayerFields()
+		_UpdatePlayerPositionsFromNodes()
 		#if Variables.IsServer:
 			#Rules.ExplodeBombs(context, delta)
 			#Rules.RemoveExplosions(context, delta)
@@ -98,6 +98,7 @@ func _ShowPlayers() -> void:
 		assert(scene)
 		var p: Types.TPlayer = Client.Data.Slots[i].Player
 		scene.visible = p.PeerID != 0
+		Client.Data.Slots[i].Scene = scene
 	pass
 
 
@@ -124,4 +125,17 @@ func _SetPlayerAuthorities() -> void:
 
 func _on_player_check_for_collisions(Sender: Node2D, NewPosition: Vector2) -> void:
 	Sender.position = Rules.ApplyObstaclesToPlayerMove(Client.Data.Map, Sender.position, NewPosition)
+	pass
+
+
+func _UpdatePlayerPositionsFromNodes() -> void:
+	if visible:
+		for i in Client.Data.Slots.size():
+			var p: Types.TPlayer = Client.Data.Slots[i].Player
+			var node: Node2D = Client.Data.Slots[i].Scene
+			if (p.PeerID != 0) && node:
+				Client.UpdatePlayerPosition(p.PeerID, Tools.ScreenPositionToField(node.position))
+				if p.PeerID == multiplayer.get_unique_id():
+					var field = Vector2i(p.Position)
+					$PlayerPosLabel.text = str(field) #"(" + str(p.field.x) + "," + str(p.field.y) + ")"
 	pass
