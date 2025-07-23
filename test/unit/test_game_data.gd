@@ -98,3 +98,12 @@ func test_SetPlayersToStartPositions() -> void:
 	o.SetPlayersToStartPositions()
 	assert_almost_eq(o.Slots[1].Player.Position.x, 14, 0.1)
 	assert_almost_eq(o.Slots[1].Player.Position.y, 10, 0.1)
+
+
+func test_ResetPlayersBeforeRound() -> void:
+	o.Slots[1].Player.TotalBombs = 5
+	o.Slots[1].Player.DroppedBombs = 4
+	o.ResetPlayersBeforeRound()
+	assert_eq(o.Slots[1].Player.TotalBombs, 1)
+	assert_eq(o.Slots[1].Player.DroppedBombs, 0)
+	pass

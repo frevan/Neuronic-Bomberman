@@ -93,3 +93,11 @@ func SetPlayersToStartPositions() -> void:
 			if Map.StartPositions.has(i):
 				p.Position = Map.StartPositions[i].Pos
 	pass
+
+
+func ResetPlayersBeforeRound() -> void:
+	for i in Slots.size():
+		var p: Types.TPlayer = Slots[i].Player
+		p.TotalBombs = 1
+		p.DroppedBombs = 0
+	pass
