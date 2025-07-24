@@ -4,10 +4,12 @@ extends TScene
 signal OnLeaveLobby
 
 
+const bombscene = preload("res://items/bomb.tscn")
 const brickscene = preload("res://items/brick.tscn") 
 const solidscene = preload("res://items/solidblock.tscn")
 
 @onready var Rules: TRules = TRules.new()
+var Bombs: Dictionary
 
 
 func BeforeShow() -> void:
@@ -15,6 +17,7 @@ func BeforeShow() -> void:
 	Client.OnNewRound.connect(_client_new_round)
 	Client.OnPlayerPositionChanged.connect(_client_player_position_changed)
 	Client.OnMapTileChanged.connect(_client_map_tile_changed)
+	Client.OnBombDropped.connect(_client_bomb_dropped)
 	pass
 
 func AfterHide() -> void:
@@ -22,6 +25,7 @@ func AfterHide() -> void:
 	Client.OnNewRound.disconnect(_client_new_round)
 	Client.OnPlayerPositionChanged.disconnect(_client_player_position_changed)
 	Client.OnMapTileChanged.disconnect(_client_map_tile_changed)
+	Client.OnBombDropped.disconnect(_client_bomb_dropped)
 	pass
 
 
@@ -58,6 +62,16 @@ func _client_player_position_changed(_PlayerID: int) -> void:
 func _client_map_tile_changed(_Field: Vector2i, _Type: int) -> void:
 	_CreateTiles()
 	pass
+
+func _client_bomb_dropped(Field: Vector2i) -> void:
+	var bomb = bombscene.instantiate()
+	bomb.position = Tools.FieldPositionToScreen(Field)
+	bomb.visible = true
+	bomb.Field = Field
+	Bombs[Field] = bomb
+	add_child.call_deferred(bomb)
+	pass
+
 
 
 func _CreateTiles() -> void:
