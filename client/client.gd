@@ -165,7 +165,7 @@ func _network_map_tile_changed(Field: Vector2i, Type: int) -> void:
 
 func _network_bomb_dropped(Field: Vector2i)-> void:
 	_log("bomb dropped on field " + str(Field))
-	# TODO: add bomb to data
+	Data.AddBombAt(Field)
 	OnBombDropped.emit(Field)
 	pass
 

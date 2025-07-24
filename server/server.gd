@@ -105,8 +105,9 @@ func _DropBomb(Player: Types.TPlayer) -> void:
 	if Player.DroppedBombs == Player.TotalBombs:
 		return
 	Player.DroppedBombs += 1
-	# TODO: add bomb to data
-	Network.SendBombDropped.rpc(Vector2i(Player.Position))
+	var pos: Vector2i = Player.Position
+	Data.AddBombAt(pos)
+	Network.SendBombDropped.rpc(pos)
 	pass
 
 

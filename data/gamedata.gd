@@ -4,6 +4,7 @@ class_name TGameData
 
 var Slots: Array
 var Map: Types.TMap = null
+var Bombs: Array[Vector2i] = []
 
 
 func InitSlots() -> void:
@@ -101,3 +102,15 @@ func ResetPlayersBeforeRound() -> void:
 		p.TotalBombs = 1
 		p.DroppedBombs = 0
 	pass
+
+
+func AddBombAt(Field: Vector2i) -> void:
+	if !FieldHasBomb(Field):
+		Bombs.append(Field)
+	pass
+
+func FieldHasBomb(Field: Vector2i) -> bool:
+	for v: Vector2i in Bombs:
+		if v == Field:
+			return true
+	return false
