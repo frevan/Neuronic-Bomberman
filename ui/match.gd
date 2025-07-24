@@ -26,6 +26,7 @@ func AfterHide() -> void:
 	Client.OnPlayerPositionChanged.disconnect(_client_player_position_changed)
 	Client.OnMapTileChanged.disconnect(_client_map_tile_changed)
 	Client.OnBombDropped.disconnect(_client_bomb_dropped)
+	_CleanUpAfterMatch()
 	pass
 
 
@@ -152,4 +153,20 @@ func _UpdatePlayerPositionsFromNodes() -> void:
 				if p.PeerID == multiplayer.get_unique_id():
 					var field = Vector2i(p.Position)
 					$PlayerPosLabel.text = str(field) #"(" + str(p.field.x) + "," + str(p.field.y) + ")"
+	pass
+
+
+func _RemoveBombScenes() -> void:
+	for scene in Bombs:
+		scene.queue_free()
+	Bombs.clear()
+	pass
+
+func _CleanUpAfterRound() -> void:
+	_RemoveBombScenes()
+	pass
+
+
+func _CleanUpAfterMatch() -> void:
+	_CleanUpAfterRound()
 	pass
