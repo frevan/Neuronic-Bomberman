@@ -102,8 +102,8 @@ func _network_player_is_dropping_bomb(PlayerID: int, Value: bool) -> void:
 
 
 func _DropBomb(Player: Types.TPlayer) -> void:
-	if Player.TotalBombs - Player.DroppedBombs == 0:
-		pass
+	if Player.DroppedBombs == Player.TotalBombs:
+		return
 	Player.DroppedBombs += 1
 	# TODO: add bomb to data
 	Network.SendBombDropped.rpc(Vector2i(Player.Position))
