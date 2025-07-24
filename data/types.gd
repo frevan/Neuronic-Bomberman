@@ -33,11 +33,9 @@ class TPlayer:
 class TSlot:
 	var Index: int
 	var Player: TPlayer
-	var Scene: Node2D
 	func _init(SetIndex: int = INVALID_SLOT) -> void:
 		Index = SetIndex
 		Player = TPlayer.new()
-		Scene = null
 		pass
 
 

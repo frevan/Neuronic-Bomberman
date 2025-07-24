@@ -9,6 +9,8 @@ const brickscene = preload("res://items/brick.tscn")
 const solidscene = preload("res://items/solidblock.tscn")
 
 @onready var Rules: TRules = TRules.new()
+
+var PlayerScenes: Dictionary # key = player_id
 var Bombs: Array[TBombScene] = []
 
 
@@ -113,7 +115,7 @@ func _ShowPlayers() -> void:
 		assert(scene)
 		var p: Types.TPlayer = Client.Data.Slots[i].Player
 		scene.visible = p.PeerID != 0
-		Client.Data.Slots[i].Scene = scene
+		PlayerScenes[p.PeerID] = scene
 	pass
 
 
@@ -147,14 +149,21 @@ func _UpdatePlayerPositionsFromNodes() -> void:
 	if visible:
 		for i in Client.Data.Slots.size():
 			var p: Types.TPlayer = Client.Data.Slots[i].Player
-			var node: Node2D = Client.Data.Slots[i].Scene
-			if (p.PeerID != 0) && node:
-				Client.UpdatePlayerPosition(p.PeerID, Tools.ScreenPositionToField(node.position))
-				if p.PeerID == multiplayer.get_unique_id():
-					var field = Vector2i(p.Position)
-					$PlayerPosLabel.text = str(field) #"(" + str(p.field.x) + "," + str(p.field.y) + ")"
+			if !p:
+				continue
+			var node: Node2D = PlayerScenes[p.PeerID]
+			if !node:
+				continue
+			Client.UpdatePlayerPosition(p.PeerID, Tools.ScreenPositionToField(node.position))
+			if p.PeerID == multiplayer.get_unique_id():
+				var field = Vector2i(p.Position)
+				$PlayerPosLabel.text = str(field)
 	pass
 
+
+func _RemovePlayerScenes() -> void:
+	PlayerScenes.clear()
+	pass
 
 func _RemoveBombScenes() -> void:
 	for scene in Bombs:
@@ -163,6 +172,7 @@ func _RemoveBombScenes() -> void:
 	pass
 
 func _CleanUpAfterRound() -> void:
+	_RemovePlayerScenes()
 	_RemoveBombScenes()
 	pass
 
