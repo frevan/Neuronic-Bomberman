@@ -9,7 +9,7 @@ const brickscene = preload("res://items/brick.tscn")
 const solidscene = preload("res://items/solidblock.tscn")
 
 @onready var Rules: TRules = TRules.new()
-var Bombs: Dictionary
+var Bombs: Array[TBombScene] = []
 
 
 func BeforeShow() -> void:
@@ -68,7 +68,7 @@ func _client_bomb_dropped(Field: Vector2i) -> void:
 	bomb.position = Tools.FieldPositionToScreen(Field)
 	bomb.visible = true
 	bomb.Field = Field
-	Bombs[Field] = bomb
+	Bombs.append(bomb)
 	add_child.call_deferred(bomb)
 	pass
 
@@ -138,7 +138,7 @@ func _SetPlayerAuthorities() -> void:
 
 
 func _on_player_check_for_collisions(Sender: Node2D, NewPosition: Vector2) -> void:
-	Sender.position = Rules.ApplyObstaclesToPlayerMove(Client.Data.Map, Sender.position, NewPosition)
+	Sender.position = Rules.ApplyObstaclesToPlayerMove(Client.Data, Sender.position, NewPosition)
 	pass
 
 

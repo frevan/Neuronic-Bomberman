@@ -24,8 +24,8 @@ func _FieldHasBrickOrSolid(Map: Types.TMap, Field: Vector2i) -> bool:
 		return Map.Fields[Field.y][Field.x] != Types.FIELD_EMPTY
 	return false
 
-func _FieldHasObstacle(Map: Types.TMap, Field: Vector2i) -> bool:
-	return _FieldHasBrickOrSolid(Map, Field) #|| _FieldHasBomb(Field)
+func _FieldHasObstacle(Data: TGameData, Field: Vector2i) -> bool:
+	return _FieldHasBrickOrSolid(Data.Map, Field) || Data.FieldHasBomb(Field)
 
 func _PlayerTouchesField(Position: Vector2, Field: Vector2i) -> int:
 	var playerRect: Rect2 = Tools.PlayerPositionToRect(Position)
@@ -39,8 +39,8 @@ func _LimitPlayerToArena(Position: Vector2) -> Vector2:
 	Position.y = min(Position.y, Tools.FIELD_OFFSET.y + (Tools.FIELD_SIZE.y * (Types.MAP_HEIGHT - 1)))
 	return Position
 
-func _CheckIfPlayerCanMoveToField(Map: Types.TMap, NewPosition: Vector2, CurrentField: Vector2i, TestField: Vector2i) -> Vector2:
-	if _FieldHasObstacle(Map, TestField):
+func _CheckIfPlayerCanMoveToField(Data: TGameData, NewPosition: Vector2, CurrentField: Vector2i, TestField: Vector2i) -> Vector2:
+	if _FieldHasObstacle(Data, TestField):
 		if _PlayerTouchesField(NewPosition, TestField):
 			if TestField.x < CurrentField.x:
 				NewPosition = _LimitPlayerLeftToField(NewPosition, CurrentField)
@@ -53,10 +53,10 @@ func _CheckIfPlayerCanMoveToField(Map: Types.TMap, NewPosition: Vector2, Current
 	return NewPosition
 
 
-func ApplyObstaclesToPlayerMove(Map: Types.TMap, Position: Vector2, NewPosition: Vector2) -> Vector2:
+func ApplyObstaclesToPlayerMove(Data: TGameData, Position: Vector2, NewPosition: Vector2) -> Vector2:
 	var playerField: Vector2i = Tools.ScreenPositionToField(Position)
-	NewPosition = _CheckIfPlayerCanMoveToField(Map, NewPosition, playerField, Vector2i(playerField.x - 1, playerField.y))
-	NewPosition = _CheckIfPlayerCanMoveToField(Map, NewPosition, playerField, Vector2i(playerField.x + 1, playerField.y))
-	NewPosition = _CheckIfPlayerCanMoveToField(Map, NewPosition, playerField, Vector2i(playerField.x, playerField.y - 1))
-	NewPosition = _CheckIfPlayerCanMoveToField(Map, NewPosition, playerField, Vector2i(playerField.x, playerField.y + 1))
+	NewPosition = _CheckIfPlayerCanMoveToField(Data, NewPosition, playerField, Vector2i(playerField.x - 1, playerField.y))
+	NewPosition = _CheckIfPlayerCanMoveToField(Data, NewPosition, playerField, Vector2i(playerField.x + 1, playerField.y))
+	NewPosition = _CheckIfPlayerCanMoveToField(Data, NewPosition, playerField, Vector2i(playerField.x, playerField.y - 1))
+	NewPosition = _CheckIfPlayerCanMoveToField(Data, NewPosition, playerField, Vector2i(playerField.x, playerField.y + 1))
 	return _LimitPlayerToArena(NewPosition)
