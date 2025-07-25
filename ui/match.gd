@@ -190,9 +190,12 @@ func _UpdatePlayerPositionsFromNodes() -> void:
 				if !node:
 					continue
 				Client.UpdatePlayerPosition(p.PeerID, Tools.ScreenPositionToField(node.position))
-				if p.PeerID == multiplayer.get_unique_id():
+			if p.PeerID == multiplayer.get_unique_id():
+				if p.Alive:
 					var field = Vector2i(p.Position)
 					$PlayerPosLabel.text = str(field)
+				else:
+					$PlayerPosLabel.text = "dead"
 	pass
 
 
