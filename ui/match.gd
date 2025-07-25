@@ -11,7 +11,7 @@ const solidscene = preload("res://items/solidblock.tscn")
 @onready var Rules: TRules = TRules.new()
 
 var PlayerScenes: Dictionary # key = player_id
-var Bombs: Array[TBombScene] = []
+var Bombs: Dictionary # key: field (Vector2i) | value: scene (Types.TBombScene)
 
 
 func BeforeShow() -> void:
@@ -20,6 +20,9 @@ func BeforeShow() -> void:
 	Client.OnPlayerPositionChanged.connect(_client_player_position_changed)
 	Client.OnMapTileChanged.connect(_client_map_tile_changed)
 	Client.OnBombDropped.connect(_client_bomb_dropped)
+	Client.OnRemoveBomb.connect(_client_remove_bomb)
+	Client.OnExplosion.connect(_client_explosion)
+	Client.OnRemoveExplosion.connect(_client_remove_explosion)
 	pass
 
 func AfterHide() -> void:
@@ -28,6 +31,9 @@ func AfterHide() -> void:
 	Client.OnPlayerPositionChanged.disconnect(_client_player_position_changed)
 	Client.OnMapTileChanged.disconnect(_client_map_tile_changed)
 	Client.OnBombDropped.disconnect(_client_bomb_dropped)
+	Client.OnRemoveBomb.disconnect(_client_remove_bomb)
+	Client.OnExplosion.disconnect(_client_explosion)
+	Client.OnRemoveExplosion.disconnect(_client_remove_explosion)
 	_CleanUpAfterMatch()
 	pass
 
@@ -71,10 +77,22 @@ func _client_bomb_dropped(Field: Vector2i) -> void:
 	bomb.position = Tools.FieldPositionToScreen(Field)
 	bomb.visible = true
 	bomb.Field = Field
-	Bombs.append(bomb)
+	Bombs[Field] = bomb
 	add_child.call_deferred(bomb)
 	pass
 
+func _client_remove_bomb(Field: Vector2i) -> void:
+	if Bombs.has(Field):
+		var scene = Bombs[Field]
+		Bombs.erase(Field)
+		scene.queue_free()
+	pass
+	
+func _client_explosion(_Field: Vector2i) -> void:
+	pass
+	
+func _client_remove_explosion(_Field: Vector2i) -> void:
+	pass
 
 
 func _CreateTiles() -> void:

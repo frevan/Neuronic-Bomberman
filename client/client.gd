@@ -17,6 +17,7 @@ signal OnNewRound
 signal OnPlayerPositionChanged # params: player_id (int)
 signal OnMapTileChanged # params: field (vector2i), type (int)
 signal OnBombDropped # params: field (vector2i)
+signal OnRemoveBomb # params: field (vector2i)
 signal OnExplosion # params: field (vector2i)
 signal OnRemoveExplosion # params: field (vector2i)
 
@@ -175,6 +176,8 @@ func _network_bomb_dropped(Field: Vector2i)-> void:
 
 func _network_create_explosion_at(Field: Vector2i) -> void:
 	_log("explosion at " + str(Field))
+	Data.RemoveBomb(Field)
+	OnRemoveBomb.emit(Field)
 	Data.AddExplosionAt(Field)
 	OnExplosion.emit(Field)
 	pass

@@ -133,6 +133,9 @@ func _ExplodeBombs(Delta: float) -> void:
 		if b.TimeUntilExplosion <= 0:
 			_CreateExplosionsForBomb(b)
 			Data.RemoveBomb(field)
+			var slot_idx = Data.FindSlotForPlayer(b.PlayerID)
+			if slot_idx != Types.INVALID_SLOT:
+				Data.Slots[slot_idx].Player.DroppedBombs -= 1
 	pass
 
 
@@ -155,7 +158,7 @@ func _CreateExplosionAt(Field: Vector2i) -> void:
 		Data.AddExplosionAt(Field)
 		Network.SendCreateExplosionAt.rpc(Field)
 	if f == Types.FIELD_BRICK:
-		Network.SendMapTileChanged.rpc(Field)
+		Network.SendMapTileChanged.rpc(Field, Types.FIELD_EMPTY)
 	pass
 
 
