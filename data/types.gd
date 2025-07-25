@@ -14,6 +14,9 @@ const MAP_WIDTH = 15
 const MAP_HEIGHT = 11
 
 
+const BOMB_EXPLOSIONTIME = 1.0 # in seconds 
+
+
 class TPlayer:
 	var PeerID: int
 	var Ready: bool
@@ -37,6 +40,12 @@ class TSlot:
 		Index = SetIndex
 		Player = TPlayer.new()
 		pass
+
+
+class TBomb:
+	var PlayerID: int
+	var Field: Vector2i
+	var TimeUntilExplosion: float # in seconds
 
 
 class TMapStartPosition:

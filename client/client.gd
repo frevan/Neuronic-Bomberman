@@ -17,6 +17,7 @@ signal OnNewRound
 signal OnPlayerPositionChanged # params: player_id (int)
 signal OnMapTileChanged # params: field (vector2i), type (int)
 signal OnBombDropped # params: field (vector2i)
+signal OnExplosion # params: field (vector2i)
 
 signal OnPlayerPositionUpdated # [for the server object] param: id (int), position (vector2)
 
@@ -165,8 +166,15 @@ func _network_map_tile_changed(Field: Vector2i, Type: int) -> void:
 
 func _network_bomb_dropped(Field: Vector2i)-> void:
 	_log("bomb dropped on field " + str(Field))
-	Data.AddBombAt(Field)
+	Data.AddBombAt(Field, 0)
 	OnBombDropped.emit(Field)
+	pass
+
+
+func _network_create_explosion_at(Field: Vector2i) -> void:
+	_log("explosion at " + str(Field))
+	Data.CreateExplosion(Field)
+	OnExplosion.emit(Field)
 	pass
 
 
@@ -187,6 +195,7 @@ func _ConnectToSignals() -> void:
 	Network.OnPlayerPositionReceived.connect(_network_player_position_received)
 	Network.OnMapTileChanged.connect(_network_map_tile_changed)
 	Network.OnBombDropped.connect(_network_bomb_dropped)
+	Network.OnCreateExplosionAt.connect(_network_create_explosion_at)
 	pass
 
 
@@ -207,6 +216,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnPlayerPositionReceived.disconnect(_network_player_position_received)
 	Network.OnMapTileChanged.disconnect(_network_map_tile_changed)
 	Network.OnBombDropped.disconnect(_network_bomb_dropped)
+	Network.OnCreateExplosionAt.disconnect(_network_create_explosion_at)
 	pass
 
 

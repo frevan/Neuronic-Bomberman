@@ -16,6 +16,21 @@ func _log(Text: String) -> void:
 	pass
 
 
+func _ready() -> void:
+	set_process(false)
+	pass
+
+
+func _process(delta: float) -> void:
+	if !Data:
+		return
+	_ExplodeBombs(delta)
+	#RemoveExplosions(delta)
+	#KillPlayersInExplosions()
+	#CheckIfMatchEnded()
+	pass
+
+
 func _peer_connected(SenderID: int) -> void:
 	_log("peer connected: " + str(SenderID))
 	pass
@@ -106,8 +121,44 @@ func _DropBomb(Player: Types.TPlayer) -> void:
 		return
 	Player.DroppedBombs += 1
 	var pos: Vector2i = Player.Position
-	Data.AddBombAt(pos)
+	Data.AddBombAt(pos, Player.PeerID)
 	Network.SendBombDropped.rpc(pos)
+	pass
+
+
+func _ExplodeBombs(Delta: float) -> void:
+	for field: Vector2i in Data.Bombs:
+		var b = Data.Bombs[field]
+		b.TimeUntilExplosion -= Delta
+		if b.TimeUntilExplosion <= 0:
+			_ExplodeABomb(b)
+			Data.RemoveBomb(b.Field)
+	pass
+
+
+func _ExplodeABomb(Bomb: Types.TBomb) -> void:
+	_CreateExplosionsForBomb(Bomb)
+	pass
+
+
+func _CreateExplosionAt(Field: Vector2i) -> void:
+	if Field.x < 0 || Field.y < 0 || Field.x >= Types.MAP_WIDTH || Field.y >= Types.MAP_HEIGHT:
+		return
+	var f = Data.Map.Fields[Field.y][Field.x]
+	if f == Types.FIELD_EMPTY || f == Types.FIELD_BRICK:
+		Data.CreateExplosion(Field)
+		Network.SendCreateExplosionAt.rpc(Field)
+	if f == Types.FIELD_BRICK:
+		Network.SendMapTileChanged.rpc(Field)
+	pass
+
+
+func _CreateExplosionsForBomb(Bomb: Types.TBomb) -> void:
+	_CreateExplosionAt(Bomb.Field)
+	_CreateExplosionAt(Vector2i(Bomb.Field.x - 1, Bomb.Field.y))
+	_CreateExplosionAt(Vector2i(Bomb.Field.x + 1, Bomb.Field.y))
+	_CreateExplosionAt(Vector2i(Bomb.Field.x, Bomb.Field.y - 1))
+	_CreateExplosionAt(Vector2i(Bomb.Field.x, Bomb.Field.y + 1))
 	pass
 
 
@@ -168,6 +219,7 @@ func _StartMatch() -> void:
 
 func _StartNewRound() -> void:
 	Data.ResetPlayersBeforeRound()
+	Data.ResetBombs()
 	Network.SendNewRound.rpc(CurrentMapName)
 	pass
 
@@ -223,6 +275,7 @@ func Start() -> bool:
 	Network.SetPeerTo(_peer)
 	
 	State = TState.LOBBY
+	set_process(true)
 	
 	_log("server started")
 	return true
@@ -236,6 +289,8 @@ func Stop() -> bool:
 	assert(State != TState.IDLE)
 	if State == TState.IDLE:
 		return false
+	
+	set_process(false)
 	
 	Network.ResetPeer()
 	_DisconnectFromSignalsOnStop()
