@@ -5,13 +5,15 @@ signal OnLeaveLobby
 
 
 const bombscene = preload("res://items/bomb.tscn")
+const explosionscene = preload("res://items/explosion.tscn")
 const brickscene = preload("res://items/brick.tscn") 
 const solidscene = preload("res://items/solidblock.tscn")
 
 @onready var Rules: TRules = TRules.new()
 
 var PlayerScenes: Dictionary # key = player_id
-var Bombs: Dictionary # key: field (Vector2i) | value: scene (Types.TBombScene)
+var Bombs: Dictionary # key: field (Vector2i) | value: scene (TBombScene)
+var Explosions: Dictionary # key: field (Vector2i) | value: scene (TExplosionScene)
 
 
 func BeforeShow() -> void:
@@ -42,11 +44,6 @@ func _process(_delta: float) -> void:
 	if visible:
 		_HandleUserInput()
 		_UpdatePlayerPositionsFromNodes()
-		#if Variables.IsServer:
-			#Rules.ExplodeBombs(context, delta)
-			#Rules.RemoveExplosions(context, delta)
-			#Rules.KillPlayersInExplosions(context)
-			#Rules.CheckIfMatchEnded(context)
 	pass
 
 
@@ -88,10 +85,20 @@ func _client_remove_bomb(Field: Vector2i) -> void:
 		scene.queue_free()
 	pass
 	
-func _client_explosion(_Field: Vector2i) -> void:
+func _client_explosion(Field: Vector2i) -> void:
+	var e = explosionscene.instantiate()
+	e.position = Tools.FieldPositionToScreen(Field)
+	e.visible = true
+	e.Field = Field
+	Explosions[Field] = e
+	add_child.call_deferred(e)
 	pass
 	
-func _client_remove_explosion(_Field: Vector2i) -> void:
+func _client_remove_explosion(Field: Vector2i) -> void:
+	if Explosions.has(Field):
+		var scene = Explosions[Field]
+		Explosions.erase(Field)
+		scene.queue_free()
 	pass
 
 
@@ -184,14 +191,23 @@ func _RemovePlayerScenes() -> void:
 	pass
 
 func _RemoveBombScenes() -> void:
-	for scene in Bombs:
+	for field in Bombs:
+		var scene = Bombs[field]
 		scene.queue_free()
 	Bombs.clear()
+	pass
+
+func _RemoveExplosionScenes() -> void:
+	for field in Explosions:
+		var scene = Explosions[field]
+		scene.queue_free()
+	Explosions.clear()
 	pass
 
 func _CleanUpAfterRound() -> void:
 	_RemovePlayerScenes()
 	_RemoveBombScenes()
+	_RemoveExplosionScenes()
 	pass
 
 

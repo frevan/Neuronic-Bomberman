@@ -1,9 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://bo3g2i0utbxb5"]
+[gd_scene load_steps=3 format=3 uid="uid://bo3g2i0utbxb5"]
 
+[ext_resource type="Script" uid="uid://dfkqmskxhrcn4" path="res://items/explosion.gd" id="1_etkhb"]
 [ext_resource type="Texture2D" uid="uid://cxeqwhtf6g3a5" path="res://assets/explosion.png" id="1_yaj70"]
 
 [node name="Explosion" type="Node2D"]
 z_index = 15
+script = ExtResource("1_etkhb")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_yaj70")
