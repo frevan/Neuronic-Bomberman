@@ -25,6 +25,7 @@ func BeforeShow() -> void:
 	Client.OnRemoveBomb.connect(_client_remove_bomb)
 	Client.OnExplosion.connect(_client_explosion)
 	Client.OnRemoveExplosion.connect(_client_remove_explosion)
+	Client.OnPlayerDied.connect(_client_player_died)
 	pass
 
 func AfterHide() -> void:
@@ -36,6 +37,7 @@ func AfterHide() -> void:
 	Client.OnRemoveBomb.disconnect(_client_remove_bomb)
 	Client.OnExplosion.disconnect(_client_explosion)
 	Client.OnRemoveExplosion.disconnect(_client_remove_explosion)
+	Client.OnPlayerDied.disconnect(_client_player_died)
 	_CleanUpAfterMatch()
 	pass
 
@@ -101,6 +103,13 @@ func _client_remove_explosion(Field: Vector2i) -> void:
 		scene.queue_free()
 	pass
 
+func _client_player_died(PlayerID: int) -> void:
+	if PlayerScenes.has(PlayerID):
+		var scene = PlayerScenes[PlayerID]
+		PlayerScenes.erase(PlayerID)
+		scene.hide()
+	pass
+
 
 func _CreateTiles() -> void:
 	for node in $Tiles.get_children():
@@ -139,7 +148,7 @@ func _ShowPlayers() -> void:
 		var scene: Node2D = _FindPlayerNodeForSlot(i)
 		assert(scene)
 		var p: Types.TPlayer = Client.Data.Slots[i].Player
-		scene.visible = p.PeerID != 0
+		scene.visible = (p.PeerID != 0) && p.Alive
 		PlayerScenes[p.PeerID] = scene
 	pass
 
@@ -176,13 +185,14 @@ func _UpdatePlayerPositionsFromNodes() -> void:
 			var p: Types.TPlayer = Client.Data.Slots[i].Player
 			if !p:
 				continue
-			var node: Node2D = PlayerScenes[p.PeerID]
-			if !node:
-				continue
-			Client.UpdatePlayerPosition(p.PeerID, Tools.ScreenPositionToField(node.position))
-			if p.PeerID == multiplayer.get_unique_id():
-				var field = Vector2i(p.Position)
-				$PlayerPosLabel.text = str(field)
+			if PlayerScenes.has(p.PeerID):
+				var node: Node2D = PlayerScenes[p.PeerID]
+				if !node:
+					continue
+				Client.UpdatePlayerPosition(p.PeerID, Tools.ScreenPositionToField(node.position))
+				if p.PeerID == multiplayer.get_unique_id():
+					var field = Vector2i(p.Position)
+					$PlayerPosLabel.text = str(field)
 	pass
 
 

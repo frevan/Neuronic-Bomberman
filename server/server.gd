@@ -26,7 +26,7 @@ func _process(delta: float) -> void:
 		return
 	_ExplodeBombs(delta)
 	_RemoveExplosions(delta)
-	#KillPlayersInExplosions()
+	_KillPlayersInExplosions()
 	#CheckIfMatchEnded()
 	pass
 
@@ -168,6 +168,20 @@ func _CreateExplosionsForBomb(Bomb: Types.TBomb) -> void:
 	_CreateExplosionAt(Vector2i(Bomb.Field.x + 1, Bomb.Field.y))
 	_CreateExplosionAt(Vector2i(Bomb.Field.x, Bomb.Field.y - 1))
 	_CreateExplosionAt(Vector2i(Bomb.Field.x, Bomb.Field.y + 1))
+	pass
+
+
+func _KillPlayersInExplosions() -> void:
+	for i in Data.Slots.size():
+		var p = Data.Slots[i].Player
+		if Data.FieldHasExplosion(p.Position):
+			_KillPlayer(p)
+	pass
+
+
+func _KillPlayer(Player: Types.TPlayer) -> void:
+	Player.Alive = false
+	Network.SendPlayerDied.rpc(Player.PeerID)
 	pass
 
 

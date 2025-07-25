@@ -103,6 +103,7 @@ func ResetPlayersBeforeRound() -> void:
 		p.TotalBombs = 1
 		p.DroppedBombs = 0
 		p.DroppingBombs = false
+		p.Alive = true
 	pass
 
 
@@ -128,6 +129,9 @@ func RemoveBomb(Field: Vector2i) -> void:
 	Bombs.erase(Field)
 	pass
 
+
+func FieldHasExplosion(Field: Vector2i) -> bool:
+	return Explosions.has(Field)
 
 func AddExplosionAt(Field: Vector2i) -> void:
 	var explosion: Types.TExplosion

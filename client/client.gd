@@ -20,6 +20,7 @@ signal OnBombDropped # params: field (vector2i)
 signal OnRemoveBomb # params: field (vector2i)
 signal OnExplosion # params: field (vector2i)
 signal OnRemoveExplosion # params: field (vector2i)
+signal OnPlayerDied # params: id (int)
 
 signal OnPlayerPositionUpdated # [for the server object] param: id (int), position (vector2)
 
@@ -190,6 +191,14 @@ func _network_remove_explosion(Field: Vector2i) -> void:
 	pass
 
 
+func _network_player_died(PlayerID: int) -> void:
+	var slot_idx = Data.FindSlotForPlayer(PlayerID)
+	if slot_idx != Types.INVALID_SLOT:
+		Data.Slots[slot_idx].Player.Alive = false
+	OnPlayerDied.emit(PlayerID)
+	pass
+
+
 func _ConnectToSignals() -> void:
 	multiplayer.connected_to_server.connect(_connected_to_server)
 	multiplayer.connection_failed.connect(_connection_failed)
@@ -209,6 +218,7 @@ func _ConnectToSignals() -> void:
 	Network.OnBombDropped.connect(_network_bomb_dropped)
 	Network.OnCreateExplosionAt.connect(_network_create_explosion_at)
 	Network.OnRemoveExplosion.connect(_network_remove_explosion)
+	Network.OnPlayerDied.connect(_network_player_died)
 	pass
 
 
@@ -231,6 +241,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnBombDropped.disconnect(_network_bomb_dropped)
 	Network.OnCreateExplosionAt.disconnect(_network_create_explosion_at)
 	Network.OnRemoveExplosion.disconnect(_network_remove_explosion)
+	Network.OnPlayerDied.disconnect(_network_player_died)
 	pass
 
 

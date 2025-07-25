@@ -25,6 +25,7 @@ class TPlayer:
 	var TotalBombs: int
 	var DroppedBombs: int
 	var DroppingBombs: bool
+	var Alive: bool
 	func _init() -> void:
 		PeerID = 0
 		Ready = false
@@ -32,6 +33,7 @@ class TPlayer:
 		TotalBombs = 0
 		DroppedBombs = 0
 		DroppingBombs = false
+		Alive = false
 
 
 class TSlot:
