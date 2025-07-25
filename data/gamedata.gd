@@ -101,6 +101,7 @@ func ResetPlayersBeforeRound() -> void:
 		var p: Types.TPlayer = Slots[i].Player
 		p.TotalBombs = 1
 		p.DroppedBombs = 0
+		p.DroppingBombs = false
 	pass
 
 
