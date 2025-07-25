@@ -18,6 +18,7 @@ signal OnPlayerPositionChanged # params: player_id (int)
 signal OnMapTileChanged # params: field (vector2i), type (int)
 signal OnBombDropped # params: field (vector2i)
 signal OnExplosion # params: field (vector2i)
+signal OnRemoveExplosion # params: field (vector2i)
 
 signal OnPlayerPositionUpdated # [for the server object] param: id (int), position (vector2)
 
@@ -131,6 +132,7 @@ func _network_new_round(MapName: String) -> void:
 		_log("failed to load map: " + MapName)
 	
 	Data.ResetPlayersBeforeRound()
+	Data.ResetBombsEtcBeforeRound()
 	
 	OnNewRound.emit()
 	Network.SendPlayerReady.rpc_id(1, true)
@@ -173,8 +175,15 @@ func _network_bomb_dropped(Field: Vector2i)-> void:
 
 func _network_create_explosion_at(Field: Vector2i) -> void:
 	_log("explosion at " + str(Field))
-	Data.CreateExplosion(Field)
+	Data.AddExplosionAt(Field)
 	OnExplosion.emit(Field)
+	pass
+
+
+func _network_remove_explosion(Field: Vector2i) -> void:
+	_log("no more explosion at " + str(Field))
+	Data.RemoveExplosion(Field)
+	OnRemoveExplosion.emit(Field)
 	pass
 
 
@@ -196,6 +205,7 @@ func _ConnectToSignals() -> void:
 	Network.OnMapTileChanged.connect(_network_map_tile_changed)
 	Network.OnBombDropped.connect(_network_bomb_dropped)
 	Network.OnCreateExplosionAt.connect(_network_create_explosion_at)
+	Network.OnRemoveExplosion.connect(_network_remove_explosion)
 	pass
 
 
@@ -217,6 +227,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnMapTileChanged.disconnect(_network_map_tile_changed)
 	Network.OnBombDropped.disconnect(_network_bomb_dropped)
 	Network.OnCreateExplosionAt.disconnect(_network_create_explosion_at)
+	Network.OnRemoveExplosion.disconnect(_network_remove_explosion)
 	pass
 
 

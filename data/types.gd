@@ -14,7 +14,8 @@ const MAP_WIDTH = 15
 const MAP_HEIGHT = 11
 
 
-const BOMB_EXPLOSIONTIME = 1.0 # in seconds 
+const BOMB_TIME = 1.0 # in seconds 
+const EXPLOSION_TIME = 1.0 # in seconds
 
 
 class TPlayer:
@@ -46,6 +47,11 @@ class TBomb:
 	var PlayerID: int
 	var Field: Vector2i
 	var TimeUntilExplosion: float # in seconds
+
+
+class TExplosion:
+	var Field: Vector2i
+	var RemainingTime: float # in seconds
 
 
 class TMapStartPosition:

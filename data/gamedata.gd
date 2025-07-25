@@ -5,6 +5,7 @@ class_name TGameData
 var Slots: Array
 var Map: Types.TMap = null
 var Bombs: Dictionary # key: field (Vector2i), value: Types.TBomb
+var Explosions: Dictionary # key: field (Vector2i), value: Types.TExplosion
 
 
 func InitSlots() -> void:
@@ -105,8 +106,9 @@ func ResetPlayersBeforeRound() -> void:
 	pass
 
 
-func ResetBombs() -> void:
+func ResetBombsEtcBeforeRound() -> void:
 	Bombs.clear()
+	Explosions.clear()
 	pass
 
 
@@ -115,7 +117,7 @@ func AddBombAt(Field: Vector2i, PlayerID: int) -> void:
 		var b = Types.TBomb.new()
 		b.Field = Field
 		b.PlayerID = PlayerID
-		b.TimeUntilExplosion = Types.BOMB_EXPLOSIONTIME
+		b.TimeUntilExplosion = Types.BOMB_TIME
 		Bombs[Field] = b
 	pass
 
@@ -127,6 +129,17 @@ func RemoveBomb(Field: Vector2i) -> void:
 	pass
 
 
-func CreateExplosion(_Field: Vector2i) -> void:
-	# TODO
+func AddExplosionAt(Field: Vector2i) -> void:
+	var explosion: Types.TExplosion
+	if Explosions.has(Field):
+		explosion = Explosions[Field]
+	else:
+		explosion = Types.TExplosion.new()
+	explosion.Field = Field
+	explosion.RemainingTime = Types.EXPLOSION_TIME
+	Explosions[Field] = explosion
+	pass
+
+func RemoveExplosion(Field: Vector2i) -> void:
+	Explosions.erase(Field)
 	pass

@@ -25,7 +25,7 @@ func _process(delta: float) -> void:
 	if !Data:
 		return
 	_ExplodeBombs(delta)
-	#RemoveExplosions(delta)
+	_RemoveExplosions(delta)
 	#KillPlayersInExplosions()
 	#CheckIfMatchEnded()
 	pass
@@ -131,14 +131,20 @@ func _ExplodeBombs(Delta: float) -> void:
 		var b = Data.Bombs[field]
 		b.TimeUntilExplosion -= Delta
 		if b.TimeUntilExplosion <= 0:
-			_ExplodeABomb(b)
-			Data.RemoveBomb(b.Field)
+			_CreateExplosionsForBomb(b)
+			Data.RemoveBomb(field)
 	pass
 
 
-func _ExplodeABomb(Bomb: Types.TBomb) -> void:
-	_CreateExplosionsForBomb(Bomb)
+func _RemoveExplosions(Delta: float) -> void:
+	for field: Vector2i in Data.Explosions:
+		var e = Data.Explosions[field]
+		e.RemainingTime -= Delta
+		if e.RemainingTime <= 0:
+			Network.SendRemoveExplosion.rpc(field)
+			Data.RemoveExplosion(field)
 	pass
+
 
 
 func _CreateExplosionAt(Field: Vector2i) -> void:
@@ -146,7 +152,7 @@ func _CreateExplosionAt(Field: Vector2i) -> void:
 		return
 	var f = Data.Map.Fields[Field.y][Field.x]
 	if f == Types.FIELD_EMPTY || f == Types.FIELD_BRICK:
-		Data.CreateExplosion(Field)
+		Data.AddExplosionAt(Field)
 		Network.SendCreateExplosionAt.rpc(Field)
 	if f == Types.FIELD_BRICK:
 		Network.SendMapTileChanged.rpc(Field)
@@ -219,7 +225,7 @@ func _StartMatch() -> void:
 
 func _StartNewRound() -> void:
 	Data.ResetPlayersBeforeRound()
-	Data.ResetBombs()
+	Data.ResetBombsEtcBeforeRound()
 	Network.SendNewRound.rpc(CurrentMapName)
 	pass
 
