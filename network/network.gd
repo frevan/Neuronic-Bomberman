@@ -21,6 +21,8 @@ signal OnMatchStarted
 signal OnNewRound # params: map_name (string)
 signal OnPlayerBecameReady # params: player_id (int), ready (bool)
 signal OnRoundStarted
+signal OnRoundEnded
+signal OnMatchEnded
 signal OnPlayerPositionReceived # params: player_id (int), field (vector2)
 signal OnMapTileChanged # params: field (vector2i), type (int)
 signal OnBombDropped # params: field (vector2i)
@@ -149,6 +151,14 @@ func SendNewRound(MapName: String) -> void:
 @rpc("reliable", "call_local", "authority")
 func SendRoundStarted() -> void:
 	OnRoundStarted.emit()
+
+@rpc("reliable", "call_local", "authority")
+func SendRoundEnded() -> void:
+	OnRoundEnded.emit()
+
+@rpc("reliable", "call_local", "authority")
+func SendMatchEnded() -> void:
+	OnMatchEnded.emit()
 
 @rpc("reliable", "call_local", "authority")
 func SendPlayerBecameReady(ID: int, Ready: bool) -> void:

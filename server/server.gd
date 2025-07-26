@@ -24,10 +24,10 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if !Data:
 		return
-	_ExplodeBombs(delta)
-	_RemoveExplosions(delta)
-	_KillPlayersInExplosions()
-	#CheckIfMatchEnded()
+	if State == TState.ROUND:
+		_ExplodeBombs(delta)
+		_RemoveExplosions(delta)
+		_KillPlayersInExplosions()
 	pass
 
 
@@ -172,16 +172,27 @@ func _CreateExplosionsForBomb(Bomb: Types.TBomb) -> void:
 
 
 func _KillPlayersInExplosions() -> void:
+	var playerWasKilled: bool = false
 	for i in Data.Slots.size():
 		var p = Data.Slots[i].Player
 		if Data.FieldHasExplosion(p.Position):
 			_KillPlayer(p)
+			playerWasKilled = true
+	if playerWasKilled:
+		_CheckIfRoundEnded()
 	pass
 
 
 func _KillPlayer(Player: Types.TPlayer) -> void:
 	Player.Alive = false
 	Network.SendPlayerDied.rpc(Player.PeerID)
+	pass
+
+
+func _CheckIfRoundEnded() -> void:
+	if Data.CountAlivePlayers() <= 1:
+		_EndMatch()
+		#_EndRound()
 	pass
 
 
@@ -269,6 +280,18 @@ func _StartRoundNow() -> void:
 	Network.SendRoundStarted.rpc()
 	pass
 
+
+func _EndRound() -> void:
+	State = TState.MATCH
+	Network.SendRoundEnded.rpc()
+	pass
+
+
+func _EndMatch() -> void:
+	State = TState.LOBBY
+	Network.SendMatchEnded.rpc()
+	pass
+	
 
 func Start() -> bool:
 	assert(!Network.IsConnected())

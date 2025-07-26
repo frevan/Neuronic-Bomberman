@@ -16,6 +16,7 @@ func _ready() -> void:
 	_InitializeLobbyScene()
 	$Connecting.Initialize(Client)
 	_InitializeMatchScene()
+	_InitializeScoreScene()
 	
 	Tools.SwitchToScene($Menu)
 	pass
@@ -50,6 +51,8 @@ func _InitializeClient() -> void:
 	Client.OnDisconnectedFromServer.connect(_client_disconnected_from_server)
 	Client.OnMatchStarted.connect(_client_match_started)
 	Client.OnNewRound.connect(_client_new_round)
+	Client.OnRoundEnded.connect(_client_round_ended)
+	Client.OnMatchEnded.connect(_client_match_ended)
 	Client.OnPlayerPositionUpdated.connect(_client_player_position_updated)
 	pass
 
@@ -61,6 +64,12 @@ func _InitializeLobbyScene() -> void:
 func _InitializeMatchScene() -> void:
 	$Match.Initialize(Client)
 	$Match.OnLeaveLobby.connect(_match_leave_lobby)
+	pass
+
+func _InitializeScoreScene() -> void:
+	$Score.Initialize(Client)
+	$Score.OnLeaveMatch.connect(_score_leave_match)
+	$Score.OnReadyForNextRound.connect(_score_ready_for_next_round)
 	pass
 
 
@@ -86,6 +95,14 @@ func _client_new_round() -> void:
 	$Match.UpdateAll()
 	pass
 
+func _client_round_ended() -> void:
+	Tools.SwitchToScene($Score)
+	pass
+	
+func _client_match_ended() -> void:
+	Tools.SwitchToScene($Score)
+	pass
+
 func _client_player_position_updated(ID: int, Position: Vector2) -> void:
 	if Server:
 		Server.UpdatePlayerPosition(ID, Position)
@@ -108,6 +125,14 @@ func _match_leave_lobby() -> void:
 	Tools.SwitchToScene($Menu)
 	pass
 
+
+func _score_leave_match() -> void:
+	Tools.SwitchToScene($Lobby)
+	pass
+
+func _score_ready_for_next_round() -> void:
+	# TODO
+	pass
 
 
 func _DisconnectAndStop() -> void:

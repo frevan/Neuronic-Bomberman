@@ -64,7 +64,6 @@ func MovePlayerToSlot(PlayerID, SlotIndex) -> void:
 	Slots[SlotIndex].Player.PeerID = PlayerID
 	pass
 
-
 func AreAllPlayersReady() -> bool:
 	for i in Slots.size():
 		if Slots[i].Player.PeerID != 0:
@@ -72,20 +71,17 @@ func AreAllPlayersReady() -> bool:
 				return false
 	return true
 
-
 func SetAllPlayersUnready() -> void:
 	for i in Slots.size():
 		if is_instance_valid(Slots[i].Player):
 			Slots[i].Player.Ready = false
 	pass
 
-
 func SetPlayerReady(PlayerID: int, Ready: bool) -> void:
 	var idx = FindSlotForPlayer(PlayerID)
 	if idx != Types.INVALID_SLOT:
 		Slots[idx].Player.Ready = Ready
 	pass
-
 
 func SetPlayersToStartPositions() -> void:
 	assert(is_instance_valid(Map))
@@ -96,22 +92,27 @@ func SetPlayersToStartPositions() -> void:
 				p.Position = Map.StartPositions[i].Pos
 	pass
 
-
 func ResetPlayersBeforeRound() -> void:
 	for i in Slots.size():
 		var p: Types.TPlayer = Slots[i].Player
 		p.TotalBombs = 1
 		p.DroppedBombs = 0
 		p.DroppingBombs = false
-		p.Alive = true
+		p.Alive = p.PeerID != 0
 	pass
+
+func CountAlivePlayers() -> int:
+	var count: int = 0
+	for i in Slots.size():
+		if Slots[i].Player.Alive:
+			count += 1
+	return count
 
 
 func ResetBombsEtcBeforeRound() -> void:
 	Bombs.clear()
 	Explosions.clear()
 	pass
-
 
 func AddBombAt(Field: Vector2i, PlayerID: int) -> void:
 	if !FieldHasBomb(Field):

@@ -14,6 +14,8 @@ signal OnPlayerMovedToSlot # params: player_id (int), slot_index (int)
 signal OnMapNameChanged # params: map_name (string)
 signal OnMatchStarted
 signal OnNewRound
+signal OnRoundEnded
+signal OnMatchEnded
 signal OnPlayerPositionChanged # params: player_id (int)
 signal OnMapTileChanged # params: field (vector2i), type (int)
 signal OnBombDropped # params: field (vector2i)
@@ -141,13 +143,27 @@ func _network_new_round(MapName: String) -> void:
 	pass
 
 
-func _network_player_became_ready(PlayerID: int, Ready: bool) -> void:
-	_log("player " + str(PlayerID) + " is ready: " + str(Ready))
+func _network_round_started() -> void:
+	_log("round started")
 	pass
 
 
-func _network_round_started() -> void:
-	_log("round started")
+func _network_round_ended() -> void:
+	_log("round ended")
+	State = TState.MATCH
+	OnRoundEnded.emit()
+	pass
+
+
+func _network_match_ended() -> void:
+	_log("match ended")
+	State = TState.LOBBY
+	OnMatchEnded.emit()
+	pass
+
+
+func _network_player_became_ready(PlayerID: int, Ready: bool) -> void:
+	_log("player " + str(PlayerID) + " is ready: " + str(Ready))
 	pass
 
 
@@ -219,6 +235,8 @@ func _ConnectToSignals() -> void:
 	Network.OnCreateExplosionAt.connect(_network_create_explosion_at)
 	Network.OnRemoveExplosion.connect(_network_remove_explosion)
 	Network.OnPlayerDied.connect(_network_player_died)
+	Network.OnRoundEnded.connect(_network_round_ended)
+	Network.OnMatchEnded.connect(_network_match_ended)
 	pass
 
 
@@ -242,6 +260,8 @@ func _DisconnectFromSignals() -> void:
 	Network.OnCreateExplosionAt.disconnect(_network_create_explosion_at)
 	Network.OnRemoveExplosion.disconnect(_network_remove_explosion)
 	Network.OnPlayerDied.disconnect(_network_player_died)
+	Network.OnRoundEnded.disconnect(_network_round_ended)
+	Network.OnMatchEnded.disconnect(_network_match_ended)
 	pass
 
 
