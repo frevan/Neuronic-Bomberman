@@ -18,30 +18,24 @@ const BOMB_TIME = 1.0 # in seconds
 const EXPLOSION_TIME = 1.0 # in seconds
 
 
-class TPlayer:
-	var PeerID: int
+class TSlot:
+	var Index: int
+	var PlayerID: int
 	var Ready: bool
 	var Position: Vector2
 	var TotalBombs: int
 	var DroppedBombs: int
 	var DroppingBombs: bool
 	var Alive: bool
-	func _init() -> void:
-		PeerID = 0
+	func _init(SetIndex: int = INVALID_SLOT) -> void:
+		Index = SetIndex
+		PlayerID = 0
 		Ready = false
 		Position = Vector2(-1, -1)
 		TotalBombs = 0
 		DroppedBombs = 0
 		DroppingBombs = false
 		Alive = false
-
-
-class TSlot:
-	var Index: int
-	var Player: TPlayer
-	func _init(SetIndex: int = INVALID_SLOT) -> void:
-		Index = SetIndex
-		Player = TPlayer.new()
 		pass
 
 

@@ -12,7 +12,7 @@ func after_each():
 
 func LoadTestMap() -> void:
 	var Maps: TMaps = TMaps.new()
-	o.Slots[1].Player.PeerID = 5
+	o.Slots[1].PlayerID = 5
 	o.Map = Maps.LoadMap("test.sch")
 
 
@@ -25,33 +25,33 @@ func test_SlotsAreNotNull() -> void:
 
 
 func test_FindFreeSlotIndexWhenNotFull() -> void:
-	o.Slots[0].Player.PeerID = 1 # one occupied slot
+	o.Slots[0].PlayerID = 1 # one occupied slot
 	var index: int = o.FindFreeSlotIndex()
 	assert_ne(index, Types.INVALID_SLOT)
 
 func test_FindFreeSlotIndexWhenFull() -> void:
 	for i in o.Slots.size():
-		o.Slots[i].Player.PeerID = 1
+		o.Slots[i].PlayerID = 1
 	var index: int = o.FindFreeSlotIndex()
 	assert_eq(index, Types.INVALID_SLOT)
 
 
 
 func test_ClearSlot() -> void:
-	o.Slots[0].Player.PeerID = 1
+	o.Slots[0].PlayerID = 1
 	o.ClearSlot(0)
-	assert_eq(o.Slots[0].Player.PeerID, 0)
+	assert_eq(o.Slots[0].PlayerID, 0)
 
 func test_ClearSlotForPlayer() -> void:
-	o.Slots[1].Player.PeerID = 1
+	o.Slots[1].PlayerID = 1
 	o.ClearSlotForPlayer(1)
-	assert_eq(o.Slots[1].Player.PeerID, 0)
+	assert_eq(o.Slots[1].PlayerID, 0)
 
 func test_DontClearSlotForOtherPlayers() -> void:
-	o.Slots[0].Player.PeerID = 1
-	o.Slots[1].Player.PeerID = 2
+	o.Slots[0].PlayerID = 1
+	o.Slots[1].PlayerID = 2
 	o.ClearSlotForPlayer(2)
-	assert_eq(o.Slots[0].Player.PeerID, 1)
+	assert_eq(o.Slots[0].PlayerID, 1)
 
 
 func test_FindSlotForUnknownPlayer() -> void:
@@ -59,7 +59,7 @@ func test_FindSlotForUnknownPlayer() -> void:
 	assert_eq(idx, Types.INVALID_SLOT)
 
 func test_FindSlotForKnownPlayer() -> void:
-	o.Slots[1].Player.PeerID = 2
+	o.Slots[1].PlayerID = 2
 	var idx = o.FindSlotForPlayer(2)
 	assert_eq(idx, 1)
 
@@ -67,45 +67,45 @@ func test_FindSlotForKnownPlayer() -> void:
 func test_AreAllPlayersReady() -> void:
 	for i in o.Slots.size():
 		if i % 2 == 0:
-			o.Slots[i].Player.PeerID = 123
-			o.Slots[i].Player.Ready = true
+			o.Slots[i].PlayerID = 123
+			o.Slots[i].Ready = true
 	assert_true(o.AreAllPlayersReady())
 
 func test_SetAllPlayersUnready() -> void:
-	o.Slots[1].Player.PeerID = 123
-	o.Slots[1].Player.Ready = false
-	o.Slots[2].Player.PeerID = 456
-	o.Slots[2].Player.Ready = true
+	o.Slots[1].PlayerID = 123
+	o.Slots[1].Ready = false
+	o.Slots[2].PlayerID = 456
+	o.Slots[2].Ready = true
 	o.SetAllPlayersUnready()
-	assert_false(o.Slots[1].Player.Ready)
-	assert_false(o.Slots[2].Player.Ready)
+	assert_false(o.Slots[1].Ready)
+	assert_false(o.Slots[2].Ready)
 	
 func test_SetPlayerReady() -> void:
-	o.Slots[1].Player.PeerID = 123
-	o.Slots[1].Player.Ready = false
-	o.Slots[2].Player.PeerID = 456
-	o.Slots[2].Player.Ready = true
+	o.Slots[1].PlayerID = 123
+	o.Slots[1].Ready = false
+	o.Slots[2].PlayerID = 456
+	o.Slots[2].Ready = true
 	o.SetPlayerReady(123, true)
 	o.SetPlayerReady(456, false)
-	assert_true(o.Slots[1].Player.Ready)
-	assert_false(o.Slots[2].Player.Ready)
+	assert_true(o.Slots[1].Ready)
+	assert_false(o.Slots[2].Ready)
 
 
 func test_SetPlayersToStartPositions() -> void:
 	LoadTestMap()
 	assert_not_null(o.Map)
-	o.Slots[1].Player.PeerID = 5
+	o.Slots[1].PlayerID = 5
 	o.SetPlayersToStartPositions()
-	assert_almost_eq(o.Slots[1].Player.Position.x, 14, 0.1)
-	assert_almost_eq(o.Slots[1].Player.Position.y, 10, 0.1)
+	assert_almost_eq(o.Slots[1].Position.x, 14, 0.1)
+	assert_almost_eq(o.Slots[1].Position.y, 10, 0.1)
 
 
 func test_ResetPlayersBeforeRound() -> void:
-	o.Slots[1].Player.TotalBombs = 5
-	o.Slots[1].Player.DroppedBombs = 4
-	o.Slots[1].Player.DroppingBombs = true
+	o.Slots[1].TotalBombs = 5
+	o.Slots[1].DroppedBombs = 4
+	o.Slots[1].DroppingBombs = true
 	o.ResetPlayersBeforeRound()
-	assert_eq(o.Slots[1].Player.TotalBombs, 1)
-	assert_eq(o.Slots[1].Player.DroppedBombs, 0)
-	assert_false(o.Slots[1].Player.DroppingBombs)
+	assert_eq(o.Slots[1].TotalBombs, 1)
+	assert_eq(o.Slots[1].DroppedBombs, 0)
+	assert_false(o.Slots[1].DroppingBombs)
 	pass

@@ -52,7 +52,7 @@ func _network_request_join_lobby(SenderID: int) -> void:
 		slot_idx = Data.FindFreeSlotIndex()
 		if slot_idx >= 0: 
 			success = true
-			Data.Slots[slot_idx].Player.PeerID = SenderID
+			Data.Slots[slot_idx].PlayerID = SenderID
 		Network.SendJoinLobbyResponse.rpc_id(SenderID, success)
 		
 	if success:
@@ -109,19 +109,19 @@ func _network_player_ready(SenderID: int, Ready: bool) -> void:
 func _network_player_is_dropping_bomb(PlayerID: int, Value: bool) -> void:
 	var idx = Data.FindSlotForPlayer(PlayerID)
 	if idx != Types.INVALID_SLOT:
-		var p: Types.TPlayer = Data.Slots[idx].Player
-		p.DroppingBombs = Value
-		if p.DroppingBombs:
-			_DropBomb(p)
+		Data.Slots[idx].DroppingBombs = Value
+		if Data.Slots[idx].DroppingBombs:
+			_DropBomb(idx)
 	pass
 
 
-func _DropBomb(Player: Types.TPlayer) -> void:
-	if Player.DroppedBombs == Player.TotalBombs:
+func _DropBomb(SlotIndex: int) -> void:
+	var slot = Data.Slots[SlotIndex]
+	if slot.DroppedBombs == slot.TotalBombs:
 		return
-	Player.DroppedBombs += 1
-	var pos: Vector2i = Player.Position
-	Data.AddBombAt(pos, Player.PeerID)
+	slot.DroppedBombs += 1
+	var pos: Vector2i = slot.Position
+	Data.AddBombAt(pos, slot.PlayerID)
 	Network.SendBombDropped.rpc(pos)
 	pass
 
@@ -135,7 +135,7 @@ func _ExplodeBombs(Delta: float) -> void:
 			Data.RemoveBomb(field)
 			var slot_idx = Data.FindSlotForPlayer(b.PlayerID)
 			if slot_idx != Types.INVALID_SLOT:
-				Data.Slots[slot_idx].Player.DroppedBombs -= 1
+				Data.Slots[slot_idx].DroppedBombs -= 1
 	pass
 
 
@@ -174,18 +174,18 @@ func _CreateExplosionsForBomb(Bomb: Types.TBomb) -> void:
 func _KillPlayersInExplosions() -> void:
 	var playerWasKilled: bool = false
 	for i in Data.Slots.size():
-		var p = Data.Slots[i].Player
-		if Data.FieldHasExplosion(p.Position):
-			_KillPlayer(p)
+		var slot = Data.Slots[i]
+		if Data.FieldHasExplosion(slot.Position):
+			_KillPlayer(i)
 			playerWasKilled = true
 	if playerWasKilled:
 		_CheckIfRoundEnded()
 	pass
 
 
-func _KillPlayer(Player: Types.TPlayer) -> void:
-	Player.Alive = false
-	Network.SendPlayerDied.rpc(Player.PeerID)
+func _KillPlayer(SlotIndex: int) -> void:
+	Data.Slots[SlotIndex].Alive = false
+	Network.SendPlayerDied.rpc(Data.Slots[SlotIndex].PlayerID)
 	pass
 
 
@@ -230,7 +230,7 @@ func _ClientDisconnected(SenderID) -> void:
 func _SendLobbyInfoToPlayer(PlayerID: int) -> void:
 	if State == TState.LOBBY:
 		for i in Data.Slots.size():
-			var other_peerid: int = Data.Slots[i].Player.PeerID
+			var other_peerid: int = Data.Slots[i].PlayerID
 			if (other_peerid != 0) && (other_peerid != PlayerID):
 				Network.SendPlayerMovedToSlot.rpc_id(PlayerID, other_peerid, i)
 		Network.SendMapName.rpc_id(PlayerID, CurrentMapName)
@@ -243,9 +243,8 @@ func _StartMatch() -> void:
 	
 	Data.SetAllPlayersUnready()
 	for i in Data.Slots.size():
-		if is_instance_valid(Data.Slots[i].Player):
-			if Data.Slots[i].Player.PeerID != 0:
-				Network.SendPlayerBecameReady.rpc(Data.Slots[i].Player.PeerID, false)
+		if Data.Slots[i].PlayerID != 0:
+			Network.SendPlayerBecameReady.rpc(Data.Slots[i].PlayerID, false)
 	
 	_StartNewRound()
 	pass
@@ -263,12 +262,10 @@ func _StartRoundNow() -> void:
 	var tempMap: Types.TMap = Maps.CopyMap(Data.Map)
 	
 	Data.SetPlayersToStartPositions()
-	for i in Data.Slots.size():
-		if is_instance_valid(Data.Slots[i].Player):
-			var p: Types.TPlayer = Data.Slots[i].Player
-			if p.PeerID != 0:
-				Network.SendPlayerPosition.rpc(p.PeerID, p.Position)
-				Maps.ClearFieldsAround(Data.Map, p.Position)
+	for slot in Data.Slots:
+		if slot.PlayerID != 0:
+			Network.SendPlayerPosition.rpc(slot.PlayerID, slot.Position)
+			Maps.ClearFieldsAround(Data.Map, slot.Position)
 	
 	for y in Data.Map.Height:
 		for x in Data.Map.Width:
@@ -356,5 +353,5 @@ func Stop() -> bool:
 func UpdatePlayerPosition(ID: int, Position: Vector2) -> void:
 	var idx = Data.FindSlotForPlayer(ID)
 	if idx != Types.INVALID_SLOT:
-		Data.Slots[idx].Player.Position = Position
+		Data.Slots[idx].Position = Position
 	pass

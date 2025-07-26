@@ -17,26 +17,26 @@ func InitSlots() -> void:
 
 func FindFreeSlotIndex() -> int:
 	for i in Slots.size():
-		if Slots[i].Player.PeerID == 0:
+		if Slots[i].PlayerID == 0:
 			return i
 	return Types.INVALID_SLOT
 
 
 func ClearSlot(Index: int) -> void:
-	Slots[Index].Player.PeerID = 0
+	Slots[Index].PlayerID = 0
 	pass
 
 
 func ClearSlotForPlayer(PlayerID: int) -> void:
 	for i in Slots.size():
-		if Slots[i].Player.PeerID == PlayerID:
+		if Slots[i].PlayerID == PlayerID:
 			ClearSlot(i)
 	pass
 
 
 func FindSlotForPlayer(PlayerID: int) -> int:
 	for i in Slots.size():
-		if Slots[i].Player.PeerID == PlayerID:
+		if Slots[i].PlayerID == PlayerID:
 			return i
 	return Types.INVALID_SLOT
 
@@ -47,7 +47,7 @@ func MovePlayerToSlotIfFree(PlayerID, SlotIndex) -> bool:
 	if (SlotIndex < 0) || (SlotIndex >= Network.MAX_CLIENTS):
 		return false
 	
-	if (Slots[SlotIndex].Player.PeerID != 0) && (Slots[SlotIndex].Player.PeerID != PlayerID):
+	if (Slots[SlotIndex].PeerID != 0) && (Slots[SlotIndex].PlayerID != PlayerID):
 		return false
 	
 	MovePlayerToSlot(PlayerID, SlotIndex)
@@ -61,50 +61,47 @@ func MovePlayerToSlot(PlayerID, SlotIndex) -> void:
 		pass
 	
 	ClearSlotForPlayer(PlayerID)
-	Slots[SlotIndex].Player.PeerID = PlayerID
+	Slots[SlotIndex].PlayerID = PlayerID
 	pass
 
 func AreAllPlayersReady() -> bool:
 	for i in Slots.size():
-		if Slots[i].Player.PeerID != 0:
-			if !Slots[i].Player.Ready:
+		if Slots[i].PlayerID != 0:
+			if !Slots[i].Ready:
 				return false
 	return true
 
 func SetAllPlayersUnready() -> void:
 	for i in Slots.size():
-		if is_instance_valid(Slots[i].Player):
-			Slots[i].Player.Ready = false
+		Slots[i].Ready = false
 	pass
 
 func SetPlayerReady(PlayerID: int, Ready: bool) -> void:
 	var idx = FindSlotForPlayer(PlayerID)
 	if idx != Types.INVALID_SLOT:
-		Slots[idx].Player.Ready = Ready
+		Slots[idx].Ready = Ready
 	pass
 
 func SetPlayersToStartPositions() -> void:
 	assert(is_instance_valid(Map))
 	for i in Slots.size():
-		var p: Types.TPlayer = Slots[i].Player
-		if p.PeerID != 0:
+		if Slots[i].PlayerID != 0:
 			if Map.StartPositions.has(i):
-				p.Position = Map.StartPositions[i].Pos
+				Slots[i].Position = Map.StartPositions[i].Pos
 	pass
 
 func ResetPlayersBeforeRound() -> void:
 	for i in Slots.size():
-		var p: Types.TPlayer = Slots[i].Player
-		p.TotalBombs = 1
-		p.DroppedBombs = 0
-		p.DroppingBombs = false
-		p.Alive = p.PeerID != 0
+		Slots[i].TotalBombs = 1
+		Slots[i].DroppedBombs = 0
+		Slots[i].DroppingBombs = false
+		Slots[i].Alive = Slots[i].PlayerID != 0
 	pass
 
 func CountAlivePlayers() -> int:
 	var count: int = 0
 	for i in Slots.size():
-		if Slots[i].Player.Alive:
+		if Slots[i].Alive:
 			count += 1
 	return count
 

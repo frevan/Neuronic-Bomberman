@@ -18,11 +18,6 @@ func test_SlotIndexIsCorrect() -> void:
 	var slot: TTypes.TSlot = TTypes.TSlot.new(15)
 	assert_eq(slot.Index, 15)
 
-
-func test_SlotPlayerIsNotNull() -> void:
-	var slot: TTypes.TSlot = TTypes.TSlot.new()
-	assert_not_null(slot.Player)
-
 func test_SlotPlayerPeerIDIsZero() -> void:
 	var slot: TTypes.TSlot = TTypes.TSlot.new()
-	assert_eq(slot.Player.PeerID, 0)
+	assert_eq(slot.PlayerID, 0)

@@ -147,9 +147,9 @@ func _ShowPlayers() -> void:
 	for i in Client.Data.Slots.size():
 		var scene: Node2D = _FindPlayerNodeForSlot(i)
 		assert(scene)
-		var p: Types.TPlayer = Client.Data.Slots[i].Player
-		scene.visible = (p.PeerID != 0) && p.Alive
-		PlayerScenes[p.PeerID] = scene
+		var slot: Types.TSlot = Client.Data.Slots[i]
+		scene.visible = (slot.PlayerID != 0) && slot.Alive
+		PlayerScenes[slot.PlayerID] = scene
 	pass
 
 
@@ -158,8 +158,7 @@ func _SetPlayerPositions() -> void:
 		var node = _FindPlayerNodeForSlot(i)
 		assert(node)
 		if node.visible:
-			var p: Types.TPlayer = Client.Data.Slots[i].Player
-			node.position = Tools.FieldPositionToScreen(p.Position)
+			node.position = Tools.FieldPositionToScreen(Client.Data.Slots[i].Position)
 	pass
 
 
@@ -168,9 +167,9 @@ func _SetPlayerAuthorities() -> void:
 		var node = _FindPlayerNodeForSlot(i)
 		assert(node)
 		if node.visible:
-			var p: Types.TPlayer = Client.Data.Slots[i].Player
-			node.set_multiplayer_authority(p.PeerID)
-			node.set_physics_process(p.PeerID == Network.PeerID)
+			var playerID: int = Client.Data.Slots[i].PlayerID
+			node.set_multiplayer_authority(playerID)
+			node.set_physics_process(playerID == Network.PeerID)
 	pass
 
 
@@ -182,17 +181,15 @@ func _on_player_check_for_collisions(Sender: Node2D, NewPosition: Vector2) -> vo
 func _UpdatePlayerPositionsFromNodes() -> void:
 	if visible:
 		for i in Client.Data.Slots.size():
-			var p: Types.TPlayer = Client.Data.Slots[i].Player
-			if !p:
-				continue
-			if PlayerScenes.has(p.PeerID):
-				var node: Node2D = PlayerScenes[p.PeerID]
+			var slot = Client.Data.Slots[i]
+			if PlayerScenes.has(slot.PlayerID):
+				var node: Node2D = PlayerScenes[slot.PlayerID]
 				if !node:
 					continue
-				Client.UpdatePlayerPosition(p.PeerID, Tools.ScreenPositionToField(node.position))
-			if p.PeerID == multiplayer.get_unique_id():
-				if p.Alive:
-					var field = Vector2i(p.Position)
+				Client.UpdatePlayerPosition(slot.PlayerID, Tools.ScreenPositionToField(node.position))
+			if slot.PlayerID == multiplayer.get_unique_id():
+				if slot.Alive:
+					var field = Vector2i(slot.Position)
 					$PlayerPosLabel.text = str(field)
 				else:
 					$PlayerPosLabel.text = "dead"

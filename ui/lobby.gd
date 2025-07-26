@@ -34,6 +34,8 @@ func _process(_delta: float) -> void:
 func _HandleUserInput() -> void:
 	if Input.is_action_just_pressed("ui_cancel"):
 		_LeaveLobby()
+	elif Input.is_action_just_pressed("ui_accept"):
+		Client.RequestStartMatch()
 	pass
 
 
@@ -76,24 +78,15 @@ func _FindPlayerNameLabel(Slot: int) -> Node:
 	return null
 
 
-func _FindPlayerForSlot(SlotIndex: int) -> Types.TPlayer:
-	if !Client:
-		return null
-	if !Client.Data:
-		return null
-	if (SlotIndex < 0) || (SlotIndex >= Network.MAX_CLIENTS):
-		return null
-	return Client.Data.Slots[SlotIndex].Player
-
-
 func _UpdatePlayerInfo() -> void:
-	for i in 10:
+	for i in Client.Data.Slots.size():
 		var label = _FindPlayerNameLabel(i)
+		if !label:
+			continue
 		label.text = "..."
-		var player: Types.TPlayer = _FindPlayerForSlot(i)
-		if player:
-			if player.PeerID != 0:
-				label.text = str(player.PeerID)
+		var slot: Types.TSlot = Client.Data.Slots[i]
+		if slot.PlayerID != 0:
+			label.text = str(slot.PlayerID)
 	pass
 
 
