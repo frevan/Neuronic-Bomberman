@@ -28,7 +28,8 @@ signal OnMapTileChanged # params: field (vector2i), type (int)
 signal OnBombDropped # params: field (vector2i)
 signal OnCreateExplosionAt # params: field (vector2i)
 signal OnRemoveExplosion # params: field (vector2i)
-signal OnPlayerDied # param: id (int)
+signal OnPlayerDied # params: id (int)
+signal OnUpdatePlayerScore # params: id (int), score (int)
 
 
 const PORT = 15063
@@ -187,3 +188,7 @@ func SendRemoveExplosion(Field: Vector2i) -> void:
 @rpc("reliable", "call_local", "authority")
 func SendPlayerDied(ID: int) -> void:
 	OnPlayerDied.emit(ID)
+
+@rpc("reliable", "call_local", "authority")
+func SendPlayerScore(ID: int, Score: int) -> void:
+	OnUpdatePlayerScore.emit(ID, Score)

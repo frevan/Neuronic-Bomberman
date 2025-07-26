@@ -241,6 +241,8 @@ func _StartMatch() -> void:
 	State = TState.MATCH
 	Network.SendMatchStarted.rpc()
 	
+	Data.ResetPlayersBeforeMatch()
+	
 	Data.SetAllPlayersUnready()
 	for i in Data.Slots.size():
 		if Data.Slots[i].PlayerID != 0:
@@ -279,16 +281,27 @@ func _StartRoundNow() -> void:
 
 
 func _EndRound() -> void:
+	_IncreasePlayerScores()
 	State = TState.MATCH
 	Network.SendRoundEnded.rpc()
 	pass
 
 
 func _EndMatch() -> void:
+	_IncreasePlayerScores()
 	State = TState.LOBBY
 	Network.SendMatchEnded.rpc()
 	pass
-	
+
+
+func _IncreasePlayerScores() -> void:
+	for slot: Types.TSlot in Data.Slots:
+		if slot.Alive:
+			slot.Score += 1
+			Network.SendPlayerScore.rpc(slot.PlayerID, slot.Score)
+	pass
+
+
 
 func Start() -> bool:
 	assert(!Network.IsConnected())

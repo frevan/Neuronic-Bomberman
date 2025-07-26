@@ -23,6 +23,7 @@ signal OnRemoveBomb # params: field (vector2i)
 signal OnExplosion # params: field (vector2i)
 signal OnRemoveExplosion # params: field (vector2i)
 signal OnPlayerDied # params: id (int)
+signal OnPlayerScoreChanged # params: id (int), score (int)
 
 signal OnPlayerPositionUpdated # [for the server object] param: id (int), position (vector2)
 
@@ -120,6 +121,7 @@ func _network_map_changed(MapName: String) -> void:
 func _network_match_started() -> void:
 	_log("match started")
 	State = TState.MATCH
+	Data.ResetPlayersBeforeMatch()
 	OnMatchStarted.emit()
 	pass
 	
@@ -207,10 +209,18 @@ func _network_remove_explosion(Field: Vector2i) -> void:
 
 
 func _network_player_died(PlayerID: int) -> void:
+	_log("player " + str(PlayerID) + " died")
 	var slot_idx = Data.FindSlotForPlayer(PlayerID)
 	if slot_idx != Types.INVALID_SLOT:
 		Data.Slots[slot_idx].Alive = false
 	OnPlayerDied.emit(PlayerID)
+	pass
+
+
+func _network_update_player_score(PlayerID: int, Score: int) -> void:
+	_log("player " + str(PlayerID) + "'s score is now " + str(Score))
+	Data.UpdatePlayerScore(PlayerID, Score)
+	OnPlayerScoreChanged.emit(PlayerID, Score)
 	pass
 
 
@@ -236,6 +246,7 @@ func _ConnectToSignals() -> void:
 	Network.OnPlayerDied.connect(_network_player_died)
 	Network.OnRoundEnded.connect(_network_round_ended)
 	Network.OnMatchEnded.connect(_network_match_ended)
+	Network.OnUpdatePlayerScore.connect(_network_update_player_score)
 	pass
 
 
@@ -261,6 +272,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnPlayerDied.disconnect(_network_player_died)
 	Network.OnRoundEnded.disconnect(_network_round_ended)
 	Network.OnMatchEnded.disconnect(_network_match_ended)
+	Network.OnUpdatePlayerScore.disconnect(_network_update_player_score)
 	pass
 
 

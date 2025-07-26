@@ -90,12 +90,18 @@ func SetPlayersToStartPositions() -> void:
 				Slots[i].Position = Map.StartPositions[i].Pos
 	pass
 
+func ResetPlayersBeforeMatch() -> void:
+	ResetPlayersBeforeRound()
+	for slot: Types.TSlot in Slots:
+		slot.Score = 0
+	pass
+
 func ResetPlayersBeforeRound() -> void:
-	for i in Slots.size():
-		Slots[i].TotalBombs = 1
-		Slots[i].DroppedBombs = 0
-		Slots[i].DroppingBombs = false
-		Slots[i].Alive = Slots[i].PlayerID != 0
+	for slot: Types.TSlot in Slots:
+		slot.TotalBombs = 1
+		slot.DroppedBombs = 0
+		slot.DroppingBombs = false
+		slot.Alive = slot.PlayerID != 0
 	pass
 
 func CountAlivePlayers() -> int:
@@ -104,6 +110,12 @@ func CountAlivePlayers() -> int:
 		if Slots[i].Alive:
 			count += 1
 	return count
+
+func UpdatePlayerScore(PlayerID: int, Score: int) -> void:
+	var idx = FindSlotForPlayer(PlayerID)
+	if idx != Types.INVALID_SLOT:
+		Slots[idx].Score = Score
+	pass
 
 
 func ResetBombsEtcBeforeRound() -> void:

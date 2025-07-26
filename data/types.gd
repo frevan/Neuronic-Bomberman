@@ -27,6 +27,7 @@ class TSlot:
 	var DroppedBombs: int
 	var DroppingBombs: bool
 	var Alive: bool
+	var Score: int
 	func _init(SetIndex: int = INVALID_SLOT) -> void:
 		Index = SetIndex
 		PlayerID = 0
@@ -36,6 +37,7 @@ class TSlot:
 		DroppedBombs = 0
 		DroppingBombs = false
 		Alive = false
+		Score = 0
 		pass
 
 
