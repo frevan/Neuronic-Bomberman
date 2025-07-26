@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=3 uid="uid://btkoy6r8d4giw"]
+
+[ext_resource type="Script" uid="uid://ds5wvb5brwx6u" path="res://ui/server_selection.gd" id="1_n1u7o"]
+
+[node name="ServerSelection" type="Node2D"]
+script = ExtResource("1_n1u7o")
+
+[node name="ServerEdit" type="LineEdit" parent="."]
+offset_left = 229.0
+offset_top = 203.0
+offset_right = 659.0
+offset_bottom = 234.0
+
+[node name="ServerCaptionLabel" type="Label" parent="ServerEdit"]
+layout_mode = 0
+offset_left = -100.0
+offset_right = -37.0
+offset_bottom = 23.0
+text = "Address"
+
+[node name="BackBtn" type="Button" parent="."]
+offset_left = 35.0
+offset_top = 513.0
+offset_right = 128.0
+offset_bottom = 566.0
+theme_override_font_sizes/font_size = 32
+text = "BACK"
+
+[node name="ConnectBtn" type="Button" parent="."]
+offset_left = 319.0
+offset_top = 291.0
+offset_right = 479.0
+offset_bottom = 344.0
+theme_override_font_sizes/font_size = 32
+text = "CONNECT"
+
+[connection signal="pressed" from="BackBtn" to="." method="_on_back_btn_pressed"]
+[connection signal="pressed" from="ConnectBtn" to="." method="_on_connect_btn_pressed"]

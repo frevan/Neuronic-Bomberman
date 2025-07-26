@@ -1,21 +1,10 @@
 extends TScene
 
 
-signal OnConnecting
+signal OnJoinServer
 
 
 var Server: TServer
-
-
-func BeforeShow() -> void:
-	super()
-	Client.OnConnectionToServerFailed.connect(_client_connection_to_server_failed)
-	pass
-
-func AfterHide() -> void:
-	super()
-	Client.OnConnectionToServerFailed.disconnect(_client_connection_to_server_failed)
-	pass
 
 
 func _process(_delta: float) -> void:
@@ -39,11 +28,5 @@ func _on_host_btn_pressed() -> void:
 	pass
 
 func _on_join_btn_pressed() -> void:
-	Client.Connect("127.0.0.1")
-	OnConnecting.emit()
-	pass
-
-
-func _client_connection_to_server_failed() -> void:
-	Tools.ShowAlert("Failed to connect")
+	OnJoinServer.emit()
 	pass
