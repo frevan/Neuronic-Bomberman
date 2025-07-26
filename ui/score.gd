@@ -15,13 +15,13 @@ func _HandleUserInput() -> void:
 		_ContinueToMatchOrLobby()
 	pass
 
-func _input(event) -> void:
-	if !visible:
-		return
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT:
-			_ContinueToMatchOrLobby()
-	pass
+#func _input(event) -> void:
+	#if !visible:
+		#return
+	#if event is InputEventMouseButton:
+		#if event.button_index == MOUSE_BUTTON_LEFT:
+			#_ContinueToMatchOrLobby()
+	#pass
 
 func _ContinueToMatchOrLobby() -> void:
 	if Client.State == Client.TState.LOBBY:
