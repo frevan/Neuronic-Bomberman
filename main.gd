@@ -6,7 +6,8 @@ var Client: TClient
 
 
 func _ready() -> void:
-	_PositionWindowForDebug()
+	if OS.has_feature("debug"):
+		_PositionWindowForDebug()
 	
 	_InitializeServer()
 	_InitializeClient()
