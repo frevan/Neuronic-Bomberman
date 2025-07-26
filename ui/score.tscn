@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://bmpqw6rtdaxnr"]
+
+[ext_resource type="Script" uid="uid://cihq1s5187dk1" path="res://ui/score.gd" id="1_7b0px"]
+
+[node name="Score" type="Node2D"]
+script = ExtResource("1_7b0px")
+
+[node name="MessageLabel" type="Label" parent="."]
+offset_left = 143.0
+offset_top = 222.0
+offset_right = 652.0
+offset_bottom = 310.0
+theme_override_font_sizes/font_size = 64
+text = "we're done here"

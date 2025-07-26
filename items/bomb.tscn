@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://b353uydlsycm3"]
+
+[ext_resource type="Texture2D" uid="uid://d0xyifj7nnf1x" path="res://assets/bomb.png" id="1_amjlg"]
+[ext_resource type="Script" uid="uid://d2a7s46cos1mu" path="res://items/bomb.gd" id="1_lnnoo"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_amjlg"]
+radius = 21.0
+
+[node name="Bomb" type="StaticBody2D"]
+z_index = 8
+collision_layer = 4
+script = ExtResource("1_lnnoo")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_amjlg")
+offset = Vector2(0, -22.5)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -21)
+shape = SubResource("CircleShape2D_amjlg")

@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://biweuy4jwafdx"]
+
+[ext_resource type="Script" uid="uid://d2t7btu8ythdv" path="res://ui/connecting.gd" id="1_ex35b"]
+
+[node name="Connecting" type="Node2D"]
+script = ExtResource("1_ex35b")
+
+[node name="Label" type="Label" parent="."]
+offset_left = 25.0
+offset_top = 25.0
+offset_right = 126.0
+offset_bottom = 48.0
+text = "Connecting..."
