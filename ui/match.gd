@@ -49,6 +49,12 @@ func AfterHide() -> void:
 	pass
 
 
+func AfterShow() -> void:
+	_CreateTiles()
+	_ShowPlayers(false)
+	pass
+
+
 func _process(_delta: float) -> void:
 	if visible:
 		_HandleUserInput()
@@ -75,6 +81,7 @@ func _client_new_round() -> void:
 func _client_round_started() -> void:
 	#_log("round started")
 	_ShowPlayers()
+	_SetPlayerAuthorities()
 	_SetPlayerPositions()
 	pass
 
@@ -145,26 +152,18 @@ func _CreateTiles() -> void:
 	pass
 
 
-func UpdateAll() -> void:
-	_CreateTiles()
-	_ShowPlayers()
-	_SetPlayerPositions()
-	_SetPlayerAuthorities()
-	pass
-
-
 func _FindPlayerNodeForSlot(SlotIndex: int) -> Node2D:
 	var nodeName = "Player" + str(SlotIndex)
 	return $Players.get_node(nodeName)
 
 
-func _ShowPlayers() -> void:
+func _ShowPlayers(CanShow: bool = true) -> void:
 	#_log("show players - show=" + str(Show))
 	for i in Client.Data.Slots.size():
 		var scene: Node2D = _FindPlayerNodeForSlot(i)
 		assert(scene)
 		var slot: Types.TSlot = Client.Data.Slots[i]
-		scene.visible = (slot.PlayerID != 0) && slot.Alive
+		scene.visible = CanShow && (slot.PlayerID != 0) && slot.Alive
 		PlayerScenes[slot.PlayerID] = scene
 	pass
 
