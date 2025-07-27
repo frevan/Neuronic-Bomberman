@@ -23,7 +23,6 @@ func _log(Text: String) -> void:
 
 func BeforeShow() -> void:
 	super()
-	$CountDownLabel.visible = false
 	Client.OnNewRound.connect(_client_new_round)
 	Client.OnRoundStarted.connect(_client_round_started)
 	Client.OnPlayerPositionChanged.connect(_client_player_position_changed)
@@ -49,6 +48,7 @@ func AfterHide() -> void:
 	Client.OnPlayerDied.disconnect(_client_player_died)
 	Client.OnCountDownStarted.disconnect(_client_countdown_started)
 	_CleanUpAfterMatch()
+	$CountDownTimer.stop()
 	pass
 
 
@@ -137,7 +137,6 @@ func _client_player_died(PlayerID: int) -> void:
 
 func _client_countdown_started(_CountDownTime: float) -> void:
 	$CountDownTimer.start()
-	$CountDownLabel.visible = true
 	_on_count_down_timer_timeout() # initial run to set the label text
 	pass
 
@@ -251,12 +250,19 @@ func _CleanUpAfterMatch() -> void:
 
 
 func _on_count_down_timer_timeout() -> void:
-	var _time: int = floor(Client.Data.CountDownTime)
-	if _time <= 0:
-		$CountDownLabel.text = "GO!"
-	else:
-		$CountDownLabel.text = str(_time)
 	if !Client.Data.CountingDown:
-		$CountDownLabel.visible = false
 		$CountDownTimer.stop()
+	_UpdateCountDownLabelText()
+	pass
+
+
+func _UpdateCountDownLabelText() -> void:
+	var s: String = "Round " + str(Client.Data.CurrentRound + 1) + " of " + str(Client.Data.NumRounds)
+	if Client.Data.CountingDown:
+		var _time: int = floor(Client.Data.CountDownTime)
+		if _time <= 0:
+			s += " - GO!"
+		else:
+			s += " - " + str(_time)
+	$CountDownLabel.text = s
 	pass

@@ -104,8 +104,10 @@ func _client_match_started() -> void:
 	pass
 
 func _client_new_round() -> void:
-	Tools.SwitchToScene($Match)
-	$Match.AfterShow()
+	if !$Score.visible:
+		Tools.SwitchToScene($Match)
+		$Match.AfterShow()
+		Client.RequestPlayerReady(true)
 	pass
 
 func _client_round_ended() -> void:
@@ -144,7 +146,9 @@ func _score_leave_match() -> void:
 	pass
 
 func _score_ready_for_next_round() -> void:
-	# TODO
+	Tools.SwitchToScene($Match)
+	$Match.AfterShow()
+	Client.RequestPlayerReady(true)
 	pass
 
 

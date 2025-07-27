@@ -15,6 +15,8 @@ func BeforeShow() -> void:
 	Client.OnPlayerMovedToSlot.connect(_client_player_moved_to_slot)
 	Client.OnMapNameChanged.connect(_client_map_name_changed)
 	Client.OnPlayerBecameReady.connect(_client_player_became_ready)
+	Client.OnNumRoundsChanged.connect(_client_num_rounds_changed)
+	_AdjustControls()
 	pass
 
 func AfterHide() -> void:
@@ -24,6 +26,7 @@ func AfterHide() -> void:
 	Client.OnPlayerMovedToSlot.disconnect(_client_player_moved_to_slot)
 	Client.OnMapNameChanged.disconnect(_client_map_name_changed)
 	Client.OnPlayerBecameReady.disconnect(_client_player_became_ready)
+	Client.OnNumRoundsChanged.disconnect(_client_num_rounds_changed)
 	pass
 
 
@@ -59,6 +62,10 @@ func _client_map_name_changed(MapName: String) -> void:
 
 func _client_player_became_ready(_PlayerID: int, _Ready: bool) -> void:
 	_UpdatePlayerInfo()
+	pass
+
+func _client_num_rounds_changed(_Value: int) -> void:
+	_AdjustRoundsLabelText()
 	pass
 
 
@@ -188,4 +195,24 @@ func _on_maps_list_item_selected(Index: int) -> void:
 
 func _on_ready_box_toggled(toggled_on: bool) -> void:
 	Client.RequestPlayerReady(toggled_on)
+	pass
+
+
+func _AdjustControls() -> void:
+	$NumRoundsSpin.visible = Network.IsServer()
+	_AdjustRoundsLabelText()
+	pass
+
+func _AdjustRoundsLabelText() -> void:
+	$NumRoundsSpin.set_value_no_signal(Client.Data.NumRounds)
+	if Network.IsServer():
+		$NumRoundsLabel.text = "Rounds"
+	else:
+		$NumRoundsLabel.text = "Rounds: " + str(Client.Data.NumRounds)
+	pass
+
+
+func _on_num_rounds_spin_value_changed(value: float) -> void:
+	var v: int = floor(value)
+	Client.RequestNumRounds(v)
 	pass

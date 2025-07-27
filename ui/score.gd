@@ -4,6 +4,11 @@ signal OnReadyForNextRound
 signal OnLeaveMatch
 
 
+func _log(Text: String) -> void:
+	print(str(Network.PeerID) + " [score] " + Text)
+	pass
+
+
 func _process(_delta: float) -> void:
 	if visible:
 		_HandleUserInput()
@@ -11,7 +16,10 @@ func _process(_delta: float) -> void:
 
 
 func _HandleUserInput() -> void:
-	if Input.is_action_just_pressed("ui_cancel") || Input.is_action_just_pressed("ui_accept"):
+	if Input.is_action_just_pressed("ui_cancel"):
+		if Client.State == Client.TState.LOBBY:
+			_ContinueToMatchOrLobby()
+	if Input.is_action_just_pressed("ui_accept"):
 		_ContinueToMatchOrLobby()
 	pass
 
@@ -34,7 +42,22 @@ func _ContinueToMatchOrLobby() -> void:
 func _on_visibility_changed() -> void:
 	if visible:
 		_UpdateMessageLabel()
+		_UpdateScoresLabel()
 	pass
+
+
+func _DetermineHighestScore() -> int:
+	var highest_score: int = 0
+	for slot: Types.TSlot in Client.Data.Slots:
+		highest_score = max(slot.Score, highest_score)
+	return highest_score
+
+
+func _DetermineMyScore() -> int:
+	for slot: Types.TSlot in Client.Data.Slots:
+		if slot.PlayerID == Network.PeerID:
+			return slot.Score
+	return -1
 
 
 func _IsThereATieForTheWin(HighestScore: int) -> bool:
@@ -46,15 +69,11 @@ func _IsThereATieForTheWin(HighestScore: int) -> bool:
 
 
 func _UpdateMessageLabel():
-	var highest_score: int = 0
-	var my_score: int = 0
-	for slot: Types.TSlot in Client.Data.Slots:
-		highest_score = max(slot.Score, highest_score)
-		if slot.PlayerID == Network.PeerID:
-			my_score = slot.Score
+	var highest_score: int = _DetermineHighestScore()
+	var my_score: int = _DetermineMyScore()
 	var tied: bool = _IsThereATieForTheWin(highest_score)
 	
-	var msg: String = "We're done here"	
+	var msg: String = "We're done here"
 	match Client.State:
 		Client.TState.LOBBY:
 			var idx = Client.Data.FindSlotForPlayer(Network.PeerID)
@@ -69,4 +88,22 @@ func _UpdateMessageLabel():
 		Client.TState.MATCH:
 			msg = "On to the next round..."
 	$MessageLabel.text = msg
+	pass
+
+
+func _UpdateScoresLabel() -> void:
+	_log("scores = " + str(Client.Data.Slots[0].Score) + " " + str(Client.Data.Slots[1].Score))
+	var s: String = ""
+	var highest_score: int = _DetermineHighestScore()
+	for score in range(highest_score, -1, -1):
+		_log("  score=" + str(score))
+		for idx in Client.Data.Slots.size():
+			var slot: Types.TSlot = Client.Data.Slots[idx]
+			if slot.PlayerID == 0:
+				continue
+			_log("    slot=" + str(slot.PlayerID) + ": " + str(slot.Score))
+			if slot.Score == score:
+				s += "\n" + str(slot.PlayerID) + " - " + str(slot.Score)
+				_log("  s=" + s)
+	$ScoresLabel.text = s
 	pass

@@ -34,9 +34,9 @@ stretch_mode = 1
 
 [node name="ClientInfoLabel" type="Label" parent="."]
 offset_left = 580.0
-offset_top = 20.0
+offset_top = 25.0
 offset_right = 780.0
-offset_bottom = 43.0
+offset_bottom = 48.0
 text = "..."
 horizontal_alignment = 2
 
@@ -45,6 +45,7 @@ offset_left = 16.0
 offset_top = 25.0
 offset_right = 56.0
 offset_bottom = 48.0
+text = "(0,0)"
 
 [node name="Tiles" type="Node2D" parent="."]
 
@@ -117,10 +118,11 @@ visible = false
 wait_time = 0.5
 
 [node name="CountDownLabel" type="Label" parent="."]
-offset_left = 294.0
-offset_top = 20.0
-offset_right = 439.0
-offset_bottom = 43.0
+offset_left = 325.0
+offset_top = 25.0
+offset_right = 475.0
+offset_bottom = 48.0
+text = "Round #"
 horizontal_alignment = 1
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]

@@ -5,6 +5,9 @@ class_name TServer
 
 const COUNTDOWN_TIME = 5
 
+const NUM_ROUNDS_MIN = 1
+const NUM_ROUNDS_MAX = 100
+
 var Data: TGameData
 var Maps: TMaps
 var CurrentMapName: String
@@ -123,6 +126,13 @@ func _network_player_is_dropping_bomb(PlayerID: int, Value: bool) -> void:
 	pass
 
 
+func _network_request_num_rounds(Value: int) -> void:
+	_log("Num rounds request: " + str(Value))
+	Data.NumRounds = clamp(Value, NUM_ROUNDS_MIN, NUM_ROUNDS_MAX)
+	Network.SendNumRoundsChanged.rpc(Data.NumRounds)
+	pass
+
+
 func _DropBomb(SlotIndex: int) -> void:
 	var slot = Data.Slots[SlotIndex]
 	if slot.DroppedBombs == slot.TotalBombs:
@@ -199,8 +209,10 @@ func _KillPlayer(SlotIndex: int) -> void:
 
 func _CheckIfRoundEnded() -> void:
 	if Data.CountAlivePlayers() <= 1:
-		_EndMatch()
-		#_EndRound()
+		if Data.CurrentRound == Data.NumRounds - 1:
+			_EndMatch()
+		else:
+			_EndRound()
 	pass
 
 
@@ -214,6 +226,7 @@ func _ConnectToSignalsOnStart() -> void:
 	Network.OnRequestStartMatch.connect(_network_request_start_match)
 	Network.OnPlayerReady.connect(_network_player_ready)
 	Network.OnPlayerIsDroppingBombs.connect(_network_player_is_dropping_bomb)
+	Network.OnRequestNumRounds.connect(_network_request_num_rounds)
 	pass
 
 func _DisconnectFromSignalsOnStop() -> void:
@@ -226,6 +239,7 @@ func _DisconnectFromSignalsOnStop() -> void:
 	Network.OnRequestStartMatch.disconnect(_network_request_start_match)
 	Network.OnPlayerReady.disconnect(_network_player_ready)
 	Network.OnPlayerIsDroppingBombs.disconnect(_network_player_is_dropping_bomb)
+	Network.OnRequestNumRounds.disconnect(_network_request_num_rounds)
 	pass
 
 
@@ -242,6 +256,7 @@ func _SendLobbyInfoToPlayer(PlayerID: int) -> void:
 			if (other_peerid != 0) && (other_peerid != PlayerID):
 				Network.SendPlayerMovedToSlot.rpc_id(PlayerID, other_peerid, i)
 		Network.SendMapName.rpc_id(PlayerID, CurrentMapName)
+		Network.SendNumRoundsChanged.rpc(Data.NumRounds)
 	pass
 
 
@@ -250,11 +265,11 @@ func _StartMatch() -> void:
 	Network.SendMatchStarted.rpc()
 	
 	Data.ResetPlayersBeforeMatch()
-	
 	Data.SetAllPlayersUnready()
 	for i in Data.Slots.size():
 		if Data.Slots[i].PlayerID != 0:
 			Network.SendPlayerBecameReady.rpc(Data.Slots[i].PlayerID, false)
+	Data.CurrentRound = -1
 	
 	_StartNewRound()
 	pass
@@ -264,12 +279,16 @@ func _StartNewRound() -> void:
 	Data.ResetPlayersBeforeRound()
 	Data.ResetBombsEtcBeforeRound()
 	Data.CountingDown = false
-	Network.SendNewRound.rpc(CurrentMapName)
+	Data.CurrentRound += 1
+	Network.SendNewRound.rpc(CurrentMapName, Data.CurrentRound)
 	pass
 
 
 func _StartCountDownToRound() -> void:
-	Data.CountDownTime = COUNTDOWN_TIME
+	if OS.has_feature("debug"):
+		Data.CountDownTime = 1.0
+	else:
+		Data.CountDownTime = COUNTDOWN_TIME
 	Data.CountingDown = true
 	Network.SendCountDownStarted.rpc(Data.CountDownTime)
 	pass
@@ -301,6 +320,7 @@ func _EndRound() -> void:
 	_SetAllPlayersUnready()
 	State = TState.MATCH
 	Network.SendRoundEnded.rpc()
+	_StartNewRound()
 	pass
 
 

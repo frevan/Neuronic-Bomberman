@@ -6,6 +6,8 @@ var Slots: Array
 var Map: Types.TMap = null
 var Bombs: Dictionary # key: field (Vector2i), value: Types.TBomb
 var Explosions: Dictionary # key: field (Vector2i), value: Types.TExplosion
+var NumRounds: int = 1
+var CurrentRound: int = -1
 
 var CountingDown: bool = false
 var CountDownTime: float = 0

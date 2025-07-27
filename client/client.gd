@@ -27,6 +27,7 @@ signal OnPlayerDied # params: id (int)
 signal OnPlayerScoreChanged # params: id (int), score (int)
 signal OnPlayerBecameReady # params: id (int), ready (bool)
 signal OnCountDownStarted # params: time (float)
+signal OnNumRoundsChanged # params: value (int)
 
 signal OnPlayerPositionUpdated # [for the server object] param: id (int), position (vector2)
 
@@ -140,8 +141,8 @@ func _network_match_started() -> void:
 	pass
 	
 	
-func _network_new_round(MapName: String) -> void:
-	_log("new round: " + MapName)
+func _network_new_round(MapName: String, Round: int) -> void:
+	_log("new round #" + str(Round) + ": " + MapName)
 	
 	Data.Map = Maps.LoadMap(MapName)
 	if is_instance_valid(Data.Map):
@@ -153,9 +154,9 @@ func _network_new_round(MapName: String) -> void:
 	
 	Data.ResetPlayersBeforeRound()
 	Data.ResetBombsEtcBeforeRound()
+	Data.CurrentRound = Round
 	
 	OnNewRound.emit()
-	Network.SendPlayerReady.rpc_id(1, true)
 	pass
 
 
@@ -252,6 +253,13 @@ func _network_countdown_started(CountDownTime: float) -> void:
 	pass
 
 
+func _network_num_rounds_changed(Value: int) -> void:
+	_log("Number of rounds changed to " + str(Value))
+	Data.NumRounds = Value
+	OnNumRoundsChanged.emit(Value)
+	pass
+
+
 func _ConnectToSignals() -> void:
 	multiplayer.connected_to_server.connect(_connected_to_server)
 	multiplayer.connection_failed.connect(_connection_failed)
@@ -276,6 +284,7 @@ func _ConnectToSignals() -> void:
 	Network.OnMatchEnded.connect(_network_match_ended)
 	Network.OnUpdatePlayerScore.connect(_network_update_player_score)
 	Network.OnCountDownStarted.connect(_network_countdown_started)
+	Network.OnNumRoundsChanged.connect(_network_num_rounds_changed)
 	pass
 
 
@@ -303,6 +312,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnMatchEnded.disconnect(_network_match_ended)
 	Network.OnUpdatePlayerScore.disconnect(_network_update_player_score)
 	Network.OnCountDownStarted.disconnect(_network_countdown_started)
+	Network.OnNumRoundsChanged.disconnect(_network_num_rounds_changed)
 	pass
 
 
@@ -407,4 +417,9 @@ func UpdatePlayerPosition(ID: int, Position: Vector2) -> void:
 
 func RequestPlayerReady(Ready: bool) -> void:
 	Network.SendPlayerReady.rpc_id(1, Ready)
+	pass
+
+
+func RequestNumRounds(Value: int) -> void:
+	Network.SendRequestNumRounds.rpc_id(1, Value)
 	pass

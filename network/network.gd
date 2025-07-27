@@ -11,6 +11,7 @@ signal OnRequestMapChange # params: map_nake (string)
 signal OnRequestStartMatch # params: sender_id (int)
 signal OnPlayerReady # params: sender_id (int), ready (bool)
 signal OnPlayerIsDroppingBombs # params: sender_id (int), value (bool)
+signal OnRequestNumRounds #params: value (int)
 # received by clients
 signal OnResponseToJoinLobby # params: accepted (bool)
 signal OnPlayerJoinedLobby # params: player_id (int)
@@ -18,7 +19,7 @@ signal OnPlayerLeftLobby # params: player_id (int)
 signal OnPlayerMovedToSlot # params: player_id (int), slot_index (int)
 signal OnMapChanged # params: map_name (string)
 signal OnMatchStarted
-signal OnNewRound # params: map_name (string)
+signal OnNewRound # params: map_name (string), round # (int)
 signal OnPlayerBecameReady # params: player_id (int), ready (bool)
 signal OnRoundStarted
 signal OnRoundEnded
@@ -31,6 +32,7 @@ signal OnRemoveExplosion # params: field (vector2i)
 signal OnPlayerDied # params: id (int)
 signal OnUpdatePlayerScore # params: id (int), score (int)
 signal OnCountDownStarted # params: time (float)
+signal OnNumRoundsChanged # params: value
 
 
 const PORT = 15063
@@ -121,6 +123,10 @@ func SendDroppingBombs(Value: bool) -> void:
 	var id = multiplayer.get_remote_sender_id()
 	OnPlayerIsDroppingBombs.emit(id, Value)
 
+@rpc("reliable", "call_local", "authority")
+func SendRequestNumRounds(Value: int) -> void:
+	OnRequestNumRounds.emit(Value)
+
 
 @rpc("reliable", "call_local", "authority")
 func SendJoinLobbyResponse(Accepted: bool) -> void:
@@ -147,8 +153,8 @@ func SendMatchStarted() -> void:
 	OnMatchStarted.emit()
 
 @rpc("reliable", "call_local", "authority")
-func SendNewRound(MapName: String) -> void:
-	OnNewRound.emit(MapName)
+func SendNewRound(MapName: String, Round: int) -> void:
+	OnNewRound.emit(MapName, Round)
 
 @rpc("reliable", "call_local", "authority")
 func SendRoundStarted() -> void:
@@ -197,3 +203,7 @@ func SendPlayerScore(ID: int, Score: int) -> void:
 @rpc("reliable", "call_local", "authority")
 func SendCountDownStarted(CountDownTime: float) -> void:
 	OnCountDownStarted.emit(CountDownTime)
+
+@rpc("reliable", "call_local", "authority")
+func SendNumRoundsChanged(Value: int) -> void:
+	OnNumRoundsChanged.emit(Value)

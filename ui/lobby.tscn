@@ -192,7 +192,7 @@ text = "..."
 offset_left = 411.0
 offset_top = 250.0
 offset_right = 774.0
-offset_bottom = 508.0
+offset_bottom = 465.0
 
 [node name="MapNameLabel" type="Label" parent="."]
 offset_left = 414.0
@@ -208,8 +208,25 @@ offset_right = 378.0
 offset_bottom = 572.0
 text = "ready"
 
+[node name="NumRoundsSpin" type="SpinBox" parent="."]
+offset_left = 487.0
+offset_top = 478.0
+offset_right = 574.0
+offset_bottom = 509.0
+min_value = 1.0
+value = 1.0
+rounded = true
+
+[node name="NumRoundsLabel" type="Label" parent="."]
+offset_left = 416.0
+offset_top = 482.0
+offset_right = 456.0
+offset_bottom = 505.0
+text = "Rounds"
+
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
 [connection signal="pressed" from="LeaveButton" to="." method="_on_leave_button_pressed"]
 [connection signal="item_selected" from="MapsList" to="." method="_on_maps_list_item_selected"]
 [connection signal="toggled" from="ReadyBox" to="." method="_on_ready_box_toggled"]
+[connection signal="value_changed" from="NumRoundsSpin" to="." method="_on_num_rounds_spin_value_changed"]
