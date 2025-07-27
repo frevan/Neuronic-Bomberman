@@ -28,6 +28,7 @@ signal OnPlayerScoreChanged # params: id (int), score (int)
 signal OnPlayerBecameReady # params: id (int), ready (bool)
 signal OnCountDownStarted # params: time (float)
 signal OnNumRoundsChanged # params: value (int)
+signal OnPlayerDisconnected # params: id (int)
 
 signal OnPlayerPositionUpdated # [for the server object] param: id (int), position (vector2)
 
@@ -82,6 +83,7 @@ func _peer_disconnected(SenderID: int) -> void:
 	_log("peer disconnected: " + str(SenderID))
 	if (State != TState.IDLE) && is_instance_valid(Data):
 		Data.ClearSlotForPlayer(SenderID)
+		OnPlayerDisconnected.emit(SenderID)
 	pass
 
 

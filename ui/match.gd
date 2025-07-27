@@ -33,6 +33,7 @@ func BeforeShow() -> void:
 	Client.OnRemoveExplosion.connect(_client_remove_explosion)
 	Client.OnPlayerDied.connect(_client_player_died)
 	Client.OnCountDownStarted.connect(_client_countdown_started)
+	Client.OnPlayerDisconnected.connect(_client_player_disconnected)
 	pass
 
 func AfterHide() -> void:
@@ -47,6 +48,7 @@ func AfterHide() -> void:
 	Client.OnRemoveExplosion.disconnect(_client_remove_explosion)
 	Client.OnPlayerDied.disconnect(_client_player_died)
 	Client.OnCountDownStarted.disconnect(_client_countdown_started)
+	Client.OnPlayerDisconnected.disconnect(_client_player_disconnected)
 	_CleanUpAfterMatch()
 	$CountDownTimer.stop()
 	pass
@@ -130,15 +132,16 @@ func _client_remove_explosion(Field: Vector2i) -> void:
 	pass
 
 func _client_player_died(PlayerID: int) -> void:
-	if PlayerScenes.has(PlayerID):
-		var scene = PlayerScenes[PlayerID]
-		PlayerScenes.erase(PlayerID)
-		scene.hide()
+	_RemovePlayerScene(PlayerID)
 	pass
 
 func _client_countdown_started(_CountDownTime: float) -> void:
 	$CountDownTimer.start()
 	_on_count_down_timer_timeout() # initial run to set the label text
+	pass
+
+func _client_player_disconnected(PlayerID: int) -> void:
+	_RemovePlayerScene(PlayerID)
 	pass
 
 
@@ -266,4 +269,12 @@ func _UpdateCountDownLabelText() -> void:
 		else:
 			s += " - " + str(_time)
 	$CountDownLabel.text = s
+	pass
+
+
+func _RemovePlayerScene(PlayerID: int) -> void:
+	if PlayerScenes.has(PlayerID):
+		var scene = PlayerScenes[PlayerID]
+		PlayerScenes.erase(PlayerID)
+		scene.hide()
 	pass
