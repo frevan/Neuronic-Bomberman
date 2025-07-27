@@ -29,7 +29,7 @@ theme_override_font_sizes/font_size = 48
 text = "LOBBY"
 
 [node name="ClientInfoLabel" type="Label" parent="."]
-offset_left = 258.0
+offset_left = 415.0
 offset_top = 548.0
 offset_right = 774.0
 offset_bottom = 571.0
@@ -201,7 +201,15 @@ offset_right = 454.0
 offset_bottom = 61.0
 text = "..."
 
+[node name="ReadyBox" type="CheckBox" parent="."]
+offset_left = 306.0
+offset_top = 541.0
+offset_right = 378.0
+offset_bottom = 572.0
+text = "ready"
+
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
 [connection signal="pressed" from="LeaveButton" to="." method="_on_leave_button_pressed"]
 [connection signal="item_selected" from="MapsList" to="." method="_on_maps_list_item_selected"]
+[connection signal="toggled" from="ReadyBox" to="." method="_on_ready_box_toggled"]

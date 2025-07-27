@@ -14,6 +14,7 @@ func BeforeShow() -> void:
 	Client.OnPlayerLeft.connect(_client_player_left)
 	Client.OnPlayerMovedToSlot.connect(_client_player_moved_to_slot)
 	Client.OnMapNameChanged.connect(_client_map_name_changed)
+	Client.OnPlayerBecameReady.connect(_client_player_became_ready)
 	pass
 
 func AfterHide() -> void:
@@ -22,6 +23,7 @@ func AfterHide() -> void:
 	Client.OnPlayerLeft.disconnect(_client_player_left)
 	Client.OnPlayerMovedToSlot.disconnect(_client_player_moved_to_slot)
 	Client.OnMapNameChanged.disconnect(_client_map_name_changed)
+	Client.OnPlayerBecameReady.disconnect(_client_player_became_ready)
 	pass
 
 
@@ -51,9 +53,12 @@ func _client_player_moved_to_slot(_PlayerID: int, _SlotIndex: int) -> void:
 	_UpdatePlayerInfo()
 	pass
 
-
 func _client_map_name_changed(MapName: String) -> void:
 	_SelectMap(MapName)
+	pass
+
+func _client_player_became_ready(_PlayerID: int, _Ready: bool) -> void:
+	_UpdatePlayerInfo()
 	pass
 
 
@@ -83,10 +88,16 @@ func _UpdatePlayerInfo() -> void:
 		var label = _FindPlayerNameLabel(i)
 		if !label:
 			continue
+		
 		label.text = "..."
 		var slot: Types.TSlot = Client.Data.Slots[i]
 		if slot.PlayerID != 0:
-			label.text = str(slot.PlayerID)
+			var s: String = str(slot.PlayerID)
+			if slot.Ready:
+				s += " (ready)"
+			label.text = s
+			if slot.PlayerID == Network.PeerID:
+				$ReadyBox.set_pressed_no_signal(slot.Ready)
 	pass
 
 
@@ -172,4 +183,9 @@ func _draw() -> void:
 func _on_maps_list_item_selected(Index: int) -> void:
 	var mapname = $MapsList.get_item_text(Index)
 	Client.RequestMapChange(mapname)
+	pass
+
+
+func _on_ready_box_toggled(toggled_on: bool) -> void:
+	Client.RequestPlayerReady(toggled_on)
 	pass

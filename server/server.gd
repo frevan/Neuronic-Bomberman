@@ -282,6 +282,7 @@ func _StartRoundNow() -> void:
 
 func _EndRound() -> void:
 	_IncreasePlayerScores()
+	_SetAllPlayersUnready()
 	State = TState.MATCH
 	Network.SendRoundEnded.rpc()
 	pass
@@ -289,8 +290,17 @@ func _EndRound() -> void:
 
 func _EndMatch() -> void:
 	_IncreasePlayerScores()
+	_SetAllPlayersUnready()
 	State = TState.LOBBY
 	Network.SendMatchEnded.rpc()
+	pass
+
+
+func _SetAllPlayersUnready() -> void:
+	Data.SetAllPlayersUnready()
+	for idx in Data.Slots.size():
+		if Data.Slots[idx].PlayerID != 0:
+			Network.SendPlayerBecameReady.rpc(Data.Slots[idx].PlayerID, Data.Slots[idx].Ready)
 	pass
 
 

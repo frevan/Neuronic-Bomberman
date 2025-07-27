@@ -24,6 +24,7 @@ signal OnExplosion # params: field (vector2i)
 signal OnRemoveExplosion # params: field (vector2i)
 signal OnPlayerDied # params: id (int)
 signal OnPlayerScoreChanged # params: id (int), score (int)
+signal OnPlayerBecameReady # params: id (int), ready (bool)
 
 signal OnPlayerPositionUpdated # [for the server object] param: id (int), position (vector2)
 
@@ -166,6 +167,10 @@ func _network_match_ended() -> void:
 
 func _network_player_became_ready(PlayerID: int, Ready: bool) -> void:
 	_log("player " + str(PlayerID) + " is ready: " + str(Ready))
+	var idx = Data.FindSlotForPlayer(PlayerID)
+	if idx != Types.INVALID_SLOT:
+		Data.Slots[idx].Ready = Ready
+		OnPlayerBecameReady.emit(PlayerID, Ready)
 	pass
 
 
@@ -372,4 +377,9 @@ func UpdatePlayerPosition(ID: int, Position: Vector2) -> void:
 		Data.Slots[idx].Position = Position
 		if Network.PeerID == 1:
 			OnPlayerPositionUpdated.emit(ID, Position)
+	pass
+
+
+func RequestPlayerReady(Ready: bool) -> void:
+	Network.SendPlayerReady.rpc_id(1, Ready)
 	pass
