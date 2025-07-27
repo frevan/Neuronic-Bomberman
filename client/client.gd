@@ -36,7 +36,7 @@ var Data: TGameData
 var CurrentMapName: String = ""
 @onready var Maps: TMaps = TMaps.new()
 
-enum TState {IDLE, CONNECTING, LOBBY, MATCH}
+enum TState {IDLE, CONNECTING, LOBBY, MATCH, ROUND}
 var State: TState = TState.IDLE
 
 
@@ -48,7 +48,7 @@ func _log(Text: String) -> void:
 func _process(delta: float) -> void:
 	if !Data:
 		return
-	if State == TState.MATCH:
+	if State == TState.MATCH || State == TState.ROUND:
 		if Data.CountingDown:
 			Data.CountDownTime -=  delta
 			if Data.CountDownTime <= 0:
@@ -162,6 +162,7 @@ func _network_new_round(MapName: String, Round: int) -> void:
 
 func _network_round_started() -> void:
 	_log("round started")
+	State = TState.ROUND
 	Data.CountingDown = false
 	OnRoundStarted.emit()
 	pass

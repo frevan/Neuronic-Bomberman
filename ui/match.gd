@@ -68,10 +68,11 @@ func _process(_delta: float) -> void:
 func _HandleUserInput() -> void:
 	if Input.is_action_just_pressed("ui_cancel"):
 		OnLeaveLobby.emit()
-	if Input.is_action_just_pressed("player_dropbomb"):
-		Client.DropBombs(true)
-	elif Input.is_action_just_released("player_dropbomb"):
-		Client.DropBombs(false)
+	if Client.State == Client.TState.ROUND && !Client.Data.CountingDown:
+		if Input.is_action_just_pressed("player_dropbomb"):
+			Client.DropBombs(true)
+		elif Input.is_action_just_released("player_dropbomb"):
+			Client.DropBombs(false)
 	pass
 
 
