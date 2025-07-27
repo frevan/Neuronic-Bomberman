@@ -127,9 +127,18 @@ func _network_player_is_dropping_bomb(PlayerID: int, Value: bool) -> void:
 
 
 func _network_request_num_rounds(Value: int) -> void:
-	_log("Num rounds request: " + str(Value))
+	_log("num rounds request: " + str(Value))
 	Data.NumRounds = clamp(Value, NUM_ROUNDS_MIN, NUM_ROUNDS_MAX)
 	Network.SendNumRoundsChanged.rpc(Data.NumRounds)
+	pass
+
+
+func _network_player_name_received(PlayerID: int, Name: String) -> void:
+	_log("player name received for " + str(PlayerID) + ": " + Name)
+	var idx = Data.FindSlotForPlayer(PlayerID)
+	if idx != Types.INVALID_SLOT:
+		Data.Slots[idx].PlayerName = Name
+		Network.SendPlayerNameChanged.rpc(PlayerID, Name)
 	pass
 
 
@@ -227,6 +236,7 @@ func _ConnectToSignalsOnStart() -> void:
 	Network.OnPlayerReady.connect(_network_player_ready)
 	Network.OnPlayerIsDroppingBombs.connect(_network_player_is_dropping_bomb)
 	Network.OnRequestNumRounds.connect(_network_request_num_rounds)
+	Network.OnPlayerNameReceived.connect(_network_player_name_received)
 	pass
 
 func _DisconnectFromSignalsOnStop() -> void:
@@ -240,6 +250,7 @@ func _DisconnectFromSignalsOnStop() -> void:
 	Network.OnPlayerReady.disconnect(_network_player_ready)
 	Network.OnPlayerIsDroppingBombs.disconnect(_network_player_is_dropping_bomb)
 	Network.OnRequestNumRounds.disconnect(_network_request_num_rounds)
+	Network.OnPlayerNameReceived.disconnect(_network_player_name_received)
 	pass
 
 
@@ -252,9 +263,11 @@ func _ClientDisconnected(SenderID) -> void:
 func _SendLobbyInfoToPlayer(PlayerID: int) -> void:
 	if State == TState.LOBBY:
 		for i in Data.Slots.size():
-			var other_peerid: int = Data.Slots[i].PlayerID
+			var slot: Types.TSlot = Data.Slots[i]
+			var other_peerid: int = slot.PlayerID
 			if (other_peerid != 0) && (other_peerid != PlayerID):
 				Network.SendPlayerMovedToSlot.rpc_id(PlayerID, other_peerid, i)
+				Network.SendPlayerNameChanged.rpc_id(PlayerID, other_peerid, slot.PlayerName)
 		Network.SendMapName.rpc_id(PlayerID, CurrentMapName)
 		Network.SendNumRoundsChanged.rpc(Data.NumRounds)
 	pass

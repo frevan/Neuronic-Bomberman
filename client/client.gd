@@ -29,10 +29,12 @@ signal OnPlayerBecameReady # params: id (int), ready (bool)
 signal OnCountDownStarted # params: time (float)
 signal OnNumRoundsChanged # params: value (int)
 signal OnPlayerDisconnected # params: id (int)
+signal OnPlayerNameChanged # params: id (int), name (string)
 
 signal OnPlayerPositionUpdated # [for the server object] param: id (int), position (vector2)
 
 
+var PlayerName: String = ""
 var Data: TGameData
 var CurrentMapName: String = ""
 @onready var Maps: TMaps = TMaps.new()
@@ -124,6 +126,7 @@ func _network_player_moved_to_slot(PlayerID: int, SlotIndex: int) -> void:
 	if (State != TState.IDLE) && (SlotIndex != Types.INVALID_SLOT):
 		Data.MovePlayerToSlot(PlayerID, SlotIndex)
 		OnPlayerMovedToSlot.emit(PlayerID, SlotIndex)
+		Network.SendPlayerName.rpc_id(1, PlayerName)
 	pass
 
 
@@ -263,6 +266,15 @@ func _network_num_rounds_changed(Value: int) -> void:
 	pass
 
 
+func _network_player_name_changed(PlayerID: int, Name: String) -> void:
+	_log("Player " + str(PlayerID) + " is now called " + Name)
+	var idx = Data.FindSlotForPlayer(PlayerID)
+	if idx != Types.INVALID_SLOT:
+		Data.Slots[idx].PlayerName = Name
+		OnPlayerNameChanged.emit(PlayerID, Name)
+	pass
+
+
 func _ConnectToSignals() -> void:
 	multiplayer.connected_to_server.connect(_connected_to_server)
 	multiplayer.connection_failed.connect(_connection_failed)
@@ -288,6 +300,7 @@ func _ConnectToSignals() -> void:
 	Network.OnUpdatePlayerScore.connect(_network_update_player_score)
 	Network.OnCountDownStarted.connect(_network_countdown_started)
 	Network.OnNumRoundsChanged.connect(_network_num_rounds_changed)
+	Network.OnPlayerNameChanged.connect(_network_player_name_changed)
 	pass
 
 
@@ -316,6 +329,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnUpdatePlayerScore.disconnect(_network_update_player_score)
 	Network.OnCountDownStarted.disconnect(_network_countdown_started)
 	Network.OnNumRoundsChanged.disconnect(_network_num_rounds_changed)
+	Network.OnPlayerNameChanged.disconnect(_network_player_name_changed)
 	pass
 
 

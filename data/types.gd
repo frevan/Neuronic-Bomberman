@@ -21,6 +21,7 @@ const EXPLOSION_TIME = 1.0 # in seconds
 class TSlot:
 	var Index: int
 	var PlayerID: int
+	var PlayerName: String
 	var Ready: bool
 	var Position: Vector2
 	var TotalBombs: int
@@ -31,6 +32,7 @@ class TSlot:
 	func _init(SetIndex: int = INVALID_SLOT) -> void:
 		Index = SetIndex
 		PlayerID = 0
+		PlayerName = ""
 		Ready = false
 		Position = Vector2(-1, -1)
 		TotalBombs = 0

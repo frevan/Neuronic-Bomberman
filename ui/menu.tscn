@@ -21,5 +21,13 @@ offset_bottom = 327.0
 theme_override_font_sizes/font_size = 32
 text = "JOIN"
 
+[node name="NameEdit" type="LineEdit" parent="."]
+offset_left = 300.0
+offset_top = 520.0
+offset_right = 500.0
+offset_bottom = 562.0
+theme_override_font_sizes/font_size = 24
+placeholder_text = "name"
+
 [connection signal="pressed" from="HostBtn" to="." method="_on_host_btn_pressed"]
 [connection signal="pressed" from="JoinBtn" to="." method="_on_join_btn_pressed"]

@@ -11,7 +11,8 @@ signal OnRequestMapChange # params: map_nake (string)
 signal OnRequestStartMatch # params: sender_id (int)
 signal OnPlayerReady # params: sender_id (int), ready (bool)
 signal OnPlayerIsDroppingBombs # params: sender_id (int), value (bool)
-signal OnRequestNumRounds #params: value (int)
+signal OnRequestNumRounds # params: value (int)
+signal OnPlayerNameReceived # params: id (int), name (string)
 # received by clients
 signal OnResponseToJoinLobby # params: accepted (bool)
 signal OnPlayerJoinedLobby # params: player_id (int)
@@ -32,7 +33,8 @@ signal OnRemoveExplosion # params: field (vector2i)
 signal OnPlayerDied # params: id (int)
 signal OnUpdatePlayerScore # params: id (int), score (int)
 signal OnCountDownStarted # params: time (float)
-signal OnNumRoundsChanged # params: value
+signal OnNumRoundsChanged # params: value (int)
+signal OnPlayerNameChanged # params:  id (int), value (string)
 
 
 const PORT = 15063
@@ -127,6 +129,11 @@ func SendDroppingBombs(Value: bool) -> void:
 func SendRequestNumRounds(Value: int) -> void:
 	OnRequestNumRounds.emit(Value)
 
+@rpc("reliable", "call_local", "any_peer")
+func SendPlayerName(Value: String) -> void:
+	var id = multiplayer.get_remote_sender_id()
+	OnPlayerNameReceived.emit(id, Value)
+
 
 @rpc("reliable", "call_local", "authority")
 func SendJoinLobbyResponse(Accepted: bool) -> void:
@@ -207,3 +214,7 @@ func SendCountDownStarted(CountDownTime: float) -> void:
 @rpc("reliable", "call_local", "authority")
 func SendNumRoundsChanged(Value: int) -> void:
 	OnNumRoundsChanged.emit(Value)
+
+@rpc("reliable", "call_local", "authority")
+func SendPlayerNameChanged(ID: int, Value: String) -> void:
+	OnPlayerNameChanged.emit(ID, Value)

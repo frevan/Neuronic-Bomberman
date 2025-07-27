@@ -16,6 +16,7 @@ func BeforeShow() -> void:
 	Client.OnMapNameChanged.connect(_client_map_name_changed)
 	Client.OnPlayerBecameReady.connect(_client_player_became_ready)
 	Client.OnNumRoundsChanged.connect(_client_num_rounds_changed)
+	Client.OnPlayerNameChanged.connect(_client_player_name_changed)
 	_AdjustControls()
 	pass
 
@@ -27,6 +28,7 @@ func AfterHide() -> void:
 	Client.OnMapNameChanged.disconnect(_client_map_name_changed)
 	Client.OnPlayerBecameReady.disconnect(_client_player_became_ready)
 	Client.OnNumRoundsChanged.disconnect(_client_num_rounds_changed)
+	Client.OnPlayerNameChanged.disconnect(_client_player_name_changed)
 	pass
 
 
@@ -68,6 +70,10 @@ func _client_num_rounds_changed(_Value: int) -> void:
 	_AdjustRoundsLabelText()
 	pass
 
+func _client_player_name_changed(_PlayerID: int, _Name: String) -> void:
+	_UpdatePlayerInfo()
+	pass
+
 
 func _UpdateControlVisibility() -> void:
 	if visible && Network.IsConnected():
@@ -99,7 +105,9 @@ func _UpdatePlayerInfo() -> void:
 		label.text = "..."
 		var slot: Types.TSlot = Client.Data.Slots[i]
 		if slot.PlayerID != 0:
-			var s: String = str(slot.PlayerID)
+			var s: String = slot.PlayerName
+			if s == "":
+				s = str(slot.PlayerID)
 			if slot.Ready:
 				s += " (ready)"
 			label.text = s
