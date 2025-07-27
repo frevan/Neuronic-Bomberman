@@ -14,6 +14,7 @@ signal OnPlayerMovedToSlot # params: player_id (int), slot_index (int)
 signal OnMapNameChanged # params: map_name (string)
 signal OnMatchStarted
 signal OnNewRound
+signal OnRoundStarted
 signal OnRoundEnded
 signal OnMatchEnded
 signal OnPlayerPositionChanged # params: player_id (int)
@@ -148,6 +149,8 @@ func _network_new_round(MapName: String) -> void:
 
 func _network_round_started() -> void:
 	_log("round started")
+	Data.CountingDown = false
+	OnRoundStarted.emit()
 	pass
 
 
@@ -229,6 +232,13 @@ func _network_update_player_score(PlayerID: int, Score: int) -> void:
 	pass
 
 
+func _network_countdown_started(CountDownTime: float) -> void:
+	_log("countdown started: " + str(CountDownTime) + " seconds")
+	Data.CountingDown = true
+	Data.CountDownTime = CountDownTime
+	pass
+
+
 func _ConnectToSignals() -> void:
 	multiplayer.connected_to_server.connect(_connected_to_server)
 	multiplayer.connection_failed.connect(_connection_failed)
@@ -252,6 +262,7 @@ func _ConnectToSignals() -> void:
 	Network.OnRoundEnded.connect(_network_round_ended)
 	Network.OnMatchEnded.connect(_network_match_ended)
 	Network.OnUpdatePlayerScore.connect(_network_update_player_score)
+	Network.OnCountDownStarted.connect(_network_countdown_started)
 	pass
 
 
@@ -278,6 +289,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnRoundEnded.disconnect(_network_round_ended)
 	Network.OnMatchEnded.disconnect(_network_match_ended)
 	Network.OnUpdatePlayerScore.disconnect(_network_update_player_score)
+	Network.OnCountDownStarted.disconnect(_network_countdown_started)
 	pass
 
 

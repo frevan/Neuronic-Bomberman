@@ -24,7 +24,13 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if !Data:
 		return
-	if State == TState.ROUND:
+	if State == TState.MATCH:
+		if Data.CountingDown:
+			Data.CountDownTime -=  delta
+			if Data.CountDownTime <= 0:
+				Data.CountingDown = false
+				_StartRoundNow()
+	elif State == TState.ROUND:
 		_ExplodeBombs(delta)
 		_RemoveExplosions(delta)
 		_KillPlayersInExplosions()
@@ -102,7 +108,7 @@ func _network_player_ready(SenderID: int, Ready: bool) -> void:
 		Network.SendPlayerBecameReady.rpc(SenderID, Ready)
 		if State == TState.MATCH:
 			if Data.AreAllPlayersReady():
-				_StartRoundNow()
+				_StartCountDownToRound()
 	pass
 
 
@@ -255,7 +261,15 @@ func _StartMatch() -> void:
 func _StartNewRound() -> void:
 	Data.ResetPlayersBeforeRound()
 	Data.ResetBombsEtcBeforeRound()
+	Data.CountingDown = false
 	Network.SendNewRound.rpc(CurrentMapName)
+	pass
+
+
+func _StartCountDownToRound() -> void:
+	Data.CountDownTime = 3
+	Data.CountingDown = true
+	Network.SendCountDownStarted.rpc(Data.CountDownTime)
 	pass
 
 

@@ -16,9 +16,15 @@ var Bombs: Dictionary # key: field (Vector2i) | value: scene (TBombScene)
 var Explosions: Dictionary # key: field (Vector2i) | value: scene (TExplosionScene)
 
 
+func _log(Text: String) -> void:
+	print(str(Network.PeerID) + " [match] " + Text)
+	pass
+
+
 func BeforeShow() -> void:
 	super()
 	Client.OnNewRound.connect(_client_new_round)
+	Client.OnRoundStarted.connect(_client_round_started)
 	Client.OnPlayerPositionChanged.connect(_client_player_position_changed)
 	Client.OnMapTileChanged.connect(_client_map_tile_changed)
 	Client.OnBombDropped.connect(_client_bomb_dropped)
@@ -31,6 +37,7 @@ func BeforeShow() -> void:
 func AfterHide() -> void:
 	super()
 	Client.OnNewRound.disconnect(_client_new_round)
+	Client.OnRoundStarted.disconnect(_client_round_started)
 	Client.OnPlayerPositionChanged.disconnect(_client_player_position_changed)
 	Client.OnMapTileChanged.disconnect(_client_map_tile_changed)
 	Client.OnBombDropped.disconnect(_client_bomb_dropped)
@@ -60,7 +67,15 @@ func _HandleUserInput() -> void:
 
 
 func _client_new_round() -> void:
-	_CreateTiles()
+	#_log("new round")
+	#_CreateTiles()
+	#_ShowPlayers(false)
+	pass
+
+func _client_round_started() -> void:
+	#_log("round started")
+	_ShowPlayers()
+	_SetPlayerPositions()
 	pass
 
 func _client_player_position_changed(_PlayerID: int) -> void:
@@ -144,6 +159,7 @@ func _FindPlayerNodeForSlot(SlotIndex: int) -> Node2D:
 
 
 func _ShowPlayers() -> void:
+	#_log("show players - show=" + str(Show))
 	for i in Client.Data.Slots.size():
 		var scene: Node2D = _FindPlayerNodeForSlot(i)
 		assert(scene)

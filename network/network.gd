@@ -30,6 +30,7 @@ signal OnCreateExplosionAt # params: field (vector2i)
 signal OnRemoveExplosion # params: field (vector2i)
 signal OnPlayerDied # params: id (int)
 signal OnUpdatePlayerScore # params: id (int), score (int)
+signal OnCountDownStarted # params: time (float)
 
 
 const PORT = 15063
@@ -192,3 +193,7 @@ func SendPlayerDied(ID: int) -> void:
 @rpc("reliable", "call_local", "authority")
 func SendPlayerScore(ID: int, Score: int) -> void:
 	OnUpdatePlayerScore.emit(ID, Score)
+
+@rpc("reliable", "call_local", "authority")
+func SendCountDownStarted(CountDownTime: float) -> void:
+	OnCountDownStarted.emit(CountDownTime)

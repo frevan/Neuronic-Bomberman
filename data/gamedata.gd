@@ -7,6 +7,9 @@ var Map: Types.TMap = null
 var Bombs: Dictionary # key: field (Vector2i), value: Types.TBomb
 var Explosions: Dictionary # key: field (Vector2i), value: Types.TExplosion
 
+var CountingDown: bool = false
+var CountDownTime: float = 0
+
 
 func InitSlots() -> void:
 	Slots.resize(Network.MAX_CLIENTS)
