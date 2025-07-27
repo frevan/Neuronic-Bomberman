@@ -41,7 +41,7 @@ func _ReadMapFileContents(MapName: String):
 	if !file:
 		return ""
 		
-	var result = file.get_as_text()
+	var result = file.get_as_text(true)
 	
 	file.close()
 	return result
