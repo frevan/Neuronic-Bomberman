@@ -26,6 +26,7 @@ signal OnRemoveExplosion # params: field (vector2i)
 signal OnPlayerDied # params: id (int)
 signal OnPlayerScoreChanged # params: id (int), score (int)
 signal OnPlayerBecameReady # params: id (int), ready (bool)
+signal OnCountDownStarted # params: time (float)
 
 signal OnPlayerPositionUpdated # [for the server object] param: id (int), position (vector2)
 
@@ -40,6 +41,17 @@ var State: TState = TState.IDLE
 
 func _log(Text: String) -> void:
 	print(str(Network.PeerID) + " [client] " + Text)
+	pass
+
+
+func _process(delta: float) -> void:
+	if !Data:
+		return
+	if State == TState.MATCH:
+		if Data.CountingDown:
+			Data.CountDownTime -=  delta
+			if Data.CountDownTime <= 0:
+				Data.CountingDown = false
 	pass
 
 
@@ -236,6 +248,7 @@ func _network_countdown_started(CountDownTime: float) -> void:
 	_log("countdown started: " + str(CountDownTime) + " seconds")
 	Data.CountingDown = true
 	Data.CountDownTime = CountDownTime
+	OnCountDownStarted.emit(CountDownTime)
 	pass
 
 

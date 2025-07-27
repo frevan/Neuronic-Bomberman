@@ -3,6 +3,8 @@ extends Node
 class_name TServer
 
 
+const COUNTDOWN_TIME = 5
+
 var Data: TGameData
 var Maps: TMaps
 var CurrentMapName: String
@@ -267,7 +269,7 @@ func _StartNewRound() -> void:
 
 
 func _StartCountDownToRound() -> void:
-	Data.CountDownTime = 3
+	Data.CountDownTime = COUNTDOWN_TIME
 	Data.CountingDown = true
 	Network.SendCountDownStarted.rpc(Data.CountDownTime)
 	pass

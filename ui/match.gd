@@ -23,6 +23,7 @@ func _log(Text: String) -> void:
 
 func BeforeShow() -> void:
 	super()
+	$CountDownLabel.visible = false
 	Client.OnNewRound.connect(_client_new_round)
 	Client.OnRoundStarted.connect(_client_round_started)
 	Client.OnPlayerPositionChanged.connect(_client_player_position_changed)
@@ -32,6 +33,7 @@ func BeforeShow() -> void:
 	Client.OnExplosion.connect(_client_explosion)
 	Client.OnRemoveExplosion.connect(_client_remove_explosion)
 	Client.OnPlayerDied.connect(_client_player_died)
+	Client.OnCountDownStarted.connect(_client_countdown_started)
 	pass
 
 func AfterHide() -> void:
@@ -45,6 +47,7 @@ func AfterHide() -> void:
 	Client.OnExplosion.disconnect(_client_explosion)
 	Client.OnRemoveExplosion.disconnect(_client_remove_explosion)
 	Client.OnPlayerDied.disconnect(_client_player_died)
+	Client.OnCountDownStarted.disconnect(_client_countdown_started)
 	_CleanUpAfterMatch()
 	pass
 
@@ -130,6 +133,12 @@ func _client_player_died(PlayerID: int) -> void:
 		var scene = PlayerScenes[PlayerID]
 		PlayerScenes.erase(PlayerID)
 		scene.hide()
+	pass
+
+func _client_countdown_started(_CountDownTime: float) -> void:
+	$CountDownTimer.start()
+	$CountDownLabel.visible = true
+	_on_count_down_timer_timeout() # initial run to set the label text
 	pass
 
 
@@ -238,4 +247,16 @@ func _CleanUpAfterRound() -> void:
 
 func _CleanUpAfterMatch() -> void:
 	_CleanUpAfterRound()
+	pass
+
+
+func _on_count_down_timer_timeout() -> void:
+	var _time: int = floor(Client.Data.CountDownTime)
+	if _time <= 0:
+		$CountDownLabel.text = "GO!"
+	else:
+		$CountDownLabel.text = str(_time)
+	if !Client.Data.CountingDown:
+		$CountDownLabel.visible = false
+		$CountDownTimer.stop()
 	pass
