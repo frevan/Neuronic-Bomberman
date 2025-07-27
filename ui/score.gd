@@ -107,3 +107,8 @@ func _UpdateScoresLabel() -> void:
 				_log("  s=" + s)
 	$ScoresLabel.text = s
 	pass
+
+
+func _on_continue_btn_pressed() -> void:
+	_ContinueToMatchOrLobby()
+	pass
