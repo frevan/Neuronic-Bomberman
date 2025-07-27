@@ -41,10 +41,6 @@ func _on_visibility_changed() -> void:
 
 
 func _HandleUserInput():
-	if Input.is_action_just_pressed("ui_cancel"):
-		OnLeave.emit()
-	elif Input.is_action_just_pressed("ui_accept"):
-		_Connect($ServerEdit.text)
 	for key in [KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5]:
 		if Input.is_key_pressed(key):
 			_HandleFunctionKeyPress(key)
@@ -137,4 +133,9 @@ func _LoadRecentServersFromFile() -> void:
 	RecentServers = contents.split("\n")
 	if RecentServers.size() > MAX_RECENT_SERVERS:
 		RecentServers.resize(MAX_RECENT_SERVERS)
+	pass
+
+
+func _on_server_edit_text_submitted(_new_text: String) -> void:
+	_Connect($ServerEdit.text)
 	pass

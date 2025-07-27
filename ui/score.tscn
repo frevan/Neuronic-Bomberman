@@ -1,6 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://bmpqw6rtdaxnr"]
+[gd_scene load_steps=5 format=3 uid="uid://bmpqw6rtdaxnr"]
 
 [ext_resource type="Script" uid="uid://cihq1s5187dk1" path="res://ui/score.gd" id="1_7b0px"]
+
+[sub_resource type="InputEventAction" id="InputEventAction_7b0px"]
+action = &"ui_accept"
+pressed = true
+
+[sub_resource type="InputEventAction" id="InputEventAction_phtbq"]
+action = &"ui_cancel"
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_07mix"]
+events = [SubResource("InputEventAction_7b0px"), SubResource("InputEventAction_phtbq")]
 
 [node name="Score" type="Node2D"]
 script = ExtResource("1_7b0px")
@@ -32,6 +43,7 @@ offset_top = 530.0
 offset_right = 490.0
 offset_bottom = 583.0
 theme_override_font_sizes/font_size = 32
+shortcut = SubResource("Shortcut_07mix")
 text = "CONTINUE"
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]

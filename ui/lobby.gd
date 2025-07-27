@@ -32,20 +32,6 @@ func AfterHide() -> void:
 	pass
 
 
-func _process(_delta: float) -> void:
-	if visible:
-		_HandleUserInput()
-	pass
-
-
-func _HandleUserInput() -> void:
-	if Input.is_action_just_pressed("ui_cancel"):
-		_LeaveLobby()
-	elif Input.is_action_just_pressed("ui_accept"):
-		Client.RequestStartMatch()
-	pass
-
-
 func _client_player_joined(_PlayerID: int) -> void:
 	_UpdatePlayerInfo()
 	pass

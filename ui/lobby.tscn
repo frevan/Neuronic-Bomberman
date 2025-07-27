@@ -1,6 +1,27 @@
-[gd_scene load_steps=2 format=3 uid="uid://djjfectrmrx13"]
+[gd_scene load_steps=8 format=3 uid="uid://djjfectrmrx13"]
 
 [ext_resource type="Script" uid="uid://cuhcrsgnvvb10" path="res://ui/lobby.gd" id="1_a2pnt"]
+
+[sub_resource type="InputEventAction" id="InputEventAction_hgmly"]
+action = &"ui_accept"
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_4sfkc"]
+events = [SubResource("InputEventAction_hgmly")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_nmq56"]
+action = &"ui_cancel"
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_hgmly"]
+events = [SubResource("InputEventAction_nmq56")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_4sfkc"]
+action = &"ui_select"
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_lyjxk"]
+events = [SubResource("InputEventAction_4sfkc")]
 
 [node name="Lobby" type="Node2D"]
 script = ExtResource("1_a2pnt")
@@ -11,6 +32,7 @@ offset_top = 530.0
 offset_right = 233.0
 offset_bottom = 583.0
 theme_override_font_sizes/font_size = 32
+shortcut = SubResource("Shortcut_4sfkc")
 text = "START"
 
 [node name="LeaveButton" type="Button" parent="."]
@@ -19,6 +41,7 @@ offset_top = 530.0
 offset_right = 122.0
 offset_bottom = 583.0
 theme_override_font_sizes/font_size = 32
+shortcut = SubResource("Shortcut_hgmly")
 text = "LEAVE"
 
 [node name="CaptionLabel" type="Label" parent="."]
@@ -206,6 +229,7 @@ offset_left = 306.0
 offset_top = 541.0
 offset_right = 378.0
 offset_bottom = 572.0
+shortcut = SubResource("Shortcut_lyjxk")
 text = "ready"
 
 [node name="NumRoundsSpin" type="SpinBox" parent="."]

@@ -1,6 +1,20 @@
-[gd_scene load_steps=2 format=3 uid="uid://btkoy6r8d4giw"]
+[gd_scene load_steps=6 format=3 uid="uid://btkoy6r8d4giw"]
 
 [ext_resource type="Script" uid="uid://ds5wvb5brwx6u" path="res://ui/server_selection.gd" id="1_n1u7o"]
+
+[sub_resource type="InputEventAction" id="InputEventAction_rvb8m"]
+action = &"ui_cancel"
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_6rdb8"]
+events = [SubResource("InputEventAction_rvb8m")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_n1u7o"]
+action = &"ui_accept"
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_rvb8m"]
+events = [SubResource("InputEventAction_n1u7o")]
 
 [node name="ServerSelection" type="Node2D"]
 script = ExtResource("1_n1u7o")
@@ -18,6 +32,7 @@ offset_top = 530.0
 offset_right = 113.0
 offset_bottom = 583.0
 theme_override_font_sizes/font_size = 32
+shortcut = SubResource("Shortcut_6rdb8")
 text = "BACK"
 
 [node name="ConnectBtn" type="Button" parent="."]
@@ -26,6 +41,7 @@ offset_top = 225.0
 offset_right = 480.0
 offset_bottom = 278.0
 theme_override_font_sizes/font_size = 32
+shortcut = SubResource("Shortcut_rvb8m")
 text = "CONNECT"
 
 [node name="RecentLabel" type="Label" parent="."]
@@ -42,5 +58,6 @@ horizontal_alignment = 2
 vertical_alignment = 2
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
+[connection signal="text_submitted" from="ServerEdit" to="." method="_on_server_edit_text_submitted"]
 [connection signal="pressed" from="BackBtn" to="." method="_on_back_btn_pressed"]
 [connection signal="pressed" from="ConnectBtn" to="." method="_on_connect_btn_pressed"]

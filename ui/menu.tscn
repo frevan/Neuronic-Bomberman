@@ -1,6 +1,27 @@
-[gd_scene load_steps=2 format=3 uid="uid://c0pu41tigjecp"]
+[gd_scene load_steps=8 format=3 uid="uid://c0pu41tigjecp"]
 
 [ext_resource type="Script" uid="uid://bktw17vb5yvs1" path="res://ui/menu.gd" id="1_bwjgb"]
+
+[sub_resource type="InputEventAction" id="InputEventAction_bwjgb"]
+action = &"ui_select"
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_udkah"]
+events = [SubResource("InputEventAction_bwjgb")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_udkah"]
+action = &"ui_accept"
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_4c782"]
+events = [SubResource("InputEventAction_udkah")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_rvb8m"]
+action = &"ui_cancel"
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_bwjgb"]
+events = [SubResource("InputEventAction_rvb8m")]
 
 [node name="Menu" type="Node2D"]
 script = ExtResource("1_bwjgb")
@@ -11,6 +32,7 @@ offset_top = 274.0
 offset_right = 393.0
 offset_bottom = 327.0
 theme_override_font_sizes/font_size = 32
+shortcut = SubResource("Shortcut_udkah")
 text = "HOST"
 
 [node name="JoinBtn" type="Button" parent="."]
@@ -19,6 +41,7 @@ offset_top = 274.0
 offset_right = 500.0
 offset_bottom = 327.0
 theme_override_font_sizes/font_size = 32
+shortcut = SubResource("Shortcut_4c782")
 text = "JOIN"
 
 [node name="NameEdit" type="LineEdit" parent="."]
@@ -29,5 +52,15 @@ offset_bottom = 562.0
 theme_override_font_sizes/font_size = 24
 placeholder_text = "name"
 
+[node name="QuitBtn" type="Button" parent="."]
+offset_left = 20.0
+offset_top = 530.0
+offset_right = 113.0
+offset_bottom = 583.0
+theme_override_font_sizes/font_size = 32
+shortcut = SubResource("Shortcut_bwjgb")
+text = "QUIT"
+
 [connection signal="pressed" from="HostBtn" to="." method="_on_host_btn_pressed"]
 [connection signal="pressed" from="JoinBtn" to="." method="_on_join_btn_pressed"]
+[connection signal="pressed" from="QuitBtn" to="." method="_on_quit_btn_pressed"]

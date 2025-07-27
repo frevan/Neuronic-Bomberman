@@ -20,19 +20,6 @@ func AfterHide() -> void:
 	pass
 
 
-func _process(_delta: float) -> void:
-	if visible:
-		_HandleUserInput()
-	pass
-
-
-func _HandleUserInput():
-	if Input.is_action_just_pressed("ui_cancel"):
-		get_tree().root.propagate_notification(NOTIFICATION_WM_CLOSE_REQUEST)
-		get_tree().quit()
-	pass
-
-
 func _on_host_btn_pressed() -> void:
 	Client.PlayerName = $NameEdit.text
 	if Server.Start():
@@ -67,4 +54,10 @@ func _SavePlayerNameToSettings() -> void:
 		return
 	file.store_string(Client.PlayerName)
 	file.close()
+	pass
+
+
+func _on_quit_btn_pressed() -> void:
+	get_tree().root.propagate_notification(NOTIFICATION_WM_CLOSE_REQUEST)
+	get_tree().quit()
 	pass
