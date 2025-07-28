@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://3k1b7qjvjstg"]
+
+[ext_resource type="Texture2D" uid="uid://bu3m6l673bu36" path="res://assets/powerup_extrabombs.png" id="1_1sgru"]
+
+[node name="Powerup" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_1sgru")
+centered = false
+offset = Vector2(-16, -32)

@@ -198,7 +198,6 @@ func _CreateExplosionsInDirection(Field: Vector2i, Direction: Vector2i, Strength
 		v += Direction
 	pass
 
-
 func _CreateExplosionsForBomb(Bomb: Types.TBomb) -> void:
 	_CreateExplosionAt(Bomb.Field)
 	_CreateExplosionsInDirection(Bomb.Field, Vector2i(-1, 0), Bomb.Strength)

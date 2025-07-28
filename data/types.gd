@@ -13,10 +13,12 @@ const FIELD_BRICK = 2
 const MAP_WIDTH = 15
 const MAP_HEIGHT = 11
 
-
 const BOMB_TIME = 1.0 # in seconds 
 const EXPLOSION_TIME = 1.0 # in seconds
-const BOMB_STRENGTH = 2 
+const BOMB_STRENGTH = 2
+
+const POWERUP_EXTRABOMB = 1
+const POWERUP_MOREFLAME = 2
 
 
 class TSlot:
@@ -70,7 +72,7 @@ class TMapPowerUp:
 	var HasOverride: bool
 	var OverrideValue: int
 	var Forbidden: bool
-	
+
 
 class TMap:
 	var Name: String

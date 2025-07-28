@@ -8,6 +8,7 @@ const bombscene = preload("res://items/bomb.tscn")
 const explosionscene = preload("res://items/explosion.tscn")
 const brickscene = preload("res://items/brick.tscn") 
 const solidscene = preload("res://items/solidblock.tscn")
+const powerupscene = preload("res://items/powerup.tscn")
 
 @onready var Rules: TRules = TRules.new()
 
@@ -56,6 +57,7 @@ func AfterHide() -> void:
 
 func AfterShow() -> void:
 	_CreateTiles()
+	_CreatePowerups()
 	_ShowPlayers(false)
 	pass
 
@@ -161,6 +163,22 @@ func _CreateTiles() -> void:
 				if node:
 					$Tiles.add_child(node, true)
 					node.position = Tools.FieldPositionToScreen(Vector2(col, row))
+	pass
+
+
+func _CreatePowerups() -> void:
+	for node in $Powerups.get_children():
+		$Powerups.remove_child(node)
+		node.queue_free()
+	
+	for field in Client.Data.Powerups:
+		var p = Client.Data.Powerups[field]
+		var node: Node2D = powerupscene.instantiate()
+		match p:
+			Types.POWERUP_EXTRABOMB: pass # TODO: load correct texture
+			Types.POWERUP_MOREFLAME: pass # TODO
+		$Powerups.add_child(node, true)
+		node.position = Tools.FieldPositionToScreen(field)
 	pass
 
 
