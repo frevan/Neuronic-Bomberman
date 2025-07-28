@@ -180,13 +180,15 @@ func _RemoveExplosions(Delta: float) -> void:
 func _CreateExplosionAt(Field: Vector2i) -> bool:
 	if Field.x < 0 || Field.y < 0 || Field.x >= Types.MAP_WIDTH || Field.y >= Types.MAP_HEIGHT:
 		return false
-	var f = Data.Map.Fields[Field.y][Field.x]
+	var f = Maps.GetFieldType(Data.Map, Field)
 	if f == Types.FIELD_EMPTY || f == Types.FIELD_BRICK:
+		Maps.SetFieldTypeTo(Data.Map, Field, Types.FIELD_EMPTY)
 		Data.AddExplosionAt(Field)
 		Network.SendCreateExplosionAt.rpc(Field)
-	if f == Types.FIELD_BRICK:
-		Network.SendMapTileChanged.rpc(Field, Types.FIELD_EMPTY)
-	return f == Types.FIELD_EMPTY
+		if f == Types.FIELD_BRICK:
+			Network.SendMapTileChanged.rpc(Field, Types.FIELD_EMPTY)
+		return f == Types.FIELD_EMPTY
+	return false
 
 func _CreateExplosionsInDirection(Field: Vector2i, Direction: Vector2i, Strength: int) -> void:
 	var v: Vector2i = Field + Direction
