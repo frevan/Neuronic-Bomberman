@@ -81,7 +81,10 @@ func _UpdateScoresLabel() -> void:
 				continue
 			_log("    slot=" + str(slot.PlayerID) + ": " + str(slot.Score))
 			if slot.Score == score:
-				s += "\n" + str(slot.PlayerID) + " - " + str(slot.Score)
+				var nme: String = slot.PlayerName
+				if nme == "":
+					nme = str(slot.PlayerID)
+				s += "\n" + nme + " - " + str(slot.Score)
 				_log("  s=" + s)
 	$ScoresLabel.text = s
 	pass
