@@ -177,24 +177,32 @@ func _RemoveExplosions(Delta: float) -> void:
 
 
 
-func _CreateExplosionAt(Field: Vector2i) -> void:
+func _CreateExplosionAt(Field: Vector2i) -> bool:
 	if Field.x < 0 || Field.y < 0 || Field.x >= Types.MAP_WIDTH || Field.y >= Types.MAP_HEIGHT:
-		return
+		return false
 	var f = Data.Map.Fields[Field.y][Field.x]
 	if f == Types.FIELD_EMPTY || f == Types.FIELD_BRICK:
 		Data.AddExplosionAt(Field)
 		Network.SendCreateExplosionAt.rpc(Field)
 	if f == Types.FIELD_BRICK:
 		Network.SendMapTileChanged.rpc(Field, Types.FIELD_EMPTY)
+	return f == Types.FIELD_EMPTY
+
+func _CreateExplosionsInDirection(Field: Vector2i, Direction: Vector2i, Strength: int) -> void:
+	var v: Vector2i = Field + Direction
+	for i in range(Strength):
+		if !_CreateExplosionAt(v):
+			break
+		v += Direction
 	pass
 
 
 func _CreateExplosionsForBomb(Bomb: Types.TBomb) -> void:
 	_CreateExplosionAt(Bomb.Field)
-	_CreateExplosionAt(Vector2i(Bomb.Field.x - 1, Bomb.Field.y))
-	_CreateExplosionAt(Vector2i(Bomb.Field.x + 1, Bomb.Field.y))
-	_CreateExplosionAt(Vector2i(Bomb.Field.x, Bomb.Field.y - 1))
-	_CreateExplosionAt(Vector2i(Bomb.Field.x, Bomb.Field.y + 1))
+	_CreateExplosionsInDirection(Bomb.Field, Vector2i(-1, 0), Bomb.Strength)
+	_CreateExplosionsInDirection(Bomb.Field, Vector2i(1, 0), Bomb.Strength)
+	_CreateExplosionsInDirection(Bomb.Field, Vector2i(0, -1), Bomb.Strength)
+	_CreateExplosionsInDirection(Bomb.Field, Vector2i(0, 1), Bomb.Strength)
 	pass
 
 

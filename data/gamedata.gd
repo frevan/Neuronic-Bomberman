@@ -130,10 +130,14 @@ func ResetBombsEtcBeforeRound() -> void:
 
 func AddBombAt(Field: Vector2i, PlayerID: int) -> void:
 	if !FieldHasBomb(Field):
+		var slot_idx = FindSlotForPlayer(PlayerID)
+		if slot_idx == Types.INVALID_SLOT:
+			return
 		var b = Types.TBomb.new()
 		b.Field = Field
 		b.PlayerID = PlayerID
 		b.TimeUntilExplosion = Types.BOMB_TIME
+		b.Strength = Slots[slot_idx].BombStrength
 		Bombs[Field] = b
 	pass
 

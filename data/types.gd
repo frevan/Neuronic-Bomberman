@@ -16,6 +16,7 @@ const MAP_HEIGHT = 11
 
 const BOMB_TIME = 1.0 # in seconds 
 const EXPLOSION_TIME = 1.0 # in seconds
+const BOMB_STRENGTH = 2 
 
 
 class TSlot:
@@ -27,6 +28,7 @@ class TSlot:
 	var TotalBombs: int
 	var DroppedBombs: int
 	var DroppingBombs: bool
+	var BombStrength: int
 	var Alive: bool
 	var Score: int
 	func _init(SetIndex: int = INVALID_SLOT) -> void:
@@ -40,6 +42,7 @@ class TSlot:
 		DroppingBombs = false
 		Alive = false
 		Score = 0
+		BombStrength = BOMB_STRENGTH
 		pass
 
 
@@ -47,6 +50,7 @@ class TBomb:
 	var PlayerID: int
 	var Field: Vector2i
 	var TimeUntilExplosion: float # in seconds
+	var Strength: int
 
 
 class TExplosion:
