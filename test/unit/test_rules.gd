@@ -28,7 +28,9 @@ func test_FieldHasBrickOrSolid() -> void:
 
 
 func test_FieldHasObstacle() -> void:
+	Data.InitSlots()
 	Data.Map = LoadTestMap()
+	Data.Slots[0].PlayerID = 123
 	Maps.ClearField(Data.Map, Vector2i(0, 1))
 	Maps.ClearField(Data.Map, Vector2i(0, 2))
 	Data.AddBombAt(Vector2i(0, 2), 123)
