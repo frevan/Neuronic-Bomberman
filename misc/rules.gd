@@ -21,7 +21,7 @@ func LimitPlayerBottomToField(Position: Vector2, PlayerField: Vector2i) -> Vecto
 
 func _FieldHasBrickOrSolid(Map: Types.TMap, Field: Vector2i) -> bool:
 	if (Field.x < Types.MAP_WIDTH) && (Field.y < Types.MAP_HEIGHT):
-		return Map.Fields[Field.y][Field.x] != Types.FIELD_EMPTY
+		return !Tools.FieldIsEmpty(Map.Fields[Field.y][Field.x])
 	return false
 
 func _FieldHasObstacle(Data: TGameData, Field: Vector2i) -> bool:

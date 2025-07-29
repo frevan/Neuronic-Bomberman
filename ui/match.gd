@@ -175,12 +175,14 @@ func _AddPowerupNode(Field: Vector2i, Type: int) -> void:
 	if !_FieldTypeIsPowerUp(Type):
 		return
 	var node: Node2D = powerupscene.instantiate()
+	var fname: String = ""
 	match Type:
-		Types.FIELD_PU_EXTRABOMB: pass
+		Types.FIELD_PU_EXTRABOMB: fname = "res://assets/powerup_extrabombs.png"
 		Types.FIELD_PU_MOREFLAME: pass
-	if node:
-		$Tiles.add_child(node, true)
-		node.position = Tools.FieldPositionToScreen(Field)
+	if fname != "":
+		node.LoadSpriteFromFile(fname)
+	$Tiles.add_child(node, true)
+	node.position = Tools.FieldPositionToScreen(Field)
 	pass
 
 func _FieldTypeIsPowerUp(Type: int) -> bool:
