@@ -57,7 +57,6 @@ func AfterHide() -> void:
 
 func AfterShow() -> void:
 	_CreateTiles()
-	_CreatePowerups()
 	_ShowPlayers(false)
 	pass
 
@@ -155,31 +154,37 @@ func _CreateTiles() -> void:
 	if Client.Data.Map:
 		for row in Client.Data.Map.Fields.size():
 			for col in Client.Data.Map.Fields[row].size():
-				var node = null
-				match Client.Data.Map.Fields[row][col]:
-					Types.FIELD_EMPTY: pass
-					Types.FIELD_SOLID: node = solidscene.instantiate()
-					Types.FIELD_BRICK: node = brickscene.instantiate()
-				if node:
-					$Tiles.add_child(node, true)
-					node.position = Tools.FieldPositionToScreen(Vector2(col, row))
+				var field_type = Client.Data.Map.Fields[row][col]
+				var field: Vector2i = Vector2i(col, row)
+				_AddFieldNode(field, field_type)
+				_AddPowerupNode(field, field_type)
 	pass
 
-
-func _CreatePowerups() -> void:
-	for node in $Powerups.get_children():
-		$Powerups.remove_child(node)
-		node.queue_free()
-	
-	for field in Client.Data.Powerups:
-		var p = Client.Data.Powerups[field]
-		var node: Node2D = powerupscene.instantiate()
-		match p:
-			Types.POWERUP_EXTRABOMB: pass # TODO: load correct texture
-			Types.POWERUP_MOREFLAME: pass # TODO
-		$Powerups.add_child(node, true)
-		node.position = Tools.FieldPositionToScreen(field)
+func _AddFieldNode(Field: Vector2i, Type: int) -> void:
+	var node: Node2D = null
+	match Type:
+		Types.FIELD_EMPTY: pass
+		Types.FIELD_SOLID: node = solidscene.instantiate()
+		Types.FIELD_BRICK: node = brickscene.instantiate()
+	if node:
+		$Tiles.add_child(node, true)
+		node.position = Tools.FieldPositionToScreen(Field)
 	pass
+
+func _AddPowerupNode(Field: Vector2i, Type: int) -> void:
+	if !_FieldTypeIsPowerUp(Type):
+		return
+	var node: Node2D = powerupscene.instantiate()
+	match Type:
+		Types.FIELD_PU_EXTRABOMB: pass
+		Types.FIELD_PU_MOREFLAME: pass
+	if node:
+		$Tiles.add_child(node, true)
+		node.position = Tools.FieldPositionToScreen(Field)
+	pass
+
+func _FieldTypeIsPowerUp(Type: int) -> bool:
+	return (Type >= Types.FIELD_PU_FIRST) && (Type <= Types.FIELD_PU_LAST)
 
 
 func _FindPlayerNodeForSlot(SlotIndex: int) -> Node2D:

@@ -9,6 +9,10 @@ const INVALID_SLOT = -1
 const FIELD_EMPTY = 0
 const FIELD_SOLID = 1
 const FIELD_BRICK = 2
+const FIELD_PU_FIRST = 100
+const FIELD_PU_EXTRABOMB = 100
+const FIELD_PU_MOREFLAME = 101
+const FIELD_PU_LAST = 199
 
 const MAP_WIDTH = 15
 const MAP_HEIGHT = 11
@@ -16,9 +20,6 @@ const MAP_HEIGHT = 11
 const BOMB_TIME = 1.0 # in seconds 
 const EXPLOSION_TIME = 1.0 # in seconds
 const BOMB_STRENGTH = 2
-
-const POWERUP_EXTRABOMB = 1
-const POWERUP_MOREFLAME = 2
 
 
 class TSlot:
