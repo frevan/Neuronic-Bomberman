@@ -16,6 +16,9 @@ enum TState {IDLE, LOBBY, MATCH, ROUND}
 var State: TState = TState.IDLE
 
 
+@onready var Rules: TRules = TRules.new()
+
+
 func _log(Text: String) -> void:
 	print(str(Network.PeerID) + " [srv] " + Text)
 	pass
@@ -54,7 +57,7 @@ func _PickUpPowerups() -> void:
 		if Tools.FieldTypeIsPowerup(type):
 			Maps.SetFieldTypeTo(Data.Map, slot.Position, Types.FIELD_EMPTY)
 			Network.SendMapTileChanged.rpc(slot.Position, Types.FIELD_EMPTY)
-			# TODO: apply powerup to player
+			Rules.ApplyPowerupToPlayer(Data, i, type)
 	pass
 
 

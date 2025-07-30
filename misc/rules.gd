@@ -60,3 +60,14 @@ func ApplyObstaclesToPlayerMove(Data: TGameData, Position: Vector2, NewPosition:
 	NewPosition = _CheckIfPlayerCanMoveToField(Data, NewPosition, playerField, Vector2i(playerField.x, playerField.y - 1))
 	NewPosition = _CheckIfPlayerCanMoveToField(Data, NewPosition, playerField, Vector2i(playerField.x, playerField.y + 1))
 	return _LimitPlayerToArena(NewPosition)
+
+
+func ApplyPowerupToPlayer(Data: TGameData, SlotIndex: int, Powerup: int) -> void:
+	assert(Data)
+	assert(SlotIndex != Types.INVALID_SLOT)
+	assert(SlotIndex < Data.Slots.size())
+	var slot: Types.TSlot = Data.Slots[SlotIndex]
+	match Powerup:
+		Types.FIELD_PU_EXTRABOMB: slot.TotalBombs += 1
+		Types.FIELD_PU_MOREFLAME: slot.BombStrength += 1
+	pass
