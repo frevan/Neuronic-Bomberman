@@ -30,15 +30,31 @@ func _process(delta: float) -> void:
 	if !Data:
 		return
 	if State == TState.MATCH:
-		if Data.CountingDown:
-			Data.CountDownTime -=  delta
-			if Data.CountDownTime <= 0:
-				Data.CountingDown = false
-				_StartRoundNow()
+		_ProcessMatch(delta)
 	elif State == TState.ROUND:
 		_ExplodeBombs(delta)
 		_RemoveExplosions(delta)
 		_KillPlayersInExplosions()
+		_PickUpPowerups()
+	pass
+
+
+func _ProcessMatch(delta: float) -> void:
+	if Data.CountingDown:
+		Data.CountDownTime -=  delta
+		if Data.CountDownTime <= 0:
+			Data.CountingDown = false
+			_StartRoundNow()
+	pass
+
+func _PickUpPowerups() -> void:
+	for i in Data.Slots.size():
+		var slot: Types.TSlot = Data.Slots[i]
+		var type: int = Maps.GetFieldType(Data.Map, slot.Position)
+		if Tools.FieldTypeIsPowerup(type):
+			Maps.SetFieldTypeTo(Data.Map, slot.Position, Types.FIELD_EMPTY)
+			Network.SendMapTileChanged.rpc(slot.Position, Types.FIELD_EMPTY)
+			# TODO: apply powerup to player
 	pass
 
 

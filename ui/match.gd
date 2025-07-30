@@ -224,7 +224,8 @@ func _SetPlayerAuthorities() -> void:
 
 
 func _on_player_check_for_collisions(Sender: Node2D, NewPosition: Vector2) -> void:
-	Sender.position = Rules.ApplyObstaclesToPlayerMove(Client.Data, Sender.position, NewPosition)
+	if Client.State == Client.TState.ROUND:
+		Sender.position = Rules.ApplyObstaclesToPlayerMove(Client.Data, Sender.position, NewPosition)
 	pass
 
 
