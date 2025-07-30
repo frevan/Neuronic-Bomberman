@@ -178,7 +178,7 @@ func _AddPowerupNode(Field: Vector2i, Type: int) -> void:
 	var fname: String = ""
 	match Type:
 		Types.FIELD_PU_EXTRABOMB: fname = "res://assets/powerup_extrabombs.png"
-		Types.FIELD_PU_MOREFLAME: pass
+		Types.FIELD_PU_MOREFLAME: fname = "res://assets/powerup_moreflame.png"
 	if fname != "":
 		node.LoadSpriteFromFile(fname)
 	$Tiles.add_child(node, true)

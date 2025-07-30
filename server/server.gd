@@ -171,6 +171,7 @@ func _RemoveExplosions(Delta: float) -> void:
 		var e = Data.Explosions[field]
 		e.RemainingTime -= Delta
 		if e.RemainingTime <= 0:
+			Network.SendMapTileChanged.rpc(field, Maps.GetFieldType(Data.Map, field))
 			Network.SendRemoveExplosion.rpc(field)
 			Data.RemoveExplosion(field)
 	pass
@@ -183,8 +184,11 @@ func _CreateExplosionAt(Field: Vector2i) -> bool:
 	if Tools.FieldCanExplode(f):
 		Data.AddExplosionAt(Field)
 		Network.SendCreateExplosionAt.rpc(Field)
-		if f == Types.FIELD_BRICK || Tools.FieldHasPowerup(f):
-			Maps.SetFieldTypeTo(Data.Map, Field, Types.FIELD_EMPTY)
+		if f == Types.FIELD_BRICK || Tools.FieldTypeIsPowerup(f):
+			var new_type = Types.FIELD_EMPTY
+			if f == Types.FIELD_BRICK:
+				new_type = _RandomlySpawnPopup()
+			Maps.SetFieldTypeTo(Data.Map, Field, new_type)
 			Network.SendMapTileChanged.rpc(Field, Types.FIELD_EMPTY)
 		return Tools.FieldIsEmpty(f)
 	return false
@@ -216,6 +220,10 @@ func _KillPlayersInExplosions() -> void:
 	if playerWasKilled:
 		_CheckIfRoundEnded()
 	pass
+
+
+func _RandomlySpawnPopup() -> int:
+	return Types.FIELD_EMPTY
 
 
 func _KillPlayer(SlotIndex: int) -> void:

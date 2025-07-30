@@ -49,11 +49,11 @@ func PlayerPositionToRect(Position: Vector2) -> Rect2:
 	return Rect2(Position.x, Position.y, PLAYER_SIZE.x, PLAYER_SIZE.y)
 
 
-func FieldHasPowerup(Type: int) -> bool:
+func FieldTypeIsPowerup(Type: int) -> bool:
 	return (Type in range(Types.FIELD_PU_FIRST, Types.FIELD_PU_LAST))
 
 func FieldIsEmpty(Type: int) -> bool:
-	return (Type == Types.FIELD_EMPTY) || FieldHasPowerup(Type)
+	return (Type == Types.FIELD_EMPTY) || FieldTypeIsPowerup(Type)
 
 func FieldCanExplode(Type: int) -> bool:
 	return (Type == Types.FIELD_BRICK) || FieldIsEmpty(Type)
