@@ -4,6 +4,8 @@ extends Node2D
 var Server: TServer
 var Client: TClient
 
+var OldWindowMode
+
 
 func _ready() -> void:
 	if OS.has_feature("debug"):
@@ -20,6 +22,17 @@ func _ready() -> void:
 	_InitializeServerSelectionScene()
 	
 	Tools.SwitchToScene($Menu)
+	pass
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey:
+		if event.pressed and event.keycode == KEY_ENTER and event.alt_pressed:
+			if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN:
+				DisplayServer.window_set_mode(OldWindowMode)
+			else:
+				OldWindowMode = DisplayServer.window_get_mode()
+				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	pass
 
 

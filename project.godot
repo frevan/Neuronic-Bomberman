@@ -29,7 +29,7 @@ Types="*res://data/types.gd"
 window/size/viewport_width=800
 window/size/viewport_height=600
 window/size/initial_position=Vector2i(400, 0)
-window/size/resizable=false
+window/stretch/mode="viewport"
 
 [editor_plugins]
 
