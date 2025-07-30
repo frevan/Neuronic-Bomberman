@@ -223,6 +223,12 @@ func _KillPlayersInExplosions() -> void:
 
 
 func _RandomlySpawnPopup() -> int:
+	var n = randi_range(0, Types.NUM_POWERUPS * 2 )
+	if n < Types.NUM_POWERUPS:
+		if Data.Map.PowerUps.has(n):
+			var pu: Types.TMapPowerUp = Data.Map.PowerUps[n]
+			if !pu.Forbidden:
+				return Types.FIELD_PU_FIRST + n
 	return Types.FIELD_EMPTY
 
 

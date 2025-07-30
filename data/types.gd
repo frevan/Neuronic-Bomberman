@@ -14,6 +14,8 @@ const FIELD_PU_EXTRABOMB = 100
 const FIELD_PU_MOREFLAME = 101
 const FIELD_PU_LAST = 199
 
+const NUM_POWERUPS = 13
+
 const MAP_WIDTH = 15
 const MAP_HEIGHT = 11
 
