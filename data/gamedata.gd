@@ -166,3 +166,9 @@ func AddExplosionAt(Field: Vector2i) -> void:
 func RemoveExplosion(Field: Vector2i) -> void:
 	Explosions.erase(Field)
 	pass
+
+func ResetExplosionRemainingTime(Field: Vector2i) -> void:
+	if Explosions.has(Field):
+		var explosion: Types.TExplosion = Explosions[Field]
+		explosion.RemainingTime = Types.EXPLOSION_TIME
+	pass

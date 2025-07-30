@@ -201,15 +201,19 @@ func _CreateExplosionAt(Field: Vector2i) -> bool:
 		return false
 	var f = Maps.GetFieldType(Data.Map, Field)
 	if Tools.FieldCanExplode(f):
-		Data.AddExplosionAt(Field)
-		Network.SendCreateExplosionAt.rpc(Field)
-		if f == Types.FIELD_BRICK || Tools.FieldTypeIsPowerup(f):
-			var new_type = Types.FIELD_EMPTY
-			if f == Types.FIELD_BRICK:
-				new_type = _RandomlySpawnPopup()
-			Maps.SetFieldTypeTo(Data.Map, Field, new_type)
-			Network.SendMapTileChanged.rpc(Field, Types.FIELD_EMPTY)
-		return Tools.FieldIsEmpty(f)
+		if Data.FieldHasExplosion(Field):
+			Data.ResetExplosionRemainingTime(Field)
+			return true
+		else:
+			Data.AddExplosionAt(Field)
+			Network.SendCreateExplosionAt.rpc(Field)
+			if f == Types.FIELD_BRICK || Tools.FieldTypeIsPowerup(f):
+				var new_type = Types.FIELD_EMPTY
+				if f == Types.FIELD_BRICK:
+					new_type = _RandomlySpawnPopup()
+				Maps.SetFieldTypeTo(Data.Map, Field, new_type)
+				Network.SendMapTileChanged.rpc(Field, Types.FIELD_EMPTY)
+			return Tools.FieldIsEmpty(f)
 	return false
 
 func _CreateExplosionsInDirection(Field: Vector2i, Direction: Vector2i, Strength: int) -> void:
