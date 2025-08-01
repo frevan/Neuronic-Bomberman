@@ -231,7 +231,7 @@ func _on_player_check_for_collisions(Sender: Node2D, NewPosition: Vector2) -> vo
 
 
 func _UpdatePlayerPositionsFromNodes() -> void:
-	if visible:
+	if visible && (Client.State == Client.TState.ROUND):
 		for i in Client.Data.Slots.size():
 			var slot = Client.Data.Slots[i]
 			if PlayerScenes.has(slot.PlayerID):

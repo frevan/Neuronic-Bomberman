@@ -39,6 +39,7 @@ func _process(delta: float) -> void:
 		_ExplodeBombs(delta)
 		_RemoveExplosions(delta)
 		_KillPlayersInExplosions()
+		_PickUpPowerups()
 	pass
 
 
@@ -181,7 +182,10 @@ func _CreateExplosionAt(Field: Vector2i) -> bool:
 	if Field.x < 0 || Field.y < 0 || Field.x >= Types.MAP_WIDTH || Field.y >= Types.MAP_HEIGHT:
 		return false
 	var f = Maps.GetFieldType(Data.Map, Field)
-	if Tools.FieldCanExplode(f):
+	if Data.FieldHasExplosion(Field):
+		Data.ResetExplosionTime(Field)
+		return true
+	elif Tools.FieldCanExplode(f):
 		Data.AddExplosionAt(Field)
 		Network.SendCreateExplosionAt.rpc(Field)
 		if f == Types.FIELD_BRICK || Tools.FieldTypeIsPowerup(f):
@@ -222,6 +226,12 @@ func _KillPlayersInExplosions() -> void:
 	pass
 
 
+func _KillPlayer(SlotIndex: int) -> void:
+	Data.Slots[SlotIndex].Alive = false
+	Network.SendPlayerDied.rpc(Data.Slots[SlotIndex].PlayerID)
+	pass
+
+
 func _RandomlySpawnPopup() -> int:
 	var n = randi_range(0, Types.NUM_POWERUPS * 2 )
 	if n < Types.NUM_POWERUPS:
@@ -231,10 +241,22 @@ func _RandomlySpawnPopup() -> int:
 				return Types.FIELD_PU_FIRST + n
 	return Types.FIELD_EMPTY
 
+func _PickUpPowerups() -> void:
+	for i in Data.Slots.size() - 1:
+		var slot: Types.TSlot = Data.Slots[i]
+		var type: int = Maps.GetFieldType(Data.Map, slot.Position)
+		if Tools.FieldTypeIsPowerup(type):
+			Maps.SetFieldTypeTo(Data.Map, slot.Position, Types.FIELD_EMPTY)
+			Network.SendMapTileChanged.rpc(slot.Position, Types.FIELD_EMPTY)
+			_ApplyPowerupToSlot(i, type)
+	pass
 
-func _KillPlayer(SlotIndex: int) -> void:
-	Data.Slots[SlotIndex].Alive = false
-	Network.SendPlayerDied.rpc(Data.Slots[SlotIndex].PlayerID)
+func _ApplyPowerupToSlot(SlotIndex: int, FieldType: int) -> void:
+	assert(SlotIndex != Types.INVALID_SLOT)
+	var slot: Types.TSlot = Data.Slots[SlotIndex]
+	match FieldType:
+		Types.FIELD_PU_EXTRABOMB: slot.TotalBombs += 1
+		Types.FIELD_PU_MOREFLAME: slot.BombStrength += 1
 	pass
 
 
