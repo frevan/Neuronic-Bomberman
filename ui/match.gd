@@ -81,8 +81,6 @@ func _HandleUserInput() -> void:
 
 func _client_new_round() -> void:
 	#_log("new round")
-	#_CreateTiles()
-	#_ShowPlayers(false)
 	pass
 
 func _client_round_started() -> void:
@@ -226,7 +224,8 @@ func _SetPlayerAuthorities() -> void:
 
 
 func _on_player_check_for_collisions(Sender: Node2D, NewPosition: Vector2) -> void:
-	Sender.position = Rules.ApplyObstaclesToPlayerMove(Client.Data, Sender.position, NewPosition)
+	if Client.State == Client.TState.ROUND:
+		Sender.position = Rules.ApplyObstaclesToPlayerMove(Client.Data, Sender.position, NewPosition)
 	pass
 
 
@@ -252,6 +251,14 @@ func _RemovePlayerScenes() -> void:
 	PlayerScenes.clear()
 	pass
 
+func _ResetPlayerSceneDirections() -> void:
+	for i in Client.Data.Slots.size():
+		var node = _FindPlayerNodeForSlot(i)
+		if node:
+			node.ResetSpriteDirection()
+	pass
+
+
 func _RemoveBombScenes() -> void:
 	for field in Bombs:
 		var scene = Bombs[field]
@@ -267,6 +274,7 @@ func _RemoveExplosionScenes() -> void:
 	pass
 
 func _CleanUpAfterRound() -> void:
+	_ResetPlayerSceneDirections()
 	_RemovePlayerScenes()
 	_RemoveBombScenes()
 	_RemoveExplosionScenes()

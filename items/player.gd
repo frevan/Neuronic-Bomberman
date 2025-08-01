@@ -48,6 +48,11 @@ func _InitializeSprite(id: int) -> void:
 	pass
 
 
+func ResetSpriteDirection() -> void:
+	$AnimatedSprite.animation = "down"
+	pass
+
+
 func _CalculateVelocity() -> void:
 	if $PlayerInput.direction:
 		velocity.x = $PlayerInput.direction.x * SPEED

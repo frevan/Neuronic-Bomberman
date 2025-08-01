@@ -16,6 +16,9 @@ enum TState {IDLE, LOBBY, MATCH, ROUND}
 var State: TState = TState.IDLE
 
 
+@onready var Rules: TRules = TRules.new()
+
+
 func _log(Text: String) -> void:
 	print(str(Network.PeerID) + " [srv] " + Text)
 	pass
@@ -30,16 +33,32 @@ func _process(delta: float) -> void:
 	if !Data:
 		return
 	if State == TState.MATCH:
-		if Data.CountingDown:
-			Data.CountDownTime -=  delta
-			if Data.CountDownTime <= 0:
-				Data.CountingDown = false
-				_StartRoundNow()
+		_ProcessMatch(delta)
 	elif State == TState.ROUND:
 		_ExplodeBombs(delta)
 		_RemoveExplosions(delta)
 		_KillPlayersInExplosions()
 		_PickUpPowerups()
+	pass
+
+
+func _ProcessMatch(delta: float) -> void:
+		if Data.CountingDown:
+			Data.CountDownTime -=  delta
+			if Data.CountDownTime <= 0:
+				Data.CountingDown = false
+				_StartRoundNow()
+		_PickUpPowerups()
+	pass
+
+func _PickUpPowerups() -> void:
+	for i in Data.Slots.size():
+		var slot: Types.TSlot = Data.Slots[i]
+		var type: int = Maps.GetFieldType(Data.Map, slot.Position)
+		if Tools.FieldTypeIsPowerup(type):
+			Maps.SetFieldTypeTo(Data.Map, slot.Position, Types.FIELD_EMPTY)
+			Network.SendMapTileChanged.rpc(slot.Position, Types.FIELD_EMPTY)
+			Rules.ApplyPowerupToPlayer(Data, i, type)
 	pass
 
 
@@ -186,6 +205,10 @@ func _CreateExplosionAt(Field: Vector2i) -> bool:
 		Data.ResetExplosionTime(Field)
 		return true
 	elif Tools.FieldCanExplode(f):
+		if Data.FieldHasExplosion(Field):
+			Data.ResetExplosionRemainingTime(Field)
+			return true
+		else:
 		Data.AddExplosionAt(Field)
 		Network.SendCreateExplosionAt.rpc(Field)
 		if f == Types.FIELD_BRICK || Tools.FieldTypeIsPowerup(f):
