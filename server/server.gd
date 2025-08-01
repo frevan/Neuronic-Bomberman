@@ -43,22 +43,11 @@ func _process(delta: float) -> void:
 
 
 func _ProcessMatch(delta: float) -> void:
-		if Data.CountingDown:
-			Data.CountDownTime -=  delta
-			if Data.CountDownTime <= 0:
-				Data.CountingDown = false
-				_StartRoundNow()
-		_PickUpPowerups()
-	pass
-
-func _PickUpPowerups() -> void:
-	for i in Data.Slots.size():
-		var slot: Types.TSlot = Data.Slots[i]
-		var type: int = Maps.GetFieldType(Data.Map, slot.Position)
-		if Tools.FieldTypeIsPowerup(type):
-			Maps.SetFieldTypeTo(Data.Map, slot.Position, Types.FIELD_EMPTY)
-			Network.SendMapTileChanged.rpc(slot.Position, Types.FIELD_EMPTY)
-			Rules.ApplyPowerupToPlayer(Data, i, type)
+	if Data.CountingDown:
+		Data.CountDownTime -=  delta
+		if Data.CountDownTime <= 0:
+			Data.CountingDown = false
+			_StartRoundNow()
 	pass
 
 
@@ -264,23 +253,14 @@ func _RandomlySpawnPopup() -> int:
 	return Types.FIELD_EMPTY
 
 func _PickUpPowerups() -> void:
-	for i in Data.Slots.size() - 1:
+	for i in Data.Slots.size():
 		var slot: Types.TSlot = Data.Slots[i]
 		var type: int = Maps.GetFieldType(Data.Map, slot.Position)
 		if Tools.FieldTypeIsPowerup(type):
 			Maps.SetFieldTypeTo(Data.Map, slot.Position, Types.FIELD_EMPTY)
 			Network.SendMapTileChanged.rpc(slot.Position, Types.FIELD_EMPTY)
-			_ApplyPowerupToSlot(i, type)
+			Rules.ApplyPowerupToPlayer(Data, i, type)
 	pass
-
-func _ApplyPowerupToSlot(SlotIndex: int, FieldType: int) -> void:
-	assert(SlotIndex != Types.INVALID_SLOT)
-	var slot: Types.TSlot = Data.Slots[SlotIndex]
-	match FieldType:
-		Types.FIELD_PU_EXTRABOMB: slot.TotalBombs += 1
-		Types.FIELD_PU_MOREFLAME: slot.BombStrength += 1
-	pass
-
 
 func _CheckIfRoundEnded() -> void:
 	if Data.CountAlivePlayers() <= 1:
