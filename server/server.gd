@@ -208,7 +208,6 @@ func _CreateExplosionAt(Field: Vector2i) -> bool:
 		if Data.FieldHasExplosion(Field):
 			Data.ResetExplosionRemainingTime(Field)
 			return true
-		else:
 		Data.AddExplosionAt(Field)
 		Network.SendCreateExplosionAt.rpc(Field)
 		if f == Types.FIELD_BRICK || Tools.FieldTypeIsPowerup(f):
