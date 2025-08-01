@@ -168,10 +168,16 @@ func _ExplodeBombs(Delta: float) -> void:
 		b.TimeUntilExplosion -= Delta
 		if b.TimeUntilExplosion <= 0:
 			_CreateExplosionsForBomb(b)
-			Data.RemoveBomb(field)
-			var slot_idx = Data.FindSlotForPlayer(b.PlayerID)
-			if slot_idx != Types.INVALID_SLOT:
-				Data.Slots[slot_idx].DroppedBombs -= 1
+			_RemoveBombFromField(field)
+	pass
+
+func _RemoveBombFromField(Field: Vector2i) -> void:
+	if Data.FieldHasBomb(Field):
+		var playerID = Data.Bombs[Field].PlayerID
+		Data.RemoveBomb(Field)
+		var slot_idx = Data.FindSlotForPlayer(playerID)
+		if slot_idx != Types.INVALID_SLOT:
+			Data.Slots[slot_idx].DroppedBombs -= 1
 	pass
 
 
@@ -199,14 +205,20 @@ func _CreateExplosionAt(Field: Vector2i) -> bool:
 			return true
 		Data.AddExplosionAt(Field)
 		Network.SendCreateExplosionAt.rpc(Field)
-		if f == Types.FIELD_BRICK || Tools.FieldTypeIsPowerup(f):
-			var new_type = Types.FIELD_EMPTY
-			if f == Types.FIELD_BRICK:
-				new_type = _RandomlySpawnPopup()
-			Maps.SetFieldTypeTo(Data.Map, Field, new_type)
-			Network.SendMapTileChanged.rpc(Field, Types.FIELD_EMPTY)
+		_ExplodeStuffInField(Field, f)
 		return Tools.FieldIsEmpty(f)
 	return false
+
+func _ExplodeStuffInField(Field: Vector2i, FieldType: int) -> void:
+	if FieldType == Types.FIELD_BRICK || Tools.FieldTypeIsPowerup(FieldType):
+		var new_type = Types.FIELD_EMPTY
+		if FieldType == Types.FIELD_BRICK:
+			new_type = _RandomlySpawnPopup()
+		Maps.SetFieldTypeTo(Data.Map, Field, new_type)
+		Network.SendMapTileChanged.rpc(Field, Types.FIELD_EMPTY)
+	if Data.FieldHasBomb(Field):
+		_RemoveBombFromField(Field)
+	pass
 
 func _CreateExplosionsInDirection(Field: Vector2i, Direction: Vector2i, Strength: int) -> void:
 	var v: Vector2i = Field + Direction
