@@ -63,69 +63,6 @@ func _peer_disconnected(SenderID: int) -> void:
 	pass
 
 
-func _network_request_map_change(MapName: String) -> void:
-	_log("request to change the map to: " + MapName)
-	if Maps.MapExists(MapName):
-		CurrentMapName = MapName
-		Network.SendMapName.rpc(CurrentMapName)
-	pass
-
-
-func _network_request_move_to_slot(SenderID: int, SlotIndex: int) -> void:
-	_log("request to move " + str(SenderID) + " to slot " + str(SlotIndex))
-	
-	var idx: int = Data.FindSlotForPlayer(SenderID)
-	if State == TState.LOBBY:
-		if Data.MovePlayerToSlotIfFree(SenderID, idx):
-			idx = SlotIndex
-	
-	Network.SendPlayerMovedToSlot.rpc(SenderID, idx)
-	pass
-
-
-func _network_request_start_match(SenderID: int) -> void:
-	_log("request to start the match from " + str(SenderID))
-	if (State == TState.LOBBY) && (SenderID == 1):
-		_StartMatch()
-	pass
-
-
-func _network_player_ready(SenderID: int, Ready: bool) -> void:
-	_log("player " + str(SenderID) + " is ready: " + str(Ready))
-	if (State == TState.LOBBY) || (State == TState.MATCH):
-		Data.SetPlayerReady(SenderID, Ready)
-		Network.SendPlayerBecameReady.rpc(SenderID, Ready)
-		if State == TState.MATCH:
-			if Data.AreAllPlayersReady():
-				_StartCountDownToRound()
-	pass
-
-
-func _network_player_is_dropping_bomb(PlayerID: int, Value: bool) -> void:
-	var idx = Data.FindSlotForPlayer(PlayerID)
-	if idx != Constants.INVALID_SLOT:
-		Data.Slots[idx].DroppingBombs = Value
-		if Data.Slots[idx].DroppingBombs:
-			_DropBomb(idx)
-	pass
-
-
-func _network_request_num_rounds(Value: int) -> void:
-	_log("num rounds request: " + str(Value))
-	Data.NumRounds = clamp(Value, NUM_ROUNDS_MIN, NUM_ROUNDS_MAX)
-	Network.SendNumRoundsChanged.rpc(Data.NumRounds)
-	pass
-
-
-func _network_player_name_received(PlayerID: int, Name: String) -> void:
-	_log("player name received for " + str(PlayerID) + ": " + Name)
-	var idx = Data.FindSlotForPlayer(PlayerID)
-	if idx != Constants.INVALID_SLOT:
-		Data.Slots[idx].PlayerName = Name
-		Network.SendPlayerNameChanged.rpc(PlayerID, Name)
-	pass
-
-
 func _DropBomb(SlotIndex: int) -> void:
 	var slot = Data.Slots[SlotIndex]
 	if slot.DroppedBombs == slot.TotalBombs:
@@ -262,13 +199,13 @@ func _ConnectToSignalsOnStart() -> void:
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
 	Network.OnRequestJoinLobby.connect(Comms._network_request_join_lobby)
 	Network.OnLeaveLobby.connect(Comms._network_leave_lobby)
-	Network.OnRequestMapChange.connect(_network_request_map_change)
-	Network.OnRequestMoveToSlot.connect(_network_request_move_to_slot)
-	Network.OnRequestStartMatch.connect(_network_request_start_match)
-	Network.OnPlayerReady.connect(_network_player_ready)
-	Network.OnPlayerIsDroppingBombs.connect(_network_player_is_dropping_bomb)
-	Network.OnRequestNumRounds.connect(_network_request_num_rounds)
-	Network.OnPlayerNameReceived.connect(_network_player_name_received)
+	Network.OnRequestMapChange.connect(Comms._network_request_map_change)
+	Network.OnRequestMoveToSlot.connect(Comms._network_request_move_to_slot)
+	Network.OnRequestStartMatch.connect(Comms._network_request_start_match)
+	Network.OnPlayerReady.connect(Comms._network_player_ready)
+	Network.OnPlayerIsDroppingBombs.connect(Comms._network_player_is_dropping_bomb)
+	Network.OnRequestNumRounds.connect(Comms._network_request_num_rounds)
+	Network.OnPlayerNameReceived.connect(Comms._network_player_name_received)
 	pass
 
 func _DisconnectFromSignalsOnStop() -> void:
@@ -276,13 +213,13 @@ func _DisconnectFromSignalsOnStop() -> void:
 	multiplayer.peer_disconnected.disconnect(_peer_disconnected)
 	Network.OnRequestJoinLobby.disconnect(Comms._network_request_join_lobby)
 	Network.OnLeaveLobby.disconnect(Comms._network_leave_lobby)
-	Network.OnRequestMapChange.disconnect(_network_request_map_change)
-	Network.OnRequestMoveToSlot.disconnect(_network_request_move_to_slot)
-	Network.OnRequestStartMatch.disconnect(_network_request_start_match)
-	Network.OnPlayerReady.disconnect(_network_player_ready)
-	Network.OnPlayerIsDroppingBombs.disconnect(_network_player_is_dropping_bomb)
-	Network.OnRequestNumRounds.disconnect(_network_request_num_rounds)
-	Network.OnPlayerNameReceived.disconnect(_network_player_name_received)
+	Network.OnRequestMapChange.disconnect(Comms._network_request_map_change)
+	Network.OnRequestMoveToSlot.disconnect(Comms._network_request_move_to_slot)
+	Network.OnRequestStartMatch.disconnect(Comms._network_request_start_match)
+	Network.OnPlayerReady.disconnect(Comms._network_player_ready)
+	Network.OnPlayerIsDroppingBombs.disconnect(Comms._network_player_is_dropping_bomb)
+	Network.OnRequestNumRounds.disconnect(Comms._network_request_num_rounds)
+	Network.OnPlayerNameReceived.disconnect(Comms._network_player_name_received)
 	pass
 
 
