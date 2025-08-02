@@ -1,6 +1,9 @@
 extends Node
 
 
+const INVALID_SLOT = -1
+
+
 const POWERUP_EXTRABOMB = 0
 const POWERUP_MOREFLAME = 1
 const POWERUP_DISEASE = 2

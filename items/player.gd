@@ -60,7 +60,7 @@ func _CalculateVelocity() -> void:
 	if Client:
 		if Client.Data:
 			var idx = Client.Data.FindSlotForPlayer(Network.PeerID)
-			if idx != Types.INVALID_SLOT:
+			if idx != Constants.INVALID_SLOT:
 				var slot: Types.TSlot = Client.Data.Slots[idx]
 				_speed = slot.Speed * 0.25
 	

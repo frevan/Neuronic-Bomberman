@@ -27,13 +27,13 @@ func test_SlotsAreNotNull() -> void:
 func test_FindFreeSlotIndexWhenNotFull() -> void:
 	o.Slots[0].PlayerID = 1 # one occupied slot
 	var index: int = o.FindFreeSlotIndex()
-	assert_ne(index, Types.INVALID_SLOT)
+	assert_ne(index, Constants.INVALID_SLOT)
 
 func test_FindFreeSlotIndexWhenFull() -> void:
 	for i in o.Slots.size():
 		o.Slots[i].PlayerID = 1
 	var index: int = o.FindFreeSlotIndex()
-	assert_eq(index, Types.INVALID_SLOT)
+	assert_eq(index, Constants.INVALID_SLOT)
 
 
 
@@ -56,7 +56,7 @@ func test_DontClearSlotForOtherPlayers() -> void:
 
 func test_FindSlotForUnknownPlayer() -> void:
 	var idx = o.FindSlotForPlayer(123)
-	assert_eq(idx, Types.INVALID_SLOT)
+	assert_eq(idx, Constants.INVALID_SLOT)
 
 func test_FindSlotForKnownPlayer() -> void:
 	o.Slots[1].PlayerID = 2

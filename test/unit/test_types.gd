@@ -12,7 +12,7 @@ func after_each():
 
 func test_SlotIndexIsInvalid() -> void:
 	var slot: TTypes.TSlot = TTypes.TSlot.new()
-	assert_eq(slot.Index, Types.INVALID_SLOT)
+	assert_eq(slot.Index, Constants.INVALID_SLOT)
 
 func test_SlotIndexIsCorrect() -> void:
 	var slot: TTypes.TSlot = TTypes.TSlot.new(15)

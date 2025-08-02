@@ -64,7 +64,7 @@ func ApplyObstaclesToPlayerMove(Data: TGameData, Position: Vector2, NewPosition:
 
 func ApplyPowerupToPlayer(Data: TGameData, SlotIndex: int, Powerup: int) -> void:
 	assert(Data)
-	assert(SlotIndex != Types.INVALID_SLOT)
+	assert(SlotIndex != Constants.INVALID_SLOT)
 	assert(SlotIndex < Data.Slots.size())
 	var slot: Types.TSlot = Data.Slots[SlotIndex]
 	var p: TPowerup = Tools.CreatePowerup(Powerup)
@@ -74,7 +74,7 @@ func ApplyPowerupToPlayer(Data: TGameData, SlotIndex: int, Powerup: int) -> void
 
 func OverridePlayerPowerup(Data: TGameData, SlotIndex: int, Powerup: int, Override: int) -> void:
 	assert(Data)
-	assert(SlotIndex != Types.INVALID_SLOT)
+	assert(SlotIndex != Constants.INVALID_SLOT)
 	assert(SlotIndex < Data.Slots.size())
 	var slot: Types.TSlot = Data.Slots[SlotIndex]
 	var p: TPowerup = Tools.CreatePowerup(Powerup)

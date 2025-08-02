@@ -3,9 +3,6 @@ extends Node
 class_name TTypes
 
 
-const INVALID_SLOT = -1
-
-
 const FIELD_EMPTY = 0
 const FIELD_SOLID = 1
 const FIELD_BRICK = 2
@@ -57,7 +54,7 @@ class TSlot:
 	var Speed: int
 	var Diseases: TDiseases
 	var Powerups: Dictionary # key=powerup number, value=TPowerup
-	func _init(SetIndex: int = INVALID_SLOT) -> void:
+	func _init(SetIndex: int = Constants.INVALID_SLOT) -> void:
 		Index = SetIndex
 		PlayerID = 0
 		PlayerName = ""

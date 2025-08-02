@@ -55,7 +55,7 @@ func _UpdateMessageLabel():
 	match Client.State:
 		Client.TState.LOBBY:
 			var idx = Client.Data.FindSlotForPlayer(Network.PeerID)
-			if idx != Types.INVALID_SLOT:
+			if idx != Constants.INVALID_SLOT:
 				if my_score == highest_score:
 					if tied:
 						msg = "You tied for the win!"

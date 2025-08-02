@@ -24,7 +24,7 @@ func FindFreeSlotIndex() -> int:
 	for i in Slots.size():
 		if Slots[i].PlayerID == 0:
 			return i
-	return Types.INVALID_SLOT
+	return Constants.INVALID_SLOT
 
 func ClearSlot(Index: int) -> void:
 	Slots[Index].PlayerID = 0
@@ -40,7 +40,7 @@ func FindSlotForPlayer(PlayerID: int) -> int:
 	for i in Slots.size():
 		if Slots[i].PlayerID == PlayerID:
 			return i
-	return Types.INVALID_SLOT
+	return Constants.INVALID_SLOT
 
 func MovePlayerToSlotIfFree(PlayerID, SlotIndex) -> bool:
 	if PlayerID <= 0:
@@ -79,7 +79,7 @@ func SetAllPlayersUnready() -> void:
 
 func SetPlayerReady(PlayerID: int, Ready: bool) -> void:
 	var idx = FindSlotForPlayer(PlayerID)
-	if idx != Types.INVALID_SLOT:
+	if idx != Constants.INVALID_SLOT:
 		Slots[idx].Ready = Ready
 	pass
 
@@ -114,7 +114,7 @@ func CountAlivePlayers() -> int:
 
 func UpdatePlayerScore(PlayerID: int, Score: int) -> void:
 	var idx = FindSlotForPlayer(PlayerID)
-	if idx != Types.INVALID_SLOT:
+	if idx != Constants.INVALID_SLOT:
 		Slots[idx].Score = Score
 	pass
 
@@ -127,7 +127,7 @@ func ResetBombsEtcBeforeRound() -> void:
 func AddBombAt(Field: Vector2i, PlayerID: int) -> void:
 	if !FieldHasBomb(Field):
 		var slot_idx = FindSlotForPlayer(PlayerID)
-		if slot_idx == Types.INVALID_SLOT:
+		if slot_idx == Constants.INVALID_SLOT:
 			return
 		var b = Types.TBomb.new()
 		b.Field = Field

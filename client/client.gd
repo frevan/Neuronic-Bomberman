@@ -124,7 +124,7 @@ func _network_player_moved_to_slot(PlayerID: int, SlotIndex: int) -> void:
 	
 	_log("player " + str(PlayerID) + " moved to slot " + str(SlotIndex))
 	
-	if (State != TState.IDLE) && (SlotIndex != Types.INVALID_SLOT):
+	if (State != TState.IDLE) && (SlotIndex != Constants.INVALID_SLOT):
 		Data.MovePlayerToSlot(PlayerID, SlotIndex)
 		OnPlayerMovedToSlot.emit(PlayerID, SlotIndex)
 		Network.SendPlayerName.rpc_id(1, PlayerName)
@@ -191,7 +191,7 @@ func _network_match_ended() -> void:
 func _network_player_became_ready(PlayerID: int, Ready: bool) -> void:
 	_log("player " + str(PlayerID) + " is ready: " + str(Ready))
 	var idx = Data.FindSlotForPlayer(PlayerID)
-	if idx != Types.INVALID_SLOT:
+	if idx != Constants.INVALID_SLOT:
 		Data.Slots[idx].Ready = Ready
 		OnPlayerBecameReady.emit(PlayerID, Ready)
 	pass
@@ -200,7 +200,7 @@ func _network_player_became_ready(PlayerID: int, Ready: bool) -> void:
 func _network_player_position_received(PlayerID: int, Position: Vector2) -> void:
 	_log("player " + str(PlayerID) + " is at: (" + str(Position.x) + "," + str(Position.y) + ")")
 	var idx = Data.FindSlotForPlayer(PlayerID)
-	if idx != Types.INVALID_SLOT:
+	if idx != Constants.INVALID_SLOT:
 		Data.Slots[idx].Position = Position
 		OnPlayerPositionChanged.emit(PlayerID)
 	pass
@@ -239,7 +239,7 @@ func _network_remove_explosion(Field: Vector2i) -> void:
 func _network_player_died(PlayerID: int) -> void:
 	_log("player " + str(PlayerID) + " died")
 	var slot_idx = Data.FindSlotForPlayer(PlayerID)
-	if slot_idx != Types.INVALID_SLOT:
+	if slot_idx != Constants.INVALID_SLOT:
 		Data.Slots[slot_idx].Alive = false
 	OnPlayerDied.emit(PlayerID)
 	pass
@@ -270,7 +270,7 @@ func _network_num_rounds_changed(Value: int) -> void:
 func _network_player_name_changed(PlayerID: int, Name: String) -> void:
 	_log("Player " + str(PlayerID) + " is now called " + Name)
 	var idx = Data.FindSlotForPlayer(PlayerID)
-	if idx != Types.INVALID_SLOT:
+	if idx != Constants.INVALID_SLOT:
 		Data.Slots[idx].PlayerName = Name
 		OnPlayerNameChanged.emit(PlayerID, Name)
 	pass
@@ -278,7 +278,7 @@ func _network_player_name_changed(PlayerID: int, Name: String) -> void:
 func _network_player_powerups_changed(PlayerID: int, TotalBombs: int, BombStrength: int, Speed: int) -> void:
 	_log("Player " + str(PlayerID) + " powerups: bombs=" + str(TotalBombs) + " range=" + str(BombStrength) + " speed=" + str(Speed))
 	var idx = Data.FindSlotForPlayer(PlayerID)
-	if idx != Types.INVALID_SLOT:
+	if idx != Constants.INVALID_SLOT:
 		var slot: Types.TSlot = Data.Slots[idx]
 		slot.TotalBombs = TotalBombs
 		slot.BombStrength = BombStrength
@@ -439,7 +439,7 @@ func DropBombs(IsDropping: bool) -> void:
 
 func UpdatePlayerPosition(ID: int, Position: Vector2) -> void:
 	var idx = Data.FindSlotForPlayer(ID)
-	if idx != Types.INVALID_SLOT:
+	if idx != Constants.INVALID_SLOT:
 		Data.Slots[idx].Position = Position
 		if Network.PeerID == 1:
 			OnPlayerPositionUpdated.emit(ID, Position)

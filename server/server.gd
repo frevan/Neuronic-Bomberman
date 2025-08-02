@@ -66,7 +66,7 @@ func _network_request_join_lobby(SenderID: int) -> void:
 	_log("request to join by: " + str(SenderID))
 	
 	var success: bool = false
-	var slot_idx: int = Types.INVALID_SLOT
+	var slot_idx: int = Constants.INVALID_SLOT
 	
 	if State == TState.LOBBY:
 		slot_idx = Data.FindFreeSlotIndex()
@@ -128,7 +128,7 @@ func _network_player_ready(SenderID: int, Ready: bool) -> void:
 
 func _network_player_is_dropping_bomb(PlayerID: int, Value: bool) -> void:
 	var idx = Data.FindSlotForPlayer(PlayerID)
-	if idx != Types.INVALID_SLOT:
+	if idx != Constants.INVALID_SLOT:
 		Data.Slots[idx].DroppingBombs = Value
 		if Data.Slots[idx].DroppingBombs:
 			_DropBomb(idx)
@@ -145,7 +145,7 @@ func _network_request_num_rounds(Value: int) -> void:
 func _network_player_name_received(PlayerID: int, Name: String) -> void:
 	_log("player name received for " + str(PlayerID) + ": " + Name)
 	var idx = Data.FindSlotForPlayer(PlayerID)
-	if idx != Types.INVALID_SLOT:
+	if idx != Constants.INVALID_SLOT:
 		Data.Slots[idx].PlayerName = Name
 		Network.SendPlayerNameChanged.rpc(PlayerID, Name)
 	pass
@@ -176,7 +176,7 @@ func _RemoveBombFromField(Field: Vector2i) -> void:
 		var playerID = Data.Bombs[Field].PlayerID
 		Data.RemoveBomb(Field)
 		var slot_idx = Data.FindSlotForPlayer(playerID)
-		if slot_idx != Types.INVALID_SLOT:
+		if slot_idx != Constants.INVALID_SLOT:
 			Data.Slots[slot_idx].DroppedBombs -= 1
 	pass
 
@@ -484,6 +484,6 @@ func Stop() -> bool:
 
 func UpdatePlayerPosition(ID: int, Position: Vector2) -> void:
 	var idx = Data.FindSlotForPlayer(ID)
-	if idx != Types.INVALID_SLOT:
+	if idx != Constants.INVALID_SLOT:
 		Data.Slots[idx].Position = Position
 	pass
