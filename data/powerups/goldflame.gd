@@ -11,5 +11,5 @@ func ApplyToSlot(Slot: Types.TSlot) -> void:
 	pass
 
 func ApplyOverrideToSlot(Slot: Types.TSlot, Override: int) -> void:
-	Slot.BombStrength = min(1, Override)
+	Slot.BombStrength = max(1, Override)
 	pass
