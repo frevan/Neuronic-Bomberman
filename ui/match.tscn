@@ -125,7 +125,6 @@ offset_bottom = 48.0
 text = "Round #"
 horizontal_alignment = 1
 
-[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="CheckForCollisions" from="Players/Player0" to="." method="_on_player_check_for_collisions"]
 [connection signal="CheckForCollisions" from="Players/Player1" to="." method="_on_player_check_for_collisions"]
 [connection signal="CheckForCollisions" from="Players/Player2" to="." method="_on_player_check_for_collisions"]
