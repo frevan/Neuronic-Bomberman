@@ -30,7 +30,7 @@ const NUM_POWERUPS = 13
 const MAP_WIDTH = 15
 const MAP_HEIGHT = 11
 
-const BOMB_TIME = 1.0 # in seconds 
+const BOMB_TIME = 2.0 # in seconds 
 const EXPLOSION_TIME = 1.0 # in seconds
 const BOMB_STRENGTH = 2
 const BOMB_STRENGTH_MAX = 1000
