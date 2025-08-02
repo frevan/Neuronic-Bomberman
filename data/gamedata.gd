@@ -132,7 +132,7 @@ func AddBombAt(Field: Vector2i, PlayerID: int) -> void:
 		var b = Types.TBomb.new()
 		b.Field = Field
 		b.PlayerID = PlayerID
-		b.TimeUntilExplosion = Types.BOMB_TIME
+		b.TimeUntilExplosion = Constants.BOMB_TIME
 		b.Strength = Slots[slot_idx].BombStrength
 		Bombs[Field] = b
 	pass
@@ -155,14 +155,14 @@ func AddExplosionAt(Field: Vector2i) -> void:
 	else:
 		explosion = Types.TExplosion.new()
 	explosion.Field = Field
-	explosion.RemainingTime = Types.EXPLOSION_TIME
+	explosion.RemainingTime = Constants.EXPLOSION_TIME
 	Explosions[Field] = explosion
 	pass
 
 func ResetExplosionTime(Field: Vector2i) -> void:
 	if Explosions.has(Field):
 		var explosion: Types.TExplosion = Explosions[Field]
-		explosion.RemainingTime = Types.EXPLOSION_TIME
+		explosion.RemainingTime = Constants.EXPLOSION_TIME
 	pass
 
 func RemoveExplosion(Field: Vector2i) -> void:
@@ -172,7 +172,7 @@ func RemoveExplosion(Field: Vector2i) -> void:
 func ResetExplosionRemainingTime(Field: Vector2i) -> void:
 	if Explosions.has(Field):
 		var explosion: Types.TExplosion = Explosions[Field]
-		explosion.RemainingTime = Types.EXPLOSION_TIME
+		explosion.RemainingTime = Constants.EXPLOSION_TIME
 	pass
 
 

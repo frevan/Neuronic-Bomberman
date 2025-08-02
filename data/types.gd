@@ -25,11 +25,6 @@ const FIELD_PU_LAST = 112
 const MAP_WIDTH = 15
 const MAP_HEIGHT = 11
 
-const BOMB_TIME = 2.0 # in seconds 
-const EXPLOSION_TIME = 1.0 # in seconds
-
-const SPEED_MIN = 4
-
 
 class TDiseases:
 	var ReversControls: bool
@@ -66,7 +61,7 @@ class TSlot:
 		Alive = false
 		Score = 0
 		BombStrength = Constants.BOMB_STRENGTH
-		Speed = SPEED_MIN
+		Speed = Constants.SPEED_MIN
 		pass
 
 

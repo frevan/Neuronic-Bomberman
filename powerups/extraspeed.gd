@@ -11,5 +11,5 @@ func ApplyToSlot(Slot: Types.TSlot) -> void:
 	pass
 
 func ApplyOverrideToSlot(Slot: Types.TSlot, Override: int) -> void:
-	Slot.Speed = min(1, Types.SPEED_MIN + Override)
+	Slot.Speed = min(1, Constants.SPEED_MIN + Override)
 	pass

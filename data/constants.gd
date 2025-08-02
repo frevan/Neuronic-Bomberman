@@ -23,3 +23,7 @@ const NUM_POWERUPS = 13
 
 const BOMB_STRENGTH = 2
 const BOMB_STRENGTH_MAX = 1000
+const BOMB_TIME = 2.0 # in seconds 
+const EXPLOSION_TIME = 1.0 # in seconds
+
+const SPEED_MIN = 4
