@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bksnjfipxapiy"
-path="res://.godot/imported/powerup_moreflame.png-ddbc67960363102bc12ec0a931ced9f7.ctex"
+uid="uid://cuy0dvm12o8dk"
+path="res://.godot/imported/powerup_spooger.png-36f8e4a7612babd5d503b6129ff538ce.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/powerup_moreflame.png"
-dest_files=["res://.godot/imported/powerup_moreflame.png-ddbc67960363102bc12ec0a931ced9f7.ctex"]
+source_file="res://assets/powerup_spooger.png"
+dest_files=["res://.godot/imported/powerup_spooger.png-36f8e4a7612babd5d503b6129ff538ce.ctex"]
 
 [params]
 

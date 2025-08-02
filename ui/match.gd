@@ -175,8 +175,19 @@ func _AddPowerupNode(Field: Vector2i, Type: int) -> void:
 	var node: Node2D = powerupscene.instantiate()
 	var fname: String = ""
 	match Type:
-		Types.FIELD_PU_EXTRABOMB: fname = "res://assets/powerup_extrabombs.png"
+		Types.FIELD_PU_EXTRABOMB: fname = "res://assets/powerup_extrabomb.png"
 		Types.FIELD_PU_MOREFLAME: fname = "res://assets/powerup_moreflame.png"
+		Types.FIELD_PU_DISEASE: fname = "res://assets/powerup_disease.png"
+		Types.FIELD_PU_CANKICK: fname = "res://assets/powerup_kick.png"
+		Types.FIELD_PU_EXTRASPEED: fname = "res://assets/powerup_speed.png"
+		Types.FIELD_PU_CANPUNCH: fname = "res://assets/powerup_punch.png"
+		Types.FIELD_PU_CANGRAB: fname = "res://assets/powerup_grab.png"
+		Types.FIELD_PU_SPOOGER: fname = "res://assets/powerup_spooger.png"
+		Types.FIELD_PU_GOLDFLAME: fname = "res://assets/powerup_maxflame.png"
+		Types.FIELD_PU_TRIGGER: fname = "res://assets/powerup_trigger.png"
+		Types.FIELD_PU_JELLYBOMBS: fname = "res://assets/powerup_jellybomb.png"
+		Types.FIELD_PU_BADDISEASE: fname = "res://assets/powerup_superdisease.png"
+		Types.FIELD_PU_RANDOM: fname = "res://assets/powerup_random.png"
 	if fname != "":
 		node.LoadSpriteFromFile(fname)
 	$Tiles.add_child(node, true)

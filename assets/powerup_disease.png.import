@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bksnjfipxapiy"
-path="res://.godot/imported/powerup_moreflame.png-ddbc67960363102bc12ec0a931ced9f7.ctex"
+uid="uid://w36vv4kmgmdm"
+path="res://.godot/imported/powerup_disease.png-9ea5c57abd1cdc2a4216752e54bb4671.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/powerup_moreflame.png"
-dest_files=["res://.godot/imported/powerup_moreflame.png-ddbc67960363102bc12ec0a931ced9f7.ctex"]
+source_file="res://assets/powerup_disease.png"
+dest_files=["res://.godot/imported/powerup_disease.png-9ea5c57abd1cdc2a4216752e54bb4671.ctex"]
 
 [params]
 

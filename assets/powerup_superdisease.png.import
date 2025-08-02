@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bu3m6l673bu36"
-path="res://.godot/imported/powerup_extrabombs.png-99ac58e8237e11bcf7df1993005d1e7f.ctex"
+uid="uid://cfw7hpii76ww0"
+path="res://.godot/imported/powerup_superdisease.png-385323caafe1f47515ecc9c0c07ae48b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/powerup_extrabombs.png"
-dest_files=["res://.godot/imported/powerup_extrabombs.png-99ac58e8237e11bcf7df1993005d1e7f.ctex"]
+source_file="res://assets/powerup_superdisease.png"
+dest_files=["res://.godot/imported/powerup_superdisease.png-385323caafe1f47515ecc9c0c07ae48b.ctex"]
 
 [params]
 

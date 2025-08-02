@@ -70,4 +70,15 @@ func ApplyPowerupToPlayer(Data: TGameData, SlotIndex: int, Powerup: int) -> void
 	match Powerup:
 		Types.FIELD_PU_EXTRABOMB: slot.TotalBombs += 1
 		Types.FIELD_PU_MOREFLAME: slot.BombStrength += 1
+		Types.FIELD_PU_DISEASE: pass
+		Types.FIELD_PU_CANKICK: pass
+		Types.FIELD_PU_EXTRASPEED: pass
+		Types.FIELD_PU_CANPUNCH: pass
+		Types.FIELD_PU_CANGRAB: pass
+		Types.FIELD_PU_SPOOGER: pass
+		Types.FIELD_PU_GOLDFLAME: pass
+		Types.FIELD_PU_TRIGGER: pass
+		Types.FIELD_PU_JELLYBOMBS: pass
+		Types.FIELD_PU_BADDISEASE: pass
+		Types.FIELD_PU_RANDOM: pass
 	pass
