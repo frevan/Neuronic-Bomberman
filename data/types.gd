@@ -87,6 +87,12 @@ class TMapPowerUp:
 	var HasOverride: bool
 	var OverrideValue: int
 	var Forbidden: bool
+	func Assign(Source: TMapPowerUp) -> void:
+		Number = Source.Number
+		BornWith = Source.BornWith
+		HasOverride = Source.HasOverride
+		OverrideValue = Source.OverrideValue
+		Forbidden = Source.Forbidden
 
 
 class TMap:

@@ -149,7 +149,7 @@ func _network_match_started() -> void:
 func _network_new_round(MapName: String, Round: int) -> void:
 	_log("new round #" + str(Round) + ": " + MapName)
 	
-	Data.Map = Maps.LoadMap(MapName)
+	Data.SetMap(Maps.LoadMap(MapName))
 	if is_instance_valid(Data.Map):
 		_log("Loaded map " + Data.Map.Name + " with caption: " + Data.Map.Caption)
 		CurrentMapName = MapName

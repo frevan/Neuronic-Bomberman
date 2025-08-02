@@ -256,12 +256,10 @@ func _KillPlayer(SlotIndex: int) -> void:
 
 
 func _RandomlySpawnPopup() -> int:
-	var n = randi_range(0, Types.NUM_POWERUPS * 2 )
-	if n < Types.NUM_POWERUPS:
-		if Data.Map.PowerUps.has(n):
-			var pu: Types.TMapPowerUp = Data.Map.PowerUps[n]
-			if !pu.Forbidden:
-				return Types.FIELD_PU_FIRST + n
+	var n = randi_range(0, Data.AvailablePowerups.size() + 1)
+	if n < Data.AvailablePowerups.size():
+		var pu: Types.TMapPowerUp = Data.AvailablePowerups[n]
+		return Types.FIELD_PU_FIRST + pu.Number
 	return Types.FIELD_EMPTY
 
 func _PickUpPowerups() -> void:
@@ -366,7 +364,7 @@ func _StartCountDownToRound() -> void:
 
 
 func _StartRoundNow() -> void:
-	Data.Map = Maps.LoadMap(CurrentMapName)
+	Data.SetMap(Maps.LoadMap(CurrentMapName))
 	var tempMap: Types.TMap = Maps.CopyMap(Data.Map)
 	
 	Data.SetPlayersToStartPositions()

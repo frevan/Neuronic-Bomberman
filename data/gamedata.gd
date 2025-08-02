@@ -2,12 +2,13 @@ extends Node
 
 class_name TGameData
 
-var Slots: Array
+var Slots: Array # Types.TSlot
 var Map: Types.TMap = null
 var Bombs: Dictionary # key: field (Vector2i), value (Types.TBomb)
 var Explosions: Dictionary # key: field (Vector2i), value (Types.TExplosion)
 var NumRounds: int = 1
 var CurrentRound: int = -1
+var AvailablePowerups: Array # Types.TMapPowerUp
 
 var CountingDown: bool = false
 var CountDownTime: float = 0
@@ -18,7 +19,6 @@ func InitSlots() -> void:
 	for i in Slots.size():
 		Slots[i] = Types.TSlot.new(i)
 	pass
-	
 
 func FindFreeSlotIndex() -> int:
 	for i in Slots.size():
@@ -26,11 +26,9 @@ func FindFreeSlotIndex() -> int:
 			return i
 	return Types.INVALID_SLOT
 
-
 func ClearSlot(Index: int) -> void:
 	Slots[Index].PlayerID = 0
 	pass
-
 
 func ClearSlotForPlayer(PlayerID: int) -> void:
 	for i in Slots.size():
@@ -38,13 +36,11 @@ func ClearSlotForPlayer(PlayerID: int) -> void:
 			ClearSlot(i)
 	pass
 
-
 func FindSlotForPlayer(PlayerID: int) -> int:
 	for i in Slots.size():
 		if Slots[i].PlayerID == PlayerID:
 			return i
 	return Types.INVALID_SLOT
-
 
 func MovePlayerToSlotIfFree(PlayerID, SlotIndex) -> bool:
 	if PlayerID <= 0:
@@ -58,7 +54,6 @@ func MovePlayerToSlotIfFree(PlayerID, SlotIndex) -> bool:
 	MovePlayerToSlot(PlayerID, SlotIndex)
 	return true
 
-
 func MovePlayerToSlot(PlayerID, SlotIndex) -> void:
 	if PlayerID <= 0:
 		pass
@@ -68,6 +63,7 @@ func MovePlayerToSlot(PlayerID, SlotIndex) -> void:
 	ClearSlotForPlayer(PlayerID)
 	Slots[SlotIndex].PlayerID = PlayerID
 	pass
+
 
 func AreAllPlayersReady() -> bool:
 	for i in Slots.size():
@@ -177,4 +173,21 @@ func ResetExplosionRemainingTime(Field: Vector2i) -> void:
 	if Explosions.has(Field):
 		var explosion: Types.TExplosion = Explosions[Field]
 		explosion.RemainingTime = Types.EXPLOSION_TIME
+	pass
+
+
+func SetMap(NewValue: Types.TMap) -> void:
+	Map = NewValue
+	InitAvailablePowerups()
+	pass
+
+
+func InitAvailablePowerups() -> void:
+	AvailablePowerups.clear()
+	for key in Map.PowerUps:
+		var pu: Types.TMapPowerUp = Map.PowerUps[key]
+		if !pu.Forbidden:
+			var p = Types.TMapPowerUp.new()
+			p.Assign(pu)
+			AvailablePowerups.append(p)
 	pass
