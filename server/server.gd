@@ -11,6 +11,7 @@ const NUM_ROUNDS_MAX = 100
 var Data: TGameData
 var Maps: TMaps
 var CurrentMapName: String
+var Comms: TServerComms
 
 enum TState {IDLE, LOBBY, MATCH, ROUND}
 var State: TState = TState.IDLE
@@ -58,32 +59,6 @@ func _peer_connected(SenderID: int) -> void:
 
 func _peer_disconnected(SenderID: int) -> void:
 	_log("peer disconnected: " + str(SenderID))
-	_ClientDisconnected(SenderID)
-	pass
-
-
-func _network_request_join_lobby(SenderID: int) -> void:
-	_log("request to join by: " + str(SenderID))
-	
-	var success: bool = false
-	var slot_idx: int = Constants.INVALID_SLOT
-	
-	if State == TState.LOBBY:
-		slot_idx = Data.FindFreeSlotIndex()
-		if slot_idx >= 0: 
-			success = true
-			Data.Slots[slot_idx].PlayerID = SenderID
-		Network.SendJoinLobbyResponse.rpc_id(SenderID, success)
-		
-	if success:
-		Network.SendPlayerJoinedLobby.rpc(SenderID)
-		Network.SendPlayerMovedToSlot.rpc(SenderID, slot_idx)
-		_SendLobbyInfoToPlayer(SenderID)
-	pass
-
-
-func _network_leave_lobby(SenderID: int) -> void:
-	_log("player " + str(SenderID) + " left the lobby")
 	_ClientDisconnected(SenderID)
 	pass
 
@@ -285,8 +260,8 @@ func _CheckIfRoundEnded() -> void:
 func _ConnectToSignalsOnStart() -> void:
 	multiplayer.peer_connected.connect(_peer_connected)
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
-	Network.OnRequestJoinLobby.connect(_network_request_join_lobby)
-	Network.OnLeaveLobby.connect(_network_leave_lobby)
+	Network.OnRequestJoinLobby.connect(Comms._network_request_join_lobby)
+	Network.OnLeaveLobby.connect(Comms._network_leave_lobby)
 	Network.OnRequestMapChange.connect(_network_request_map_change)
 	Network.OnRequestMoveToSlot.connect(_network_request_move_to_slot)
 	Network.OnRequestStartMatch.connect(_network_request_start_match)
@@ -299,8 +274,8 @@ func _ConnectToSignalsOnStart() -> void:
 func _DisconnectFromSignalsOnStop() -> void:
 	multiplayer.peer_connected.disconnect(_peer_connected)
 	multiplayer.peer_disconnected.disconnect(_peer_disconnected)
-	Network.OnRequestJoinLobby.disconnect(_network_request_join_lobby)
-	Network.OnLeaveLobby.disconnect(_network_leave_lobby)
+	Network.OnRequestJoinLobby.disconnect(Comms._network_request_join_lobby)
+	Network.OnLeaveLobby.disconnect(Comms._network_leave_lobby)
 	Network.OnRequestMapChange.disconnect(_network_request_map_change)
 	Network.OnRequestMoveToSlot.disconnect(_network_request_move_to_slot)
 	Network.OnRequestStartMatch.disconnect(_network_request_start_match)
@@ -446,6 +421,9 @@ func Start() -> bool:
 	if Maps.MapNames.size() > 0:
 		CurrentMapName = Maps.MapNames[0]
 	
+	Comms = TServerComms.new()
+	Comms.Initialize(self)
+	
 	_ConnectToSignalsOnStart()
 	Network.SetPeerTo(_peer)
 	
@@ -475,6 +453,8 @@ func Stop() -> bool:
 	Maps.queue_free()
 	Maps = null
 	CurrentMapName = ""
+	Comms.queue_free()
+	Comms = null
 	
 	State = TState.IDLE
 	
