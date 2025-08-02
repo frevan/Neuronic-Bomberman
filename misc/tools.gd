@@ -50,7 +50,7 @@ func PlayerPositionToRect(Position: Vector2) -> Rect2:
 
 
 func FieldTypeIsPowerup(Type: int) -> bool:
-	return (Type in range(Types.FIELD_PU_FIRST, Types.FIELD_PU_LAST))
+	return (Type in range(Types.FIELD_PU_FIRST, Types.FIELD_PU_LAST + 1))
 
 func FieldIsEmpty(Type: int) -> bool:
 	return (Type == Types.FIELD_EMPTY) || FieldTypeIsPowerup(Type)
