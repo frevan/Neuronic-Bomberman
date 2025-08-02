@@ -379,6 +379,9 @@ func _StartRoundNow() -> void:
 			if tempMap.Fields[y][x] != type:
 				Network.SendMapTileChanged.rpc(Vector2i(x, y), type)
 	
+	Rules.ApplyInitialPowerupsToPlayers(Data)
+	# TODO: send these to all clients
+	
 	State = TState.ROUND
 	Network.SendRoundStarted.rpc()
 	pass

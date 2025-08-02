@@ -88,3 +88,40 @@ func ApplyPowerupToPlayer(Data: TGameData, SlotIndex: int, Powerup: int) -> void
 				Powerup = Types.FIELD_PU_EXTRABOMB
 			ApplyPowerupToPlayer(Data, SlotIndex, Powerup)
 	pass
+
+func OverridePlayerPowerup(Data: TGameData, SlotIndex: int, Powerup: int, Override: int) -> void:
+	assert(Data)
+	assert(SlotIndex != Types.INVALID_SLOT)
+	assert(SlotIndex < Data.Slots.size())
+	var slot: Types.TSlot = Data.Slots[SlotIndex]
+	match Powerup:
+		Types.FIELD_PU_EXTRABOMB: slot.TotalBombs = Override
+		Types.FIELD_PU_MOREFLAME: slot.BombStrength = Override
+		Types.FIELD_PU_DISEASE: pass
+		Types.FIELD_PU_CANKICK: pass
+		Types.FIELD_PU_EXTRASPEED: pass
+		Types.FIELD_PU_CANPUNCH: pass
+		Types.FIELD_PU_CANGRAB: pass
+		Types.FIELD_PU_SPOOGER: pass
+		Types.FIELD_PU_GOLDFLAME: slot.BombStrength = Override
+		Types.FIELD_PU_TRIGGER: pass
+		Types.FIELD_PU_JELLYBOMBS: pass
+		Types.FIELD_PU_BADDISEASE: pass
+	pass
+
+func ApplyInitialPowerupsToPlayers(Data: TGameData) -> void:
+	var _initial_powerups: Array
+	for key in Data.Map.PowerUps:
+		var pu: Types.TMapPowerUp = Data.Map.PowerUps[key]
+		if pu.Number == Types.FIELD_PU_RANDOM - Types.FIELD_PU_FIRST:
+			continue
+		if pu.BornWith || pu.HasOverride:
+			_initial_powerups.append(pu)
+	
+	for i in Data.Slots.size():
+		for powerup: Types.TMapPowerUp in _initial_powerups:
+			if powerup.BornWith:
+				ApplyPowerupToPlayer(Data, i, Types.FIELD_PU_FIRST + powerup.Number)
+			elif powerup.HasOverride:
+				OverridePlayerPowerup(Data, i, Types.FIELD_PU_FIRST + powerup.Number, powerup.OverrideValue)
+	pass
