@@ -34,7 +34,8 @@ signal OnPlayerDied # params: id (int)
 signal OnUpdatePlayerScore # params: id (int), score (int)
 signal OnCountDownStarted # params: time (float)
 signal OnNumRoundsChanged # params: value (int)
-signal OnPlayerNameChanged # params:  id (int), value (string)
+signal OnPlayerNameChanged # params: id (int), value (string)
+signal OnPlayerPowerupsChanged # params: id (int), total_bombs (int), bomb_strength (int), speed (int)
 
 
 const PORT = 15063
@@ -218,3 +219,7 @@ func SendNumRoundsChanged(Value: int) -> void:
 @rpc("reliable", "call_local", "authority")
 func SendPlayerNameChanged(ID: int, Value: String) -> void:
 	OnPlayerNameChanged.emit(ID, Value)
+
+@rpc("reliable", "call_local", "authority")
+func SendPlayerPowerups(ID: int, TotalBombs: int, BombStrength: int, Speed: int) -> void:
+	OnPlayerPowerupsChanged.emit(ID, TotalBombs, BombStrength, Speed)

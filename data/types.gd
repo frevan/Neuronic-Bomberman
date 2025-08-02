@@ -35,6 +35,8 @@ const EXPLOSION_TIME = 1.0 # in seconds
 const BOMB_STRENGTH = 2
 const BOMB_STRENGTH_MAX = 1000
 
+const SPEED_MIN = 4
+
 
 class TSlot:
 	var Index: int
@@ -48,6 +50,7 @@ class TSlot:
 	var BombStrength: int
 	var Alive: bool
 	var Score: int
+	var Speed: int
 	func _init(SetIndex: int = INVALID_SLOT) -> void:
 		Index = SetIndex
 		PlayerID = 0
@@ -60,6 +63,7 @@ class TSlot:
 		Alive = false
 		Score = 0
 		BombStrength = BOMB_STRENGTH
+		Speed = SPEED_MIN
 		pass
 
 

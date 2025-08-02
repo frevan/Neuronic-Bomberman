@@ -30,6 +30,7 @@ signal OnCountDownStarted # params: time (float)
 signal OnNumRoundsChanged # params: value (int)
 signal OnPlayerDisconnected # params: id (int)
 signal OnPlayerNameChanged # params: id (int), name (string)
+signal OnPlayerPowerupsChanged # params: id (int), total_bombs (int), bomb_strength (int), speed (int)
 
 signal OnPlayerPositionUpdated # [for the server object] param: id (int), position (vector2)
 
@@ -274,6 +275,17 @@ func _network_player_name_changed(PlayerID: int, Name: String) -> void:
 		OnPlayerNameChanged.emit(PlayerID, Name)
 	pass
 
+func _network_player_powerups_changed(PlayerID: int, TotalBombs: int, BombStrength: int, Speed: int) -> void:
+	_log("Player " + str(PlayerID) + " powerups: bombs=" + str(TotalBombs) + " range=" + str(BombStrength) + " speed=" + str(Speed))
+	var idx = Data.FindSlotForPlayer(PlayerID)
+	if idx != Types.INVALID_SLOT:
+		var slot: Types.TSlot = Data.Slots[idx]
+		slot.TotalBombs = TotalBombs
+		slot.BombStrength = BombStrength
+		slot.Speed = Speed
+		OnPlayerPowerupsChanged.emit(PlayerID, TotalBombs, BombStrength, Speed)
+	pass
+
 
 func _ConnectToSignals() -> void:
 	multiplayer.connected_to_server.connect(_connected_to_server)
@@ -301,6 +313,7 @@ func _ConnectToSignals() -> void:
 	Network.OnCountDownStarted.connect(_network_countdown_started)
 	Network.OnNumRoundsChanged.connect(_network_num_rounds_changed)
 	Network.OnPlayerNameChanged.connect(_network_player_name_changed)
+	Network.OnPlayerPowerupsChanged.connect(_network_player_powerups_changed)
 	pass
 
 
@@ -330,6 +343,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnCountDownStarted.disconnect(_network_countdown_started)
 	Network.OnNumRoundsChanged.disconnect(_network_num_rounds_changed)
 	Network.OnPlayerNameChanged.disconnect(_network_player_name_changed)
+	Network.OnPlayerPowerupsChanged.disconnect(_network_player_powerups_changed)
 	pass
 
 

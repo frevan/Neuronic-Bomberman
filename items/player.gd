@@ -9,6 +9,8 @@ signal CheckForCollisions(Sender: Node2D, NewPosition: Vector2)
 
 @export var animation = ""
 
+var Client: TClient
+
 
 func _ready():
 	# only process physics for the local player	
@@ -54,9 +56,17 @@ func ResetSpriteDirection() -> void:
 
 
 func _CalculateVelocity() -> void:
+	var _speed = 1
+	if Client:
+		if Client.Data:
+			var idx = Client.Data.FindSlotForPlayer(Network.PeerID)
+			if idx != Types.INVALID_SLOT:
+				var slot: Types.TSlot = Client.Data.Slots[idx]
+				_speed = slot.Speed * 0.25
+	
 	if $PlayerInput.direction:
-		velocity.x = $PlayerInput.direction.x * SPEED
-		velocity.y = $PlayerInput.direction.y * SPEED
+		velocity.x = $PlayerInput.direction.x * SPEED * _speed
+		velocity.y = $PlayerInput.direction.y * SPEED * _speed
 	else:
 		velocity = Vector2.ZERO
 	pass
@@ -64,8 +74,6 @@ func _CalculateVelocity() -> void:
 
 func _Move(delta: float) -> void:
 	var newpos: Vector2 = Vector2(position.x + (velocity.x * delta),  position.y + (velocity.y * delta))
-	position = newpos
-	#position = Rules.ApplyObstaclesToPlayerMove(context, position, newpos)
 	CheckForCollisions.emit(self, newpos)
 	pass
 

@@ -72,7 +72,7 @@ func ApplyPowerupToPlayer(Data: TGameData, SlotIndex: int, Powerup: int) -> void
 		Types.FIELD_PU_MOREFLAME: slot.BombStrength += 1
 		Types.FIELD_PU_DISEASE: pass
 		Types.FIELD_PU_CANKICK: pass
-		Types.FIELD_PU_EXTRASPEED: pass
+		Types.FIELD_PU_EXTRASPEED: slot.Speed += 1
 		Types.FIELD_PU_CANPUNCH: pass
 		Types.FIELD_PU_CANGRAB: pass
 		Types.FIELD_PU_SPOOGER: pass
@@ -99,7 +99,7 @@ func OverridePlayerPowerup(Data: TGameData, SlotIndex: int, Powerup: int, Overri
 		Types.FIELD_PU_MOREFLAME: slot.BombStrength = Override
 		Types.FIELD_PU_DISEASE: pass
 		Types.FIELD_PU_CANKICK: pass
-		Types.FIELD_PU_EXTRASPEED: pass
+		Types.FIELD_PU_EXTRASPEED: slot.Speed = Types.SPEED_MIN + (Override - 1)
 		Types.FIELD_PU_CANPUNCH: pass
 		Types.FIELD_PU_CANGRAB: pass
 		Types.FIELD_PU_SPOOGER: pass
