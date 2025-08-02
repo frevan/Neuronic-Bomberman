@@ -76,9 +76,11 @@ func ApplyPowerupToPlayer(Data: TGameData, SlotIndex: int, Powerup: int) -> void
 		Types.FIELD_PU_CANPUNCH: pass
 		Types.FIELD_PU_CANGRAB: pass
 		Types.FIELD_PU_SPOOGER: pass
-		Types.FIELD_PU_GOLDFLAME: pass
+		Types.FIELD_PU_GOLDFLAME: slot.BombStrength = Types.BOMB_STRENGTH_MAX
 		Types.FIELD_PU_TRIGGER: pass
 		Types.FIELD_PU_JELLYBOMBS: pass
 		Types.FIELD_PU_BADDISEASE: pass
-		Types.FIELD_PU_RANDOM: pass
+		Types.FIELD_PU_RANDOM: 
+			Powerup = Types.FIELD_PU_FIRST + randi_range(0, Types.NUM_POWERUPS - 2) # ignore random!
+			ApplyPowerupToPlayer(Data, SlotIndex, Powerup)
 	pass

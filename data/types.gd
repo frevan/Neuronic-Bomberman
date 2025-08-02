@@ -23,7 +23,7 @@ const FIELD_PU_TRIGGER = 109
 const FIELD_PU_JELLYBOMBS = 110
 const FIELD_PU_BADDISEASE = 111
 const FIELD_PU_RANDOM = 112
-const FIELD_PU_LAST = 199
+const FIELD_PU_LAST = 112
 
 const NUM_POWERUPS = 13
 
@@ -33,6 +33,7 @@ const MAP_HEIGHT = 11
 const BOMB_TIME = 1.0 # in seconds 
 const EXPLOSION_TIME = 1.0 # in seconds
 const BOMB_STRENGTH = 2
+const BOMB_STRENGTH_MAX = 1000
 
 
 class TSlot:
