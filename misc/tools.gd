@@ -28,6 +28,29 @@ func SwitchToScene(Scene: TScene) -> void:
 	pass
 
 
+func CreatePowerup(Which: int) ->  TPowerup:
+	if (Which >= 0) && (Which < Constants.NUM_POWERUPS):
+		var powerup: TPowerup = null
+		match Which:
+			Constants.POWERUP_EXTRABOMB: powerup = TExtraBombPowerup.new()
+			Constants.POWERUP_MOREFLAME: powerup = TMoreFlamePowerup.new()
+			#Constants.POWERUP_DISEASE:
+			#Constants.POWERUP_CANKICK:
+			Constants.POWERUP_EXTRASPEED: powerup = TExtraSpeedPowerup.new()
+			#Constants.POWERUP_CANPUNCH:
+			#Constants.POWERUP_CANGRAB:
+			#Constants.POWERUP_SPOOGER:
+			Constants.POWERUP_GOLDFLAME: powerup = TGoldFlamePowerup.new()
+			#Constants.POWERUP_TRIGGER:
+			#Constants.POWERUP_JELLYBOMBS:
+			#Constants.POWERUP_BADDISEASE:
+			Constants.POWERUP_RANDOM: powerup = TRandomPowerup.new()
+		if powerup:
+			powerup.Initialize()
+		return powerup
+	return null
+
+
 const FIELD_SIZE = Vector2(48, 45)
 const FIELD_OFFSET = Vector2(64, 125)
 const PLAYER_SIZE = Vector2(48, 45)

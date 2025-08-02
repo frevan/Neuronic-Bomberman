@@ -23,6 +23,7 @@ config/icon="uid://c48kdaut4xv5v"
 Tools="*res://misc/tools.gd"
 Network="*res://network/network.gd"
 Types="*res://data/types.gd"
+Constants="*res://data/constants.gd"
 
 [display]
 

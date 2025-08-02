@@ -67,26 +67,9 @@ func ApplyPowerupToPlayer(Data: TGameData, SlotIndex: int, Powerup: int) -> void
 	assert(SlotIndex != Types.INVALID_SLOT)
 	assert(SlotIndex < Data.Slots.size())
 	var slot: Types.TSlot = Data.Slots[SlotIndex]
-	match Powerup:
-		Types.FIELD_PU_EXTRABOMB: slot.TotalBombs += 1
-		Types.FIELD_PU_MOREFLAME: slot.BombStrength += 1
-		Types.FIELD_PU_DISEASE: pass
-		Types.FIELD_PU_CANKICK: pass
-		Types.FIELD_PU_EXTRASPEED: slot.Speed += 1
-		Types.FIELD_PU_CANPUNCH: pass
-		Types.FIELD_PU_CANGRAB: pass
-		Types.FIELD_PU_SPOOGER: pass
-		Types.FIELD_PU_GOLDFLAME: slot.BombStrength = Types.BOMB_STRENGTH_MAX
-		Types.FIELD_PU_TRIGGER: pass
-		Types.FIELD_PU_JELLYBOMBS: pass
-		Types.FIELD_PU_BADDISEASE: pass
-		Types.FIELD_PU_RANDOM: 
-			var i = randi_range(0, Data.AvailablePowerups.size() - 1)
-			var pu: Types.TMapPowerUp = Data.AvailablePowerups[i]
-			Powerup = Types.FIELD_PU_FIRST + pu.Number
-			if Powerup == Types.FIELD_PU_RANDOM:
-				Powerup = Types.FIELD_PU_EXTRABOMB
-			ApplyPowerupToPlayer(Data, SlotIndex, Powerup)
+	var p: TPowerup = Tools.CreatePowerup(Powerup)
+	if p:
+		p.ApplyToSlot(slot)
 	pass
 
 func OverridePlayerPowerup(Data: TGameData, SlotIndex: int, Powerup: int, Override: int) -> void:
@@ -94,19 +77,9 @@ func OverridePlayerPowerup(Data: TGameData, SlotIndex: int, Powerup: int, Overri
 	assert(SlotIndex != Types.INVALID_SLOT)
 	assert(SlotIndex < Data.Slots.size())
 	var slot: Types.TSlot = Data.Slots[SlotIndex]
-	match Powerup:
-		Types.FIELD_PU_EXTRABOMB: slot.TotalBombs = Override
-		Types.FIELD_PU_MOREFLAME: slot.BombStrength = Override
-		Types.FIELD_PU_DISEASE: pass
-		Types.FIELD_PU_CANKICK: pass
-		Types.FIELD_PU_EXTRASPEED: slot.Speed = Types.SPEED_MIN + (Override - 1)
-		Types.FIELD_PU_CANPUNCH: pass
-		Types.FIELD_PU_CANGRAB: pass
-		Types.FIELD_PU_SPOOGER: pass
-		Types.FIELD_PU_GOLDFLAME: slot.BombStrength = Override
-		Types.FIELD_PU_TRIGGER: pass
-		Types.FIELD_PU_JELLYBOMBS: pass
-		Types.FIELD_PU_BADDISEASE: pass
+	var p: TPowerup = Tools.CreatePowerup(Powerup)
+	if p:
+		p.ApplyOverrideToSlot(slot, Override)
 	pass
 
 func ApplyInitialPowerupsToPlayers(Data: TGameData) -> void:
@@ -121,7 +94,7 @@ func ApplyInitialPowerupsToPlayers(Data: TGameData) -> void:
 	for i in Data.Slots.size():
 		for powerup: Types.TMapPowerUp in _initial_powerups:
 			if powerup.BornWith:
-				ApplyPowerupToPlayer(Data, i, Types.FIELD_PU_FIRST + powerup.Number)
+				ApplyPowerupToPlayer(Data, i, powerup.Number)
 			elif powerup.HasOverride:
-				OverridePlayerPowerup(Data, i, Types.FIELD_PU_FIRST + powerup.Number, powerup.OverrideValue)
+				OverridePlayerPowerup(Data, i, powerup.Number, powerup.OverrideValue)
 	pass

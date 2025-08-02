@@ -269,7 +269,7 @@ func _PickUpPowerups() -> void:
 		if Tools.FieldTypeIsPowerup(type):
 			Maps.SetFieldTypeTo(Data.Map, slot.Position, Types.FIELD_EMPTY)
 			Network.SendMapTileChanged.rpc(slot.Position, Types.FIELD_EMPTY)
-			Rules.ApplyPowerupToPlayer(Data, i, type)
+			Rules.ApplyPowerupToPlayer(Data, i, type - Types.FIELD_PU_FIRST)
 			Network.SendPlayerPowerups.rpc(slot.PlayerID, slot.TotalBombs, slot.BombStrength, slot.Speed)
 	pass
 

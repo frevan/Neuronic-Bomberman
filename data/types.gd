@@ -25,18 +25,22 @@ const FIELD_PU_BADDISEASE = 111
 const FIELD_PU_RANDOM = 112
 const FIELD_PU_LAST = 112
 
-const NUM_POWERUPS = 13
-
 const MAP_WIDTH = 15
 const MAP_HEIGHT = 11
 
 const BOMB_TIME = 2.0 # in seconds 
 const EXPLOSION_TIME = 1.0 # in seconds
-const BOMB_STRENGTH = 2
-const BOMB_STRENGTH_MAX = 1000
 
 const SPEED_MIN = 4
 
+
+class TDiseases:
+	var ReversControls: bool
+	var Slow: bool
+	var Diarrhea: bool
+	var Constipated: bool
+	var RandomMovement: bool
+	var StickyMovement: bool
 
 class TSlot:
 	var Index: int
@@ -51,6 +55,8 @@ class TSlot:
 	var Alive: bool
 	var Score: int
 	var Speed: int
+	var Diseases: TDiseases
+	var Powerups: Dictionary # key=powerup number, value=TPowerup
 	func _init(SetIndex: int = INVALID_SLOT) -> void:
 		Index = SetIndex
 		PlayerID = 0
@@ -62,7 +68,7 @@ class TSlot:
 		DroppingBombs = false
 		Alive = false
 		Score = 0
-		BombStrength = BOMB_STRENGTH
+		BombStrength = Constants.BOMB_STRENGTH
 		Speed = SPEED_MIN
 		pass
 
