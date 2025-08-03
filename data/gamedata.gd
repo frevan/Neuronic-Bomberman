@@ -129,7 +129,7 @@ func AddBombAt(Field: Vector2i, PlayerID: int) -> bool:
 	if slot_idx == Constants.INVALID_SLOT:
 		return false
 	var b = TBomb.new()
-	b.Field = Field
+	b.Position = Field
 	b.PlayerID = PlayerID
 	b.TimeUntilExplosion = Constants.BOMB_TIME
 	b.Strength = Slots[slot_idx].Player.BombStrength

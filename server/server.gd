@@ -160,11 +160,11 @@ func _CreateExplosionsInDirection(Field: Vector2i, Direction: Vector2i, Strength
 	pass
 
 func _CreateExplosionsForBomb(Bomb: TBomb) -> void:
-	_CreateExplosionAt(Bomb.Field)
-	_CreateExplosionsInDirection(Bomb.Field, Vector2i(-1, 0), Bomb.Strength)
-	_CreateExplosionsInDirection(Bomb.Field, Vector2i(1, 0), Bomb.Strength)
-	_CreateExplosionsInDirection(Bomb.Field, Vector2i(0, -1), Bomb.Strength)
-	_CreateExplosionsInDirection(Bomb.Field, Vector2i(0, 1), Bomb.Strength)
+	_CreateExplosionAt(Bomb.Position)
+	_CreateExplosionsInDirection(Bomb.Position, Vector2i(-1, 0), Bomb.Strength)
+	_CreateExplosionsInDirection(Bomb.Position, Vector2i(1, 0), Bomb.Strength)
+	_CreateExplosionsInDirection(Bomb.Position, Vector2i(0, -1), Bomb.Strength)
+	_CreateExplosionsInDirection(Bomb.Position, Vector2i(0, 1), Bomb.Strength)
 	pass
 
 
