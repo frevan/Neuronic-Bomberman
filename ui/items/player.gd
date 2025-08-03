@@ -12,6 +12,9 @@ signal CheckForCollisions(Sender: Node2D, NewPosition: Vector2)
 @export var animation = ""
 
 var Data: TGameData
+var SlotIndex: int = Constants.INVALID_SLOT
+
+@onready var Rules: TRules = TRules.new()
 
 
 func _ready():
@@ -108,4 +111,12 @@ func _StartOrStopAnimation() -> void:
 	else:
 		$AnimatedSprite.animation = animation
 		$AnimatedSprite.play()
+	pass
+
+
+func _on_player_input_direction_changed() -> void:
+	if SlotIndex != Constants.INVALID_SLOT:
+		var slot: TSlot = Data.Slots[SlotIndex]
+		if slot.Player.Diseases[Constants.DISEASE_REVERSE_CONTROLS]:
+			$PlayerInput.direction = Rules.ProcessDisease_ReverseControls($PlayerInput.direction)
 	pass

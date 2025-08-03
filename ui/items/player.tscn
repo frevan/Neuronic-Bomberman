@@ -494,3 +494,5 @@ script = ExtResource("3_506kp")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -22)
 shape = SubResource("CapsuleShape2D_q8m0y")
+
+[connection signal="DirectionChanged" from="PlayerInput" to="." method="_on_player_input_direction_changed"]

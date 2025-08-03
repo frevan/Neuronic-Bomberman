@@ -98,3 +98,11 @@ func ApplyInitialPowerupsToPlayers(Data: TGameData) -> void:
 			elif powerup.HasOverride:
 				OverridePlayerPowerup(Data, i, powerup.Number, powerup.OverrideValue)
 	pass
+
+
+func ProcessDisease_ReverseControls(Direction: Vector2) -> Vector2:
+	if Direction.x != 0:
+		Direction.x = -Direction.x
+	if Direction.y != 0:
+		Direction.y = -Direction.y
+	return Direction

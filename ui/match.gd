@@ -211,6 +211,7 @@ func _ShowPlayers(CanShow: bool = true) -> void:
 		var slot: TSlot = Client.Data.Slots[i]
 		scene.visible = CanShow && (slot.PlayerID != 0) && slot.Player.Alive
 		scene.Data = Client.Data
+		scene.SlotIndex = i
 		PlayerScenes[slot.PlayerID] = scene
 	pass
 
