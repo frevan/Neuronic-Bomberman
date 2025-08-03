@@ -11,13 +11,13 @@ func after_each():
 
 
 func test_SlotIndexIsInvalid() -> void:
-	var slot: TTypes.TSlot = TTypes.TSlot.new()
+	var slot: TSlot = TSlot.new()
 	assert_eq(slot.Index, Constants.INVALID_SLOT)
 
 func test_SlotIndexIsCorrect() -> void:
-	var slot: TTypes.TSlot = TTypes.TSlot.new(15)
+	var slot: TSlot = TSlot.new(15)
 	assert_eq(slot.Index, 15)
 
 func test_SlotPlayerPeerIDIsZero() -> void:
-	var slot: TTypes.TSlot = TTypes.TSlot.new()
+	var slot: TSlot = TSlot.new()
 	assert_eq(slot.PlayerID, 0)
