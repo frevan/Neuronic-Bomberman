@@ -176,7 +176,7 @@ func _RandomlySpawnPopup() -> int:
 
 func _PickUpPowerups() -> void:
 	for i in Data.Slots.size():
-		var slot: Types.TSlot = Data.Slots[i]
+		var slot: TSlot = Data.Slots[i]
 		var type: int = Maps.GetFieldType(Data.Map, slot.Position)
 		if Tools.FieldTypeIsPowerup(type):
 			Maps.SetFieldTypeTo(Data.Map, slot.Position, Types.FIELD_EMPTY)
@@ -232,7 +232,7 @@ func _ClientDisconnected(SenderID) -> void:
 func _SendLobbyInfoToPlayer(PlayerID: int) -> void:
 	if State == TState.LOBBY:
 		for i in Data.Slots.size():
-			var slot: Types.TSlot = Data.Slots[i]
+			var slot: TSlot = Data.Slots[i]
 			var other_peerid: int = slot.PlayerID
 			if (other_peerid != 0) && (other_peerid != PlayerID):
 				Network.SendPlayerMovedToSlot.rpc_id(PlayerID, other_peerid, i)
@@ -326,7 +326,7 @@ func _SetAllPlayersUnready() -> void:
 
 
 func _IncreasePlayerScores() -> void:
-	for slot: Types.TSlot in Data.Slots:
+	for slot: TSlot in Data.Slots:
 		if slot.Alive:
 			slot.Score += 1
 			Network.SendPlayerScore.rpc(slot.PlayerID, slot.Score)

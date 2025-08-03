@@ -279,7 +279,7 @@ func _network_player_powerups_changed(PlayerID: int, TotalBombs: int, BombStreng
 	_log("Player " + str(PlayerID) + " powerups: bombs=" + str(TotalBombs) + " range=" + str(BombStrength) + " speed=" + str(Speed))
 	var idx = Data.FindSlotForPlayer(PlayerID)
 	if idx != Constants.INVALID_SLOT:
-		var slot: Types.TSlot = Data.Slots[idx]
+		var slot: TSlot = Data.Slots[idx]
 		slot.TotalBombs = TotalBombs
 		slot.BombStrength = BombStrength
 		slot.Speed = Speed

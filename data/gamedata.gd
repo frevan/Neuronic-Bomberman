@@ -2,7 +2,7 @@ extends Node
 
 class_name TGameData
 
-var Slots: Array # Types.TSlot
+var Slots: Array # TSlot
 var Map: Types.TMap = null
 var Bombs: Dictionary # key: field (Vector2i), value (Types.TBomb)
 var Explosions: Dictionary # key: field (Vector2i), value (Types.TExplosion)
@@ -17,7 +17,7 @@ var CountDownTime: float = 0
 func InitSlots() -> void:
 	Slots.resize(Network.MAX_CLIENTS)
 	for i in Slots.size():
-		Slots[i] = Types.TSlot.new(i)
+		Slots[i] = TSlot.new(i)
 	pass
 
 func FindFreeSlotIndex() -> int:
@@ -93,12 +93,12 @@ func SetPlayersToStartPositions() -> void:
 
 func ResetPlayersBeforeMatch() -> void:
 	ResetPlayersBeforeRound()
-	for slot: Types.TSlot in Slots:
+	for slot: TSlot in Slots:
 		slot.Score = 0
 	pass
 
 func ResetPlayersBeforeRound() -> void:
-	for slot: Types.TSlot in Slots:
+	for slot: TSlot in Slots:
 		slot.TotalBombs = 1
 		slot.DroppedBombs = 0
 		slot.DroppingBombs = false

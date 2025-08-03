@@ -66,7 +66,7 @@ func ApplyPowerupToPlayer(Data: TGameData, SlotIndex: int, Powerup: int) -> void
 	assert(Data)
 	assert(SlotIndex != Constants.INVALID_SLOT)
 	assert(SlotIndex < Data.Slots.size())
-	var slot: Types.TSlot = Data.Slots[SlotIndex]
+	var slot: TSlot = Data.Slots[SlotIndex]
 	var p: TPowerup = Tools.CreatePowerup(Powerup)
 	if p:
 		p.ApplyToSlot(slot)
@@ -76,7 +76,7 @@ func OverridePlayerPowerup(Data: TGameData, SlotIndex: int, Powerup: int, Overri
 	assert(Data)
 	assert(SlotIndex != Constants.INVALID_SLOT)
 	assert(SlotIndex < Data.Slots.size())
-	var slot: Types.TSlot = Data.Slots[SlotIndex]
+	var slot: TSlot = Data.Slots[SlotIndex]
 	var p: TPowerup = Tools.CreatePowerup(Powerup)
 	if p:
 		p.ApplyOverrideToSlot(slot, Override)

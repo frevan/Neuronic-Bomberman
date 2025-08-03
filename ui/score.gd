@@ -26,13 +26,13 @@ func _on_visibility_changed() -> void:
 
 func _DetermineHighestScore() -> int:
 	var highest_score: int = 0
-	for slot: Types.TSlot in Client.Data.Slots:
+	for slot: TSlot in Client.Data.Slots:
 		highest_score = max(slot.Score, highest_score)
 	return highest_score
 
 
 func _DetermineMyScore() -> int:
-	for slot: Types.TSlot in Client.Data.Slots:
+	for slot: TSlot in Client.Data.Slots:
 		if slot.PlayerID == Network.PeerID:
 			return slot.Score
 	return -1
@@ -40,7 +40,7 @@ func _DetermineMyScore() -> int:
 
 func _IsThereATieForTheWin(HighestScore: int) -> bool:
 	var count: int = 0
-	for slot: Types.TSlot in Client.Data.Slots:
+	for slot: TSlot in Client.Data.Slots:
 		if slot.Score == HighestScore:
 			count += 1
 	return count > 1
@@ -76,7 +76,7 @@ func _UpdateScoresLabel() -> void:
 	for score in range(highest_score, -1, -1):
 		_log("  score=" + str(score))
 		for idx in Client.Data.Slots.size():
-			var slot: Types.TSlot = Client.Data.Slots[idx]
+			var slot: TSlot = Client.Data.Slots[idx]
 			if slot.PlayerID == 0:
 				continue
 			_log("    slot=" + str(slot.PlayerID) + ": " + str(slot.Score))

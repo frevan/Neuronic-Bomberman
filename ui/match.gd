@@ -208,7 +208,7 @@ func _ShowPlayers(CanShow: bool = true) -> void:
 	for i in Client.Data.Slots.size():
 		var scene: Node2D = _FindPlayerNodeForSlot(i)
 		assert(scene)
-		var slot: Types.TSlot = Client.Data.Slots[i]
+		var slot: TSlot = Client.Data.Slots[i]
 		scene.visible = CanShow && (slot.PlayerID != 0) && slot.Alive
 		scene.Data = Client.Data
 		PlayerScenes[slot.PlayerID] = scene

@@ -26,48 +26,6 @@ const MAP_WIDTH = 15
 const MAP_HEIGHT = 11
 
 
-class TDiseases:
-	var ReversControls: bool
-	var Slow: bool
-	var Diarrhea: bool
-	var Constipated: bool
-	var RandomMovement: bool
-	var StickyMovement: bool
-
-class TSlot:
-	var Index: int
-	var PlayerID: int
-	var PlayerName: String
-	var Ready: bool
-	var Position: Vector2
-	var TotalBombs: int
-	var DroppedBombs: int
-	var DroppingBombs: bool
-	var BombStrength: int
-	var Alive: bool
-	var Score: int
-	var Speed: int
-	var Diseases: Array[bool]
-	var Powerups: Dictionary # key=powerup number, value=TPowerup
-	func _init(SetIndex: int = Constants.INVALID_SLOT) -> void:
-		Index = SetIndex
-		PlayerID = 0
-		PlayerName = ""
-		Ready = false
-		Position = Vector2(-1, -1)
-		TotalBombs = 0
-		DroppedBombs = 0
-		DroppingBombs = false
-		Alive = false
-		Score = 0
-		BombStrength = Constants.BOMB_STRENGTH
-		Speed = Constants.SPEED_MIN
-		Diseases.resize(Constants.NUM_DISEASES)
-		for i in Constants.NUM_DISEASES:
-			Diseases[i] = false
-		pass
-
-
 class TBomb:
 	var PlayerID: int
 	var Field: Vector2i

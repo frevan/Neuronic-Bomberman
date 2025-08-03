@@ -6,10 +6,10 @@ class_name TMoreFlamePowerup
 func Initialize() -> void:
 	Number = Constants.POWERUP_MOREFLAME
 
-func ApplyToSlot(Slot: Types.TSlot) -> void:
+func ApplyToSlot(Slot: TSlot) -> void:
 	Slot.BombStrength += 1
 	pass
 
-func ApplyOverrideToSlot(Slot: Types.TSlot, Override: int) -> void:
+func ApplyOverrideToSlot(Slot: TSlot, Override: int) -> void:
 	Slot.BombStrength = max(1, Override)
 	pass

@@ -6,7 +6,7 @@ class_name TRandomPowerup
 func Initialize() -> void:
 	Number = Constants.POWERUP_RANDOM
 
-func ApplyToSlot(Slot: Types.TSlot) -> void:
+func ApplyToSlot(Slot: TSlot) -> void:
 	var which: int = randi_range(0, Constants.NUM_POWERUPS - 1)
 	if which == Constants.POWERUP_RANDOM:
 		which = Constants.POWERUP_EXTRABOMB
@@ -18,5 +18,5 @@ func ApplyToSlot(Slot: Types.TSlot) -> void:
 	powerup.ApplyToSlot(Slot)
 	pass
 
-func ApplyOverrideToSlot(_Slot: Types.TSlot, _Override: int) -> void:
+func ApplyOverrideToSlot(_Slot: TSlot, _Override: int) -> void:
 	pass

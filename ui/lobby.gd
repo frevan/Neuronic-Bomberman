@@ -109,7 +109,7 @@ func _UpdatePlayerInfo() -> void:
 			continue
 		
 		label.text = "..."
-		var slot: Types.TSlot = Client.Data.Slots[i]
+		var slot: TSlot = Client.Data.Slots[i]
 		if slot.PlayerID != 0:
 			var s: String = slot.PlayerName
 			if s == "":
