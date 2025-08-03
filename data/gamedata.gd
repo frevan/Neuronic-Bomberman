@@ -124,18 +124,19 @@ func ResetBombsEtcBeforeRound() -> void:
 	Explosions.clear()
 	pass
 
-func AddBombAt(Field: Vector2i, PlayerID: int) -> void:
-	if !FieldHasBomb(Field):
-		var slot_idx = FindSlotForPlayer(PlayerID)
-		if slot_idx == Constants.INVALID_SLOT:
-			return
-		var b = Types.TBomb.new()
-		b.Field = Field
-		b.PlayerID = PlayerID
-		b.TimeUntilExplosion = Constants.BOMB_TIME
-		b.Strength = Slots[slot_idx].Player.BombStrength
-		Bombs[Field] = b
-	pass
+func AddBombAt(Field: Vector2i, PlayerID: int) -> bool:
+	if FieldHasBomb(Field):
+		return false
+	var slot_idx = FindSlotForPlayer(PlayerID)
+	if slot_idx == Constants.INVALID_SLOT:
+		return false
+	var b = Types.TBomb.new()
+	b.Field = Field
+	b.PlayerID = PlayerID
+	b.TimeUntilExplosion = Constants.BOMB_TIME
+	b.Strength = Slots[slot_idx].Player.BombStrength
+	Bombs[Field] = b
+	return true
 
 func FieldHasBomb(Field: Vector2i) -> bool:
 	return Bombs.has(Field)

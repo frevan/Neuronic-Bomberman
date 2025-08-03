@@ -36,6 +36,7 @@ func _process(delta: float) -> void:
 	if State == TState.MATCH:
 		_ProcessMatch(delta)
 	elif State == TState.ROUND:
+		_DropBombs(delta)
 		_ExplodeBombs(delta)
 		_RemoveExplosions(delta)
 		_KillPlayersInExplosions()
@@ -63,14 +64,30 @@ func _peer_disconnected(SenderID: int) -> void:
 	pass
 
 
+func _DropBombs(_Delta: float) -> void:
+	for i in Data.Slots.size():
+		var slot: TSlot = Data.Slots[i]
+		if (slot.PlayerID == 0) or !slot.Player.Alive:
+			continue
+		if slot.Player.DroppingBombs || slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
+			_DropBomb(i)
+	pass
+
 func _DropBomb(SlotIndex: int) -> void:
 	var slot = Data.Slots[SlotIndex]
-	if (slot.Player.DroppedBombs == slot.Player.TotalBombs) || slot.Player.Diseases[Constants.DISEASE_CONSTIPATION]:
-		return
-	slot.Player.DroppedBombs += 1
-	var pos: Vector2i = slot.Player.Position
-	Data.AddBombAt(pos, slot.PlayerID)
-	Network.SendBombDropped.rpc(pos)
+	
+	var will_drop = false
+	if slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
+		will_drop = true
+	else:
+		will_drop = !(slot.Player.DroppedBombs == slot.Player.TotalBombs) 
+		will_drop &= !slot.Player.Diseases[Constants.DISEASE_CONSTIPATION]
+		
+	if will_drop:
+		var pos: Vector2i = slot.Player.Position
+		if Data.AddBombAt(pos, slot.PlayerID):
+			slot.Player.DroppedBombs += 1
+			Network.SendBombDropped.rpc(pos)
 	pass
 
 
