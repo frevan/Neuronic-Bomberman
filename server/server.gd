@@ -137,7 +137,7 @@ func _CreateExplosionAt(Field: Vector2i) -> bool:
 		Data.AddExplosionAt(Field)
 		Network.SendCreateExplosionAt.rpc(Field)
 		_ExplodeStuffInField(Field, f)
-		return Tools.FieldIsEmpty(f)
+		return f == Types.FIELD_EMPTY
 	return false
 
 func _ExplodeStuffInField(Field: Vector2i, FieldType: int) -> void:
