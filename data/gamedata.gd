@@ -4,7 +4,7 @@ class_name TGameData
 
 var Slots: Array # TSlot
 var Map: Types.TMap = null
-var Bombs: Dictionary # key: field (Vector2i), value (Types.TBomb)
+var Bombs: Dictionary # key: field (Vector2i), value: bomb (TBomb)
 var Explosions: Dictionary # key: field (Vector2i), value (Types.TExplosion)
 var NumRounds: int = 1
 var CurrentRound: int = -1
@@ -128,7 +128,7 @@ func AddBombAt(Field: Vector2i, PlayerID: int) -> bool:
 	var slot_idx = FindSlotForPlayer(PlayerID)
 	if slot_idx == Constants.INVALID_SLOT:
 		return false
-	var b = Types.TBomb.new()
+	var b = TBomb.new()
 	b.Field = Field
 	b.PlayerID = PlayerID
 	b.TimeUntilExplosion = Constants.BOMB_TIME

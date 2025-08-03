@@ -26,13 +26,6 @@ const MAP_WIDTH = 15
 const MAP_HEIGHT = 11
 
 
-class TBomb:
-	var PlayerID: int
-	var Field: Vector2i
-	var TimeUntilExplosion: float # in seconds
-	var Strength: int
-
-
 class TExplosion:
 	var Field: Vector2i
 	var RemainingTime: float # in seconds
