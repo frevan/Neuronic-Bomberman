@@ -31,7 +31,7 @@ const DISEASE_STICKY_MOVEMENT = 5
 const NUM_DISEASES = 6
 
 
-
+const MAX_BOMBS = 10
 const BOMB_STRENGTH = 2
 const BOMB_STRENGTH_MAX = 1000
 const BOMB_TIME = 2.0 # in seconds 
