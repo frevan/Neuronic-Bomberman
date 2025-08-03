@@ -100,9 +100,21 @@ func ApplyInitialPowerupsToPlayers(Data: TGameData) -> void:
 	pass
 
 
-func ProcessDisease_ReverseControls(Direction: Vector2) -> Vector2:
+func ProcessDisease_ReverseControls(_Delta: float, Direction: Vector2) -> Vector2:
 	if Direction.x != 0:
 		Direction.x = -Direction.x
 	if Direction.y != 0:
 		Direction.y = -Direction.y
 	return Direction
+
+var _LastDirection: Vector2
+var _TimeSinceChange: float = 0
+
+func ProcessDisease_RandomMovement(Delta: float, Direction: Vector2) -> Vector2:
+	if Direction.is_zero_approx():
+		return Direction
+	_TimeSinceChange -= Delta
+	if _TimeSinceChange <= 0:
+		_LastDirection = Vector2(randi_range(-1, 1), randi_range(-1, 1))
+		_TimeSinceChange = 0.1
+	return _LastDirection

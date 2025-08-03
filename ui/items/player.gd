@@ -114,9 +114,11 @@ func _StartOrStopAnimation() -> void:
 	pass
 
 
-func _on_player_input_direction_changed() -> void:
+func _on_player_input_direction_changed(Delta: float) -> void:
 	if SlotIndex != Constants.INVALID_SLOT:
 		var slot: TSlot = Data.Slots[SlotIndex]
 		if slot.Player.Diseases[Constants.DISEASE_REVERSE_CONTROLS]:
-			$PlayerInput.direction = Rules.ProcessDisease_ReverseControls($PlayerInput.direction)
+			$PlayerInput.direction = Rules.ProcessDisease_ReverseControls(Delta, $PlayerInput.direction)
+		if slot.Player.Diseases[Constants.DISEASE_RANDOM_MOVEMENT]:
+			$PlayerInput.direction = Rules.ProcessDisease_RandomMovement(Delta, $PlayerInput.direction)
 	pass
