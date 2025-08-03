@@ -43,7 +43,7 @@ func CreatePowerup(Which: int) ->  TPowerup:
 			Constants.POWERUP_GOLDFLAME: powerup = TGoldFlamePowerup.new()
 			#Constants.POWERUP_TRIGGER:
 			#Constants.POWERUP_JELLYBOMBS:
-			#Constants.POWERUP_BADDISEASE:
+			Constants.POWERUP_BADDISEASE: powerup = TBadDiseasePowerup.new()
 			Constants.POWERUP_RANDOM: powerup = TRandomPowerup.new()
 		if powerup:
 			powerup.Initialize()
