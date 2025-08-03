@@ -47,7 +47,7 @@ class TSlot:
 	var Alive: bool
 	var Score: int
 	var Speed: int
-	var Diseases: TDiseases
+	var Diseases: Array[bool]
 	var Powerups: Dictionary # key=powerup number, value=TPowerup
 	func _init(SetIndex: int = Constants.INVALID_SLOT) -> void:
 		Index = SetIndex
@@ -62,6 +62,9 @@ class TSlot:
 		Score = 0
 		BombStrength = Constants.BOMB_STRENGTH
 		Speed = Constants.SPEED_MIN
+		Diseases.resize(Constants.NUM_DISEASES)
+		for i in Constants.NUM_DISEASES:
+			Diseases[i] = false
 		pass
 
 

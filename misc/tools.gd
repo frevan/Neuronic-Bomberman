@@ -34,7 +34,7 @@ func CreatePowerup(Which: int) ->  TPowerup:
 		match Which:
 			Constants.POWERUP_EXTRABOMB: powerup = TExtraBombPowerup.new()
 			Constants.POWERUP_MOREFLAME: powerup = TMoreFlamePowerup.new()
-			#Constants.POWERUP_DISEASE:
+			Constants.POWERUP_DISEASE: powerup = TDiseasePowerup.new()
 			#Constants.POWERUP_CANKICK:
 			Constants.POWERUP_EXTRASPEED: powerup = TExtraSpeedPowerup.new()
 			#Constants.POWERUP_CANPUNCH:
