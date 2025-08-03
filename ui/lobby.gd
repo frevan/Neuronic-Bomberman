@@ -35,7 +35,7 @@ func AfterHide() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey:
 		if event.pressed:
-			if (Network.PeerID == 1) && (event.keycode == KEY_UP || event.keycode == KEY_DOWN):
+			if Network.IsServer() && (event.keycode == KEY_UP || event.keycode == KEY_DOWN):
 				var idx: int = _IndexOfMapInList(Client.CurrentMapName)
 				if event.keycode == KEY_UP:
 					idx -= 1
