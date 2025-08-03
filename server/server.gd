@@ -328,8 +328,8 @@ func _SetAllPlayersUnready() -> void:
 func _IncreasePlayerScores() -> void:
 	for slot: TSlot in Data.Slots:
 		if slot.Player.Alive:
-			slot.Player.Score += 1
-			Network.SendPlayerScore.rpc(slot.PlayerID, slot.Player.Score)
+			slot.Score += 1
+			Network.SendPlayerScore.rpc(slot.PlayerID, slot.Score)
 	pass
 
 

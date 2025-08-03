@@ -94,7 +94,7 @@ func SetPlayersToStartPositions() -> void:
 func ResetPlayersBeforeMatch() -> void:
 	ResetPlayersBeforeRound()
 	for slot: TSlot in Slots:
-		slot.Player.Score = 0
+		slot.Score = 0
 	pass
 
 func ResetPlayersBeforeRound() -> void:
@@ -115,7 +115,7 @@ func CountAlivePlayers() -> int:
 func UpdatePlayerScore(PlayerID: int, Score: int) -> void:
 	var idx = FindSlotForPlayer(PlayerID)
 	if idx != Constants.INVALID_SLOT:
-		Slots[idx].Player.Score = Score
+		Slots[idx].Score = Score
 	pass
 
 

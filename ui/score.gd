@@ -27,21 +27,21 @@ func _on_visibility_changed() -> void:
 func _DetermineHighestScore() -> int:
 	var highest_score: int = 0
 	for slot: TSlot in Client.Data.Slots:
-		highest_score = max(slot.Player.Score, highest_score)
+		highest_score = max(slot.Score, highest_score)
 	return highest_score
 
 
 func _DetermineMyScore() -> int:
 	for slot: TSlot in Client.Data.Slots:
 		if slot.PlayerID == Network.PeerID:
-			return slot.Player.Score
+			return slot.Score
 	return -1
 
 
 func _IsThereATieForTheWin(HighestScore: int) -> bool:
 	var count: int = 0
 	for slot: TSlot in Client.Data.Slots:
-		if slot.Player.Score == HighestScore:
+		if slot.Score == HighestScore:
 			count += 1
 	return count > 1
 
@@ -70,7 +70,7 @@ func _UpdateMessageLabel():
 
 
 func _UpdateScoresLabel() -> void:
-	_log("scores = " + str(Client.Data.Slots[0].Player.Score) + " " + str(Client.Data.Slots[1].Player.Score))
+	_log("scores = " + str(Client.Data.Slots[0].Score) + " " + str(Client.Data.Slots[1].Score))
 	var s: String = ""
 	var highest_score: int = _DetermineHighestScore()
 	for score in range(highest_score, -1, -1):
@@ -79,12 +79,12 @@ func _UpdateScoresLabel() -> void:
 			var slot: TSlot = Client.Data.Slots[idx]
 			if slot.PlayerID == 0:
 				continue
-			_log("    slot=" + str(slot.PlayerID) + ": " + str(slot.Player.Score))
-			if slot.Player.Score == score:
+			_log("    slot=" + str(slot.PlayerID) + ": " + str(slot.Score))
+			if slot.Score == score:
 				var nme: String = slot.PlayerName
 				if nme == "":
 					nme = str(slot.PlayerID)
-				s += "\n" + nme + " - " + str(slot.Player.Score)
+				s += "\n" + nme + " - " + str(slot.Score)
 				_log("  s=" + s)
 	$ScoresLabel.text = s
 	pass

@@ -100,9 +100,9 @@ func test_SetPlayersToStartPositions() -> void:
 	assert_almost_eq(o.Slots[1].Player.Position.y, 10, 0.1)
 
 func test_ResetPlayersBeforeMatch() -> void:
-	o.Slots[1].Player.Score = 123
+	o.Slots[1].Score = 123
 	o.ResetPlayersBeforeMatch()
-	assert_eq(o.Slots[1].Player.Score, 0)
+	assert_eq(o.Slots[1].Score, 0)
 	pass
 
 func test_ResetPlayersBeforeRound() -> void:

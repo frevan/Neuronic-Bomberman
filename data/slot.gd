@@ -7,6 +7,7 @@ var Index: int
 var PlayerID: int
 var PlayerName: String
 var Ready: bool
+var Score: int
 var Player: TPlayingData
 
 class TPlayingData:
@@ -16,7 +17,6 @@ class TPlayingData:
 	var DroppingBombs: bool
 	var BombStrength: int
 	var Alive: bool
-	var Score: int
 	var Speed: int
 	var Diseases: Array[bool]
 	var Powerups: Dictionary # key=powerup number, value=TPowerup
@@ -26,7 +26,6 @@ class TPlayingData:
 		DroppedBombs = 0
 		DroppingBombs = false
 		Alive = false
-		Score = 0
 		BombStrength = Constants.BOMB_STRENGTH
 		Speed = Constants.SPEED_MIN
 		Diseases.resize(Constants.NUM_DISEASES)
@@ -37,7 +36,6 @@ class TPlayingData:
 		DroppedBombs = Source.DroppedBombs
 		DroppingBombs = Source.DroppingBombs
 		Alive = Source.Alive
-		Score = Source.Score
 		BombStrength = Source.BombStrength
 		Speed = Source.Speed
 		for i in Constants.NUM_DISEASES:
@@ -49,5 +47,6 @@ func _init(SetIndex: int = Constants.INVALID_SLOT) -> void:
 	PlayerID = 0
 	PlayerName = ""
 	Ready = false
+	Score = 0
 	Player = TPlayingData.new()
 	pass
