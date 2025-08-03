@@ -32,6 +32,26 @@ func AfterHide() -> void:
 	pass
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey:
+		if event.pressed:
+			if (Network.PeerID == 1) && (event.keycode == KEY_UP || event.keycode == KEY_DOWN):
+				var idx: int = _IndexOfMapInList(Client.CurrentMapName)
+				if event.keycode == KEY_UP:
+					idx -= 1
+					if idx < 0:
+						idx = $MapsList.item_count - 1
+				else:
+					idx += 1
+					if idx >= $MapsList.item_count:
+						idx = 0
+				var mapname = $MapsList.get_item_text(idx)
+				Client.RequestMapChange(mapname)
+				$MapsList.select(idx)
+				$MapsList.ensure_current_is_visible()
+	pass
+
+
 func _client_player_joined(_PlayerID: int) -> void:
 	_UpdatePlayerInfo()
 	pass
@@ -112,9 +132,6 @@ func _UpdateClientInfo() -> void:
 
 func _UpdateMapInfo() -> void:
 	$MapNameLabel.text = Client.CurrentMapName
-	#if context.map:
-		#SelectMap(context.map.name) # reload map when returning to lobby
-	#FillMapsList()
 	pass
 
 
@@ -210,3 +227,10 @@ func _on_num_rounds_spin_value_changed(value: float) -> void:
 	var v: int = floor(value)
 	Client.RequestNumRounds(v)
 	pass
+
+
+func _IndexOfMapInList(Name: String) -> int:
+	for i in $MapsList.item_count:
+		if $MapsList.get_item_text(i) == Name:
+			return i
+	return -1
