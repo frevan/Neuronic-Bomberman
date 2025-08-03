@@ -11,7 +11,7 @@ signal CheckForCollisions(Sender: Node2D, NewPosition: Vector2)
 
 @export var animation = ""
 
-var Client: TClient
+var Data: TGameData
 
 
 func _ready():
@@ -57,12 +57,11 @@ func ResetSpriteDirection() -> void:
 
 func _CalculatePlayerSpeed() -> int:
 	var _speed = 1
-	if Client:
-		if Client.Data:
-			var idx = Client.Data.FindSlotForPlayer(Network.PeerID)
-			if idx != Constants.INVALID_SLOT:
-				var slot: Types.TSlot = Client.Data.Slots[idx]
-				_speed = slot.Speed #* 0.25
+	if Data:
+		var idx = Data.FindSlotForPlayer(Network.PeerID)
+		if idx != Constants.INVALID_SLOT:
+			var slot: Types.TSlot = Data.Slots[idx]
+			_speed = slot.Speed * 0.25
 	return SPEED * _speed
 
 func _MoveInSteps(delta: float) -> void:
