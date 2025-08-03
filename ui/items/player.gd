@@ -69,6 +69,7 @@ func _CalculatePlayerSpeed() -> int:
 
 func _MoveInSteps(delta: float) -> void:
 	var spd = _CalculatePlayerSpeed()
+	spd = _ApplyDiseasesToSpeed(delta, spd)
 	_CalculateVelocity(spd)
 	var step_delta = delta / (spd / SPEED_STEP)
 	var cur_delta = 0
@@ -122,3 +123,11 @@ func _on_player_input_direction_changed(Delta: float) -> void:
 		if slot.Player.Diseases[Constants.DISEASE_RANDOM_MOVEMENT]:
 			$PlayerInput.direction = Rules.ProcessDisease_RandomMovement(Delta, $PlayerInput.direction)
 	pass
+
+
+func _ApplyDiseasesToSpeed(Delta: float, Speed: float) -> float:
+	if SlotIndex != Constants.INVALID_SLOT:
+		var slot: TSlot = Data.Slots[SlotIndex]
+		if slot.Player.Diseases[Constants.DISEASE_SLOW]:
+			return Rules.ProcessDisease_Slow(Delta, Speed)
+	return Speed

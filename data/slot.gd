@@ -43,6 +43,7 @@ class TPlayingData:
 		Speed = Constants.SPEED_MIN
 		for i in Constants.NUM_DISEASES:
 			Diseases[i] = false
+		Diseases[Constants.DISEASE_SLOW] = true
 	func AssignWithoutPosition(Source: TPlayingData) -> void:
 		TotalBombs = Source.TotalBombs
 		DroppedBombs = Source.DroppedBombs

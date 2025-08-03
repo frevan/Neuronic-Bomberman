@@ -118,3 +118,6 @@ func ProcessDisease_RandomMovement(Delta: float, Direction: Vector2) -> Vector2:
 		_LastDirection = Vector2(randi_range(-1, 1), randi_range(-1, 1))
 		_TimeSinceChange = 0.1
 	return _LastDirection
+
+func ProcessDisease_Slow(_Delta: float, _Speed: float) -> float:
+	return Constants.SPEED_SLOW
