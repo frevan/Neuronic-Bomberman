@@ -80,8 +80,10 @@ func _DropBomb(SlotIndex: int) -> void:
 	if slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
 		will_drop = true
 	else:
-		will_drop = !(slot.Player.DroppedBombs == slot.Player.TotalBombs) 
-		will_drop = will_drop && (!slot.Player.Diseases[Constants.DISEASE_CONSTIPATION])
+		var total = slot.Player.TotalBombs
+		var dropped = slot.Player.DroppedBombs
+		var constipated = slot.Player.Diseases[Constants.DISEASE_CONSTIPATION]
+		will_drop = (dropped < total) && !constipated
 		
 	if will_drop:
 		var pos: Vector2i = slot.Player.Position

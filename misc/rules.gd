@@ -107,17 +107,30 @@ func ProcessDisease_ReverseControls(_Delta: float, Direction: Vector2) -> Vector
 		Direction.y = -Direction.y
 	return Direction
 
-var _LastDirection: Vector2
-var _TimeSinceChange: float = 0
+var _Random_LastDirection: Vector2
+var _Random_TimeSinceChange: float = 0
 
 func ProcessDisease_RandomMovement(Delta: float, Direction: Vector2) -> Vector2:
 	if Direction.is_zero_approx():
 		return Direction
-	_TimeSinceChange -= Delta
-	if _TimeSinceChange <= 0:
-		_LastDirection = Vector2(randi_range(-1, 1), randi_range(-1, 1))
-		_TimeSinceChange = 0.1
-	return _LastDirection
+	_Random_TimeSinceChange -= Delta
+	if _Random_TimeSinceChange <= 0:
+		_Random_LastDirection = Vector2(randi_range(-1, 1), randi_range(-1, 1))
+		_Random_TimeSinceChange = 0.1
+	return _Random_LastDirection
 
 func ProcessDisease_Slow(_Delta: float, _Speed: float) -> float:
 	return Constants.SPEED_SLOW
+
+var _Sticky_Active: bool = false
+var _Sticky_TimeSinceChange: float = 0.0
+
+func ProcessDisease_StickyMovement(Delta: float, Speed: float) -> float:
+	_Sticky_TimeSinceChange -= Delta
+	if _Sticky_TimeSinceChange < 0:
+		_Sticky_Active = !_Sticky_Active
+		_Sticky_TimeSinceChange = 0.6
+	if _Sticky_Active:
+		return Constants.SPEED_SLOW
+	else:
+		return Speed

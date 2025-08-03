@@ -58,18 +58,18 @@ func ResetSpriteDirection() -> void:
 	pass
 
 
-func _CalculatePlayerSpeed() -> int:
-	var _speed = 1
+func _CalculatePlayerSpeed(delta: float) -> int:
+	var _speed = Constants.SPEED_MIN
 	if Data:
 		var idx = Data.FindSlotForPlayer(Network.PeerID)
 		if idx != Constants.INVALID_SLOT:
 			var slot: TSlot = Data.Slots[idx]
-			_speed = slot.Player.Speed * 0.25
-	return SPEED * _speed
+			_speed = slot.Player.Speed
+	_speed = _ApplyDiseasesToSpeed(delta, _speed)
+	return SPEED * _speed * 0.25
 
 func _MoveInSteps(delta: float) -> void:
-	var spd = _CalculatePlayerSpeed()
-	spd = _ApplyDiseasesToSpeed(delta, spd)
+	var spd = _CalculatePlayerSpeed(delta)
 	_CalculateVelocity(spd)
 	var step_delta = delta / (spd / SPEED_STEP)
 	var cur_delta = 0
@@ -126,8 +126,11 @@ func _on_player_input_direction_changed(Delta: float) -> void:
 
 
 func _ApplyDiseasesToSpeed(Delta: float, Speed: float) -> float:
+	var spd: float = Speed
 	if SlotIndex != Constants.INVALID_SLOT:
 		var slot: TSlot = Data.Slots[SlotIndex]
 		if slot.Player.Diseases[Constants.DISEASE_SLOW]:
-			return Rules.ProcessDisease_Slow(Delta, Speed)
-	return Speed
+			spd = Rules.ProcessDisease_Slow(Delta, spd)
+		if slot.Player.Diseases[Constants.DISEASE_STICKY_MOVEMENT]:
+			spd = Rules.ProcessDisease_StickyMovement(Delta, spd)
+	return spd

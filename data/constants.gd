@@ -38,4 +38,4 @@ const BOMB_TIME = 2.0 # in seconds
 const EXPLOSION_TIME = 1.0 # in seconds
 
 const SPEED_MIN = 4
-const SPEED_SLOW = 2
+const SPEED_SLOW = 1

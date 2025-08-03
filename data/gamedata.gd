@@ -99,9 +99,7 @@ func ResetPlayersBeforeMatch() -> void:
 
 func ResetPlayersBeforeRound() -> void:
 	for slot: TSlot in Slots:
-		slot.Player.TotalBombs = 1
-		slot.Player.DroppedBombs = 0
-		slot.Player.DroppingBombs = false
+		slot.Player.ResetWithoutPosition()
 		slot.Player.Alive = slot.PlayerID != 0
 	pass
 

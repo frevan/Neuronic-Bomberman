@@ -35,7 +35,7 @@ class TPlayingData:
 		Position = Vector2(-1, -1)
 		ResetWithoutPosition()
 	func ResetWithoutPosition() -> void:
-		TotalBombs = 0
+		TotalBombs = 1
 		DroppedBombs = 0
 		DroppingBombs = false
 		Alive = false
@@ -43,7 +43,7 @@ class TPlayingData:
 		Speed = Constants.SPEED_MIN
 		for i in Constants.NUM_DISEASES:
 			Diseases[i] = false
-		Diseases[Constants.DISEASE_SLOW] = true
+		Powerups.clear()
 	func AssignWithoutPosition(Source: TPlayingData) -> void:
 		TotalBombs = Source.TotalBombs
 		DroppedBombs = Source.DroppedBombs
