@@ -283,8 +283,8 @@ func _StartRoundNow() -> void:
 	Data.SetPlayersToStartPositions()
 	for slot in Data.Slots:
 		if slot.PlayerID != 0:
-			Network.SendPlayerPosition.rpc(slot.PlayerID, slot.Player.Position)
 			Maps.ClearFieldsAround(Data.Map, slot.Player.Position)
+	Rules.ApplyInitialPowerupsToPlayers(Data)
 	
 	for y in Data.Map.Height:
 		for x in Data.Map.Width:
@@ -292,8 +292,10 @@ func _StartRoundNow() -> void:
 			if tempMap.Fields[y][x] != type:
 				Network.SendMapTileChanged.rpc(Vector2i(x, y), type)
 	
-	Rules.ApplyInitialPowerupsToPlayers(Data)
-	# TODO: send these to all clients
+	for slot in Data.Slots:
+		if slot.PlayerID != 0:
+			Network.SendPlayerPosition.rpc(slot.PlayerID, slot.Player.Position)
+			Network.SendPlayingState.rpc(slot.PlayerID, slot.Player.ToJSONString())
 	
 	State = TState.ROUND
 	Network.SendRoundStarted.rpc()

@@ -274,12 +274,12 @@ func _network_player_name_changed(PlayerID: int, Name: String) -> void:
 		OnPlayerNameChanged.emit(PlayerID, Name)
 	pass
 
-func _network_playing_state_update(PlayerID: int, PlayingState: TSlot.TPlayingData) -> void:
-	#_log("Player " + str(PlayerID) + " playing state changed")
+func _network_playing_state_update(PlayerID: int, PlayingState: String) -> void:
+	_log("Player " + str(PlayerID) + " playing state changed")
 	var idx = Data.FindSlotForPlayer(PlayerID)
 	if idx != Constants.INVALID_SLOT:
 		var slot: TSlot = Data.Slots[idx]
-		slot.Player.AssignWithoutPosition(PlayingState)
+		slot.Player.FromJSONString(PlayingState)
 	pass
 
 

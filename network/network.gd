@@ -35,7 +35,7 @@ signal OnUpdatePlayerScore # params: id (int), score (int)
 signal OnCountDownStarted # params: time (float)
 signal OnNumRoundsChanged # params: value (int)
 signal OnPlayerNameChanged # params: id (int), value (string)
-signal OnPlayingStateUpdate # params: id (int), state (TSlot.TPlayingData)
+signal OnPlayingStateUpdate # params: id (int), state (JSON string)
 
 
 const PORT = 15063
@@ -221,5 +221,5 @@ func SendPlayerNameChanged(ID: int, Value: String) -> void:
 	OnPlayerNameChanged.emit(ID, Value)
 
 @rpc("reliable", "call_local", "authority")
-func SendPlayingState(ID: int, State: TSlot.TPlayingData) -> void:
+func SendPlayingState(ID: int, State: String) -> void:
 	OnPlayingStateUpdate.emit(ID, State)
