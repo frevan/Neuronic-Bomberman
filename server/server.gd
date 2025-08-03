@@ -182,7 +182,7 @@ func _PickUpPowerups() -> void:
 			Maps.SetFieldTypeTo(Data.Map, slot.Player.Position, Types.FIELD_EMPTY)
 			Network.SendMapTileChanged.rpc(slot.Player.Position, Types.FIELD_EMPTY)
 			Rules.ApplyPowerupToPlayer(Data, i, type - Types.FIELD_PU_FIRST)
-			Network.SendPlayerPowerups.rpc(slot.PlayerID, slot.Player.TotalBombs, slot.Player.BombStrength, slot.Player.Speed)
+			Network.SendPlayingState.rpc(slot.PlayerID, slot.Player)
 	pass
 
 func _CheckIfRoundEnded() -> void:

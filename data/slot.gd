@@ -7,6 +7,7 @@ var Index: int
 var PlayerID: int
 var PlayerName: String
 var Ready: bool
+var Player: TPlayingData
 
 class TPlayingData:
 	var Position: Vector2
@@ -31,8 +32,16 @@ class TPlayingData:
 		Diseases.resize(Constants.NUM_DISEASES)
 		for i in Constants.NUM_DISEASES:
 			Diseases[i] = false
-
-var Player: TPlayingData
+	func AssignWithoutPosition(Source: TPlayingData) -> void:
+		TotalBombs = Source.TotalBombs
+		DroppedBombs = Source.DroppedBombs
+		DroppingBombs = Source.DroppingBombs
+		Alive = Source.Alive
+		Score = Source.Score
+		BombStrength = Source.BombStrength
+		Speed = Source.Speed
+		for i in Constants.NUM_DISEASES:
+			Diseases[i] = Source.Diseases[i]
 
 
 func _init(SetIndex: int = Constants.INVALID_SLOT) -> void:
