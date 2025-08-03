@@ -201,7 +201,7 @@ func _network_player_position_received(PlayerID: int, Position: Vector2) -> void
 	_log("player " + str(PlayerID) + " is at: (" + str(Position.x) + "," + str(Position.y) + ")")
 	var idx = Data.FindSlotForPlayer(PlayerID)
 	if idx != Constants.INVALID_SLOT:
-		Data.Slots[idx].Position = Position
+		Data.Slots[idx].Player.Position = Position
 		OnPlayerPositionChanged.emit(PlayerID)
 	pass
 
@@ -240,7 +240,7 @@ func _network_player_died(PlayerID: int) -> void:
 	_log("player " + str(PlayerID) + " died")
 	var slot_idx = Data.FindSlotForPlayer(PlayerID)
 	if slot_idx != Constants.INVALID_SLOT:
-		Data.Slots[slot_idx].Alive = false
+		Data.Slots[slot_idx].Player.Alive = false
 	OnPlayerDied.emit(PlayerID)
 	pass
 
@@ -280,9 +280,9 @@ func _network_player_powerups_changed(PlayerID: int, TotalBombs: int, BombStreng
 	var idx = Data.FindSlotForPlayer(PlayerID)
 	if idx != Constants.INVALID_SLOT:
 		var slot: TSlot = Data.Slots[idx]
-		slot.TotalBombs = TotalBombs
-		slot.BombStrength = BombStrength
-		slot.Speed = Speed
+		slot.Player.TotalBombs = TotalBombs
+		slot.Player.BombStrength = BombStrength
+		slot.Player.Speed = Speed
 		OnPlayerPowerupsChanged.emit(PlayerID, TotalBombs, BombStrength, Speed)
 	pass
 
@@ -440,7 +440,7 @@ func DropBombs(IsDropping: bool) -> void:
 func UpdatePlayerPosition(ID: int, Position: Vector2) -> void:
 	var idx = Data.FindSlotForPlayer(ID)
 	if idx != Constants.INVALID_SLOT:
-		Data.Slots[idx].Position = Position
+		Data.Slots[idx].Player.Position = Position
 		if Network.PeerID == 1:
 			OnPlayerPositionUpdated.emit(ID, Position)
 	pass

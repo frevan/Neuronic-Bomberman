@@ -209,7 +209,7 @@ func _ShowPlayers(CanShow: bool = true) -> void:
 		var scene: Node2D = _FindPlayerNodeForSlot(i)
 		assert(scene)
 		var slot: TSlot = Client.Data.Slots[i]
-		scene.visible = CanShow && (slot.PlayerID != 0) && slot.Alive
+		scene.visible = CanShow && (slot.PlayerID != 0) && slot.Player.Alive
 		scene.Data = Client.Data
 		PlayerScenes[slot.PlayerID] = scene
 	pass
@@ -220,7 +220,7 @@ func _SetPlayerPositions() -> void:
 		var node = _FindPlayerNodeForSlot(i)
 		assert(node)
 		if node.visible:
-			node.position = Tools.FieldPositionToScreen(Client.Data.Slots[i].Position)
+			node.position = Tools.FieldPositionToScreen(Client.Data.Slots[i].Player.Position)
 	pass
 
 
@@ -251,8 +251,8 @@ func _UpdatePlayerPositionsFromNodes() -> void:
 					continue
 				Client.UpdatePlayerPosition(slot.PlayerID, Tools.ScreenPositionToField(node.position))
 			if slot.PlayerID == multiplayer.get_unique_id():
-				if slot.Alive:
-					var field = Vector2i(slot.Position)
+				if slot.Player.Alive:
+					var field = Vector2i(slot.Player.Position)
 					$PlayerPosLabel.text = str(field)
 				else:
 					$PlayerPosLabel.text = "dead"

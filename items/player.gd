@@ -61,7 +61,7 @@ func _CalculatePlayerSpeed() -> int:
 		var idx = Data.FindSlotForPlayer(Network.PeerID)
 		if idx != Constants.INVALID_SLOT:
 			var slot: TSlot = Data.Slots[idx]
-			_speed = slot.Speed * 0.25
+			_speed = slot.Player.Speed * 0.25
 	return SPEED * _speed
 
 func _MoveInSteps(delta: float) -> void:

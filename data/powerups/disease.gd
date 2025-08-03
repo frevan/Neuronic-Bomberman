@@ -8,10 +8,10 @@ func Initialize() -> void:
 
 func ApplyToSlot(Slot: TSlot) -> void:
 	var disease: int = randi_range(0, Constants.NUM_DISEASES)
-	Slot.Diseases[disease] = true
+	Slot.Player.Diseases[disease] = true
 	pass
 
 func ApplyOverrideToSlot(Slot: TSlot, Override: int) -> void:
 	if (Override >= 0) && (Override < Constants.NUM_DISEASES):
-		Slot.Diseases[Override] = true
+		Slot.Player.Diseases[Override] = true
 	pass

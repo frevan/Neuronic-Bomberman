@@ -25,10 +25,10 @@ func Process(_Delta: float) -> void:
 
 
 func _AddToSlot(Slot: TSlot) -> void:
-	Slot.Powerups.set(Number, self)
+	Slot.Player.Powerups.set(Number, self)
 	pass
 
 func _RemoveFromSlot(Slot: TSlot) -> void:
-	if Slot.Powerups.has(Number):
-		Slot.Powerups.erase(Number)
+	if Slot.Player.Powerups.has(Number):
+		Slot.Player.Powerups.erase(Number)
 	pass

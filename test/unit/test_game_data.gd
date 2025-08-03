@@ -96,24 +96,24 @@ func test_SetPlayersToStartPositions() -> void:
 	assert_not_null(o.Map)
 	o.Slots[1].PlayerID = 5
 	o.SetPlayersToStartPositions()
-	assert_almost_eq(o.Slots[1].Position.x, 14, 0.1)
-	assert_almost_eq(o.Slots[1].Position.y, 10, 0.1)
+	assert_almost_eq(o.Slots[1].Player.Position.x, 14, 0.1)
+	assert_almost_eq(o.Slots[1].Player.Position.y, 10, 0.1)
 
 func test_ResetPlayersBeforeMatch() -> void:
-	o.Slots[1].Score = 123
+	o.Slots[1].Player.Score = 123
 	o.ResetPlayersBeforeMatch()
-	assert_eq(o.Slots[1].Score, 0)
+	assert_eq(o.Slots[1].Player.Score, 0)
 	pass
 
 func test_ResetPlayersBeforeRound() -> void:
 	o.Slots[1].PlayerID = 123
-	o.Slots[1].TotalBombs = 5
-	o.Slots[1].DroppedBombs = 4
-	o.Slots[1].DroppingBombs = true
-	o.Slots[1].Alive = false
+	o.Slots[1].Player.TotalBombs = 5
+	o.Slots[1].Player.DroppedBombs = 4
+	o.Slots[1].Player.DroppingBombs = true
+	o.Slots[1].Player.Alive = false
 	o.ResetPlayersBeforeRound()
-	assert_eq(o.Slots[1].TotalBombs, 1)
-	assert_eq(o.Slots[1].DroppedBombs, 0)
-	assert_false(o.Slots[1].DroppingBombs)
-	assert_true(o.Slots[1].Alive)
+	assert_eq(o.Slots[1].Player.TotalBombs, 1)
+	assert_eq(o.Slots[1].Player.DroppedBombs, 0)
+	assert_false(o.Slots[1].Player.DroppingBombs)
+	assert_true(o.Slots[1].Player.Alive)
 	pass

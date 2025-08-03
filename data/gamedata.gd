@@ -88,34 +88,34 @@ func SetPlayersToStartPositions() -> void:
 	for i in Slots.size():
 		if Slots[i].PlayerID != 0:
 			if Map.StartPositions.has(i):
-				Slots[i].Position = Map.StartPositions[i].Pos
+				Slots[i].Player.Position = Map.StartPositions[i].Pos
 	pass
 
 func ResetPlayersBeforeMatch() -> void:
 	ResetPlayersBeforeRound()
 	for slot: TSlot in Slots:
-		slot.Score = 0
+		slot.Player.Score = 0
 	pass
 
 func ResetPlayersBeforeRound() -> void:
 	for slot: TSlot in Slots:
-		slot.TotalBombs = 1
-		slot.DroppedBombs = 0
-		slot.DroppingBombs = false
-		slot.Alive = slot.PlayerID != 0
+		slot.Player.TotalBombs = 1
+		slot.Player.DroppedBombs = 0
+		slot.Player.DroppingBombs = false
+		slot.Player.Alive = slot.PlayerID != 0
 	pass
 
 func CountAlivePlayers() -> int:
 	var count: int = 0
 	for i in Slots.size():
-		if Slots[i].Alive:
+		if Slots[i].Player.Alive:
 			count += 1
 	return count
 
 func UpdatePlayerScore(PlayerID: int, Score: int) -> void:
 	var idx = FindSlotForPlayer(PlayerID)
 	if idx != Constants.INVALID_SLOT:
-		Slots[idx].Score = Score
+		Slots[idx].Player.Score = Score
 	pass
 
 
@@ -133,7 +133,7 @@ func AddBombAt(Field: Vector2i, PlayerID: int) -> void:
 		b.Field = Field
 		b.PlayerID = PlayerID
 		b.TimeUntilExplosion = Constants.BOMB_TIME
-		b.Strength = Slots[slot_idx].BombStrength
+		b.Strength = Slots[slot_idx].Player.BombStrength
 		Bombs[Field] = b
 	pass
 

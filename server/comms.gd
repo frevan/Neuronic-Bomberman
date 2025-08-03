@@ -83,8 +83,8 @@ func _network_player_ready(SenderID: int, Ready: bool) -> void:
 func _network_player_is_dropping_bomb(PlayerID: int, Value: bool) -> void:
 	var idx = Server.Data.FindSlotForPlayer(PlayerID)
 	if idx != Constants.INVALID_SLOT:
-		Server.Data.Slots[idx].DroppingBombs = Value
-		if Server.Data.Slots[idx].DroppingBombs:
+		Server.Data.Slots[idx].Player.DroppingBombs = Value
+		if Server.Data.Slots[idx].Player.DroppingBombs:
 			Server._DropBomb(idx)
 	pass
 

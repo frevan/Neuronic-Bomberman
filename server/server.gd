@@ -65,10 +65,10 @@ func _peer_disconnected(SenderID: int) -> void:
 
 func _DropBomb(SlotIndex: int) -> void:
 	var slot = Data.Slots[SlotIndex]
-	if slot.DroppedBombs == slot.TotalBombs:
+	if slot.Player.DroppedBombs == slot.Player.TotalBombs:
 		return
-	slot.DroppedBombs += 1
-	var pos: Vector2i = slot.Position
+	slot.Player.DroppedBombs += 1
+	var pos: Vector2i = slot.Player.Position
 	Data.AddBombAt(pos, slot.PlayerID)
 	Network.SendBombDropped.rpc(pos)
 	pass
@@ -89,7 +89,7 @@ func _RemoveBombFromField(Field: Vector2i) -> void:
 		Data.RemoveBomb(Field)
 		var slot_idx = Data.FindSlotForPlayer(playerID)
 		if slot_idx != Constants.INVALID_SLOT:
-			Data.Slots[slot_idx].DroppedBombs -= 1
+			Data.Slots[slot_idx].Player.DroppedBombs -= 1
 	pass
 
 
@@ -153,7 +153,7 @@ func _KillPlayersInExplosions() -> void:
 	var playerWasKilled: bool = false
 	for i in Data.Slots.size():
 		var slot = Data.Slots[i]
-		if Data.FieldHasExplosion(slot.Position):
+		if Data.FieldHasExplosion(slot.Player.Position):
 			_KillPlayer(i)
 			playerWasKilled = true
 	if playerWasKilled:
@@ -162,7 +162,7 @@ func _KillPlayersInExplosions() -> void:
 
 
 func _KillPlayer(SlotIndex: int) -> void:
-	Data.Slots[SlotIndex].Alive = false
+	Data.Slots[SlotIndex].Player.Alive = false
 	Network.SendPlayerDied.rpc(Data.Slots[SlotIndex].PlayerID)
 	pass
 
@@ -177,12 +177,12 @@ func _RandomlySpawnPopup() -> int:
 func _PickUpPowerups() -> void:
 	for i in Data.Slots.size():
 		var slot: TSlot = Data.Slots[i]
-		var type: int = Maps.GetFieldType(Data.Map, slot.Position)
+		var type: int = Maps.GetFieldType(Data.Map, slot.Player.Position)
 		if Tools.FieldTypeIsPowerup(type):
-			Maps.SetFieldTypeTo(Data.Map, slot.Position, Types.FIELD_EMPTY)
-			Network.SendMapTileChanged.rpc(slot.Position, Types.FIELD_EMPTY)
+			Maps.SetFieldTypeTo(Data.Map, slot.Player.Position, Types.FIELD_EMPTY)
+			Network.SendMapTileChanged.rpc(slot.Player.Position, Types.FIELD_EMPTY)
 			Rules.ApplyPowerupToPlayer(Data, i, type - Types.FIELD_PU_FIRST)
-			Network.SendPlayerPowerups.rpc(slot.PlayerID, slot.TotalBombs, slot.BombStrength, slot.Speed)
+			Network.SendPlayerPowerups.rpc(slot.PlayerID, slot.Player.TotalBombs, slot.Player.BombStrength, slot.Player.Speed)
 	pass
 
 func _CheckIfRoundEnded() -> void:
@@ -283,8 +283,8 @@ func _StartRoundNow() -> void:
 	Data.SetPlayersToStartPositions()
 	for slot in Data.Slots:
 		if slot.PlayerID != 0:
-			Network.SendPlayerPosition.rpc(slot.PlayerID, slot.Position)
-			Maps.ClearFieldsAround(Data.Map, slot.Position)
+			Network.SendPlayerPosition.rpc(slot.PlayerID, slot.Player.Position)
+			Maps.ClearFieldsAround(Data.Map, slot.Player.Position)
 	
 	for y in Data.Map.Height:
 		for x in Data.Map.Width:
@@ -327,9 +327,9 @@ func _SetAllPlayersUnready() -> void:
 
 func _IncreasePlayerScores() -> void:
 	for slot: TSlot in Data.Slots:
-		if slot.Alive:
-			slot.Score += 1
-			Network.SendPlayerScore.rpc(slot.PlayerID, slot.Score)
+		if slot.Player.Alive:
+			slot.Player.Score += 1
+			Network.SendPlayerScore.rpc(slot.PlayerID, slot.Player.Score)
 	pass
 
 
@@ -402,5 +402,5 @@ func Stop() -> bool:
 func UpdatePlayerPosition(ID: int, Position: Vector2) -> void:
 	var idx = Data.FindSlotForPlayer(ID)
 	if idx != Constants.INVALID_SLOT:
-		Data.Slots[idx].Position = Position
+		Data.Slots[idx].Player.Position = Position
 	pass
