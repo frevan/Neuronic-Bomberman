@@ -4,11 +4,11 @@ extends TScene
 signal OnLeaveLobby
 
 
-const bombscene = preload("res://items/bomb.tscn")
-const explosionscene = preload("res://items/explosion.tscn")
-const brickscene = preload("res://items/brick.tscn") 
-const solidscene = preload("res://items/solidblock.tscn")
-const powerupscene = preload("res://items/powerup.tscn")
+const bombscene = preload("res://ui/items/bomb.tscn")
+const explosionscene = preload("res://ui/items/explosion.tscn")
+const brickscene = preload("res://ui/items/brick.tscn") 
+const solidscene = preload("res://ui/items/solidblock.tscn")
+const powerupscene = preload("res://ui/items/powerup.tscn")
 
 @onready var Rules: TRules = TRules.new()
 
