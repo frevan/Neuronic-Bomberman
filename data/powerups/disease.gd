@@ -7,7 +7,7 @@ func Initialize() -> void:
 	Number = Constants.POWERUP_DISEASE
 
 func ApplyToSlot(Slot: TSlot) -> void:
-	var disease: int = randi_range(0, Constants.NUM_DISEASES)
+	var disease: int = randi_range(0, Constants.NUM_DISEASES - 1)
 	Slot.Player.Diseases[disease] = true
 	pass
 
