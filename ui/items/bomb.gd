@@ -2,4 +2,5 @@ extends StaticBody2D
 
 class_name TBombScene
 
-var Field: Vector2i
+var PlayerID: int
+var Type: int

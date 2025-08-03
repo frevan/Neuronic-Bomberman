@@ -4,7 +4,7 @@ class_name TGameData
 
 var Slots: Array # TSlot
 var Map: Types.TMap = null
-var Bombs: Dictionary # key: field (Vector2i), value: bomb (TBomb)
+var Bombs: Dictionary # key: bomb id (int), value: bomb (TBomb)
 var Explosions: Dictionary # key: field (Vector2i), value (Types.TExplosion)
 var NumRounds: int = 1
 var CurrentRound: int = -1
@@ -122,25 +122,40 @@ func ResetBombsEtcBeforeRound() -> void:
 	Explosions.clear()
 	pass
 
-func AddBombAt(Field: Vector2i, PlayerID: int) -> bool:
-	if FieldHasBomb(Field):
+func AddBombAt(PlayerID: int, BombID: int, Type: int, Position: Vector2) -> bool:
+	if GetBombInField(Position):
 		return false
-	var slot_idx = FindSlotForPlayer(PlayerID)
-	if slot_idx == Constants.INVALID_SLOT:
+	var idx = FindSlotForPlayer(PlayerID)
+	if idx == Constants.INVALID_SLOT:
 		return false
 	var b = TBomb.new()
-	b.Position = Field
+	if BombID == Constants.INVALID_BOMB_ID:
+		b.ID = Tools.NewBombID()
+	else:
+		b.ID = BombID
+	b.Type = Type
+	b.Position = Position
 	b.PlayerID = PlayerID
 	b.TimeUntilExplosion = Constants.BOMB_TIME
-	b.Strength = Slots[slot_idx].Player.BombStrength
-	Bombs[Field] = b
+	b.Strength = Slots[idx].Player.BombStrength
+	Bombs[b.ID] = b
 	return true
 
-func FieldHasBomb(Field: Vector2i) -> bool:
-	return Bombs.has(Field)
+func GetBombInField(Field: Vector2i) -> TBomb:
+	for id in Bombs:
+		var f: Vector2i = Bombs[id].Position
+		if f == Field:
+			return Bombs[id]
+	return null
 
-func RemoveBomb(Field: Vector2i) -> void:
-	Bombs.erase(Field)
+func RemoveBomb(BombID: int) -> void:
+	Bombs.erase(BombID)
+	pass
+
+func RemoveBombAt(Field: Vector2i) -> void:
+	var bomb = GetBombInField(Field)
+	if bomb:
+		RemoveBomb(bomb.ID)
 	pass
 
 

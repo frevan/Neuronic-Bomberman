@@ -33,7 +33,7 @@ func test_FieldHasObstacle() -> void:
 	Data.Slots[0].PlayerID = 123
 	Maps.ClearField(Data.Map, Vector2i(0, 1))
 	Maps.ClearField(Data.Map, Vector2i(0, 2))
-	Data.AddBombAt(Vector2i(0, 2), 123)
+	Data.AddBombAt(123, Constants.INVALID_BOMB_ID, Constants.BOMB_NORMAL, Vector2(0, 2))
 	assert_true(o._FieldHasObstacle(Data, Vector2i(0, 0))) # check for brick
 	assert_false(o._FieldHasObstacle(Data, Vector2i(0, 1))) # check for empty field
 	assert_true(o._FieldHasObstacle(Data, Vector2i(0, 2))) # check for bomb

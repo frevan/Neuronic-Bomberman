@@ -2,6 +2,7 @@ extends Node
 
 
 const INVALID_SLOT = -1
+const INVALID_BOMB_ID = -1
 
 
 const POWERUP_EXTRABOMB = 0
@@ -30,6 +31,9 @@ const DISEASE_STICKY_MOVEMENT = 5
 
 const NUM_DISEASES = 6
 
+
+const BOMB_NORMAL = 0
+const BOMB_TRIGGER = 1
 
 const MAX_BOMBS = 10
 const BOMB_STRENGTH = 2

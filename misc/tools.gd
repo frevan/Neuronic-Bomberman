@@ -80,3 +80,10 @@ func FieldIsEmpty(Type: int) -> bool:
 
 func FieldCanExplode(Type: int) -> bool:
 	return (Type == Types.FIELD_BRICK) || FieldIsEmpty(Type)
+
+
+var _BombID: int = 0
+
+func NewBombID() -> int:
+	_BombID += 1
+	return _BombID

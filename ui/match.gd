@@ -13,7 +13,7 @@ const powerupscene = preload("res://ui/items/powerup.tscn")
 @onready var Rules: TRules = TRules.new()
 
 var PlayerScenes: Dictionary # key = player_id
-var Bombs: Dictionary # key: field (Vector2i) | value: scene (TBombScene)
+var Bombs: Dictionary # key: bomb_id (int) | value: scene (TBombScene)
 var Explosions: Dictionary # key: field (Vector2i) | value: scene (TExplosionScene)
 
 
@@ -98,19 +98,20 @@ func _client_map_tile_changed(_Field: Vector2i, _Type: int) -> void:
 	_CreateTiles()
 	pass
 
-func _client_bomb_dropped(Field: Vector2i) -> void:
-	var bomb = bombscene.instantiate()
-	bomb.position = Tools.FieldPositionToScreen(Field)
-	bomb.visible = true
-	bomb.Field = Field
-	Bombs[Field] = bomb
-	add_child.call_deferred(bomb)
+func _client_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vector2) -> void:
+	var scene = bombscene.instantiate()
+	scene.PlayerID = PlayerID
+	scene.Type = Type
+	scene.position = Tools.FieldPositionToScreen(Position)
+	scene.visible = true
+	Bombs[BombID] = scene
+	add_child.call_deferred(scene)
 	pass
 
-func _client_remove_bomb(Field: Vector2i) -> void:
-	if Bombs.has(Field):
-		var scene = Bombs[Field]
-		Bombs.erase(Field)
+func _client_remove_bomb(BombID: int) -> void:
+	if Bombs.has(BombID):
+		var scene = Bombs[BombID]
+		Bombs.erase(BombID)
 		scene.queue_free()
 	pass
 	
@@ -273,8 +274,8 @@ func _ResetPlayerSceneDirections() -> void:
 
 
 func _RemoveBombScenes() -> void:
-	for field in Bombs:
-		var scene = Bombs[field]
+	for id in Bombs:
+		var scene = Bombs[id]
 		scene.queue_free()
 	Bombs.clear()
 	pass

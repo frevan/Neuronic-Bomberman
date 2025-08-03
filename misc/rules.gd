@@ -25,7 +25,7 @@ func _FieldHasBrickOrSolid(Map: Types.TMap, Field: Vector2i) -> bool:
 	return false
 
 func _FieldHasObstacle(Data: TGameData, Field: Vector2i) -> bool:
-	return _FieldHasBrickOrSolid(Data.Map, Field) || Data.FieldHasBomb(Field)
+	return _FieldHasBrickOrSolid(Data.Map, Field) || Data.GetBombInField(Field)
 
 func _PlayerTouchesField(Position: Vector2, Field: Vector2i) -> bool:
 	var playerRect: Rect2 = Tools.PlayerPositionToRect(Position)

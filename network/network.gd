@@ -27,7 +27,7 @@ signal OnRoundEnded
 signal OnMatchEnded
 signal OnPlayerPositionReceived # params: player_id (int), field (vector2)
 signal OnMapTileChanged # params: field (vector2i), type (int)
-signal OnBombDropped # params: field (vector2i)
+signal OnBombDropped # params: id (int), bomb id (int), type (int), position (vector2)
 signal OnCreateExplosionAt # params: field (vector2i)
 signal OnRemoveExplosion # params: field (vector2i)
 signal OnPlayerDied # params: id (int)
@@ -189,8 +189,8 @@ func SendMapTileChanged(Field: Vector2i, Type: int) -> void:
 	OnMapTileChanged.emit(Field, Type)
 
 @rpc("reliable", "call_local", "authority")
-func SendBombDropped(Field: Vector2i) -> void:
-	OnBombDropped.emit(Field)
+func SendBombDropped(ID: int, BombID: int, Type: int, Position: Vector2) -> void:
+	OnBombDropped.emit(ID, BombID, Type, Position)
 
 @rpc("reliable", "call_local", "authority")
 func SendCreateExplosionAt(Field: Vector2i) -> void:

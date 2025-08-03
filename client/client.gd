@@ -19,8 +19,8 @@ signal OnRoundEnded
 signal OnMatchEnded
 signal OnPlayerPositionChanged # params: player_id (int)
 signal OnMapTileChanged # params: field (vector2i), type (int)
-signal OnBombDropped # params: field (vector2i)
-signal OnRemoveBomb # params: field (vector2i)
+signal OnBombDropped # params: id (int), bomb_id (int), type (int), position (vector2i)
+signal OnRemoveBomb # params: bomb_id (int)
 signal OnExplosion # params: field (vector2i)
 signal OnRemoveExplosion # params: field (vector2i)
 signal OnPlayerDied # params: id (int)
@@ -212,17 +212,19 @@ func _network_map_tile_changed(Field: Vector2i, Type: int) -> void:
 	pass
 
 
-func _network_bomb_dropped(Field: Vector2i)-> void:
-	_log("bomb dropped on field " + str(Field))
-	Data.AddBombAt(Field, 0)
-	OnBombDropped.emit(Field)
+func _network_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vector2)-> void:
+	_log(str(PlayerID) + "dropped bomb at " + str(Position))
+	Data.AddBombAt(PlayerID, BombID, Type, Position)
+	OnBombDropped.emit(PlayerID, BombID, Type, Position)
 	pass
 
 
 func _network_create_explosion_at(Field: Vector2i) -> void:
 	_log("explosion at " + str(Field))
-	Data.RemoveBomb(Field)
-	OnRemoveBomb.emit(Field)
+	var bomb = Data.GetBombInField(Field)
+	if bomb:
+		Data.RemoveBomb(bomb.ID)
+		OnRemoveBomb.emit(bomb.ID)
 	Data.AddExplosionAt(Field)
 	OnExplosion.emit(Field)
 	pass

@@ -87,28 +87,28 @@ func _DropBomb(SlotIndex: int) -> void:
 		
 	if will_drop:
 		var pos: Vector2i = slot.Player.Position
-		if Data.AddBombAt(pos, slot.PlayerID):
+		var id: int = Tools.NewBombID()
+		if Data.AddBombAt(slot.PlayerID, id, Constants.BOMB_NORMAL, pos):
 			slot.Player.DroppedBombs += 1
-			Network.SendBombDropped.rpc(pos)
+			Network.SendBombDropped.rpc(slot.PlayerID, id, Constants.BOMB_NORMAL, pos)
 	pass
 
 
 func _ExplodeBombs(Delta: float) -> void:
-	for field: Vector2i in Data.Bombs:
-		var b = Data.Bombs[field]
-		b.TimeUntilExplosion -= Delta
-		if b.TimeUntilExplosion <= 0:
-			_CreateExplosionsForBomb(b)
-			_RemoveBombFromField(field)
+	for id in Data.Bombs:
+		var bomb = Data.Bombs[id]
+		bomb.TimeUntilExplosion -= Delta
+		if bomb.TimeUntilExplosion <= 0:
+			_CreateExplosionsForBomb(bomb)
+			_RemoveBomb(bomb)
 	pass
 
-func _RemoveBombFromField(Field: Vector2i) -> void:
-	if Data.FieldHasBomb(Field):
-		var playerID = Data.Bombs[Field].PlayerID
-		Data.RemoveBomb(Field)
-		var slot_idx = Data.FindSlotForPlayer(playerID)
-		if slot_idx != Constants.INVALID_SLOT:
-			Data.Slots[slot_idx].Player.DroppedBombs -= 1
+func _RemoveBomb(Bomb: TBomb) -> void:
+	var playerID = Bomb.PlayerID
+	Data.RemoveBomb(Bomb.ID)
+	var idx = Data.FindSlotForPlayer(playerID)
+	if idx != Constants.INVALID_SLOT:
+		Data.Slots[idx].Player.DroppedBombs -= 1
 	pass
 
 
@@ -147,8 +147,9 @@ func _ExplodeStuffInField(Field: Vector2i, FieldType: int) -> void:
 			new_type = _RandomlySpawnPopup()
 		Maps.SetFieldTypeTo(Data.Map, Field, new_type)
 		Network.SendMapTileChanged.rpc(Field, Types.FIELD_EMPTY)
-	if Data.FieldHasBomb(Field):
-		_RemoveBombFromField(Field)
+	var bomb = Data.GetBombInField(Field)
+	if bomb:
+		_RemoveBomb(bomb)
 	pass
 
 func _CreateExplosionsInDirection(Field: Vector2i, Direction: Vector2i, Strength: int) -> void:
