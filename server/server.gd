@@ -65,7 +65,7 @@ func _peer_disconnected(SenderID: int) -> void:
 
 func _DropBomb(SlotIndex: int) -> void:
 	var slot = Data.Slots[SlotIndex]
-	if slot.Player.DroppedBombs == slot.Player.TotalBombs:
+	if (slot.Player.DroppedBombs == slot.Player.TotalBombs) || slot.Player.Diseases[Constants.DISEASE_CONSTIPATION]:
 		return
 	slot.Player.DroppedBombs += 1
 	var pos: Vector2i = slot.Player.Position
