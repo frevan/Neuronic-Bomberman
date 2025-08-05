@@ -104,6 +104,10 @@ func _client_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vecto
 	scene.Type = Type
 	scene.position = Tools.FieldPositionToScreen(Position)
 	scene.visible = true
+	var fname: String = "res://assets/bomb.png"
+	if Type == Constants.BOMB_TRIGGER: 
+		fname = "res://assets/triggerbomb.png"
+	scene.LoadSpriteFromFile(fname)
 	Bombs[BombID] = scene
 	add_child.call_deferred(scene)
 	pass
