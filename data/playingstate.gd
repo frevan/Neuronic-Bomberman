@@ -64,7 +64,7 @@ func ToJSONString() -> String:
 	for i in Constants.NUM_DISEASES:
 		d.set(KEY_DISEASE + str(i), Diseases[i])
 	for key in Powerups:
-		d.set(KEY_POWERUP + Powerups[key].Number, Powerups[key].Number)
+		d.set(KEY_POWERUP + str(Powerups[key].Number), Powerups[key].Number)
 	return JSON.stringify(d)
 	
 func FromJSONString(Source: String) -> void:
