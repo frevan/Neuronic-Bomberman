@@ -82,6 +82,8 @@ collision_layer = 2
 position = Vector2(400.5, 585)
 shape = SubResource("RectangleShape2D_vt7kf")
 
+[node name="ExplosionLayer" type="Node2D" parent="."]
+
 [node name="Players" type="Node2D" parent="."]
 
 [node name="Player0" parent="Players" instance=ExtResource("4_hudsj")]

@@ -90,7 +90,7 @@ func _DropBomb(SlotIndex: int) -> void:
 		var id: int = Tools.NewBombID()
 		var type = Constants.BOMB_NORMAL
 		if slot.Player.Powerups.has(Constants.POWERUP_TRIGGER):
-			type = Constants.POWERUP_TRIGGER
+			type = Constants.BOMB_TRIGGER
 		if Data.AddBombAt(slot.PlayerID, id, type, pos):
 			slot.Player.DroppedBombs += 1
 			Network.SendBombDropped.rpc(slot.PlayerID, id, type, pos)
@@ -102,8 +102,13 @@ func _ExplodeBombs(Delta: float) -> void:
 		var bomb = Data.Bombs[id]
 		bomb.TimeUntilExplosion -= Delta
 		if bomb.TimeUntilExplosion <= 0:
-			_CreateExplosionsForBomb(bomb)
-			_RemoveBomb(bomb)
+			_ExplodeBomb(bomb)
+	pass
+
+
+func _ExplodeBomb(Bomb: TBomb) -> void:
+	_RemoveBomb(Bomb)
+	_CreateExplosionsForBomb(Bomb)
 	pass
 
 func _RemoveBomb(Bomb: TBomb) -> void:
@@ -152,7 +157,7 @@ func _ExplodeStuffInField(Field: Vector2i, FieldType: int) -> void:
 		Network.SendMapTileChanged.rpc(Field, Types.FIELD_EMPTY)
 	var bomb = Data.GetBombInField(Field)
 	if bomb:
-		_RemoveBomb(bomb)
+		_ExplodeBomb(bomb)
 	pass
 
 func _CreateExplosionsInDirection(Field: Vector2i, Direction: Vector2i, Strength: int) -> void:

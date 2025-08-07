@@ -125,7 +125,7 @@ func _client_explosion(Field: Vector2i) -> void:
 	e.visible = true
 	e.Field = Field
 	Explosions[Field] = e
-	add_child.call_deferred(e)
+	$ExplosionLayer.add_child.call_deferred(e)
 	pass
 	
 func _client_remove_explosion(Field: Vector2i) -> void:
