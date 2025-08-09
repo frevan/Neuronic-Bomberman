@@ -78,13 +78,14 @@ func _HandleUserInput(delta: float) -> void:
 	pass
 
 func _CheckPrimaryKey(delta: float) -> void:
-	var state = DoubleTapDetector.Process(delta, "player_drop")
-	if state == TDoubleTap.STATE_KEYDOWN:
+	if Input.is_action_just_pressed("player_drop"):
+		DoubleTapDetector.ProcessKeyDown()
 		Client.KeyPressed(Constants.HOLDINGKEY_PRIMARY, true)
-	elif state == TDoubleTap.STATE_KEYUP:
+	if Input.is_action_just_released("player_drop"):
 		Client.KeyPressed(Constants.HOLDINGKEY_PRIMARY, false)
-	elif state == TDoubleTap.STATE_DOUBLETAP:
-		Client.KeyPressed(Constants.DOUBLETAP_PRIMARY, true)
+		if DoubleTapDetector.ProcessKeyUp():
+			Client.KeyPressed(Constants.DOUBLETAP_PRIMARY, true)
+	DoubleTapDetector.Process(delta)
 	pass
 
 func _CheckSecondaryKey(_delta: float) -> void:
