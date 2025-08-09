@@ -36,8 +36,8 @@ func _process(delta: float) -> void:
 	if State == TState.MATCH:
 		_ProcessMatch(delta)
 	elif State == TState.ROUND:
-		_DropBombs(delta)
-		_ExplodeBombs(delta)
+		_ProcessPlayerKeys(delta)
+		_ProcessBombs(delta)
 		_RemoveExplosions(delta)
 		_KillPlayersInExplosions()
 		_PickUpPowerups()
@@ -64,45 +64,52 @@ func _peer_disconnected(SenderID: int) -> void:
 	pass
 
 
-func _DropBombs(_Delta: float) -> void:
+func _ProcessPlayerKeys(_Delta: float) -> void:
 	for i in Data.Slots.size():
 		var slot: TSlot = Data.Slots[i]
 		if (slot.PlayerID == 0) or !slot.Player.Alive:
 			continue
 		if slot.Player.HoldingPrimaryKey || slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
-			_DropBomb(i)
+			_DropBomb(slot)
+		if slot.Player.HoldingSecundaryKey:
+			_ExplodeTriggerBombs(slot)
 	pass
 
-func _DropBomb(SlotIndex: int) -> void:
-	var slot = Data.Slots[SlotIndex]
-	
+func _DropBomb(Slot: TSlot) -> void:
 	var will_drop = false
-	if slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
+	if Slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
 		will_drop = true
 	else:
-		var total = slot.Player.TotalBombs
-		var dropped = slot.Player.DroppedBombs
-		var constipated = slot.Player.Diseases[Constants.DISEASE_CONSTIPATION]
+		var total = Slot.Player.TotalBombs
+		var dropped = Slot.Player.DroppedBombs
+		var constipated = Slot.Player.Diseases[Constants.DISEASE_CONSTIPATION]
 		will_drop = (dropped < total) && !constipated
 		
 	if will_drop:
-		var pos: Vector2i = slot.Player.Position
+		var pos: Vector2i = Slot.Player.Position
 		var id: int = Tools.NewBombID()
 		var type = Constants.BOMB_NORMAL
-		if slot.Player.NumTriggerBombs > 0:
+		if Slot.Player.NumTriggerBombs > 0:
 			type = Constants.BOMB_TRIGGER
-			slot.Player.NumTriggerBombs -= 1
-		if Data.AddBombAt(slot.PlayerID, id, type, pos):
-			slot.Player.DroppedBombs += 1
-			Network.SendBombDropped.rpc(slot.PlayerID, id, type, pos)
+			Slot.Player.NumTriggerBombs -= 1
+		if Data.AddBombAt(Slot.PlayerID, id, type, pos):
+			Slot.Player.DroppedBombs += 1
+			Network.SendBombDropped.rpc(Slot.PlayerID, id, type, pos)
+	pass
+
+func _ExplodeTriggerBombs(Slot: TSlot) -> void:
+	var bomb: TBomb = Data.FindOldestTriggerBombFor(Slot.PlayerID)
+	if bomb:
+		_ExplodeBomb(bomb)
 	pass
 
 
-func _ExplodeBombs(Delta: float) -> void:
+func _ProcessBombs(Delta: float) -> void:
 	for id in Data.Bombs:
-		var bomb = Data.Bombs[id]
+		var bomb: TBomb = Data.Bombs[id]
 		bomb.TimeUntilExplosion -= Delta
-		if bomb.TimeUntilExplosion <= 0:
+		bomb.TimeSinceDrop += Delta
+		if (bomb.Type == Constants.BOMB_NORMAL) && (bomb.TimeUntilExplosion <= 0):
 			_ExplodeBomb(bomb)
 	pass
 
@@ -130,7 +137,6 @@ func _RemoveExplosions(Delta: float) -> void:
 			Network.SendRemoveExplosion.rpc(field)
 			Data.RemoveExplosion(field)
 	pass
-
 
 func _CreateExplosionAt(Field: Vector2i) -> bool:
 	if Field.x < 0 || Field.y < 0 || Field.x >= Types.MAP_WIDTH || Field.y >= Types.MAP_HEIGHT:

@@ -213,7 +213,7 @@ func _network_map_tile_changed(Field: Vector2i, Type: int) -> void:
 
 
 func _network_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vector2)-> void:
-	_log(str(PlayerID) + "dropped bomb at " + str(Position) + " with type " + str(Type))
+	_log(str(PlayerID) + " dropped bomb at " + str(Position) + " with type " + str(Type))
 	Data.AddBombAt(PlayerID, BombID, Type, Position)
 	OnBombDropped.emit(PlayerID, BombID, Type, Position)
 	pass

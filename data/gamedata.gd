@@ -158,6 +158,18 @@ func RemoveBombAt(Field: Vector2i) -> void:
 		RemoveBomb(bomb.ID)
 	pass
 
+func FindOldestTriggerBombFor(PlayerID: int) -> TBomb:
+	var oldestBomb: TBomb = null
+	for id in Bombs:
+		var bomb: TBomb = Bombs[id]
+		if (bomb.PlayerID != PlayerID) || (bomb.Type != Constants.BOMB_TRIGGER):
+			continue
+		if !oldestBomb:
+			oldestBomb = bomb
+		elif oldestBomb.TimeSinceDrop < bomb.TimeSinceDrop:
+			oldestBomb = bomb
+	return oldestBomb
+
 
 func FieldHasExplosion(Field: Vector2i) -> bool:
 	return Explosions.has(Field)

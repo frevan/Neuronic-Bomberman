@@ -86,7 +86,7 @@ func _network_player_is_holding_key(PlayerID: int, KeyIndex: int, Value: bool) -
 		var slot: TSlot = Server.Data.Slots[idx]
 		match KeyIndex:
 			Constants.HOLDINGKEY_PRIMARY: slot.Player.HoldingPrimaryKey = Value
-			Constants.HOLDINGKEY_SECONDARY: pass
+			Constants.HOLDINGKEY_SECONDARY: slot.Player.HoldingSecundaryKey = Value
 	pass
 
 
