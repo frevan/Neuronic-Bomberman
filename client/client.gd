@@ -430,8 +430,8 @@ func RequestStartMatch() -> void:
 	pass
 
 
-func DropBombs(IsDropping: bool) -> void:
-	Network.SendHoldingKey.rpc_id(1, Constants.HOLDINGKEY_PRIMARY, IsDropping)
+func KeyPressed(KeyIndex: int, Value: bool) -> void:
+	Network.SendHoldingKey.rpc_id(1, KeyIndex, Value)
 	pass
 
 
