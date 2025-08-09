@@ -42,6 +42,12 @@ func FindSlotForPlayer(PlayerID: int) -> int:
 			return i
 	return Constants.INVALID_SLOT
 
+func GetSlotForPlayer(PlayerID: int) -> TSlot:
+	for i in Slots.size():
+		if Slots[i].PlayerID == PlayerID:
+			return Slots[i]
+	return null
+
 func MovePlayerToSlotIfFree(PlayerID, SlotIndex) -> bool:
 	if PlayerID <= 0:
 		return false

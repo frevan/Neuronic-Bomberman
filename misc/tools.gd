@@ -39,7 +39,7 @@ func CreatePowerup(Which: int) ->  TPowerup:
 			Constants.POWERUP_EXTRASPEED: powerup = TExtraSpeedPowerup.new()
 			#Constants.POWERUP_CANPUNCH:
 			#Constants.POWERUP_CANGRAB:
-			#Constants.POWERUP_SPOOGER:
+			Constants.POWERUP_SPOOGER: powerup = TSpoogerPowerup.new()
 			Constants.POWERUP_GOLDFLAME: powerup = TGoldFlamePowerup.new()
 			Constants.POWERUP_TRIGGER: powerup = TTriggerBombPowerup.new()
 			#Constants.POWERUP_JELLYBOMBS:

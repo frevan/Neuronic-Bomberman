@@ -452,3 +452,13 @@ func RequestPlayerReady(Ready: bool) -> void:
 func RequestNumRounds(Value: int) -> void:
 	Network.SendRequestNumRounds.rpc_id(1, Value)
 	pass
+
+
+func SetPlayerDirection(NewDirection: int) -> void:
+	var id = Network.PeerID 
+	var slot: TSlot = Data.GetSlotForPlayer(id)
+	if slot:
+		if NewDirection != slot.Player.Direction:
+			slot.Player.Direction = NewDirection
+			Network.SendPlayerDirection.rpc_id(1, NewDirection)
+	pass

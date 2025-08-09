@@ -495,4 +495,4 @@ script = ExtResource("3_506kp")
 position = Vector2(0, -22)
 shape = SubResource("CapsuleShape2D_q8m0y")
 
-[connection signal="DirectionChanged" from="PlayerInput" to="." method="_on_player_input_direction_changed"]
+[connection signal="OnDirectionChanged" from="PlayerInput" to="." method="_on_player_input_on_direction_changed"]

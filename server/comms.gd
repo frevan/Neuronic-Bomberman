@@ -87,6 +87,7 @@ func _network_player_is_holding_key(PlayerID: int, KeyIndex: int, Value: bool) -
 		match KeyIndex:
 			Constants.HOLDINGKEY_PRIMARY: slot.Player.HoldingPrimaryKey = Value
 			Constants.HOLDINGKEY_SECONDARY: slot.Player.HoldingSecundaryKey = Value
+			Constants.DOUBLETAP_PRIMARY: Server.ProcessDoubleTap(PlayerID, KeyIndex)
 	pass
 
 
@@ -103,4 +104,12 @@ func _network_player_name_received(PlayerID: int, Name: String) -> void:
 	if idx != Constants.INVALID_SLOT:
 		Server.Data.Slots[idx].PlayerName = Name
 		Network.SendPlayerNameChanged.rpc(PlayerID, Name)
+	pass
+
+
+func _network_player_direction_change(PlayerID: int, NewDirection: int) -> void:
+	_log("player direction received for " + str(PlayerID) + ": " + str(NewDirection))
+	var slot: TSlot = Server.Data.GetSlotForPlayer(PlayerID)
+	if slot:
+		slot.Player.Direction = NewDirection
 	pass

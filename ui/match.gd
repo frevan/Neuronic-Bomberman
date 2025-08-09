@@ -80,13 +80,11 @@ func _HandleUserInput(delta: float) -> void:
 func _CheckPrimaryKey(delta: float) -> void:
 	var state = DoubleTapDetector.Process(delta, "player_drop")
 	if state == TDoubleTap.STATE_KEYDOWN:
-		#_log("key down")
 		Client.KeyPressed(Constants.HOLDINGKEY_PRIMARY, true)
 	elif state == TDoubleTap.STATE_KEYUP:
-		#_log("key up")
 		Client.KeyPressed(Constants.HOLDINGKEY_PRIMARY, false)
 	elif state == TDoubleTap.STATE_DOUBLETAP:
-		_log("double tap")
+		Client.KeyPressed(Constants.DOUBLETAP_PRIMARY, true)
 	pass
 
 func _CheckSecondaryKey(_delta: float) -> void:
@@ -347,3 +345,23 @@ func _RemovePlayerScene(PlayerID: int) -> void:
 		PlayerScenes.erase(PlayerID)
 		scene.hide()
 	pass
+
+
+func _on_player_direction_changed(_Sender: Node2D, NewDirection: Vector2) -> void:
+	var d = _VectorToDirection(NewDirection)
+	if d != Constants.DIRECTION_NONE:
+		Client.SetPlayerDirection(d)
+	pass
+
+func _VectorToDirection(Vector: Vector2) -> int:
+	if absf(Vector.y) > absf(Vector.x):
+		if Vector.y > 0:
+			return Constants.DIRECTION_DOWN
+		elif Vector.y < 0:
+			return Constants.DIRECTION_UP
+	else:
+		if Vector.x > 0:
+			return Constants.DIRECTION_RIGHT
+		elif Vector.x < 0:
+			return Constants.DIRECTION_LEFT
+	return Constants.DIRECTION_NONE 

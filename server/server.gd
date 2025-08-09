@@ -72,12 +72,12 @@ func _ProcessPlayers(Delta: float) -> void:
 			continue
 		slot.Player.TimeBeforeNextTriggeredBomb -= Delta
 		if slot.Player.HoldingPrimaryKey || slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
-			_DropBomb(slot)
+			_DropBomb(slot, slot.Player.Position)
 		if slot.Player.HoldingSecundaryKey:
 			_ExplodeTriggerBombs(slot)
 	pass
 
-func _DropBomb(Slot: TSlot) -> void:
+func _DropBomb(Slot: TSlot, Field: Vector2i) -> void:
 	var will_drop = false
 	if Slot.Player.Diseases[Constants.DISEASE_DIARRHEA] > 0:
 		will_drop = true
@@ -88,14 +88,13 @@ func _DropBomb(Slot: TSlot) -> void:
 		will_drop = (dropped < total) && !constipated
 		
 	if will_drop:
-		var pos: Vector2i = Slot.Player.Position
 		var id: int = Tools.NewBombID()
 		var type = Constants.BOMB_NORMAL
 		if Slot.Player.NumTriggerBombs > 0:
 			type = Constants.BOMB_TRIGGER
-		if Data.AddBombAt(Slot.PlayerID, id, type, pos):
+		if Data.AddBombAt(Slot.PlayerID, id, type, Field):
 			Slot.Player.DroppedBombs += 1
-			Network.SendBombDropped.rpc(Slot.PlayerID, id, type, pos)
+			Network.SendBombDropped.rpc(Slot.PlayerID, id, type, Field)
 	pass
 
 func _ExplodeTriggerBombs(Slot: TSlot) -> void:
@@ -263,6 +262,7 @@ func _ConnectToSignalsOnStart() -> void:
 	Network.OnPlayerHoldingKey.connect(Comms._network_player_is_holding_key)
 	Network.OnRequestNumRounds.connect(Comms._network_request_num_rounds)
 	Network.OnPlayerNameReceived.connect(Comms._network_player_name_received)
+	Network.OnPlayerDirectionChange.connect(Comms._network_player_direction_change)
 	pass
 
 func _DisconnectFromSignalsOnStop() -> void:
@@ -277,6 +277,7 @@ func _DisconnectFromSignalsOnStop() -> void:
 	Network.OnPlayerHoldingKey.disconnect(Comms._network_player_is_holding_key)
 	Network.OnRequestNumRounds.disconnect(Comms._network_request_num_rounds)
 	Network.OnPlayerNameReceived.disconnect(Comms._network_player_name_received)
+	Network.OnPlayerDirectionChange.disconnect(Comms._network_player_direction_change)
 	pass
 
 
@@ -463,3 +464,31 @@ func UpdatePlayerPosition(ID: int, Position: Vector2) -> void:
 	if idx != Constants.INVALID_SLOT:
 		Data.Slots[idx].Player.Position = Position
 	pass
+
+func ProcessDoubleTap(PlayerID, KeyIndex) -> void:
+	match KeyIndex:
+		Constants.DOUBLETAP_PRIMARY:
+			var slot: TSlot = Data.GetSlotForPlayer(PlayerID)
+			if slot:
+				if slot.Player.HasSpooger:
+					var fields: Array[Vector2i] = _FindFieldsForSpooger(slot)
+					for field: Vector2i in fields:
+						if slot.Player.DroppedBombs < slot.Player.TotalBombs:
+							_DropBomb(slot, field)
+					pass
+	pass
+
+func _FindFieldsForSpooger(Slot: TSlot) -> Array[Vector2i]:
+	var result: Array[Vector2i] = []
+	var vector: Vector2i
+	match Slot.Player.Direction:
+		Constants.DIRECTION_LEFT: vector = Vector2i(-1, 0)
+		Constants.DIRECTION_RIGHT: vector = Vector2i(1, 0)
+		Constants.DIRECTION_UP: vector = Vector2i(0, -1)
+		Constants.DIRECTION_DOWN: vector = Vector2i(0, 1)
+	var field: Vector2i = Slot.Player.Position
+	field += vector
+	while Maps.GetFieldType(Data.Map, field) == Types.FIELD_EMPTY:
+		result.append(field)
+		field += vector 
+	return result

@@ -15,6 +15,8 @@ var BombStrength: int
 var Alive: bool
 var Speed: int
 var Diseases: Array[float]
+var HasSpooger: bool
+var Direction: int
 
 
 const KEY_TOTALBOMBS = "total_bombs"
@@ -26,6 +28,8 @@ const KEY_ALIVE = "alive"
 const KEY_BOMBSTRENGTH = "bomb_strength"
 const KEY_SPEED = "speed"
 const KEY_DISEASE = "disease_"
+const KEY_SPOOGER = "spooger"
+const KEY_DIRECTION = "direction"
 
 
 func _init() -> void:
@@ -44,6 +48,8 @@ func ResetWithoutPosition() -> void:
 	Speed = Constants.SPEED_MIN
 	ClearDiseases()
 	TimeBeforeNextTriggeredBomb = 0
+	HasSpooger = true
+	Direction = Constants.DIRECTION_DOWN
 	
 func AssignWithoutPosition(Source: TPlayingState) -> void:
 	TotalBombs = Source.TotalBombs
@@ -57,6 +63,8 @@ func AssignWithoutPosition(Source: TPlayingState) -> void:
 	for i in Constants.NUM_DISEASES:
 		Diseases[i] = Source.Diseases[i]
 	TimeBeforeNextTriggeredBomb = Source.TimeBeforeNextTriggeredBomb
+	HasSpooger = Source.HasSpooger
+	Direction = Source.Direction
 
 func ToJSONString() -> String:
 	var d: Dictionary
@@ -70,6 +78,8 @@ func ToJSONString() -> String:
 	d.set(KEY_SPEED, Speed)
 	for i in Constants.NUM_DISEASES:
 		d.set(KEY_DISEASE + str(i), Diseases[i])
+	d.set(KEY_SPOOGER, HasSpooger)
+	d.set(KEY_DIRECTION, Direction)
 	return JSON.stringify(d)
 
 func FromJSONString(Source: String) -> void:
@@ -94,6 +104,10 @@ func FromJSONString(Source: String) -> void:
 	for i in Constants.NUM_DISEASES:
 		if d.has(KEY_DISEASE + str(i)):
 			Diseases[i] = d[KEY_DISEASE + str(i)]
+	if d.has(KEY_SPOOGER):
+		HasSpooger = d[KEY_SPOOGER]
+	if d.has(KEY_DIRECTION):
+		Direction = d[KEY_DIRECTION]
 	pass
 
 

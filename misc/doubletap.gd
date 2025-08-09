@@ -8,7 +8,7 @@ const STATE_KEYUP = 1
 const STATE_KEYDOWN = 2
 const STATE_DOUBLETAP = 3
 
-const MAX_TIME = 0.05
+const MAX_TIME = 0.06
 
 
 enum TDetectionStage {IDLE, FIRST, SECOND}

@@ -1,6 +1,9 @@
 extends CharacterBody2D
 
 
+signal OnDirectionChanged(Sender: Node2D, NewDirection: Vector2)
+
+
 const SPEED = 400.0
 const SPEED_STEP = 200.0
 
@@ -134,3 +137,7 @@ func _ApplyDiseasesToSpeed(Delta: float, Speed: float) -> float:
 		if slot.Player.Diseases[Constants.DISEASE_STICKY_MOVEMENT] > 0:
 			spd = Rules.ProcessDisease_StickyMovement(Delta, spd)
 	return spd
+
+
+func _on_player_input_on_direction_changed(NewDirection: Vector2) -> void:
+	OnDirectionChanged.emit(self, NewDirection)
