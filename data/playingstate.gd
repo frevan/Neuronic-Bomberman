@@ -12,7 +12,7 @@ var HoldingSecundaryKey: bool
 var BombStrength: int
 var Alive: bool
 var Speed: int
-var Diseases: Array[bool]
+var Diseases: Array[float]
 
 
 const KEY_TOTALBOMBS = "total_bombs"
@@ -95,5 +95,5 @@ func FromJSONString(Source: String) -> void:
 
 func ClearDiseases() -> void:
 	for i in Constants.NUM_DISEASES:
-		Diseases[i] = false
+		Diseases[i] = 0
 	pass

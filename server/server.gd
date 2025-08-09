@@ -41,6 +41,7 @@ func _process(delta: float) -> void:
 		_RemoveExplosions(delta)
 		_KillPlayersInExplosions()
 		_PickUpPowerups()
+		_ProcessDiseases(delta)
 	pass
 
 
@@ -77,12 +78,12 @@ func _ProcessPlayerKeys(_Delta: float) -> void:
 
 func _DropBomb(Slot: TSlot) -> void:
 	var will_drop = false
-	if Slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
+	if Slot.Player.Diseases[Constants.DISEASE_DIARRHEA] > 0:
 		will_drop = true
 	else:
 		var total = Slot.Player.TotalBombs
 		var dropped = Slot.Player.DroppedBombs
-		var constipated = Slot.Player.Diseases[Constants.DISEASE_CONSTIPATION]
+		var constipated = Slot.Player.Diseases[Constants.DISEASE_CONSTIPATION] > 0
 		will_drop = (dropped < total) && !constipated
 		
 	if will_drop:
@@ -219,6 +220,22 @@ func _PickUpPowerups() -> void:
 			Rules.ApplyPowerupToPlayer(Data, i, type - Types.FIELD_PU_FIRST)
 			Network.SendPlayingState.rpc(slot.PlayerID, slot.Player.ToJSONString())
 	pass
+
+
+func _ProcessDiseases(delta: float) -> void:
+	for i in Data.Slots.size():
+		var slot: TSlot = Data.Slots[i]
+		var state_changed: bool = false
+		for idx in Constants.NUM_DISEASES:
+			if slot.Player.Diseases[idx] > 0:
+				slot.Player.Diseases[idx] -= delta
+				if slot.Player.Diseases[idx] <= 0:
+					slot.Player.Diseases[idx] = 0
+					state_changed = true
+		if state_changed:
+			Network.SendPlayingState.rpc(slot.PlayerID, slot.Player.ToJSONString())
+	pass
+
 
 func _CheckIfRoundEnded() -> void:
 	if Data.CountAlivePlayers() <= 1:

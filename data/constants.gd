@@ -30,6 +30,7 @@ const DISEASE_RANDOM_MOVEMENT = 4
 const DISEASE_STICKY_MOVEMENT = 5
 
 const NUM_DISEASES = 6
+const DISEASE_TIME = 2 # in seconds
 
 
 const BOMB_NORMAL = 0
