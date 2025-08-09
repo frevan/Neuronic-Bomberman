@@ -80,11 +80,13 @@ func _network_player_ready(SenderID: int, Ready: bool) -> void:
 	pass
 
 
-func _network_player_is_dropping_bomb(PlayerID: int, Value: bool) -> void:
+func _network_player_is_holding_key(PlayerID: int, KeyIndex: int, Value: bool) -> void:
 	var idx = Server.Data.FindSlotForPlayer(PlayerID)
 	if idx != Constants.INVALID_SLOT:
 		var slot: TSlot = Server.Data.Slots[idx]
-		slot.Player.DroppingBombs = Value
+		match KeyIndex:
+			Constants.HOLDINGKEY_PRIMARY: slot.Player.HoldingPrimaryKey = Value
+			Constants.HOLDINGKEY_SECONDARY: pass
 	pass
 
 

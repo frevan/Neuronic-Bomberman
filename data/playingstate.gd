@@ -7,7 +7,8 @@ var Position: Vector2
 var TotalBombs: int
 var NumTriggerBombs: int
 var DroppedBombs: int
-var DroppingBombs: bool
+var HoldingPrimaryKey: bool
+var HoldingSecundaryKey: bool
 var BombStrength: int
 var Alive: bool
 var Speed: int
@@ -17,7 +18,8 @@ var Diseases: Array[bool]
 const KEY_TOTALBOMBS = "total_bombs"
 const KEY_NUMTRIGGERBOMBS = "num_trigger_bombs"
 const KEY_DROPPEDBOMBS = "dropped_bombs"
-const KEY_DROPPINGBOMBS = "dropping_bombs"
+const KEY_PRIMARYKEY = "primary"
+const KEY_SECUNDARYKEY = "secundary"
 const KEY_ALIVE = "alive"
 const KEY_BOMBSTRENGTH = "bomb_strength"
 const KEY_SPEED = "speed"
@@ -33,7 +35,8 @@ func ResetWithoutPosition() -> void:
 	TotalBombs = 1
 	NumTriggerBombs = 0
 	DroppedBombs = 0
-	DroppingBombs = false
+	HoldingPrimaryKey = false
+	HoldingSecundaryKey = false
 	Alive = false
 	BombStrength = Constants.BOMB_STRENGTH
 	Speed = Constants.SPEED_MIN
@@ -44,7 +47,8 @@ func AssignWithoutPosition(Source: TPlayingState) -> void:
 	TotalBombs = Source.TotalBombs
 	NumTriggerBombs = Source.NumTriggerBombs
 	DroppedBombs = Source.DroppedBombs
-	DroppingBombs = Source.DroppingBombs
+	HoldingPrimaryKey = Source.HoldingPrimaryKey
+	HoldingSecundaryKey = Source.HoldingSecundaryKey
 	Alive = Source.Alive
 	BombStrength = Source.BombStrength
 	Speed = Source.Speed
@@ -56,7 +60,8 @@ func ToJSONString() -> String:
 	d.set(KEY_TOTALBOMBS, TotalBombs)
 	d.set(KEY_NUMTRIGGERBOMBS, NumTriggerBombs)
 	d.set(KEY_DROPPEDBOMBS, DroppedBombs)
-	d.set(KEY_DROPPINGBOMBS, DroppingBombs)
+	d.set(KEY_PRIMARYKEY, HoldingPrimaryKey)
+	d.set(KEY_SECUNDARYKEY, HoldingSecundaryKey)
 	d.set(KEY_ALIVE, Alive)
 	d.set(KEY_BOMBSTRENGTH, BombStrength)
 	d.set(KEY_SPEED, Speed)
@@ -73,8 +78,10 @@ func FromJSONString(Source: String) -> void:
 		NumTriggerBombs = d[KEY_NUMTRIGGERBOMBS]
 	if d.has(KEY_DROPPEDBOMBS):
 		DroppedBombs = d[KEY_DROPPEDBOMBS]
-	if d.has(KEY_DROPPINGBOMBS):
-		DroppingBombs = d[KEY_DROPPINGBOMBS]
+	if d.has(KEY_PRIMARYKEY):
+		HoldingPrimaryKey = d[KEY_PRIMARYKEY]
+	if d.has(KEY_SECUNDARYKEY):
+		HoldingSecundaryKey = d[KEY_SECUNDARYKEY]
 	if d.has(KEY_ALIVE):
 		Alive = d[KEY_ALIVE]
 	if d.has(KEY_BOMBSTRENGTH):

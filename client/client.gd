@@ -431,7 +431,7 @@ func RequestStartMatch() -> void:
 
 
 func DropBombs(IsDropping: bool) -> void:
-	Network.SendDroppingBombs.rpc_id(1, IsDropping)
+	Network.SendHoldingKey.rpc_id(1, Constants.HOLDINGKEY_PRIMARY, IsDropping)
 	pass
 
 

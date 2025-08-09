@@ -43,3 +43,6 @@ const EXPLOSION_TIME = 1.0 # in seconds
 
 const SPEED_MIN = 4
 const SPEED_SLOW = 1
+
+const HOLDINGKEY_PRIMARY = 0
+const HOLDINGKEY_SECONDARY = 1

@@ -69,7 +69,7 @@ func _DropBombs(_Delta: float) -> void:
 		var slot: TSlot = Data.Slots[i]
 		if (slot.PlayerID == 0) or !slot.Player.Alive:
 			continue
-		if slot.Player.DroppingBombs || slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
+		if slot.Player.HoldingPrimaryKey || slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
 			_DropBomb(i)
 	pass
 
@@ -232,7 +232,7 @@ func _ConnectToSignalsOnStart() -> void:
 	Network.OnRequestMoveToSlot.connect(Comms._network_request_move_to_slot)
 	Network.OnRequestStartMatch.connect(Comms._network_request_start_match)
 	Network.OnPlayerReady.connect(Comms._network_player_ready)
-	Network.OnPlayerIsDroppingBombs.connect(Comms._network_player_is_dropping_bomb)
+	Network.OnPlayerHoldingKey.connect(Comms._network_player_is_holding_key)
 	Network.OnRequestNumRounds.connect(Comms._network_request_num_rounds)
 	Network.OnPlayerNameReceived.connect(Comms._network_player_name_received)
 	pass
@@ -246,7 +246,7 @@ func _DisconnectFromSignalsOnStop() -> void:
 	Network.OnRequestMoveToSlot.disconnect(Comms._network_request_move_to_slot)
 	Network.OnRequestStartMatch.disconnect(Comms._network_request_start_match)
 	Network.OnPlayerReady.disconnect(Comms._network_player_ready)
-	Network.OnPlayerIsDroppingBombs.disconnect(Comms._network_player_is_dropping_bomb)
+	Network.OnPlayerHoldingKey.disconnect(Comms._network_player_is_holding_key)
 	Network.OnRequestNumRounds.disconnect(Comms._network_request_num_rounds)
 	Network.OnPlayerNameReceived.disconnect(Comms._network_player_name_received)
 	pass
