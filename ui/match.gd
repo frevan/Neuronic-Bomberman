@@ -16,6 +16,8 @@ var PlayerScenes: Dictionary # key = player_id
 var Bombs: Dictionary # key: bomb_id (int) | value: scene (TBombScene)
 var Explosions: Dictionary # key: field (Vector2i) | value: scene (TExplosionScene)
 
+@onready var DoubleTapDetector: TDoubleTap = TDoubleTap.new()
+
 
 func _log(Text: String) -> void:
 	print(str(Network.PeerID) + " [match] " + Text)
@@ -61,25 +63,37 @@ func AfterShow() -> void:
 	pass
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if visible:
-		_HandleUserInput()
+		_HandleUserInput(delta)
 		_UpdatePlayerPositionsFromNodes()
 	pass
 
-
-func _HandleUserInput() -> void:
+func _HandleUserInput(delta: float) -> void:
 	if Input.is_action_just_pressed("ui_cancel"):
 		OnLeaveLobby.emit()
 	if Client.State == Client.TState.ROUND && !Client.Data.CountingDown:
-		if Input.is_action_just_pressed("player_drop"):
-			Client.KeyPressed(Constants.HOLDINGKEY_PRIMARY, true)
-		elif Input.is_action_just_released("player_drop"):
-			Client.KeyPressed(Constants.HOLDINGKEY_PRIMARY, false)
-		if Input.is_action_just_pressed("player_kick"):
-			Client.KeyPressed(Constants.HOLDINGKEY_SECONDARY, true)
-		elif Input.is_action_just_released("player_kick"):
-			Client.KeyPressed(Constants.HOLDINGKEY_SECONDARY, false)
+		_CheckPrimaryKey(delta)
+		_CheckSecondaryKey(delta)
+	pass
+
+func _CheckPrimaryKey(delta: float) -> void:
+	var state = DoubleTapDetector.Process(delta, "player_drop")
+	if state == TDoubleTap.STATE_KEYDOWN:
+		#_log("key down")
+		Client.KeyPressed(Constants.HOLDINGKEY_PRIMARY, true)
+	elif state == TDoubleTap.STATE_KEYUP:
+		#_log("key up")
+		Client.KeyPressed(Constants.HOLDINGKEY_PRIMARY, false)
+	elif state == TDoubleTap.STATE_DOUBLETAP:
+		_log("double tap")
+	pass
+
+func _CheckSecondaryKey(_delta: float) -> void:
+	if Input.is_action_just_pressed("player_kick"):
+		Client.KeyPressed(Constants.HOLDINGKEY_SECONDARY, true)
+	elif Input.is_action_just_released("player_kick"):
+		Client.KeyPressed(Constants.HOLDINGKEY_SECONDARY, false)
 	pass
 
 
