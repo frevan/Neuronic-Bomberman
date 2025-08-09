@@ -89,8 +89,9 @@ func _DropBomb(SlotIndex: int) -> void:
 		var pos: Vector2i = slot.Player.Position
 		var id: int = Tools.NewBombID()
 		var type = Constants.BOMB_NORMAL
-		if slot.Player.Powerups.has(Constants.POWERUP_TRIGGER):
+		if slot.Player.NumTriggerBombs > 0:
 			type = Constants.BOMB_TRIGGER
+			slot.Player.NumTriggerBombs -= 1
 		if Data.AddBombAt(slot.PlayerID, id, type, pos):
 			slot.Player.DroppedBombs += 1
 			Network.SendBombDropped.rpc(slot.PlayerID, id, type, pos)
