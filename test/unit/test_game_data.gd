@@ -110,12 +110,12 @@ func test_ResetPlayersBeforeRound() -> void:
 	o.Slots[1].Player.TotalBombs = 5
 	o.Slots[1].Player.DroppedBombs = 4
 	o.Slots[1].Player.HoldingPrimaryKey = true
-	o.Slots[1].Player.HoldingSecundaryKey = true
+	o.Slots[1].Player.HoldingSecondaryKey = true
 	o.Slots[1].Player.Alive = false
 	o.ResetPlayersBeforeRound()
 	assert_eq(o.Slots[1].Player.TotalBombs, 1)
 	assert_eq(o.Slots[1].Player.DroppedBombs, 0)
 	assert_false(o.Slots[1].Player.HoldingPrimaryKey)
-	assert_false(o.Slots[1].Player.HoldingSecundaryKey)
+	assert_false(o.Slots[1].Player.HoldingSecondaryKey)
 	assert_true(o.Slots[1].Player.Alive)
 	pass

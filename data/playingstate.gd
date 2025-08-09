@@ -10,12 +10,13 @@ var TotalBombs: int
 var NumTriggerBombs: int
 var DroppedBombs: int
 var HoldingPrimaryKey: bool
-var HoldingSecundaryKey: bool
+var HoldingSecondaryKey: bool
 var BombStrength: int
 var Alive: bool
 var Speed: int
 var Diseases: Array[float]
 var HasSpooger: bool
+var CanKick: bool
 var Direction: int
 
 
@@ -23,12 +24,13 @@ const KEY_TOTALBOMBS = "total_bombs"
 const KEY_NUMTRIGGERBOMBS = "num_trigger_bombs"
 const KEY_DROPPEDBOMBS = "dropped_bombs"
 const KEY_PRIMARYKEY = "primary"
-const KEY_SECUNDARYKEY = "secundary"
+const KEY_SECONDARYKEY = "secondary"
 const KEY_ALIVE = "alive"
 const KEY_BOMBSTRENGTH = "bomb_strength"
 const KEY_SPEED = "speed"
 const KEY_DISEASE = "disease_"
 const KEY_SPOOGER = "spooger"
+const KEY_CANKICK = "can_kick"
 const KEY_DIRECTION = "direction"
 
 
@@ -42,13 +44,14 @@ func ResetWithoutPosition() -> void:
 	NumTriggerBombs = 0
 	DroppedBombs = 0
 	HoldingPrimaryKey = false
-	HoldingSecundaryKey = false
+	HoldingSecondaryKey = false
 	Alive = false
 	BombStrength = Constants.BOMB_STRENGTH
 	Speed = Constants.SPEED_MIN
 	ClearDiseases()
 	TimeBeforeNextTriggeredBomb = 0
 	HasSpooger = false
+	CanKick = true
 	Direction = Constants.DIRECTION_DOWN
 	
 func AssignWithoutPosition(Source: TPlayingState) -> void:
@@ -56,7 +59,7 @@ func AssignWithoutPosition(Source: TPlayingState) -> void:
 	NumTriggerBombs = Source.NumTriggerBombs
 	DroppedBombs = Source.DroppedBombs
 	HoldingPrimaryKey = Source.HoldingPrimaryKey
-	HoldingSecundaryKey = Source.HoldingSecundaryKey
+	HoldingSecondaryKey = Source.HoldingSecondaryKey
 	Alive = Source.Alive
 	BombStrength = Source.BombStrength
 	Speed = Source.Speed
@@ -64,6 +67,7 @@ func AssignWithoutPosition(Source: TPlayingState) -> void:
 		Diseases[i] = Source.Diseases[i]
 	TimeBeforeNextTriggeredBomb = Source.TimeBeforeNextTriggeredBomb
 	HasSpooger = Source.HasSpooger
+	CanKick = Source.CanKick
 	Direction = Source.Direction
 
 func ToJSONString() -> String:
@@ -72,13 +76,14 @@ func ToJSONString() -> String:
 	d.set(KEY_NUMTRIGGERBOMBS, NumTriggerBombs)
 	d.set(KEY_DROPPEDBOMBS, DroppedBombs)
 	d.set(KEY_PRIMARYKEY, HoldingPrimaryKey)
-	d.set(KEY_SECUNDARYKEY, HoldingSecundaryKey)
+	d.set(KEY_SECONDARYKEY, HoldingSecondaryKey)
 	d.set(KEY_ALIVE, Alive)
 	d.set(KEY_BOMBSTRENGTH, BombStrength)
 	d.set(KEY_SPEED, Speed)
 	for i in Constants.NUM_DISEASES:
 		d.set(KEY_DISEASE + str(i), Diseases[i])
 	d.set(KEY_SPOOGER, HasSpooger)
+	d.set(KEY_CANKICK, CanKick)
 	d.set(KEY_DIRECTION, Direction)
 	return JSON.stringify(d)
 
@@ -93,8 +98,8 @@ func FromJSONString(Source: String) -> void:
 		DroppedBombs = d[KEY_DROPPEDBOMBS]
 	if d.has(KEY_PRIMARYKEY):
 		HoldingPrimaryKey = d[KEY_PRIMARYKEY]
-	if d.has(KEY_SECUNDARYKEY):
-		HoldingSecundaryKey = d[KEY_SECUNDARYKEY]
+	if d.has(KEY_SECONDARYKEY):
+		HoldingSecondaryKey = d[KEY_SECONDARYKEY]
 	if d.has(KEY_ALIVE):
 		Alive = d[KEY_ALIVE]
 	if d.has(KEY_BOMBSTRENGTH):
@@ -106,6 +111,8 @@ func FromJSONString(Source: String) -> void:
 			Diseases[i] = d[KEY_DISEASE + str(i)]
 	if d.has(KEY_SPOOGER):
 		HasSpooger = d[KEY_SPOOGER]
+	if d.has(KEY_CANKICK):
+		CanKick = d[KEY_CANKICK]
 	if d.has(KEY_DIRECTION):
 		Direction = d[KEY_DIRECTION]
 	pass

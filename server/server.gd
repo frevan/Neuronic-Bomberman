@@ -73,7 +73,7 @@ func _ProcessPlayers(Delta: float) -> void:
 		slot.Player.TimeBeforeNextTriggeredBomb -= Delta
 		if slot.Player.HoldingPrimaryKey || slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
 			_DropBomb(slot, slot.Player.Position)
-		if slot.Player.HoldingSecundaryKey:
+		if slot.Player.HoldingSecondaryKey:
 			_ExplodeTriggerBombs(slot)
 	pass
 
