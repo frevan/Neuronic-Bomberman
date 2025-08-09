@@ -7,6 +7,7 @@ func Initialize() -> void:
 	Number = Constants.POWERUP_MOREFLAME
 
 func ApplyToSlot(Slot: TSlot) -> void:
+	super(Slot)
 	Slot.Player.BombStrength += 1
 	pass
 

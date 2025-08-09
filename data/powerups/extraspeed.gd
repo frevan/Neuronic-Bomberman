@@ -7,6 +7,7 @@ func Initialize() -> void:
 	Number = Constants.POWERUP_EXTRASPEED
 
 func ApplyToSlot(Slot: TSlot) -> void:
+	super(Slot)
 	Slot.Player.Speed += 1
 	pass
 

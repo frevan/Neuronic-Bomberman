@@ -7,6 +7,7 @@ func Initialize() -> void:
 	Number = Constants.POWERUP_TRIGGER
 
 func ApplyToSlot(Slot: TSlot) -> void:
+	super(Slot)
 	Slot.Player.NumTriggerBombs = Slot.Player.TotalBombs
 	pass
 

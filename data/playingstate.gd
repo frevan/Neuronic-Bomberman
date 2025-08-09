@@ -40,8 +40,7 @@ func ResetWithoutPosition() -> void:
 	Alive = false
 	BombStrength = Constants.BOMB_STRENGTH
 	Speed = Constants.SPEED_MIN
-	for i in Constants.NUM_DISEASES:
-		Diseases[i] = false
+	ClearDiseases()
 	
 func AssignWithoutPosition(Source: TPlayingState) -> void:
 	TotalBombs = Source.TotalBombs
@@ -91,4 +90,10 @@ func FromJSONString(Source: String) -> void:
 	for i in Constants.NUM_DISEASES:
 		if d.has(KEY_DISEASE + str(i)):
 			Diseases[i] = d[KEY_DISEASE + str(i)]
+	pass
+
+
+func ClearDiseases() -> void:
+	for i in Constants.NUM_DISEASES:
+		Diseases[i] = false
 	pass

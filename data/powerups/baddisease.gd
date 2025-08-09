@@ -5,8 +5,10 @@ class_name TBadDiseasePowerup
 
 func Initialize() -> void:
 	Number = Constants.POWERUP_BADDISEASE
+	WillClearDiseases = false
 
 func ApplyToSlot(Slot: TSlot) -> void:
+	super(Slot)
 	for i in [0, 1, 2]:
 		var disease = randi_range(0, Constants.NUM_DISEASES - 1)
 		Slot.Player.Diseases[disease] = true
