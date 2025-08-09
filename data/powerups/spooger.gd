@@ -4,7 +4,7 @@ class_name TSpoogerPowerup
 
 
 func Initialize() -> void:
-	Number = Constants.POWERUP_EXTRABOMB
+	Number = Constants.POWERUP_SPOOGER
 
 func ApplyToSlot(Slot: TSlot) -> void:
 	super(Slot)
