@@ -4,6 +4,8 @@ class_name TPlayingState
 
 
 var Position: Vector2
+var TimeBeforeNextTriggeredBomb: float # in seconds
+
 var TotalBombs: int
 var NumTriggerBombs: int
 var DroppedBombs: int
@@ -41,6 +43,7 @@ func ResetWithoutPosition() -> void:
 	BombStrength = Constants.BOMB_STRENGTH
 	Speed = Constants.SPEED_MIN
 	ClearDiseases()
+	TimeBeforeNextTriggeredBomb = 0
 	
 func AssignWithoutPosition(Source: TPlayingState) -> void:
 	TotalBombs = Source.TotalBombs
@@ -53,6 +56,7 @@ func AssignWithoutPosition(Source: TPlayingState) -> void:
 	Speed = Source.Speed
 	for i in Constants.NUM_DISEASES:
 		Diseases[i] = Source.Diseases[i]
+	TimeBeforeNextTriggeredBomb = Source.TimeBeforeNextTriggeredBomb
 
 func ToJSONString() -> String:
 	var d: Dictionary

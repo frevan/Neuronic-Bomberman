@@ -36,7 +36,7 @@ func _process(delta: float) -> void:
 	if State == TState.MATCH:
 		_ProcessMatch(delta)
 	elif State == TState.ROUND:
-		_ProcessPlayerKeys(delta)
+		_ProcessPlayers(delta)
 		_ProcessBombs(delta)
 		_RemoveExplosions(delta)
 		_KillPlayersInExplosions()
@@ -65,11 +65,12 @@ func _peer_disconnected(SenderID: int) -> void:
 	pass
 
 
-func _ProcessPlayerKeys(_Delta: float) -> void:
+func _ProcessPlayers(Delta: float) -> void:
 	for i in Data.Slots.size():
 		var slot: TSlot = Data.Slots[i]
 		if (slot.PlayerID == 0) or !slot.Player.Alive:
 			continue
+		slot.Player.TimeBeforeNextTriggeredBomb -= Delta
 		if slot.Player.HoldingPrimaryKey || slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
 			_DropBomb(slot)
 		if slot.Player.HoldingSecundaryKey:
@@ -92,7 +93,6 @@ func _DropBomb(Slot: TSlot) -> void:
 		var type = Constants.BOMB_NORMAL
 		if Slot.Player.NumTriggerBombs > 0:
 			type = Constants.BOMB_TRIGGER
-			Slot.Player.NumTriggerBombs -= 1
 		if Data.AddBombAt(Slot.PlayerID, id, type, pos):
 			Slot.Player.DroppedBombs += 1
 			Network.SendBombDropped.rpc(Slot.PlayerID, id, type, pos)
@@ -100,7 +100,7 @@ func _DropBomb(Slot: TSlot) -> void:
 
 func _ExplodeTriggerBombs(Slot: TSlot) -> void:
 	var bomb: TBomb = Data.FindOldestTriggerBombFor(Slot.PlayerID)
-	if bomb:
+	if bomb && (Slot.Player.TimeBeforeNextTriggeredBomb <= 0):
 		_ExplodeBomb(bomb)
 	pass
 
@@ -118,6 +118,11 @@ func _ProcessBombs(Delta: float) -> void:
 func _ExplodeBomb(Bomb: TBomb) -> void:
 	_RemoveBomb(Bomb)
 	_CreateExplosionsForBomb(Bomb)
+	if Bomb.Type == Constants.BOMB_TRIGGER:
+		var idx = Data.FindSlotForPlayer(Bomb.PlayerID)
+		if idx != Constants.INVALID_SLOT:
+			var slot: TSlot = Data.Slots[idx]
+			slot.Player.TimeBeforeNextTriggeredBomb = Constants.TIME_BETWEEN_TRIGGERS
 	pass
 
 func _RemoveBomb(Bomb: TBomb) -> void:

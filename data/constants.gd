@@ -33,6 +33,9 @@ const NUM_DISEASES = 6
 const DISEASE_TIME = 2 # in seconds
 
 
+const TIME_BETWEEN_TRIGGERS = 0.8 # in seconds
+
+
 const BOMB_NORMAL = 0
 const BOMB_TRIGGER = 1
 
