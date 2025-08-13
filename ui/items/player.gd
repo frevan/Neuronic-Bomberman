@@ -8,10 +8,6 @@ const SPEED = 400.0
 const SPEED_STEP = 200.0
 
 
-
-signal CheckForCollisions(Sender: Node2D, NewPosition: Vector2)
-
-
 @export var animation = ""
 
 var Data: TGameData
@@ -71,30 +67,6 @@ func _CalculatePlayerSpeed(delta: float) -> int:
 			_speed = slot.Player.Speed
 	_speed = _ApplyDiseasesToSpeed(delta, _speed)
 	return SPEED * _speed * 0.25
-
-func _MoveInSteps(delta: float) -> void:
-	var spd = _CalculatePlayerSpeed(delta)
-	_CalculateVelocity(spd)
-	var step_delta = delta / (spd / SPEED_STEP)
-	var cur_delta = 0
-	while cur_delta < delta:
-		if !velocity == Vector2.ZERO:
-			_Move(step_delta)
-		cur_delta += step_delta
-	pass
-
-func _CalculateVelocity(CurrentSpeed: float) -> void:
-	if $PlayerInput.direction:
-		velocity.x = $PlayerInput.direction.x * CurrentSpeed
-		velocity.y = $PlayerInput.direction.y * CurrentSpeed
-	else:
-		velocity = Vector2.ZERO
-	pass
-
-func _Move(delta: float) -> void:
-	var newpos: Vector2 = Vector2(position.x + (velocity.x * delta),  position.y + (velocity.y * delta))
-	CheckForCollisions.emit(self, newpos)
-	pass
 
 
 func _UpdateSpriteAnimation() -> void:
