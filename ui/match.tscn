@@ -53,7 +53,8 @@ text = "(0,0)"
 
 [node name="Left" type="StaticBody2D" parent="Border"]
 position = Vector2(30, 80)
-collision_layer = 2
+collision_layer = 1024
+collision_mask = 3071
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Border/Left"]
 position = Vector2(0, 248.5)
@@ -61,7 +62,8 @@ shape = SubResource("RectangleShape2D_jcqty")
 
 [node name="Top" type="StaticBody2D" parent="Border"]
 position = Vector2(50, 70)
-collision_layer = 2
+collision_layer = 1024
+collision_mask = 3071
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Border/Top"]
 position = Vector2(353, 0)
@@ -69,14 +71,16 @@ shape = SubResource("RectangleShape2D_t8g0u")
 
 [node name="Right" type="StaticBody2D" parent="Border"]
 position = Vector2(770, 80)
-collision_layer = 2
+collision_layer = 1024
+collision_mask = 3071
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Border/Right"]
 position = Vector2(0, 248)
 shape = SubResource("RectangleShape2D_3v8o5")
 
 [node name="Bottom" type="StaticBody2D" parent="Border"]
-collision_layer = 2
+collision_layer = 1024
+collision_mask = 3071
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Border/Bottom"]
 position = Vector2(400.5, 585)
@@ -88,33 +92,52 @@ shape = SubResource("RectangleShape2D_vt7kf")
 
 [node name="Player0" parent="Players" instance=ExtResource("4_hudsj")]
 visible = false
+collision_mask = 7168
 
 [node name="Player1" parent="Players" instance=ExtResource("4_hudsj")]
 visible = false
+collision_layer = 2
+collision_mask = 7168
 
 [node name="Player2" parent="Players" instance=ExtResource("4_hudsj")]
 visible = false
+collision_layer = 4
+collision_mask = 7168
 
 [node name="Player3" parent="Players" instance=ExtResource("4_hudsj")]
 visible = false
+collision_layer = 8
+collision_mask = 7168
 
 [node name="Player4" parent="Players" instance=ExtResource("4_hudsj")]
 visible = false
+collision_layer = 16
+collision_mask = 7168
 
 [node name="Player5" parent="Players" instance=ExtResource("4_hudsj")]
 visible = false
+collision_layer = 32
+collision_mask = 7168
 
 [node name="Player6" parent="Players" instance=ExtResource("4_hudsj")]
 visible = false
+collision_layer = 64
+collision_mask = 7168
 
 [node name="Player7" parent="Players" instance=ExtResource("4_hudsj")]
 visible = false
+collision_layer = 128
+collision_mask = 7168
 
 [node name="Player8" parent="Players" instance=ExtResource("4_hudsj")]
 visible = false
+collision_layer = 256
+collision_mask = 7168
 
 [node name="Player9" parent="Players" instance=ExtResource("4_hudsj")]
 visible = false
+collision_layer = 512
+collision_mask = 7168
 
 [node name="CountDownTimer" type="Timer" parent="."]
 wait_time = 0.5

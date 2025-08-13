@@ -10,6 +10,15 @@ const brickscene = preload("res://ui/items/brick.tscn")
 const solidscene = preload("res://ui/items/solidblock.tscn")
 const powerupscene = preload("res://ui/items/powerup.tscn")
 
+
+const COLLISIONLAYER_BLOCK = 0b00000100_00000000
+const COLLISIONLAYER_BOMB = 0b0001000_00000000
+
+const COLLISIONMASK_ALL = 0xffffffff
+const COLLISIONMASK_BLOCK = 0#0b00011111_11111111
+const COLLISIONMASK_BOMB = 0b00011111_11111111
+
+
 @onready var Rules: TRules = TRules.new()
 
 var PlayerScenes: Dictionary # key = player_id
@@ -67,6 +76,7 @@ func _process(delta: float) -> void:
 	if visible:
 		_HandleUserInput(delta)
 		_UpdatePlayerPositionsFromNodes()
+		_RemoveCollisionExceptions()
 	pass
 
 func _HandleUserInput(delta: float) -> void:
@@ -121,12 +131,15 @@ func _client_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vecto
 	scene.Type = Type
 	scene.position = Tools.FieldPositionToScreen(Position)
 	scene.visible = true
+	scene.collision_layer = COLLISIONLAYER_BOMB
+	scene.collision_mask = COLLISIONMASK_BOMB
 	var fname: String = "res://assets/bomb.png"
 	if Type == Constants.BOMB_TRIGGER: 
 		fname = "res://assets/triggerbomb.png"
 	scene.LoadSpriteFromFile(fname)
 	Bombs[BombID] = scene
 	add_child.call_deferred(scene)
+	_AddCollisionExceptionsWithBomb(scene)
 	pass
 
 func _client_remove_bomb(BombID: int) -> void:
@@ -187,6 +200,8 @@ func _AddFieldNode(Field: Vector2i, Type: int) -> void:
 		Types.FIELD_SOLID: node = solidscene.instantiate()
 		Types.FIELD_BRICK: node = brickscene.instantiate()
 	if node:
+		node.collision_layer = COLLISIONLAYER_BLOCK
+		node.collision_mask = COLLISIONMASK_BLOCK
 		$Tiles.add_child(node, true)
 		node.position = Tools.FieldPositionToScreen(Field)
 	pass
@@ -224,6 +239,18 @@ func _FindPlayerNodeForSlot(SlotIndex: int) -> Node2D:
 	var nodeName = "Player" + str(SlotIndex)
 	return $Players.get_node(nodeName)
 
+func _FindPlayerNodeForID(PlayerID: int) -> Node2D:
+	var slot: TSlot = Client.Data.GetSlotForPlayer(PlayerID)
+	if slot:
+		return _FindPlayerNodeForSlot(slot.Index)
+	return null
+
+func _GetPlayerSlotFromNode(Scene: Node2D) -> TSlot:
+	var idx: int = Scene.SlotIndex
+	if (idx >= 0) && (idx < Client.Data.Slots.size()):
+		return Client.Data.Slots[idx]
+	return null
+
 
 func _ShowPlayers(CanShow: bool = true) -> void:
 	#_log("show players - show=" + str(Show))
@@ -258,9 +285,9 @@ func _SetPlayerAuthorities() -> void:
 	pass
 
 
-func _on_player_check_for_collisions(Sender: Node2D, NewPosition: Vector2) -> void:
-	if Client.State == Client.TState.ROUND:
-		Sender.position = Rules.ApplyObstaclesToPlayerMove(Client.Data, Sender.position, NewPosition)
+func _on_player_check_for_collisions(_Sender: Node2D, _NewPosition: Vector2) -> void:
+	#if Client.State == Client.TState.ROUND:
+		#Sender.position = Rules.ApplyObstaclesToPlayerMove(Client.Data, Sender.position, NewPosition)
 	pass
 
 
@@ -281,6 +308,34 @@ func _UpdatePlayerPositionsFromNodes() -> void:
 					$PlayerPosLabel.text = "dead"
 	pass
 
+
+func _AddCollisionExceptionsWithBomb(Scene: Node2D) -> void:
+	for i in Client.Data.Slots.size():
+		var slot: TSlot = Client.Data.Slots[i]
+		var pscene = _FindPlayerNodeForID(slot.PlayerID)
+		if !pscene:
+			return
+		var playerrect = Tools.PositionToRect(pscene.position)
+		var bombrect = Tools.PositionToRect(Scene.position)
+		if bombrect.intersects(playerrect):
+			Scene.add_collision_exception_with(pscene)
+	pass
+
+
+func _RemoveCollisionExceptions() -> void:
+	if visible && (Client.State == Client.TState.ROUND):
+		for i in Client.Data.Slots.size():
+			var slot: TSlot = Client.Data.Slots[i]
+			var pscene = _FindPlayerNodeForID(slot.PlayerID)
+			if !pscene:
+				return
+			var playerrect = Tools.PositionToRect(pscene.position)
+			for id in Bombs:
+				var bscene: Node2D = Bombs[id]
+				var bombrect = Tools.PositionToRect(bscene.position)
+				if !bombrect.intersects(playerrect):
+					bscene.remove_collision_exception_with(pscene)
+	pass
 
 func _RemovePlayerScenes() -> void:
 	PlayerScenes.clear()
@@ -365,4 +420,4 @@ func _VectorToDirection(Vector: Vector2) -> int:
 			return Constants.DIRECTION_RIGHT
 		elif Vector.x < 0:
 			return Constants.DIRECTION_LEFT
-	return Constants.DIRECTION_NONE 
+	return Constants.DIRECTION_NONE

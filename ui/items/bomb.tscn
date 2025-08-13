@@ -6,9 +6,10 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_amjlg"]
 radius = 21.0
 
-[node name="Bomb" type="StaticBody2D"]
+[node name="Bomb" type="CharacterBody2D"]
 z_index = 8
-collision_layer = 4
+collision_layer = 0
+collision_mask = 0
 script = ExtResource("1_lnnoo")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

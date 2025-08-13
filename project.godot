@@ -76,6 +76,22 @@ player_kick={
 ]
 }
 
+[layer_names]
+
+2d_physics/layer_1="Player 0"
+2d_physics/layer_2="Player 1"
+2d_physics/layer_3="Player 2"
+2d_physics/layer_4="Player 3"
+2d_physics/layer_5="Player 4"
+2d_physics/layer_6="Player 5"
+2d_physics/layer_7="Player 6"
+2d_physics/layer_8="Player 7"
+2d_physics/layer_9="Player 8"
+2d_physics/layer_10="Player 9"
+2d_physics/layer_11="Blocks"
+2d_physics/layer_12="Bombs"
+2d_physics/layer_13="Powerups"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

@@ -42,8 +42,9 @@ func _process(_delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	if !visible:
 		return
-	_MoveInSteps(delta)
 	_UpdateSpriteAnimation()
+	velocity = $PlayerInput.direction * _CalculatePlayerSpeed(delta)
+	move_and_slide()
 	pass
 
 

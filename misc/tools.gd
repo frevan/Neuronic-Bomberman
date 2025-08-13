@@ -68,6 +68,12 @@ func FieldToRect(Field: Vector2i) -> Rect2:
 	r.size = FIELD_SIZE
 	return r
 
+func PositionToRect(Position: Vector2) -> Rect2:
+	var r: Rect2
+	r.position = Position
+	r.size = FIELD_SIZE
+	return r
+
 func PlayerPositionToRect(Position: Vector2) -> Rect2:
 	return Rect2(Position.x, Position.y, PLAYER_SIZE.x, PLAYER_SIZE.y)
 
