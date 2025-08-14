@@ -70,22 +70,22 @@ func _UpdateMessageLabel():
 
 
 func _UpdateScoresLabel() -> void:
-	_log("scores = " + str(Client.Data.Slots[0].Score) + " " + str(Client.Data.Slots[1].Score))
+	#_log("scores = " + str(Client.Data.Slots[0].Score) + " " + str(Client.Data.Slots[1].Score))
 	var s: String = ""
 	var highest_score: int = _DetermineHighestScore()
 	for score in range(highest_score, -1, -1):
-		_log("  score=" + str(score))
+		#_log("  score=" + str(score))
 		for idx in Client.Data.Slots.size():
 			var slot: TSlot = Client.Data.Slots[idx]
 			if slot.PlayerID == 0:
 				continue
-			_log("    slot=" + str(slot.PlayerID) + ": " + str(slot.Score))
+			#_log("    slot=" + str(slot.PlayerID) + ": " + str(slot.Score))
 			if slot.Score == score:
 				var nme: String = slot.PlayerName
 				if nme == "":
 					nme = str(slot.PlayerID)
 				s += "\n" + nme + " - " + str(slot.Score)
-				_log("  s=" + s)
+				#_log("  s=" + s)
 	$ScoresLabel.text = s
 	pass
 

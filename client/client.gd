@@ -197,7 +197,7 @@ func _network_player_became_ready(PlayerID: int, Ready: bool) -> void:
 
 
 func _network_player_position_received(PlayerID: int, Position: Vector2) -> void:
-	_log("player " + str(PlayerID) + " is at: (" + str(Position.x) + "," + str(Position.y) + ")")
+	#_log("player " + str(PlayerID) + " is at: (" + str(Position.x) + "," + str(Position.y) + ")")
 	var idx = Data.FindSlotForPlayer(PlayerID)
 	if idx != Constants.INVALID_SLOT:
 		Data.Slots[idx].Player.Position = Position
@@ -206,21 +206,21 @@ func _network_player_position_received(PlayerID: int, Position: Vector2) -> void
 
 
 func _network_map_tile_changed(Field: Vector2i, Type: int) -> void:
-	_log("map tile " + str(Field) + " changed to " + str(Type))
+	#_log("map tile " + str(Field) + " changed to " + str(Type))
 	Maps.SetFieldTypeTo(Data.Map, Field, Type)
 	OnMapTileChanged.emit(Field, Type)
 	pass
 
 
 func _network_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vector2)-> void:
-	_log(str(PlayerID) + " dropped bomb at " + str(Position) + " with type " + str(Type))
+	#_log(str(PlayerID) + " dropped bomb at " + str(Position) + " with type " + str(Type))
 	Data.AddBombAt(PlayerID, BombID, Type, Position)
 	OnBombDropped.emit(PlayerID, BombID, Type, Position)
 	pass
 
 
 func _network_create_explosion_at(Field: Vector2i) -> void:
-	_log("explosion at " + str(Field))
+	#_log("explosion at " + str(Field))
 	var bomb = Data.GetBombInField(Field)
 	if bomb:
 		Data.RemoveBomb(bomb.ID)
@@ -231,14 +231,14 @@ func _network_create_explosion_at(Field: Vector2i) -> void:
 
 
 func _network_remove_explosion(Field: Vector2i) -> void:
-	_log("no more explosion at " + str(Field))
+	#_log("no more explosion at " + str(Field))
 	Data.RemoveExplosion(Field)
 	OnRemoveExplosion.emit(Field)
 	pass
 
 
 func _network_player_died(PlayerID: int) -> void:
-	_log("player " + str(PlayerID) + " died")
+	#_log("player " + str(PlayerID) + " died")
 	var slot_idx = Data.FindSlotForPlayer(PlayerID)
 	if slot_idx != Constants.INVALID_SLOT:
 		Data.Slots[slot_idx].Player.Alive = false
