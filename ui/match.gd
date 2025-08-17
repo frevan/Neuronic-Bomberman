@@ -439,5 +439,7 @@ func _on_player_collided_with_bomb(Sender: TPlayerScene, Bomb: TBombScene, _Coll
 	var player_input: Object = Sender.get_node("PlayerInput")
 	if player_input:
 		if player_input.direction != Vector2.ZERO:
-			Bomb.direction = player_input.direction
+			var slot: TSlot = Client.Data.Slots[Sender.SlotIndex]
+			if slot.Player.CanKick:
+				Bomb.direction = player_input.direction
 	pass

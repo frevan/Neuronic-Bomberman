@@ -51,7 +51,7 @@ func ResetWithoutPosition() -> void:
 	ClearDiseases()
 	TimeBeforeNextTriggeredBomb = 0
 	HasSpooger = false
-	CanKick = true
+	CanKick = false
 	Direction = Constants.DIRECTION_DOWN
 	
 func AssignWithoutPosition(Source: TPlayingState) -> void:
