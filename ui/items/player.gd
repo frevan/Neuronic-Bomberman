@@ -1,11 +1,10 @@
 extends CharacterBody2D
 
+class_name TPlayerScene
+
 
 signal OnDirectionChanged(Sender: Node2D, NewDirection: Vector2)
-
-
-const SPEED = 400.0
-const SPEED_STEP = 200.0
+signal CollidedWithBomb(Sender: Node2D, Bomb: Node2D, Collision: KinematicCollision2D)
 
 
 @export var animation = ""
@@ -17,7 +16,7 @@ var SlotIndex: int = Constants.INVALID_SLOT
 
 
 func _ready():
-	# only process physics for the local player	
+	# only process physics for the local player
 	if get_multiplayer_authority() != multiplayer.get_unique_id():
 		set_physics_process(false)
 	pass
@@ -40,7 +39,12 @@ func _physics_process(delta: float) -> void:
 		return
 	_UpdateSpriteAnimation()
 	velocity = $PlayerInput.direction * _CalculatePlayerSpeed(delta)
-	move_and_slide()
+	var collided: bool = move_and_slide()
+	if collided:
+		var collision: KinematicCollision2D = get_last_slide_collision()
+		var collider: Object = collision.get_collider()
+		if (collider is Node2D) && (collider is TBombScene):
+			CollidedWithBomb.emit(self, collider, collision)
 	pass
 
 
@@ -66,7 +70,7 @@ func _CalculatePlayerSpeed(delta: float) -> int:
 			var slot: TSlot = Data.Slots[idx]
 			_speed = slot.Player.Speed
 	_speed = _ApplyDiseasesToSpeed(delta, _speed)
-	return SPEED * _speed * 0.25
+	return Constants.PLAYER_SPEED * _speed * 0.25
 
 
 func _UpdateSpriteAnimation() -> void:

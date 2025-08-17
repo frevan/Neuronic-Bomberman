@@ -465,6 +465,13 @@ func UpdatePlayerPosition(ID: int, Position: Vector2) -> void:
 		Data.Slots[idx].Player.Position = Position
 	pass
 
+func UpdateBombPosition(BombID: int, Position: Vector2) -> void:
+	var bomb = Data.GetBombForID(BombID)
+	if bomb:
+		bomb.Position = Position
+	pass
+
+
 func ProcessDoubleTap(PlayerID, KeyIndex) -> void:
 	match KeyIndex:
 		Constants.DOUBLETAP_PRIMARY:

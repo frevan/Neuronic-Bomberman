@@ -2,8 +2,10 @@ extends CharacterBody2D
 
 class_name TBombScene
 
+
 var PlayerID: int
 var Type: int
+var BombID: int
 
 @export var direction = Vector2()
 
@@ -13,10 +15,11 @@ func LoadSpriteFromFile(FileName: String) -> void:
 	pass
 
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	if !visible:
 		return
 	if get_multiplayer_authority() == Network.PeerID:
-		velocity = direction * 400
-		move_and_slide()
+		if direction != Vector2.ZERO:
+			velocity = direction * Constants.BOMB_SPEED
+			move_and_slide()
 	pass

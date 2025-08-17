@@ -76,6 +76,7 @@ func _process(delta: float) -> void:
 	if visible:
 		_HandleUserInput(delta)
 		_UpdatePlayerPositionsFromNodes()
+		_UpdateBombPositionsFromNodes()
 		_RemoveCollisionExceptions()
 	pass
 
@@ -129,6 +130,7 @@ func _client_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vecto
 	var scene = bombscene.instantiate()
 	scene.name = str(BombID)
 	scene.PlayerID = PlayerID
+	scene.BombID = BombID
 	scene.Type = Type
 	scene.position = Tools.FieldPositionToScreen(Position)
 	scene.visible = true
@@ -310,6 +312,14 @@ func _UpdatePlayerPositionsFromNodes() -> void:
 					$PlayerPosLabel.text = "dead"
 	pass
 
+func _UpdateBombPositionsFromNodes() -> void:
+	if visible && (Client.State == Client.TState.ROUND):
+		for i in $Bombs.get_child_count():
+			var scene = $Bombs.get_child(i)
+			if scene:
+				Client.UpdateBombPosition(scene.BombID, Tools.ScreenPositionToField(scene.position))
+	pass
+
 
 func _AddCollisionExceptionsWithBomb(Scene: Node2D) -> void:
 	for i in Client.Data.Slots.size():
@@ -423,3 +433,11 @@ func _VectorToDirection(Vector: Vector2) -> int:
 		elif Vector.x < 0:
 			return Constants.DIRECTION_LEFT
 	return Constants.DIRECTION_NONE
+
+
+func _on_player_collided_with_bomb(Sender: TPlayerScene, Bomb: TBombScene, _Collision: KinematicCollision2D) -> void:
+	var player_input: Object = Sender.get_node("PlayerInput")
+	if player_input:
+		if player_input.direction != Vector2.ZERO:
+			Bomb.direction = player_input.direction
+	pass

@@ -157,6 +157,11 @@ func GetBombInField(Field: Vector2i) -> TBomb:
 			return Bombs[id]
 	return null
 
+func GetBombForID(BombID: int) -> TBomb:
+	if Bombs.has(BombID):
+		return Bombs[BombID]
+	return null
+
 func RemoveBomb(BombID: int) -> void:
 	Bombs.erase(BombID)
 	pass

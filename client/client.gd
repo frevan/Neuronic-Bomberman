@@ -31,7 +31,8 @@ signal OnNumRoundsChanged # params: value (int)
 signal OnPlayerDisconnected # params: id (int)
 signal OnPlayerNameChanged # params: id (int), name (string)
 
-signal OnPlayerPositionUpdated # [for the server object] param: id (int), position (vector2)
+signal OnPlayerPositionUpdated(ID: int, Position: Vector2) # [for the server object] param: id (int), position (vector2)
+signal OnBombPositionUpdated(BombID: int, Position: Vector2) # [for the server object] param: id (int), position (vector2)
 
 
 var PlayerName: String = ""
@@ -441,6 +442,14 @@ func UpdatePlayerPosition(ID: int, Position: Vector2) -> void:
 		Data.Slots[idx].Player.Position = Position
 		if Network.PeerID == 1:
 			OnPlayerPositionUpdated.emit(ID, Position)
+	pass
+	
+func UpdateBombPosition(BombID: int, Position: Vector2) -> void:
+	if Network.IsServer():
+		var bomb: TBomb = Data.GetBombForID(BombID)
+		if bomb:
+			bomb.Position = Position
+		OnBombPositionUpdated.emit(BombID, Position)
 	pass
 
 

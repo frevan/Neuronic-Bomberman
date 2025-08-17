@@ -68,6 +68,7 @@ func _InitializeClient() -> void:
 	Client.OnRoundEnded.connect(_client_round_ended)
 	Client.OnMatchEnded.connect(_client_match_ended)
 	Client.OnPlayerPositionUpdated.connect(_client_player_position_updated)
+	Client.OnBombPositionUpdated.connect(_client_bomb_position_updated)
 	pass
 
 func _InitializeMenuScene() -> void:
@@ -134,6 +135,11 @@ func _client_match_ended() -> void:
 func _client_player_position_updated(ID: int, Position: Vector2) -> void:
 	if Server:
 		Server.UpdatePlayerPosition(ID, Position)
+	pass
+
+func _client_bomb_position_updated(BombID: int, Position: Vector2) -> void:
+	if Server:
+		Server.UpdateBombPosition(BombID, Position)
 	pass
 
 
