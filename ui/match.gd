@@ -132,7 +132,7 @@ func _client_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vecto
 	scene.PlayerID = PlayerID
 	scene.BombID = BombID
 	scene.Type = Type
-	scene.position = Tools.FieldPositionToScreen(Position)
+	scene.position = Tools.FieldPositionToScreen(Position) + Tools.BOMB_POS_OFFSET
 	scene.visible = true
 	scene.collision_layer = COLLISIONLAYER_BOMB
 	scene.collision_mask = COLLISIONMASK_BOMB

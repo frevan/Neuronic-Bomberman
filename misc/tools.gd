@@ -53,6 +53,7 @@ func CreatePowerup(Which: int) ->  TPowerup:
 
 const FIELD_SIZE = Vector2(48, 45)
 const FIELD_OFFSET = Vector2(64, 125)
+const BOMB_POS_OFFSET = Vector2(0, -2)
 const PLAYER_SIZE = Vector2(48, 45)
 
 func FieldPositionToScreen(Position: Vector2) -> Vector2:

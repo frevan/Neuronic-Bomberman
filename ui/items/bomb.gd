@@ -21,5 +21,9 @@ func _physics_process(_delta: float) -> void:
 	if get_multiplayer_authority() == Network.PeerID:
 		if direction != Vector2.ZERO:
 			velocity = direction * Constants.BOMB_SPEED
-			move_and_slide()
+			var collided: bool = move_and_slide()
+			if collided:
+				direction = Vector2.ZERO
+				var field = Tools.ScreenPositionToField(position)
+				position = Tools.FieldPositionToScreen(field) + Tools.BOMB_POS_OFFSET
 	pass
