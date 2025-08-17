@@ -108,7 +108,7 @@ func _network_player_name_received(PlayerID: int, Name: String) -> void:
 
 
 func _network_player_direction_change(PlayerID: int, NewDirection: int) -> void:
-	_log("player direction received for " + str(PlayerID) + ": " + str(NewDirection))
+	#_log("player direction received for " + str(PlayerID) + ": " + str(NewDirection))
 	var slot: TSlot = Server.Data.GetSlotForPlayer(PlayerID)
 	if slot:
 		slot.Player.Direction = NewDirection
