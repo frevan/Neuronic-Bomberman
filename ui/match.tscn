@@ -139,6 +139,8 @@ visible = false
 collision_layer = 512
 collision_mask = 7168
 
+[node name="Bombs" type="Node2D" parent="."]
+
 [node name="CountDownTimer" type="Timer" parent="."]
 wait_time = 0.5
 

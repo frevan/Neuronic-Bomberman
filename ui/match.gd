@@ -127,6 +127,7 @@ func _client_map_tile_changed(_Field: Vector2i, _Type: int) -> void:
 
 func _client_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vector2) -> void:
 	var scene = bombscene.instantiate()
+	scene.name = str(BombID)
 	scene.PlayerID = PlayerID
 	scene.Type = Type
 	scene.position = Tools.FieldPositionToScreen(Position)
@@ -137,8 +138,9 @@ func _client_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vecto
 	if Type == Constants.BOMB_TRIGGER: 
 		fname = "res://assets/triggerbomb.png"
 	scene.LoadSpriteFromFile(fname)
+	scene.set_multiplayer_authority(1)
 	Bombs[BombID] = scene
-	add_child.call_deferred(scene)
+	$Bombs.add_child.call_deferred(scene)
 	_AddCollisionExceptionsWithBomb(scene)
 	pass
 
