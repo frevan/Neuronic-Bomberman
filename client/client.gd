@@ -471,3 +471,8 @@ func SetPlayerDirection(NewDirection: int) -> void:
 			slot.Player.Direction = NewDirection
 			Network.SendPlayerDirection.rpc_id(1, NewDirection)
 	pass
+
+
+func SendBombIsMoving(BombID: int, Value: bool) -> void:
+	Network.SendBombIsMoving.rpc_id(1, BombID, Value)
+	pass

@@ -14,6 +14,7 @@ signal OnPlayerHoldingKey # params: sender_id (int), key_index (int), value (boo
 signal OnRequestNumRounds # params: value (int)
 signal OnPlayerNameReceived # params: id (int), name (string)
 signal OnPlayerDirectionChange # params: id (int), direction (int)
+signal OnBombIsMoving(BombID: int, Value: bool)
 # received by clients
 signal OnResponseToJoinLobby # params: accepted (bool)
 signal OnPlayerJoinedLobby # params: player_id (int)
@@ -140,6 +141,11 @@ func SendPlayerName(Value: String) -> void:
 func SendPlayerDirection(Value: int) -> void:
 	var id = multiplayer.get_remote_sender_id()
 	OnPlayerDirectionChange.emit(id, Value)
+
+@rpc("reliable", "call_local", "any_peer")
+func SendBombIsMoving(BombID: int, Value: bool) -> void:
+	if multiplayer.get_remote_sender_id() == 1:
+		OnBombIsMoving.emit(BombID, Value)
 
 
 @rpc("reliable", "call_local", "authority")

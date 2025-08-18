@@ -136,6 +136,7 @@ func _client_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vecto
 	scene.visible = true
 	scene.collision_layer = COLLISIONLAYER_BOMB
 	scene.collision_mask = COLLISIONMASK_BOMB
+	scene.StoppedMoving.connect(_bomb_stopped_moving)
 	var fname: String = "res://assets/bomb.png"
 	if Type == Constants.BOMB_TRIGGER: 
 		fname = "res://assets/triggerbomb.png"
@@ -442,4 +443,9 @@ func _on_player_collided_with_bomb(Sender: TPlayerScene, Bomb: TBombScene, _Coll
 			var slot: TSlot = Client.Data.Slots[Sender.SlotIndex]
 			if slot.Player.CanKick:
 				Bomb.direction = player_input.direction
+				Client.SendBombIsMoving(Bomb.BombID, true)
+	pass
+
+func _bomb_stopped_moving(Sender: TBombScene) -> void:
+	Client.SendBombIsMoving(Sender.BombID, false)
 	pass

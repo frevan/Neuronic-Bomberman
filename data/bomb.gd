@@ -9,3 +9,4 @@ var Position: Vector2
 var TimeUntilExplosion: float # in seconds
 var TimeSinceDrop: float # in seconds
 var Strength: int
+var IsMoving: bool

@@ -113,3 +113,10 @@ func _network_player_direction_change(PlayerID: int, NewDirection: int) -> void:
 	if slot:
 		slot.Player.Direction = NewDirection
 	pass
+
+
+func _network_bomb_is_moving(BombID: int, Value: bool) -> void:
+	if Server.Data.Bombs.has(BombID):
+		var bomb: TBomb = Server.Data.Bombs[BombID]
+		bomb.IsMoving = Value
+	pass

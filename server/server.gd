@@ -107,10 +107,11 @@ func _ExplodeTriggerBombs(Slot: TSlot) -> void:
 func _ProcessBombs(Delta: float) -> void:
 	for id in Data.Bombs:
 		var bomb: TBomb = Data.Bombs[id]
-		bomb.TimeUntilExplosion -= Delta
 		bomb.TimeSinceDrop += Delta
-		if (bomb.Type == Constants.BOMB_NORMAL) && (bomb.TimeUntilExplosion <= 0):
-			_ExplodeBomb(bomb)
+		if !bomb.IsMoving:
+			bomb.TimeUntilExplosion -= Delta
+			if (bomb.Type == Constants.BOMB_NORMAL) && (bomb.TimeUntilExplosion <= 0):
+				_ExplodeBomb(bomb)
 	pass
 
 
@@ -263,6 +264,7 @@ func _ConnectToSignalsOnStart() -> void:
 	Network.OnRequestNumRounds.connect(Comms._network_request_num_rounds)
 	Network.OnPlayerNameReceived.connect(Comms._network_player_name_received)
 	Network.OnPlayerDirectionChange.connect(Comms._network_player_direction_change)
+	Network.OnBombIsMoving.connect(Comms._network_bomb_is_moving)
 	pass
 
 func _DisconnectFromSignalsOnStop() -> void:
@@ -278,6 +280,7 @@ func _DisconnectFromSignalsOnStop() -> void:
 	Network.OnRequestNumRounds.disconnect(Comms._network_request_num_rounds)
 	Network.OnPlayerNameReceived.disconnect(Comms._network_player_name_received)
 	Network.OnPlayerDirectionChange.disconnect(Comms._network_player_direction_change)
+	Network.OnBombIsMoving.disconnect(Comms._network_bomb_is_moving)
 	pass
 
 
