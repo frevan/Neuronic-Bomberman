@@ -17,6 +17,7 @@ var Speed: int
 var Diseases: Array[float]
 var HasSpooger: bool
 var CanKick: bool
+var CanPunch: bool
 var Direction: int
 
 
@@ -31,6 +32,7 @@ const KEY_SPEED = "speed"
 const KEY_DISEASE = "disease_"
 const KEY_SPOOGER = "spooger"
 const KEY_CANKICK = "can_kick"
+const KEY_CANPUNCH = "can_punch"
 const KEY_DIRECTION = "direction"
 
 
@@ -52,6 +54,7 @@ func ResetWithoutPosition() -> void:
 	TimeBeforeNextTriggeredBomb = 0
 	HasSpooger = false
 	CanKick = false
+	CanPunch = false
 	Direction = Constants.DIRECTION_DOWN
 	
 func AssignWithoutPosition(Source: TPlayingState) -> void:
@@ -68,6 +71,7 @@ func AssignWithoutPosition(Source: TPlayingState) -> void:
 	TimeBeforeNextTriggeredBomb = Source.TimeBeforeNextTriggeredBomb
 	HasSpooger = Source.HasSpooger
 	CanKick = Source.CanKick
+	CanPunch = Source.CanPunch
 	Direction = Source.Direction
 
 func ToJSONString() -> String:
@@ -84,6 +88,7 @@ func ToJSONString() -> String:
 		d.set(KEY_DISEASE + str(i), Diseases[i])
 	d.set(KEY_SPOOGER, HasSpooger)
 	d.set(KEY_CANKICK, CanKick)
+	d.set(KEY_CANPUNCH, CanPunch)
 	d.set(KEY_DIRECTION, Direction)
 	return JSON.stringify(d)
 
@@ -113,6 +118,8 @@ func FromJSONString(Source: String) -> void:
 		HasSpooger = d[KEY_SPOOGER]
 	if d.has(KEY_CANKICK):
 		CanKick = d[KEY_CANKICK]
+	if d.has(KEY_CANPUNCH):
+		CanKick = d[KEY_CANPUNCH]
 	if d.has(KEY_DIRECTION):
 		Direction = d[KEY_DIRECTION]
 	pass
