@@ -20,6 +20,7 @@ signal OnMatchEnded
 signal OnPlayerPositionChanged # params: player_id (int)
 signal OnMapTileChanged # params: field (vector2i), type (int)
 signal OnBombDropped # params: id (int), bomb_id (int), type (int), position (vector2i)
+signal OnBombPosition(BombID: int, Position: Vector2)
 signal OnRemoveBomb # params: bomb_id (int)
 signal OnExplosion # params: field (vector2i)
 signal OnRemoveExplosion # params: field (vector2i)
@@ -219,6 +220,16 @@ func _network_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vect
 	OnBombDropped.emit(PlayerID, BombID, Type, Position)
 	pass
 
+func _network_bomb_status(BombID: int, Status: String) -> void:
+	pass
+	
+func _network_bomb_position(BombID: int, Position: Vector2) -> void:
+	var bomb: TBomb = Data.GetBombForID(BombID)
+	if bomb:
+		bomb.Position = Position
+		OnBombPosition.emit(BombID, Position)
+	pass
+
 
 func _network_create_explosion_at(Field: Vector2i) -> void:
 	#_log("explosion at " + str(Field))
@@ -303,6 +314,8 @@ func _ConnectToSignals() -> void:
 	Network.OnPlayerPositionReceived.connect(_network_player_position_received)
 	Network.OnMapTileChanged.connect(_network_map_tile_changed)
 	Network.OnBombDropped.connect(_network_bomb_dropped)
+	Network.OnBombStatus.connect(_network_bomb_status)
+	Network.OnBombPosition.connect(_network_bomb_position)
 	Network.OnCreateExplosionAt.connect(_network_create_explosion_at)
 	Network.OnRemoveExplosion.connect(_network_remove_explosion)
 	Network.OnPlayerDied.connect(_network_player_died)
@@ -333,6 +346,8 @@ func _DisconnectFromSignals() -> void:
 	Network.OnPlayerPositionReceived.disconnect(_network_player_position_received)
 	Network.OnMapTileChanged.disconnect(_network_map_tile_changed)
 	Network.OnBombDropped.disconnect(_network_bomb_dropped)
+	Network.OnBombStatus.disconnect(_network_bomb_status)
+	Network.OnBombPosition.disconnect(_network_bomb_position)
 	Network.OnCreateExplosionAt.disconnect(_network_create_explosion_at)
 	Network.OnRemoveExplosion.disconnect(_network_remove_explosion)
 	Network.OnPlayerDied.disconnect(_network_player_died)

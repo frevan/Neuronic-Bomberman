@@ -124,11 +124,12 @@ func _PunchBombNextToPlayer(Slot: TSlot) -> bool:
 	return false
 
 func _PunchBomb(Bomb: TBomb, Direction: Vector2i) -> void:
-	Bomb.IsKicked = true
 	Bomb.IsMoving = true
-	Bomb.KickDirection = Direction
-	Bomb.KickStartField = Vector2i(Bomb.Position)
-	Bomb.KickEndField = Bomb.KickStartField + (Direction * 4) # TODO: deal with boundaries
+	Bomb.IsPunched = true
+	Bomb.PunchDirection = Direction
+	Bomb.PunchStartField = Vector2i(Bomb.Position)
+	Bomb.PunchEndField = Bomb.PunchStartField + (Direction * 4)
+	Network.SendBombStatus.rpc(Bomb.ID, Bomb.ToJSONString())
 	pass
 
 
@@ -141,19 +142,25 @@ func _ProcessBombs(Delta: float) -> void:
 			bomb.TimeUntilExplosion -= Delta
 			if (bomb.Type == Constants.BOMB_NORMAL) && (bomb.TimeUntilExplosion <= 0):
 				_ExplodeBomb(bomb)
-		elif bomb.IsKicked:
-			_MoveKickedBomb(Delta, bomb)
+		elif bomb.IsPunched:
+			_MovePunchedBomb(Delta, bomb)
 	pass
 
-func _MoveKickedBomb(Delta: float, Bomb: TBomb) -> void:
+func _MovePunchedBomb(Delta: float, Bomb: TBomb) -> void:
 	var speed: float = Delta * Constants.BOMB_SPEED_KICK
-	var velocity: Vector2 = Vector2(Bomb.KickDirection) * speed
-	Bomb.Position = Bomb.Position + velocity
-	_log("bomb pos = " + str(Bomb.Position) + " velocity = " + str(velocity) + " speed = " + str(speed))
-	if abs(Vector2i(Bomb.Position) - Bomb.KickStartField) >= abs(Bomb.KickEndField - Bomb.KickStartField):
-		Bomb.IsMoving = false
-		Bomb.IsKicked = false
-		Bomb.Position = Bomb.KickEndField
+	# TODO: move in a curve
+	Bomb.Position = Bomb.Position + (Vector2(Bomb.PunchDirection) * speed)
+	var field: Vector2i = Vector2i(Bomb.Position)
+	if abs(field - Bomb.PunchStartField) >= abs(Bomb.PunchEndField - Bomb.PunchStartField):
+		if Maps.GetFieldType(Data.Map, field) == Types.FIELD_EMPTY:
+			Bomb.IsMoving = false
+			Bomb.IsPunched = false
+			Bomb.Position = Bomb.PunchEndField
+			Network.SendBombStatus(Bomb.ID, Bomb.ToJSONString())
+		else:
+			Bomb.PunchEndField += Bomb.PunchDirection
+		# TODO: handle out of bounds
+	Network.SendBombPosition.rpc(Bomb.ID, Bomb.Position)
 	pass
 
 
@@ -513,7 +520,7 @@ func UpdatePlayerPosition(ID: int, Position: Vector2) -> void:
 func UpdateBombPosition(BombID: int, Position: Vector2) -> void:
 	var bomb = Data.GetBombForID(BombID)
 	if bomb:
-		if bomb.IsMoving && !bomb.IsKicked:
+		if bomb.IsMoving && !bomb.IsPunched:
 			bomb.Position = Position
 	pass
 

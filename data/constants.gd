@@ -47,7 +47,7 @@ const EXPLOSION_TIME = 1.0 # in seconds
 
 const PLAYER_SPEED = 300.0
 const BOMB_SPEED = 500.0
-const BOMB_SPEED_KICK = 3.0 # fields per second
+const BOMB_SPEED_KICK = 6.0 # fields per second
 
 const SPEED_MIN = 4
 const SPEED_SLOW = 1

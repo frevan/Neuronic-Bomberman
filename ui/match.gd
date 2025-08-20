@@ -40,6 +40,7 @@ func BeforeShow() -> void:
 	Client.OnPlayerPositionChanged.connect(_client_player_position_changed)
 	Client.OnMapTileChanged.connect(_client_map_tile_changed)
 	Client.OnBombDropped.connect(_client_bomb_dropped)
+	Client.OnBombPosition.connect(_client_bomb_position)
 	Client.OnRemoveBomb.connect(_client_remove_bomb)
 	Client.OnExplosion.connect(_client_explosion)
 	Client.OnRemoveExplosion.connect(_client_remove_explosion)
@@ -55,6 +56,7 @@ func AfterHide() -> void:
 	Client.OnPlayerPositionChanged.disconnect(_client_player_position_changed)
 	Client.OnMapTileChanged.disconnect(_client_map_tile_changed)
 	Client.OnBombDropped.disconnect(_client_bomb_dropped)
+	Client.OnBombPosition.disconnect(_client_bomb_position)
 	Client.OnRemoveBomb.disconnect(_client_remove_bomb)
 	Client.OnExplosion.disconnect(_client_explosion)
 	Client.OnRemoveExplosion.disconnect(_client_remove_explosion)
@@ -145,6 +147,12 @@ func _client_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vecto
 	Bombs[BombID] = scene
 	$Bombs.add_child.call_deferred(scene)
 	_AddCollisionExceptionsWithBomb(scene)
+	pass
+
+func _client_bomb_position(BombID: int, Position: Vector2) -> void:
+	if Bombs.has(BombID):
+		var scene = Bombs[BombID]
+		scene.position = Tools.FieldPositionToScreen(Position) + Tools.BOMB_POS_OFFSET
 	pass
 
 func _client_remove_bomb(BombID: int) -> void:
