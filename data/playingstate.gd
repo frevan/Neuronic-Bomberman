@@ -119,7 +119,7 @@ func FromJSONString(Source: String) -> void:
 	if d.has(KEY_CANKICK):
 		CanKick = d[KEY_CANKICK]
 	if d.has(KEY_CANPUNCH):
-		CanKick = d[KEY_CANPUNCH]
+		CanPunch = d[KEY_CANPUNCH]
 	if d.has(KEY_DIRECTION):
 		Direction = d[KEY_DIRECTION]
 	pass

@@ -74,9 +74,10 @@ func _ProcessPlayers(Delta: float) -> void:
 		if slot.Player.HoldingPrimaryKey || slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
 			_DropBomb(slot, slot.Player.Position)
 		if slot.Player.HoldingSecondaryKey:
+			var hasPunched: bool = false
 			if slot.Player.CanPunch:
-				_PunchBombNextToPlayer(slot)
-			else:
+				hasPunched = _PunchBombNextToPlayer(slot)
+			if !hasPunched:
 				_ExplodeTriggerBombs(slot)
 	pass
 
@@ -106,12 +107,28 @@ func _ExplodeTriggerBombs(Slot: TSlot) -> void:
 		_ExplodeBomb(bomb)
 	pass
 
-func _PunchBombNextToPlayer(Slot: TSlot) -> void:
-	# TODO: 
-	# - set kicked status on bomb + ismoving
-	# - tell  clients that it's been kicked
-	# - start its movement
-	# - process its movement and send that to clients
+func _PunchBombNextToPlayer(Slot: TSlot) -> bool:
+	var direction: Vector2i = Vector2i.ZERO	
+	match Slot.Player.Direction:
+		Constants.DIRECTION_LEFT: direction = Vector2i(-1, 0)
+		Constants.DIRECTION_RIGHT: direction = Vector2i(1, 0)
+		Constants.DIRECTION_UP: direction = Vector2i(0, -1)
+		Constants.DIRECTION_DOWN: direction = Vector2i(0, 1)
+	var field: Vector2i = Vector2i(Slot.Player.Position) + direction
+	if (field >= Vector2i.ZERO) && (field < Vector2i(Types.MAP_WIDTH, Types.MAP_HEIGHT)):
+		var bomb: TBomb = Data.GetBombInField(field)
+		if bomb:
+			if !bomb.IsMoving:
+				_PunchBomb(bomb, direction)
+				return true
+	return false
+
+func _PunchBomb(Bomb: TBomb, Direction: Vector2i) -> void:
+	Bomb.IsKicked = true
+	Bomb.IsMoving = true
+	Bomb.KickDirection = Direction
+	Bomb.KickStartField = Vector2i(Bomb.Position)
+	Bomb.KickEndField = Bomb.KickStartField + (Direction * 4) # TODO: deal with boundaries
 	pass
 
 
@@ -124,6 +141,19 @@ func _ProcessBombs(Delta: float) -> void:
 			bomb.TimeUntilExplosion -= Delta
 			if (bomb.Type == Constants.BOMB_NORMAL) && (bomb.TimeUntilExplosion <= 0):
 				_ExplodeBomb(bomb)
+		elif bomb.IsKicked:
+			_MoveKickedBomb(Delta, bomb)
+	pass
+
+func _MoveKickedBomb(Delta: float, Bomb: TBomb) -> void:
+	var speed: float = Delta * Constants.BOMB_SPEED_KICK
+	var velocity: Vector2 = Vector2(Bomb.KickDirection) * speed
+	Bomb.Position = Bomb.Position + velocity
+	_log("bomb pos = " + str(Bomb.Position) + " velocity = " + str(velocity) + " speed = " + str(speed))
+	if abs(Vector2i(Bomb.Position) - Bomb.KickStartField) >= abs(Bomb.KickEndField - Bomb.KickStartField):
+		Bomb.IsMoving = false
+		Bomb.IsKicked = false
+		Bomb.Position = Bomb.KickEndField
 	pass
 
 
@@ -483,7 +513,8 @@ func UpdatePlayerPosition(ID: int, Position: Vector2) -> void:
 func UpdateBombPosition(BombID: int, Position: Vector2) -> void:
 	var bomb = Data.GetBombForID(BombID)
 	if bomb:
-		bomb.Position = Position
+		if bomb.IsMoving && !bomb.IsKicked:
+			bomb.Position = Position
 	pass
 
 
