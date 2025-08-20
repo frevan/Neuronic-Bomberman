@@ -159,7 +159,19 @@ func _MovePunchedBomb(Delta: float, Bomb: TBomb) -> void:
 			Network.SendBombStatus(Bomb.ID, Bomb.ToJSONString())
 		else:
 			Bomb.PunchEndField += Bomb.PunchDirection
-		# TODO: handle out of bounds
+	else:
+		if Bomb.PunchDirection.x < 0 && Bomb.PunchEndField.x < 0 && field.x < 0:
+			Bomb.PunchEndField.x = Types.MAP_WIDTH - 1
+			Bomb.Position.x = Types.MAP_WIDTH
+		elif Bomb.PunchDirection.x > 0 && Bomb.PunchEndField.x >= Types.MAP_WIDTH && field.x > Types.MAP_WIDTH:
+			Bomb.PunchEndField.x = 0
+			Bomb.Position.x = -1
+		elif Bomb.PunchDirection.y < 0 && Bomb.PunchEndField.y < 0 && field.y < 0:
+			Bomb.PunchEndField.y = Types.MAP_HEIGHT - 1
+			Bomb.Position.y = Types.MAP_HEIGHT
+		elif Bomb.PunchDirection.y > 0 && Bomb.PunchEndField.y >= Types.MAP_HEIGHT && field.y > Types.MAP_HEIGHT:
+			Bomb.PunchEndField.y = 0
+			Bomb.Position.y = -1
 	Network.SendBombPosition.rpc(Bomb.ID, Bomb.Position)
 	pass
 
