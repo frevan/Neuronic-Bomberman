@@ -74,7 +74,10 @@ func _ProcessPlayers(Delta: float) -> void:
 		if slot.Player.HoldingPrimaryKey || slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
 			_DropBomb(slot, slot.Player.Position)
 		if slot.Player.HoldingSecondaryKey:
-			_ExplodeTriggerBombs(slot)
+			if slot.Player.CanPunch:
+				_PunchBombNextToPlayer(slot)
+			else:
+				_ExplodeTriggerBombs(slot)
 	pass
 
 func _DropBomb(Slot: TSlot, Field: Vector2i) -> void:
@@ -102,6 +105,15 @@ func _ExplodeTriggerBombs(Slot: TSlot) -> void:
 	if bomb && (Slot.Player.TimeBeforeNextTriggeredBomb <= 0):
 		_ExplodeBomb(bomb)
 	pass
+
+func _PunchBombNextToPlayer(Slot: TSlot) -> void:
+	# TODO: 
+	# - set kicked status on bomb + ismoving
+	# - tell  clients that it's been kicked
+	# - start its movement
+	# - process its movement and send that to clients
+	pass
+
 
 
 func _ProcessBombs(Delta: float) -> void:
