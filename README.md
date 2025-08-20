@@ -1,6 +1,6 @@
 # Neuronic Bomberman
 
-This is an attempt to create a 64bit Windows clone of Atomic Bomberman.
+This is an attempt to create a modern-day clone of Atomic Bomberman for Windows and other platforms.
 
 External dependencies:
 - Godot 4.4: https://godotengine.org/
