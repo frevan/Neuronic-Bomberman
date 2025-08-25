@@ -152,7 +152,7 @@ func _client_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vecto
 	pass
 
 func _client_bomb_position(BombID: int, Position: Vector2) -> void:
-	_log("bomb position: " + str(Position))
+	#_log("bomb position: " + str(Position))
 	if Bombs.has(BombID):
 		var scene = Bombs[BombID]
 		scene.position = Tools.FieldPositionToScreen(Position) + Tools.BOMB_POS_OFFSET
@@ -161,7 +161,7 @@ func _client_bomb_position(BombID: int, Position: Vector2) -> void:
 func _client_bomb_status_changed(BombID: int) -> void:
 	var bomb = Client.Data.GetBombForID(BombID)
 	if bomb && Bombs.has(BombID):
-		_log("bomb status: punched=" + str(bomb.IsPunched))
+		#_log("bomb status: punched=" + str(bomb.IsPunched))
 		var scene = Bombs[BombID]
 		scene.EnableCollisions(bomb.IsPunched)
 	pass
