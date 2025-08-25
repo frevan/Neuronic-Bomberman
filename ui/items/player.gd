@@ -39,12 +39,13 @@ func _physics_process(delta: float) -> void:
 		return
 	_UpdateSpriteAnimation()
 	velocity = $PlayerInput.direction * _CalculatePlayerSpeed(delta)
-	var collided: bool = move_and_slide()
-	if collided:
-		var collision: KinematicCollision2D = get_last_slide_collision()
-		var collider: Object = collision.get_collider()
-		if (collider is Node2D) && (collider is TBombScene):
-			CollidedWithBomb.emit(self, collider, collision)
+	if velocity != Vector2.ZERO:
+		var collided: bool = move_and_slide()
+		if collided:
+			var collision: KinematicCollision2D = get_last_slide_collision()
+			var collider: Object = collision.get_collider()
+			if (collider is Node2D) && (collider is TBombScene):
+				CollidedWithBomb.emit(self, collider, collision)
 	pass
 
 
