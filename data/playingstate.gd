@@ -54,7 +54,7 @@ func ResetWithoutPosition() -> void:
 	TimeBeforeNextTriggeredBomb = 0
 	HasSpooger = false
 	CanKick = false
-	CanPunch = true
+	CanPunch = false
 	Direction = Constants.DIRECTION_DOWN
 	
 func AssignWithoutPosition(Source: TPlayingState) -> void:
