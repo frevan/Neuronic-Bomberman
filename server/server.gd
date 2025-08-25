@@ -145,11 +145,24 @@ func _ProcessBombs(Delta: float) -> void:
 		elif bomb.IsPunched:
 			_MovePunchedBomb(Delta, bomb)
 	pass
+	
+func _CalculateNewBombPosition(Delta: float, Bomb: TBomb) -> Vector2:
+	var speed: float = Delta * Constants.BOMB_SPEED_KICK
+	var r = Bomb.Position + (Vector2(Bomb.PunchDirection) * speed)
+	var total_distance: float
+	var cur_distance: float
+	if Bomb.PunchDirection.x != 0:
+		total_distance = Bomb.PunchStartField.x - Bomb.PunchEndField.x
+		cur_distance = Bomb.Position.x - Bomb.PunchStartField.x
+		r.y = Bomb.PunchStartField.y + sin(cur_distance / total_distance * PI)
+	elif Bomb.PunchDirection.y != 0:
+		total_distance = absf(Bomb.PunchStartField.y - Bomb.PunchEndField.y)
+		cur_distance = absf(Bomb.Position.y - Bomb.PunchStartField.y)
+		r.x = Bomb.PunchStartField.x + sin(cur_distance / total_distance * PI)
+	return r
 
 func _MovePunchedBomb(Delta: float, Bomb: TBomb) -> void:
-	var speed: float = Delta * Constants.BOMB_SPEED_KICK
-	# TODO: move in a curve
-	Bomb.Position = Bomb.Position + (Vector2(Bomb.PunchDirection) * speed)
+	Bomb.Position = _CalculateNewBombPosition(Delta, Bomb)
 	var field: Vector2i = Vector2i(Bomb.Position)
 	if abs(field - Bomb.PunchStartField) >= abs(Bomb.PunchEndField - Bomb.PunchStartField):
 		if Maps.GetFieldType(Data.Map, field) == Types.FIELD_EMPTY:

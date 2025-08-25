@@ -41,6 +41,7 @@ func BeforeShow() -> void:
 	Client.OnMapTileChanged.connect(_client_map_tile_changed)
 	Client.OnBombDropped.connect(_client_bomb_dropped)
 	Client.OnBombPosition.connect(_client_bomb_position)
+	Client.OnBombStatusChanged.connect(_client_bomb_status_changed)
 	Client.OnRemoveBomb.connect(_client_remove_bomb)
 	Client.OnExplosion.connect(_client_explosion)
 	Client.OnRemoveExplosion.connect(_client_remove_explosion)
@@ -57,6 +58,7 @@ func AfterHide() -> void:
 	Client.OnMapTileChanged.disconnect(_client_map_tile_changed)
 	Client.OnBombDropped.disconnect(_client_bomb_dropped)
 	Client.OnBombPosition.disconnect(_client_bomb_position)
+	Client.OnBombStatusChanged.disconnect(_client_bomb_status_changed)
 	Client.OnRemoveBomb.disconnect(_client_remove_bomb)
 	Client.OnExplosion.disconnect(_client_explosion)
 	Client.OnRemoveExplosion.disconnect(_client_remove_explosion)
@@ -150,9 +152,18 @@ func _client_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vecto
 	pass
 
 func _client_bomb_position(BombID: int, Position: Vector2) -> void:
+	_log("bomb position: " + str(Position))
 	if Bombs.has(BombID):
 		var scene = Bombs[BombID]
 		scene.position = Tools.FieldPositionToScreen(Position) + Tools.BOMB_POS_OFFSET
+	pass
+
+func _client_bomb_status_changed(BombID: int) -> void:
+	var bomb = Client.Data.GetBombForID(BombID)
+	if bomb && Bombs.has(BombID):
+		_log("bomb status: punched=" + str(bomb.IsPunched))
+		var scene = Bombs[BombID]
+		scene.EnableCollisions(bomb.IsPunched)
 	pass
 
 func _client_remove_bomb(BombID: int) -> void:

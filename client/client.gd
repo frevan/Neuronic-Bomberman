@@ -21,6 +21,7 @@ signal OnPlayerPositionChanged # params: player_id (int)
 signal OnMapTileChanged # params: field (vector2i), type (int)
 signal OnBombDropped # params: id (int), bomb_id (int), type (int), position (vector2i)
 signal OnBombPosition(BombID: int, Position: Vector2)
+signal OnBombStatusChanged(BombID: int)
 signal OnRemoveBomb # params: bomb_id (int)
 signal OnExplosion # params: field (vector2i)
 signal OnRemoveExplosion # params: field (vector2i)
@@ -221,6 +222,10 @@ func _network_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vect
 	pass
 
 func _network_bomb_status(BombID: int, Status: String) -> void:
+	var bomb: TBomb = Data.GetBombForID(BombID)
+	if bomb:
+		bomb.FromJSONString(Status)
+		OnBombStatusChanged.emit(BombID)
 	pass
 	
 func _network_bomb_position(BombID: int, Position: Vector2) -> void:

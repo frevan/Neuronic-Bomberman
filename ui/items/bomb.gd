@@ -18,6 +18,11 @@ func LoadSpriteFromFile(FileName: String) -> void:
 	pass
 
 
+func EnableCollisions(Value: bool) -> void:
+	$CollisionShape2D.disabled = !Value
+	pass
+
+
 func _physics_process(_delta: float) -> void:
 	if !visible:
 		return
