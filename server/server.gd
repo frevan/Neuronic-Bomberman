@@ -119,7 +119,7 @@ func _ExplodeTriggerBombs(Slot: TSlot) -> void:
 	pass
 
 func _PunchBombNextToPlayer(Slot: TSlot) -> bool:
-	var direction: Vector2i = Vector2i.ZERO	
+	var direction: Vector2i = Vector2i.ZERO
 	match Slot.Player.Direction:
 		Constants.DIRECTION_LEFT: direction = Vector2i(-1, 0)
 		Constants.DIRECTION_RIGHT: direction = Vector2i(1, 0)
@@ -158,8 +158,22 @@ func _ThrowBomb(BombID: int) -> void:
 	if !bomb:
 		return
 	var slot: TSlot = Data.GetSlotForPlayer(bomb.IsGrabbedBy)
-	bomb.IsMoving = false
+	if !slot:
+		return
+	var direction: Vector2i = Vector2i.ZERO
+	match slot.Player.Direction:
+		Constants.DIRECTION_LEFT: direction = Vector2i(-1, 0)
+		Constants.DIRECTION_RIGHT: direction = Vector2i(1, 0)
+		Constants.DIRECTION_UP: direction = Vector2i(0, -1)
+		Constants.DIRECTION_DOWN: direction = Vector2i(0, 1)
+	var field: Vector2i = Vector2i(slot.Player.Position) + direction
+	if (field >= Vector2i.ZERO) && (field < Vector2i(Types.MAP_WIDTH, Types.MAP_HEIGHT)):
+		bomb.PunchDirection = direction
+		bomb.PunchStartField = Vector2i(bomb.Position)
+		bomb.PunchEndField = bomb.PunchStartField + (direction * 4)
 	bomb.IsGrabbedBy = Constants.INVALID_BOMB_ID
+	bomb.IsMoving = true
+	bomb.IsPunched = true
 	Network.SendBombStatus.rpc(bomb.ID, bomb.ToJSONString())
 	if slot:
 		slot.Player.HasGrabbedBombID = Constants.INVALID_BOMB_ID
@@ -176,8 +190,6 @@ func _ProcessBombs(Delta: float) -> void:
 				_ExplodeBomb(bomb)
 		elif bomb.IsPunched:
 			_MovePunchedBomb(Delta, bomb)
-		elif bomb.IsGrabbedBy != Constants.INVALID_SLOT:
-			_MoveGrabbedBomb(bomb)
 	pass
 	
 func _CalculateNewBombPosition(Delta: float, Bomb: TBomb) -> Vector2:
@@ -219,16 +231,6 @@ func _MovePunchedBomb(Delta: float, Bomb: TBomb) -> void:
 		elif Bomb.PunchDirection.y > 0 && Bomb.PunchEndField.y >= Types.MAP_HEIGHT && field.y > Types.MAP_HEIGHT:
 			Bomb.PunchEndField.y = 0
 			Bomb.Position.y = -1
-	Network.SendBombPosition.rpc(Bomb.ID, Bomb.Position)
-	pass
-
-func _MoveGrabbedBomb(Bomb: TBomb) -> void:
-	if Bomb.IsGrabbedBy == Constants.INVALID_SLOT:
-		return
-	var slot: TSlot = Data.GetSlotForPlayer(Bomb.IsGrabbedBy)
-	if !slot:
-		return
-	Bomb.Position = slot.Player.Position
 	Network.SendBombPosition.rpc(Bomb.ID, Bomb.Position)
 	pass
 

@@ -12,12 +12,12 @@ var Strength: int
 
 var IsMoving: bool
 
-var IsPunched: bool
+var IsPunched: bool = false
 var PunchDirection: Vector2i
 var PunchStartField: Vector2i
 var PunchEndField: Vector2i
 
-var IsGrabbedBy: int # player id
+var IsGrabbedBy: int = Constants.INVALID_SLOT # player id
 
 
 const KEY_IsMoving = "moving"

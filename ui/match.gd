@@ -80,6 +80,7 @@ func _process(delta: float) -> void:
 	if visible:
 		_HandleUserInput(delta)
 		_UpdatePlayerPositionsFromNodes()
+		_MoveGrabbedBombNodes()
 		_UpdateBombPositionsFromNodes()
 		_RemoveCollisionExceptions()
 	pass
@@ -338,6 +339,16 @@ func _UpdateBombPositionsFromNodes() -> void:
 			var scene = $Bombs.get_child(i)
 			if scene:
 				Client.UpdateBombPosition(scene.BombID, Tools.ScreenPositionToField(scene.position))
+	pass
+
+func _MoveGrabbedBombNodes() -> void:
+	for b in Bombs.values():
+		var bomb: TBomb = Client.Data.GetBombForID(b.BombID)
+		if bomb:
+			if bomb.IsGrabbedBy != Constants.INVALID_SLOT:
+				var playerscene: Node2D = PlayerScenes[bomb.IsGrabbedBy]
+				if playerscene:
+					b.position = playerscene.position
 	pass
 
 
