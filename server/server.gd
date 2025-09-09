@@ -72,7 +72,17 @@ func _ProcessPlayers(Delta: float) -> void:
 			continue
 		slot.Player.TimeBeforeNextTriggeredBomb -= Delta
 		if slot.Player.HoldingPrimaryKey || slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
-			_DropBomb(slot, slot.Player.Position)
+			var r: bool = false
+			if slot.Player.HasGrabbedBombID == Constants.INVALID_BOMB_ID:
+				r = _DropBomb(slot, slot.Player.Position)
+			if r:
+				slot.Player.CanGrabBombNow = false
+			elif slot.Player.PrimaryAction == Constants.PA_GRABBOMB && slot.Player.CanGrabBombNow:
+				_GrabBomb(slot)
+		elif !slot.Player.HoldingPrimaryKey && (slot.Player.HasGrabbedBombID != Constants.INVALID_BOMB_ID):
+				var bombid: int = Data.FindBombGrabbedBy(slot.PlayerID)
+				if bombid != Constants.INVALID_BOMB_ID:
+					_ThrowBomb(bombid)
 		if slot.Player.HoldingSecondaryKey:
 			var hasPunched: bool = false
 			if slot.Player.CanPunch:
@@ -81,7 +91,7 @@ func _ProcessPlayers(Delta: float) -> void:
 				_ExplodeTriggerBombs(slot)
 	pass
 
-func _DropBomb(Slot: TSlot, Field: Vector2i) -> void:
+func _DropBomb(Slot: TSlot, Field: Vector2i) -> bool:
 	var will_drop = false
 	if Slot.Player.Diseases[Constants.DISEASE_DIARRHEA] > 0:
 		will_drop = true
@@ -99,7 +109,8 @@ func _DropBomb(Slot: TSlot, Field: Vector2i) -> void:
 		if Data.AddBombAt(Slot.PlayerID, id, type, Field):
 			Slot.Player.DroppedBombs += 1
 			Network.SendBombDropped.rpc(Slot.PlayerID, id, type, Field)
-	pass
+			return true
+	return false
 
 func _ExplodeTriggerBombs(Slot: TSlot) -> void:
 	var bomb: TBomb = Data.FindOldestTriggerBombFor(Slot.PlayerID)
@@ -132,6 +143,27 @@ func _PunchBomb(Bomb: TBomb, Direction: Vector2i) -> void:
 	Network.SendBombStatus.rpc(Bomb.ID, Bomb.ToJSONString())
 	pass
 
+func _GrabBomb(Slot: TSlot) -> void:
+	var bomb: TBomb = Data.GetBombInField(Slot.Player.Position)
+	if !bomb:
+		return
+	bomb.IsMoving = true
+	bomb.IsGrabbedBy = Slot.PlayerID
+	Network.SendBombStatus.rpc(bomb.ID, bomb.ToJSONString())
+	Slot.Player.HasGrabbedBombID = bomb.ID
+	pass
+
+func _ThrowBomb(BombID: int) -> void:
+	var bomb: TBomb = Data.GetBombForID(BombID)
+	if !bomb:
+		return
+	var slot: TSlot = Data.GetSlotForPlayer(bomb.IsGrabbedBy)
+	bomb.IsMoving = false
+	bomb.IsGrabbedBy = Constants.INVALID_BOMB_ID
+	Network.SendBombStatus.rpc(bomb.ID, bomb.ToJSONString())
+	if slot:
+		slot.Player.HasGrabbedBombID = Constants.INVALID_BOMB_ID
+	pass
 
 
 func _ProcessBombs(Delta: float) -> void:
@@ -144,6 +176,8 @@ func _ProcessBombs(Delta: float) -> void:
 				_ExplodeBomb(bomb)
 		elif bomb.IsPunched:
 			_MovePunchedBomb(Delta, bomb)
+		elif bomb.IsGrabbedBy != Constants.INVALID_SLOT:
+			_MoveGrabbedBomb(bomb)
 	pass
 	
 func _CalculateNewBombPosition(Delta: float, Bomb: TBomb) -> Vector2:
@@ -185,6 +219,16 @@ func _MovePunchedBomb(Delta: float, Bomb: TBomb) -> void:
 		elif Bomb.PunchDirection.y > 0 && Bomb.PunchEndField.y >= Types.MAP_HEIGHT && field.y > Types.MAP_HEIGHT:
 			Bomb.PunchEndField.y = 0
 			Bomb.Position.y = -1
+	Network.SendBombPosition.rpc(Bomb.ID, Bomb.Position)
+	pass
+
+func _MoveGrabbedBomb(Bomb: TBomb) -> void:
+	if Bomb.IsGrabbedBy == Constants.INVALID_SLOT:
+		return
+	var slot: TSlot = Data.GetSlotForPlayer(Bomb.IsGrabbedBy)
+	if !slot:
+		return
+	Bomb.Position = slot.Player.Position
 	Network.SendBombPosition.rpc(Bomb.ID, Bomb.Position)
 	pass
 
@@ -555,7 +599,7 @@ func ProcessDoubleTap(PlayerID, KeyIndex) -> void:
 		Constants.DOUBLETAP_PRIMARY:
 			var slot: TSlot = Data.GetSlotForPlayer(PlayerID)
 			if slot:
-				if slot.Player.HasSpooger:
+				if slot.Player.PrimaryAction == Constants.PA_SPOOGER:
 					var fields: Array[Vector2i] = _FindFieldsForSpooger(slot)
 					for field: Vector2i in fields:
 						if slot.Player.DroppedBombs < slot.Player.TotalBombs:

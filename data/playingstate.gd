@@ -5,6 +5,8 @@ class_name TPlayingState
 
 var Position: Vector2
 var TimeBeforeNextTriggeredBomb: float # in seconds
+var CanGrabBombNow: bool = false
+var HasGrabbedBombID: int = Constants.INVALID_BOMB_ID
 
 var TotalBombs: int
 var NumTriggerBombs: int
@@ -15,7 +17,7 @@ var BombStrength: int
 var Alive: bool
 var Speed: int
 var Diseases: Array[float]
-var HasSpooger: bool
+var PrimaryAction: int # drop bomb, spooger or grab (see PA_ constants)
 var CanKick: bool
 var CanPunch: bool
 var Direction: int
@@ -30,7 +32,7 @@ const KEY_ALIVE = "alive"
 const KEY_BOMBSTRENGTH = "bomb_strength"
 const KEY_SPEED = "speed"
 const KEY_DISEASE = "disease_"
-const KEY_SPOOGER = "spooger"
+const KEY_PRIMARYACTION = "primary_action"
 const KEY_CANKICK = "can_kick"
 const KEY_CANPUNCH = "can_punch"
 const KEY_DIRECTION = "direction"
@@ -42,7 +44,7 @@ func _init() -> void:
 	ResetWithoutPosition()
 	
 func ResetWithoutPosition() -> void:
-	TotalBombs = 1
+	TotalBombs = 3
 	NumTriggerBombs = 0
 	DroppedBombs = 0
 	HoldingPrimaryKey = false
@@ -52,7 +54,7 @@ func ResetWithoutPosition() -> void:
 	Speed = Constants.SPEED_MIN
 	ClearDiseases()
 	TimeBeforeNextTriggeredBomb = 0
-	HasSpooger = false
+	PrimaryAction = Constants.PA_NONE
 	CanKick = false
 	CanPunch = false
 	Direction = Constants.DIRECTION_DOWN
@@ -69,7 +71,7 @@ func AssignWithoutPosition(Source: TPlayingState) -> void:
 	for i in Constants.NUM_DISEASES:
 		Diseases[i] = Source.Diseases[i]
 	TimeBeforeNextTriggeredBomb = Source.TimeBeforeNextTriggeredBomb
-	HasSpooger = Source.HasSpooger
+	PrimaryAction = Source.PrimaryAction
 	CanKick = Source.CanKick
 	CanPunch = Source.CanPunch
 	Direction = Source.Direction
@@ -86,7 +88,7 @@ func ToJSONString() -> String:
 	d.set(KEY_SPEED, Speed)
 	for i in Constants.NUM_DISEASES:
 		d.set(KEY_DISEASE + str(i), Diseases[i])
-	d.set(KEY_SPOOGER, HasSpooger)
+	d.set(KEY_PRIMARYACTION, PrimaryAction)
 	d.set(KEY_CANKICK, CanKick)
 	d.set(KEY_CANPUNCH, CanPunch)
 	d.set(KEY_DIRECTION, Direction)
@@ -114,8 +116,8 @@ func FromJSONString(Source: String) -> void:
 	for i in Constants.NUM_DISEASES:
 		if d.has(KEY_DISEASE + str(i)):
 			Diseases[i] = d[KEY_DISEASE + str(i)]
-	if d.has(KEY_SPOOGER):
-		HasSpooger = d[KEY_SPOOGER]
+	if d.has(KEY_PRIMARYACTION):
+		PrimaryAction = d[KEY_PRIMARYACTION]
 	if d.has(KEY_CANKICK):
 		CanKick = d[KEY_CANKICK]
 	if d.has(KEY_CANPUNCH):

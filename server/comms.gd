@@ -85,9 +85,14 @@ func _network_player_is_holding_key(PlayerID: int, KeyIndex: int, Value: bool) -
 	if idx != Constants.INVALID_SLOT:
 		var slot: TSlot = Server.Data.Slots[idx]
 		match KeyIndex:
-			Constants.HOLDINGKEY_PRIMARY: slot.Player.HoldingPrimaryKey = Value
-			Constants.HOLDINGKEY_SECONDARY: slot.Player.HoldingSecondaryKey = Value
-			Constants.DOUBLETAP_PRIMARY: Server.ProcessDoubleTap(PlayerID, KeyIndex)
+			Constants.HOLDINGKEY_PRIMARY: 
+				slot.Player.HoldingPrimaryKey = Value
+				if !Value:
+					slot.Player.CanGrabBombNow = true
+			Constants.HOLDINGKEY_SECONDARY: 
+				slot.Player.HoldingSecondaryKey = Value
+			Constants.DOUBLETAP_PRIMARY: 
+				Server.ProcessDoubleTap(PlayerID, KeyIndex)
 	pass
 
 

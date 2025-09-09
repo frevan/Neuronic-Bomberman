@@ -232,3 +232,17 @@ func InitAvailablePowerups() -> void:
 			p.Assign(pu)
 			AvailablePowerups.append(p)
 	pass
+
+
+func FindBombGrabbedBy(PlayerID: int) -> int:
+	var bomb: TBomb = GetBombGrabbedBy(PlayerID)
+	if bomb:
+		return bomb.ID
+	return Constants.INVALID_BOMB_ID
+
+func GetBombGrabbedBy(PlayerID: int) -> TBomb:
+	for id in Bombs:
+		var bomb: TBomb = Bombs[id]
+		if bomb.IsGrabbedBy == PlayerID:
+			return bomb
+	return null

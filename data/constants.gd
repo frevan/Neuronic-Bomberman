@@ -62,3 +62,9 @@ const DIRECTION_LEFT = 0
 const DIRECTION_RIGHT = 1
 const DIRECTION_UP = 2
 const DIRECTION_DOWN = 3
+
+
+# PrimaryAction values
+const PA_NONE = 0
+const PA_SPOOGER = 1
+const PA_GRABBOMB = 2
