@@ -21,6 +21,7 @@ var PrimaryAction: int # drop bomb, spooger or grab (see PA_ constants)
 var CanKick: bool
 var CanPunch: bool
 var Direction: int
+var JellyBombs: bool
 
 
 const KEY_TOTALBOMBS = "total_bombs"
@@ -36,6 +37,7 @@ const KEY_PRIMARYACTION = "primary_action"
 const KEY_CANKICK = "can_kick"
 const KEY_CANPUNCH = "can_punch"
 const KEY_DIRECTION = "direction"
+const KEY_JELLY = "jelly"
 
 
 func _init() -> void:
@@ -58,6 +60,7 @@ func ResetWithoutPosition() -> void:
 	CanKick = false
 	CanPunch = false
 	Direction = Constants.DIRECTION_DOWN
+	JellyBombs = false
 	
 func AssignWithoutPosition(Source: TPlayingState) -> void:
 	TotalBombs = Source.TotalBombs
@@ -74,6 +77,7 @@ func AssignWithoutPosition(Source: TPlayingState) -> void:
 	PrimaryAction = Source.PrimaryAction
 	CanKick = Source.CanKick
 	CanPunch = Source.CanPunch
+	JellyBombs = Source.JellyBombs
 	Direction = Source.Direction
 
 func ToJSONString() -> String:
@@ -91,6 +95,7 @@ func ToJSONString() -> String:
 	d.set(KEY_PRIMARYACTION, PrimaryAction)
 	d.set(KEY_CANKICK, CanKick)
 	d.set(KEY_CANPUNCH, CanPunch)
+	d.set(KEY_JELLY, JellyBombs)
 	d.set(KEY_DIRECTION, Direction)
 	return JSON.stringify(d)
 
@@ -122,6 +127,8 @@ func FromJSONString(Source: String) -> void:
 		CanKick = d[KEY_CANKICK]
 	if d.has(KEY_CANPUNCH):
 		CanPunch = d[KEY_CANPUNCH]
+	if d.has(KEY_JELLY):
+		JellyBombs = d[KEY_JELLY]
 	if d.has(KEY_DIRECTION):
 		Direction = d[KEY_DIRECTION]
 	pass

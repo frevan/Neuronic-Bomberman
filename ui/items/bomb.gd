@@ -3,7 +3,7 @@ extends CharacterBody2D
 class_name TBombScene
 
 
-signal StoppedMoving(Sender: TBombScene)
+signal Collided(Sender: TBombScene)
 
 
 var PlayerID: int
@@ -31,8 +31,5 @@ func _physics_process(_delta: float) -> void:
 			velocity = direction * Constants.BOMB_SPEED
 			var collided: bool = move_and_slide()
 			if collided:
-				direction = Vector2.ZERO
-				var field = Tools.ScreenPositionToField(position)
-				position = Tools.FieldPositionToScreen(field) + Tools.BOMB_POS_OFFSET
-				StoppedMoving.emit(self)
+				Collided.emit(self)
 	pass

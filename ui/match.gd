@@ -141,7 +141,7 @@ func _client_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vecto
 	scene.visible = true
 	scene.collision_layer = COLLISIONLAYER_BOMB
 	scene.collision_mask = COLLISIONMASK_BOMB
-	scene.StoppedMoving.connect(_bomb_stopped_moving)
+	scene.Collided.connect(_bomb_collided)
 	var fname: String = "res://assets/bomb.png"
 	if Type == Constants.BOMB_TRIGGER: 
 		fname = "res://assets/triggerbomb.png"
@@ -476,6 +476,14 @@ func _on_player_collided_with_bomb(Sender: TPlayerScene, Bomb: TBombScene, _Coll
 				Client.SendBombIsMoving(Bomb.BombID, true)
 	pass
 
-func _bomb_stopped_moving(Sender: TBombScene) -> void:
-	Client.SendBombIsMoving(Sender.BombID, false)
+func _bomb_collided(Sender: TBombScene) -> void:
+	var bomb: TBomb = Client.Data.GetBombForID(Sender.BombID)
+	if bomb:
+		if bomb.IsJelly:
+			Sender.direction = Sender.direction * -1.0
+		else:
+			Sender.direction = Vector2.ZERO
+			var field = Tools.ScreenPositionToField(Sender.position)
+			Sender.position = Tools.FieldPositionToScreen(field) + Tools.BOMB_POS_OFFSET
+			Client.SendBombIsMoving(Sender.BombID, false)
 	pass

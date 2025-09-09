@@ -144,6 +144,7 @@ func AddBombAt(PlayerID: int, BombID: int, Type: int, Position: Vector2) -> bool
 	b.PlayerID = PlayerID
 	b.TimeUntilExplosion = Constants.BOMB_TIME
 	b.Strength = Slots[idx].Player.BombStrength
+	b.IsJelly = Slots[idx].Player.JellyBombs
 	b.IsMoving = false
 	Bombs[b.ID] = b
 	if b.Type == Constants.BOMB_TRIGGER:

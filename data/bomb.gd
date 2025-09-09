@@ -19,10 +19,13 @@ var PunchEndField: Vector2i
 
 var IsGrabbedBy: int = Constants.INVALID_SLOT # player id
 
+var IsJelly: bool = false
+
 
 const KEY_IsMoving = "moving"
 const KEY_IsPunched = "punched"
 const KEY_IsGrabbedBy = "grabbed_by"
+const KEY_IsJelly = "jelly"
 
 
 func ToJSONString() -> String:
@@ -30,6 +33,7 @@ func ToJSONString() -> String:
 	d.set(KEY_IsMoving, IsMoving)
 	d.set(KEY_IsPunched, IsPunched)
 	d.set(KEY_IsGrabbedBy, IsGrabbedBy)
+	d.set(KEY_IsJelly, IsJelly)
 	return JSON.stringify(d)
 
 func FromJSONString(Source: String) -> void:
@@ -40,4 +44,6 @@ func FromJSONString(Source: String) -> void:
 		IsPunched = d[KEY_IsPunched]
 	if d.has(KEY_IsGrabbedBy):
 		IsGrabbedBy = d[KEY_IsGrabbedBy]
+	if d.has(KEY_IsJelly):
+		IsGrabbedBy = d[KEY_IsJelly]
 	pass

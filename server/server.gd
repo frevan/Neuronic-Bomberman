@@ -184,7 +184,7 @@ func _ProcessBombs(Delta: float) -> void:
 	for id in Data.Bombs:
 		var bomb: TBomb = Data.Bombs[id]
 		bomb.TimeSinceDrop += Delta
-		if !bomb.IsMoving:
+		if !bomb.IsPunched:
 			bomb.TimeUntilExplosion -= Delta
 			if (bomb.Type == Constants.BOMB_NORMAL) && (bomb.TimeUntilExplosion <= 0):
 				_ExplodeBomb(bomb)
