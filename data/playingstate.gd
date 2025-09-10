@@ -4,6 +4,7 @@ class_name TPlayingState
 
 
 var Position: Vector2
+var TimeSinceLastBombDrop: float # in seconds
 var TimeBeforeNextTriggeredBomb: float # in seconds
 var CanGrabBombNow: bool = false
 var HasGrabbedBombID: int = Constants.INVALID_BOMB_ID
@@ -46,7 +47,7 @@ func _init() -> void:
 	ResetWithoutPosition()
 	
 func ResetWithoutPosition() -> void:
-	TotalBombs = 1
+	TotalBombs = 10
 	NumTriggerBombs = 0
 	DroppedBombs = 0
 	HoldingPrimaryKey = false
@@ -55,6 +56,7 @@ func ResetWithoutPosition() -> void:
 	BombStrength = Constants.BOMB_STRENGTH
 	Speed = Constants.SPEED_MIN
 	ClearDiseases()
+	TimeSinceLastBombDrop = 0
 	TimeBeforeNextTriggeredBomb = 0
 	PrimaryAction = Constants.PA_NONE
 	CanKick = false
@@ -73,6 +75,7 @@ func AssignWithoutPosition(Source: TPlayingState) -> void:
 	Speed = Source.Speed
 	for i in Constants.NUM_DISEASES:
 		Diseases[i] = Source.Diseases[i]
+	TimeSinceLastBombDrop = Source.TimeSinceLastBombDrop
 	TimeBeforeNextTriggeredBomb = Source.TimeBeforeNextTriggeredBomb
 	PrimaryAction = Source.PrimaryAction
 	CanKick = Source.CanKick

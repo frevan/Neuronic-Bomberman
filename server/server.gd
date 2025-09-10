@@ -86,11 +86,13 @@ func _ProcessPlayers(Delta: float) -> void:
 		var slot: TSlot = Data.Slots[i]
 		if (slot.PlayerID == 0) or !slot.Player.Alive:
 			continue
+		slot.Player.TimeSinceLastBombDrop += Delta
 		slot.Player.TimeBeforeNextTriggeredBomb -= Delta
 		if slot.Player.HoldingPrimaryKey || slot.Player.Diseases[Constants.DISEASE_DIARRHEA]:
 			var r: bool = false
 			if slot.Player.HasGrabbedBombID == Constants.INVALID_BOMB_ID:
-				r = _DropBomb(slot, slot.Player.Position)
+				if slot.Player.TimeSinceLastBombDrop > Constants.TIME_BETWEEN_DROPS:
+					r = _DropBomb(slot, slot.Player.Position)
 			if r:
 				slot.Player.CanGrabBombNow = false
 			elif slot.Player.PrimaryAction == Constants.PA_GRABBOMB && slot.Player.CanGrabBombNow:
@@ -123,6 +125,7 @@ func _DropBomb(Slot: TSlot, Field: Vector2i) -> bool:
 		if Slot.Player.NumTriggerBombs > 0:
 			type = Constants.BOMB_TRIGGER
 		if Data.AddBombAt(Slot.PlayerID, id, type, Field):
+			Slot.Player.TimeSinceLastBombDrop = 0
 			Slot.Player.DroppedBombs += 1
 			Network.SendBombDropped.rpc(Slot.PlayerID, id, type, Field)
 			return true
