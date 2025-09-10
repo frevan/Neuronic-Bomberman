@@ -433,7 +433,7 @@ func _SendLobbyInfoToPlayer(PlayerID: int) -> void:
 				Network.SendPlayerMovedToSlot.rpc_id(PlayerID, other_peerid, i)
 				Network.SendPlayerNameChanged.rpc_id(PlayerID, other_peerid, slot.PlayerName)
 		Network.SendMapName.rpc_id(PlayerID, CurrentMapName)
-		Network.SendWinConditionChanged.rpc(Constants.WinCondition.NUM_ROUNDS, Data.NumRounds)
+		Network.SendWinConditionChanged.rpc(Data.WinCondition, Data.NumRounds)
 	pass
 
 
