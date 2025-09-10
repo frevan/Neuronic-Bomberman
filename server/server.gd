@@ -18,6 +18,14 @@ var Comms: TServerComms
 enum TState {IDLE, LOBBY, MATCH, ROUND}
 var State: TState = TState.IDLE
 
+var CurrentTimeOutBlockTime: float
+var LastTimeOutBlockTime: float
+var LastTimeOutBlockField: Vector2i
+var TimeOutBlockDirection: Vector2i
+var TimeOutMin: Vector2i
+var TimeOutMax: Vector2i
+const TimeOutBlockSpacing: float = 0.25 # in seconds
+
 
 @onready var Rules: TRules = TRules.new()
 
@@ -45,7 +53,11 @@ func _process(delta: float) -> void:
 		_PickUpPowerups()
 		_ProcessDiseases(delta)
 		if Data.MaxTime > 0:
-			Data.CurrentRoundTime -= delta
+			if Data.CurrentRoundTime <= 0:
+				_FillWithSolidBlocks(delta)
+				_KillPlayersDuringTimeOut()
+			else:
+				Data.CurrentRoundTime -= delta
 	pass
 
 
@@ -463,6 +475,7 @@ func _StartNewRound() -> void:
 	Data.CountingDown = false
 	Data.CurrentRound += 1
 	Data.CurrentRoundTime = Data.MaxTime
+	LastTimeOutBlockTime = -1
 	Network.SendNewRound.rpc(CurrentMapName, Data.CurrentRound)
 	pass
 
@@ -644,3 +657,55 @@ func _FindFieldsForSpooger(Slot: TSlot) -> Array[Vector2i]:
 		result.append(field)
 		field += vector 
 	return result
+
+
+func _FillWithSolidBlocks(Delta: float) -> void:
+	if LastTimeOutBlockTime < 0: # init
+		LastTimeOutBlockTime = 0
+		LastTimeOutBlockField = Vector2i.ZERO
+		TimeOutBlockDirection = Vector2i(1, 0)
+		CurrentTimeOutBlockTime = 0
+		TimeOutMin = Vector2i(0, 0)
+		TimeOutMax = Vector2i(Types.MAP_WIDTH - 1, Types.MAP_HEIGHT - 1)
+		Maps.SetFieldTypeTo(Data.Map, LastTimeOutBlockField, Types.FIELD_SOLID)
+		Network.SendMapTileChanged.rpc(LastTimeOutBlockField, Types.FIELD_SOLID)
+		return
+	CurrentTimeOutBlockTime = CurrentTimeOutBlockTime + Delta
+	if CurrentTimeOutBlockTime > LastTimeOutBlockTime + TimeOutBlockSpacing:
+		LastTimeOutBlockTime = CurrentTimeOutBlockTime
+		LastTimeOutBlockField = _NextTimeOutBlockField(LastTimeOutBlockField)
+		Maps.SetFieldTypeTo(Data.Map, LastTimeOutBlockField, Types.FIELD_SOLID)
+		Network.SendMapTileChanged.rpc(LastTimeOutBlockField, Types.FIELD_SOLID)
+	pass
+
+func _NextTimeOutBlockField(CurField: Vector2i) -> Vector2i:
+	var field = CurField + TimeOutBlockDirection
+	if TimeOutBlockDirection.x > 0 && field.x > TimeOutMax.x:
+		TimeOutBlockDirection = Vector2i(0, 1)
+		field = CurField + TimeOutBlockDirection
+		TimeOutMin.y += 1
+	elif TimeOutBlockDirection.x < 0 && field.x < TimeOutMin.x:
+		TimeOutBlockDirection = Vector2i(0, -1)
+		field = CurField + TimeOutBlockDirection
+		TimeOutMax.y -= 1
+	elif TimeOutBlockDirection.y > 0 && field.y > TimeOutMax.y:
+		TimeOutBlockDirection = Vector2i(-1, 0)
+		field = CurField + TimeOutBlockDirection
+		TimeOutMax.x -=1
+	elif TimeOutBlockDirection.y < 0 && field.y < TimeOutMin.y:
+		TimeOutBlockDirection = Vector2i(1, 0)
+		field = CurField + TimeOutBlockDirection
+		TimeOutMin.x += 1
+	return field
+
+
+func _KillPlayersDuringTimeOut() -> void:
+	var playerWasKilled: bool = false
+	for i in Data.Slots.size():
+		var slot = Data.Slots[i]
+		if Maps.GetFieldType(Data.Map, slot.Player.Position) == Types.FIELD_SOLID:
+			_KillPlayer(i)
+			playerWasKilled = true
+	if playerWasKilled:
+		_CheckIfRoundEnded()
+	pass
