@@ -46,7 +46,7 @@ func _init() -> void:
 	ResetWithoutPosition()
 	
 func ResetWithoutPosition() -> void:
-	TotalBombs = 3
+	TotalBombs = 1
 	NumTriggerBombs = 0
 	DroppedBombs = 0
 	HoldingPrimaryKey = false

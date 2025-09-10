@@ -170,7 +170,7 @@ func _ThrowBomb(BombID: int) -> void:
 	if (field >= Vector2i.ZERO) && (field < Vector2i(Types.MAP_WIDTH, Types.MAP_HEIGHT)):
 		bomb.PunchDirection = direction
 		bomb.PunchStartField = Vector2i(bomb.Position)
-		bomb.PunchEndField = bomb.PunchStartField + (direction * 4)
+		bomb.PunchEndField = Vector2i(slot.Player.Position) + (direction * 4)
 	bomb.IsGrabbedBy = Constants.INVALID_BOMB_ID
 	bomb.IsMoving = true
 	bomb.IsPunched = true
@@ -207,11 +207,18 @@ func _CalculateNewBombPosition(Delta: float, Bomb: TBomb) -> Vector2:
 		r.x = Bomb.PunchStartField.x + sin(cur_distance / total_distance * PI)
 	return r
 
+func _HasPunchedBombReachedDestination(Field: Vector2i, Bomb: TBomb) -> bool:
+	if Bomb.PunchDirection.x != 0:
+		return abs(Field.x - Bomb.PunchStartField.x) >= abs(Bomb.PunchEndField.x - Bomb.PunchStartField.x)
+	elif Bomb.PunchDirection.y != 0:
+		return abs(Field.y - Bomb.PunchStartField.y) >= abs(Bomb.PunchEndField.y - Bomb.PunchStartField.y)
+	return true
+
 func _MovePunchedBomb(Delta: float, Bomb: TBomb) -> void:
 	Bomb.Position = _CalculateNewBombPosition(Delta, Bomb)
 	var field: Vector2i = Vector2i(Bomb.Position)
-	if abs(field - Bomb.PunchStartField) >= abs(Bomb.PunchEndField - Bomb.PunchStartField):
-		if Maps.GetFieldType(Data.Map, field) == Types.FIELD_EMPTY:
+	if _HasPunchedBombReachedDestination(field, Bomb):
+		if Maps.GetFieldType(Data.Map, Bomb.PunchEndField) == Types.FIELD_EMPTY:
 			Bomb.IsMoving = false
 			Bomb.IsPunched = false
 			Bomb.Position = Bomb.PunchEndField
