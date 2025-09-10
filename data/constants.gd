@@ -68,3 +68,6 @@ const DIRECTION_DOWN = 3
 const PA_NONE = 0
 const PA_SPOOGER = 1
 const PA_GRABBOMB = 2
+
+
+enum WinCondition { NUM_ROUNDS, SCORE }

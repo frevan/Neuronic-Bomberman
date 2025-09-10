@@ -232,25 +232,40 @@ offset_bottom = 572.0
 shortcut = SubResource("Shortcut_lyjxk")
 text = "ready"
 
-[node name="NumRoundsSpin" type="SpinBox" parent="."]
-offset_left = 487.0
-offset_top = 478.0
-offset_right = 574.0
-offset_bottom = 509.0
+[node name="WinConditionLabel" type="Label" parent="."]
+unique_name_in_owner = true
+offset_left = 416.0
+offset_top = 482.0
+offset_right = 475.0
+offset_bottom = 505.0
+text = "Rounds"
+
+[node name="WinConditionSelector" type="OptionButton" parent="."]
+unique_name_in_owner = true
+offset_left = 409.0
+offset_top = 477.0
+offset_right = 502.0
+offset_bottom = 511.0
+selected = 0
+item_count = 2
+popup/item_0/text = "Rounds"
+popup/item_0/id = 0
+popup/item_1/text = "Score"
+popup/item_1/id = 1
+
+[node name="WinConditionSpin" type="SpinBox" parent="WinConditionSelector"]
+unique_name_in_owner = true
+offset_left = 110.0
+offset_right = 197.0
+offset_bottom = 31.0
 min_value = 1.0
 value = 1.0
 rounded = true
-
-[node name="NumRoundsLabel" type="Label" parent="."]
-offset_left = 416.0
-offset_top = 482.0
-offset_right = 456.0
-offset_bottom = 505.0
-text = "Rounds"
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
 [connection signal="pressed" from="LeaveButton" to="." method="_on_leave_button_pressed"]
 [connection signal="item_selected" from="MapsList" to="." method="_on_maps_list_item_selected"]
 [connection signal="toggled" from="ReadyBox" to="." method="_on_ready_box_toggled"]
-[connection signal="value_changed" from="NumRoundsSpin" to="." method="_on_num_rounds_spin_value_changed"]
+[connection signal="item_selected" from="WinConditionSelector" to="." method="_on_win_condition_selector_item_selected"]
+[connection signal="value_changed" from="WinConditionSelector/WinConditionSpin" to="." method="_on_win_condition_spin_value_changed"]

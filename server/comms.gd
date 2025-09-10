@@ -96,10 +96,18 @@ func _network_player_is_holding_key(PlayerID: int, KeyIndex: int, Value: bool) -
 	pass
 
 
-func _network_request_num_rounds(Value: int) -> void:
-	_log("num rounds request: " + str(Value))
-	Server.Data.NumRounds = clamp(Value, Server.NUM_ROUNDS_MIN, Server.NUM_ROUNDS_MAX)
-	Network.SendNumRoundsChanged.rpc(Server.Data.NumRounds)
+func _network_request_win_condition(Condition: Constants.WinCondition, Value: int) -> void:
+	_log("win condition request: " + str(Condition) + " with value " + str(Value))
+	Server.Data.WinCondition = clamp(Condition, Constants.WinCondition.NUM_ROUNDS, Constants.WinCondition.SCORE)
+	var v: int = 0
+	match Server.Data.WinCondition:
+		Constants.WinCondition.NUM_ROUNDS: 
+			Server.Data.NumRounds = clamp(Value, Server.NUM_ROUNDS_MIN, Server.NUM_ROUNDS_MAX)
+			v = Server.Data.NumRounds
+		Constants.WinCondition.SCORE: 
+			Server.Data.ScoreToWin = clamp(Value, Server.SCORE_MIN, Server.SCORE_MAX)
+			v = Server.Data.ScoreToWin
+	Network.SendWinConditionChanged.rpc(Server.Data.WinCondition, v)
 	pass
 
 

@@ -15,7 +15,7 @@ func BeforeShow() -> void:
 	Client.OnPlayerMovedToSlot.connect(_client_player_moved_to_slot)
 	Client.OnMapNameChanged.connect(_client_map_name_changed)
 	Client.OnPlayerBecameReady.connect(_client_player_became_ready)
-	Client.OnNumRoundsChanged.connect(_client_num_rounds_changed)
+	Client.OnWinConditionChanged.connect(_client_win_condition_changed)
 	Client.OnPlayerNameChanged.connect(_client_player_name_changed)
 	_AdjustControls()
 	pass
@@ -27,7 +27,7 @@ func AfterHide() -> void:
 	Client.OnPlayerMovedToSlot.disconnect(_client_player_moved_to_slot)
 	Client.OnMapNameChanged.disconnect(_client_map_name_changed)
 	Client.OnPlayerBecameReady.disconnect(_client_player_became_ready)
-	Client.OnNumRoundsChanged.disconnect(_client_num_rounds_changed)
+	Client.OnWinConditionChanged.disconnect(_client_win_condition_changed)
 	Client.OnPlayerNameChanged.disconnect(_client_player_name_changed)
 	pass
 
@@ -72,8 +72,8 @@ func _client_player_became_ready(_PlayerID: int, _Ready: bool) -> void:
 	_UpdatePlayerInfo()
 	pass
 
-func _client_num_rounds_changed(_Value: int) -> void:
-	_AdjustRoundsLabelText()
+func _client_win_condition_changed(_Condition: Constants.WinCondition, _Value: int) -> void:
+	_AdjustWinConditionControls()
 	pass
 
 func _client_player_name_changed(_PlayerID: int, _Name: String) -> void:
@@ -210,22 +210,29 @@ func _on_ready_box_toggled(toggled_on: bool) -> void:
 
 
 func _AdjustControls() -> void:
-	$NumRoundsSpin.visible = Network.IsServer()
-	_AdjustRoundsLabelText()
+	$%WinConditionSelector.visible = Network.IsServer()
+	$%WinConditionLabel.visible = !Network.IsServer()
+	_AdjustWinConditionControls()
 	pass
 
-func _AdjustRoundsLabelText() -> void:
-	$NumRoundsSpin.set_value_no_signal(Client.Data.NumRounds)
+func _AdjustWinConditionControls() -> void:
+	var v: int = 0
+	var idx: int = 0
+	var s: String
+	match Client.Data.WinCondition:
+		Constants.WinCondition.NUM_ROUNDS:
+			idx = 0
+			v = Client.Data.NumRounds
+			s = "Rounds"
+		Constants.WinCondition.SCORE:
+			idx = 1
+			v = Client.Data.ScoreToWin
+			s = "Score"
 	if Network.IsServer():
-		$NumRoundsLabel.text = "Rounds"
+		$%WinConditionSelector.select(idx)
+		$%WinConditionSpin.set_value_no_signal(v)
 	else:
-		$NumRoundsLabel.text = "Rounds: " + str(Client.Data.NumRounds)
-	pass
-
-
-func _on_num_rounds_spin_value_changed(value: float) -> void:
-	var v: int = floor(value)
-	Client.RequestNumRounds(v)
+		$%WinConditionLabel.text = s + ": " + str(v)
 	pass
 
 
@@ -234,3 +241,23 @@ func _IndexOfMapInList(Name: String) -> int:
 		if $MapsList.get_item_text(i) == Name:
 			return i
 	return -1
+
+
+func _on_win_condition_selector_item_selected(index: int) -> void:
+	var condition: Constants.WinCondition
+	var v: int
+	match index:
+		0: 
+			condition = Constants.WinCondition.NUM_ROUNDS
+			v = Client.Data.NumRounds
+		1: 
+			condition = Constants.WinCondition.SCORE
+			v = Client.Data.ScoreToWin
+	Client.RequestWinCondition(condition, v)
+	pass
+
+
+func _on_win_condition_spin_value_changed(value: float) -> void:
+	var v: int = floor(value)
+	Client.RequestWinCondition(Client.Data.WinCondition, v)
+	pass

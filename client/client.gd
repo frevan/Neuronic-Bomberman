@@ -29,7 +29,7 @@ signal OnPlayerDied # params: id (int)
 signal OnPlayerScoreChanged # params: id (int), score (int)
 signal OnPlayerBecameReady # params: id (int), ready (bool)
 signal OnCountDownStarted # params: time (float)
-signal OnNumRoundsChanged # params: value (int)
+signal OnWinConditionChanged(Condition: Constants.WinCondition, Value: int)
 signal OnPlayerDisconnected # params: id (int)
 signal OnPlayerNameChanged # params: id (int), name (string)
 
@@ -278,10 +278,13 @@ func _network_countdown_started(CountDownTime: float) -> void:
 	pass
 
 
-func _network_num_rounds_changed(Value: int) -> void:
-	_log("Number of rounds changed to " + str(Value))
-	Data.NumRounds = Value
-	OnNumRoundsChanged.emit(Value)
+func _network_win_condition_changed(Condition: Constants.WinCondition, Value: int) -> void:
+	_log("Win condition changed to " + str(Condition) + " with value " + str(Value))
+	Data.WinCondition = Condition
+	match Condition:
+		Constants.WinCondition.NUM_ROUNDS: Data.NumRounds = Value
+		Constants.WinCondition.SCORE: Data.ScoreToWin = Value
+	OnWinConditionChanged.emit(Condition, Value)
 	pass
 
 
@@ -328,7 +331,7 @@ func _ConnectToSignals() -> void:
 	Network.OnMatchEnded.connect(_network_match_ended)
 	Network.OnUpdatePlayerScore.connect(_network_update_player_score)
 	Network.OnCountDownStarted.connect(_network_countdown_started)
-	Network.OnNumRoundsChanged.connect(_network_num_rounds_changed)
+	Network.OnWinConditionChanged.connect(_network_win_condition_changed)
 	Network.OnPlayerNameChanged.connect(_network_player_name_changed)
 	Network.OnPlayingStateUpdate.connect(_network_playing_state_update)
 	pass
@@ -360,7 +363,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnMatchEnded.disconnect(_network_match_ended)
 	Network.OnUpdatePlayerScore.disconnect(_network_update_player_score)
 	Network.OnCountDownStarted.disconnect(_network_countdown_started)
-	Network.OnNumRoundsChanged.disconnect(_network_num_rounds_changed)
+	Network.OnWinConditionChanged.disconnect(_network_win_condition_changed)
 	Network.OnPlayerNameChanged.disconnect(_network_player_name_changed)
 	Network.OnPlayingStateUpdate.disconnect(_network_playing_state_update)
 	pass
@@ -478,8 +481,8 @@ func RequestPlayerReady(Ready: bool) -> void:
 	pass
 
 
-func RequestNumRounds(Value: int) -> void:
-	Network.SendRequestNumRounds.rpc_id(1, Value)
+func RequestWinCondition(Condition: Constants.WinCondition, Value: int) -> void:
+	Network.SendRequestWinCondition.rpc_id(1, Condition, Value)
 	pass
 
 

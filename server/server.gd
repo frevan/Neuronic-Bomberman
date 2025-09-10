@@ -7,6 +7,8 @@ const COUNTDOWN_TIME = 5
 
 const NUM_ROUNDS_MIN = 1
 const NUM_ROUNDS_MAX = 100
+const SCORE_MIN = 1
+const SCORE_MAX = 100
 
 var Data: TGameData
 var Maps: TMaps
@@ -388,7 +390,7 @@ func _ConnectToSignalsOnStart() -> void:
 	Network.OnRequestStartMatch.connect(Comms._network_request_start_match)
 	Network.OnPlayerReady.connect(Comms._network_player_ready)
 	Network.OnPlayerHoldingKey.connect(Comms._network_player_is_holding_key)
-	Network.OnRequestNumRounds.connect(Comms._network_request_num_rounds)
+	Network.OnRequestWinCondition.connect(Comms._network_request_win_condition)
 	Network.OnPlayerNameReceived.connect(Comms._network_player_name_received)
 	Network.OnPlayerDirectionChange.connect(Comms._network_player_direction_change)
 	Network.OnBombIsMoving.connect(Comms._network_bomb_is_moving)
@@ -404,7 +406,7 @@ func _DisconnectFromSignalsOnStop() -> void:
 	Network.OnRequestStartMatch.disconnect(Comms._network_request_start_match)
 	Network.OnPlayerReady.disconnect(Comms._network_player_ready)
 	Network.OnPlayerHoldingKey.disconnect(Comms._network_player_is_holding_key)
-	Network.OnRequestNumRounds.disconnect(Comms._network_request_num_rounds)
+	Network.OnRequestWinCondition.disconnect(Comms._network_request_win_condition)
 	Network.OnPlayerNameReceived.disconnect(Comms._network_player_name_received)
 	Network.OnPlayerDirectionChange.disconnect(Comms._network_player_direction_change)
 	Network.OnBombIsMoving.disconnect(Comms._network_bomb_is_moving)
@@ -426,7 +428,7 @@ func _SendLobbyInfoToPlayer(PlayerID: int) -> void:
 				Network.SendPlayerMovedToSlot.rpc_id(PlayerID, other_peerid, i)
 				Network.SendPlayerNameChanged.rpc_id(PlayerID, other_peerid, slot.PlayerName)
 		Network.SendMapName.rpc_id(PlayerID, CurrentMapName)
-		Network.SendNumRoundsChanged.rpc(Data.NumRounds)
+		Network.SendWinConditionChanged.rpc(Constants.WinCondition.NUM_ROUNDS, Data.NumRounds)
 	pass
 
 

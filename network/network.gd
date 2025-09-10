@@ -11,7 +11,7 @@ signal OnRequestMapChange # params: map_nake (string)
 signal OnRequestStartMatch # params: sender_id (int)
 signal OnPlayerReady # params: sender_id (int), ready (bool)
 signal OnPlayerHoldingKey # params: sender_id (int), key_index (int), value (bool)
-signal OnRequestNumRounds # params: value (int)
+signal OnRequestWinCondition(Condition: Constants.WinCondition, Value: int)
 signal OnPlayerNameReceived # params: id (int), name (string)
 signal OnPlayerDirectionChange # params: id (int), direction (int)
 signal OnBombIsMoving(BombID: int, Value: bool)
@@ -37,7 +37,7 @@ signal OnRemoveExplosion # params: field (vector2i)
 signal OnPlayerDied # params: id (int)
 signal OnUpdatePlayerScore # params: id (int), score (int)
 signal OnCountDownStarted # params: time (float)
-signal OnNumRoundsChanged # params: value (int)
+signal OnWinConditionChanged(Condition: Constants.WinCondition, Value: int)
 signal OnPlayerNameChanged # params: id (int), value (string)
 signal OnPlayingStateUpdate # params: id (int), state (JSON string)
 
@@ -131,8 +131,8 @@ func SendHoldingKey(KeyIndex: int, Value: bool) -> void:
 	OnPlayerHoldingKey.emit(id, KeyIndex, Value)
 
 @rpc("reliable", "call_local", "authority")
-func SendRequestNumRounds(Value: int) -> void:
-	OnRequestNumRounds.emit(Value)
+func SendRequestWinCondition(Condition: Constants.WinCondition, Value: int) -> void:
+	OnRequestWinCondition.emit(Condition, Value)
 
 @rpc("reliable", "call_local", "any_peer")
 func SendPlayerName(Value: String) -> void:
@@ -235,8 +235,8 @@ func SendCountDownStarted(CountDownTime: float) -> void:
 	OnCountDownStarted.emit(CountDownTime)
 
 @rpc("reliable", "call_local", "authority")
-func SendNumRoundsChanged(Value: int) -> void:
-	OnNumRoundsChanged.emit(Value)
+func SendWinConditionChanged(Condition: Constants.WinCondition, Value: int) -> void:
+	OnWinConditionChanged.emit(Condition, Value)
 
 @rpc("reliable", "call_local", "authority")
 func SendPlayerNameChanged(ID: int, Value: String) -> void:

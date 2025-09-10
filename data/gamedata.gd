@@ -6,7 +6,9 @@ var Slots: Array # TSlot
 var Map: Types.TMap = null
 var Bombs: Dictionary # key: bomb id (int), value: bomb (TBomb)
 var Explosions: Dictionary # key: field (Vector2i), value (Types.TExplosion)
-var NumRounds: int = 1
+var WinCondition: Constants.WinCondition = Constants.WinCondition.NUM_ROUNDS
+var NumRounds: int = 3
+var ScoreToWin: int = 3
 var CurrentRound: int = -1
 var AvailablePowerups: Array # Types.TMapPowerUp
 
