@@ -508,8 +508,8 @@ func _bomb_collided(Sender: TBombScene) -> void:
 func _on_round_time_timer_timeout() -> void:
 	var s: String = ""
 	if Client.Data.MaxTime > 0:
-		var seconds: int = int(fmod(Client.Data.CurrentRoundTime, 60.0))
-		var minutes: int = int(Client.Data.CurrentRoundTime / 60.0)
+		var seconds: int = maxi(0, int(fmod(Client.Data.CurrentRoundTime, 60.0)))
+		var minutes: int = maxi(0, int(Client.Data.CurrentRoundTime / 60.0))
 		s = "%02d:%02d" % [minutes, seconds]
 	$RoundTimeLabel.text = s
 	pass
