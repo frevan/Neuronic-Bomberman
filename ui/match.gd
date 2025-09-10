@@ -428,13 +428,18 @@ func _on_count_down_timer_timeout() -> void:
 
 
 func _UpdateCountDownLabelText() -> void:
-	var s: String = "Round " + str(Client.Data.CurrentRound + 1) + " of " + str(Client.Data.NumRounds)
+	var s: String
+	match Client.Data.WinCondition:
+		Constants.WinCondition.NUM_ROUNDS: s = "Round " + str(Client.Data.CurrentRound + 1) + " of " + str(Client.Data.NumRounds)
+		Constants.WinCondition.SCORE: s = "First to " + str(Client.Data.ScoreToWin) + " wins"
 	if Client.Data.CountingDown:
+		if s != "":
+			s += " - "
 		var _time: int = floor(Client.Data.CountDownTime)
 		if _time <= 0:
-			s += " - GO!"
+			s += "GO!"
 		else:
-			s += " - " + str(_time)
+			s += str(_time)
 	$CountDownLabel.text = s
 	pass
 
