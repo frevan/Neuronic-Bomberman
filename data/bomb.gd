@@ -45,5 +45,5 @@ func FromJSONString(Source: String) -> void:
 	if d.has(KEY_IsGrabbedBy):
 		IsGrabbedBy = d[KEY_IsGrabbedBy]
 	if d.has(KEY_IsJelly):
-		IsGrabbedBy = d[KEY_IsJelly]
+		IsJelly = d[KEY_IsJelly]
 	pass
