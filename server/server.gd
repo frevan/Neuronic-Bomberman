@@ -44,6 +44,8 @@ func _process(delta: float) -> void:
 		_KillPlayersInExplosions()
 		_PickUpPowerups()
 		_ProcessDiseases(delta)
+		if Data.MaxTime > 0:
+			Data.CurrentRoundTime -= delta
 	pass
 
 
@@ -460,6 +462,7 @@ func _StartNewRound() -> void:
 	Data.ResetBombsEtcBeforeRound()
 	Data.CountingDown = false
 	Data.CurrentRound += 1
+	Data.CurrentRoundTime = Data.MaxTime
 	Network.SendNewRound.rpc(CurrentMapName, Data.CurrentRound)
 	pass
 

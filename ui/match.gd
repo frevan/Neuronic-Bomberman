@@ -37,6 +37,7 @@ func BeforeShow() -> void:
 	super()
 	Client.OnNewRound.connect(_client_new_round)
 	Client.OnRoundStarted.connect(_client_round_started)
+	Client.OnRoundEnded.connect(_client_round_ended)
 	Client.OnPlayerPositionChanged.connect(_client_player_position_changed)
 	Client.OnMapTileChanged.connect(_client_map_tile_changed)
 	Client.OnBombDropped.connect(_client_bomb_dropped)
@@ -54,6 +55,7 @@ func AfterHide() -> void:
 	super()
 	Client.OnNewRound.disconnect(_client_new_round)
 	Client.OnRoundStarted.disconnect(_client_round_started)
+	Client.OnRoundEnded.disconnect(_client_round_ended)
 	Client.OnPlayerPositionChanged.disconnect(_client_player_position_changed)
 	Client.OnMapTileChanged.disconnect(_client_map_tile_changed)
 	Client.OnBombDropped.disconnect(_client_bomb_dropped)
@@ -67,6 +69,7 @@ func AfterHide() -> void:
 	Client.OnPlayerDisconnected.disconnect(_client_player_disconnected)
 	_CleanUpAfterMatch()
 	$CountDownTimer.stop()
+	$RoundTimeTimer.stop()
 	pass
 
 
@@ -121,6 +124,13 @@ func _client_round_started() -> void:
 	_ShowPlayers()
 	_SetPlayerAuthorities()
 	_SetPlayerPositions()
+	_on_round_time_timer_timeout()
+	if Client.Data.MaxTime > 0:
+		$RoundTimeTimer.start()
+	pass
+
+func _client_round_ended() -> void:
+	$RoundTimeTimer.stop()
 	pass
 
 func _client_player_position_changed(_PlayerID: int) -> void:
@@ -326,12 +336,12 @@ func _UpdatePlayerPositionsFromNodes() -> void:
 				if !node:
 					continue
 				Client.UpdatePlayerPosition(slot.PlayerID, Tools.ScreenPositionToField(node.position))
-			if slot.PlayerID == multiplayer.get_unique_id():
-				if slot.Player.Alive:
-					var field = Vector2i(slot.Player.Position)
-					$PlayerPosLabel.text = str(field)
-				else:
-					$PlayerPosLabel.text = "dead"
+			#if slot.PlayerID == multiplayer.get_unique_id():
+				#if slot.Player.Alive:
+					#var field = Vector2i(slot.Player.Position)
+					#$PlayerPosLabel.text = str(field)
+				#else:
+					#$PlayerPosLabel.text = "dead"
 	pass
 
 func _UpdateBombPositionsFromNodes() -> void:
@@ -492,4 +502,14 @@ func _bomb_collided(Sender: TBombScene) -> void:
 			var field = Tools.ScreenPositionToField(Sender.position)
 			Sender.position = Tools.FieldPositionToScreen(field) + Tools.BOMB_POS_OFFSET
 			Client.SendBombIsMoving(Sender.BombID, false)
+	pass
+
+
+func _on_round_time_timer_timeout() -> void:
+	var s: String = ""
+	if Client.Data.MaxTime > 0:
+		var seconds: int = int(fmod(Client.Data.CurrentRoundTime, 60.0))
+		var minutes: int = int(Client.Data.CurrentRoundTime / 60.0)
+		s = "%02d:%02d" % [minutes, seconds]
+	$RoundTimeLabel.text = s
 	pass

@@ -60,6 +60,9 @@ func _process(delta: float) -> void:
 			Data.CountDownTime -=  delta
 			if Data.CountDownTime <= 0:
 				Data.CountingDown = false
+		elif State == TState.ROUND:
+			if Data.MaxTime > 0:
+				Data.CurrentRoundTime -= delta
 	pass
 
 
@@ -164,6 +167,7 @@ func _network_new_round(MapName: String, Round: int) -> void:
 	Data.ResetPlayersBeforeRound()
 	Data.ResetBombsEtcBeforeRound()
 	Data.CurrentRound = Round
+	Data.CurrentRoundTime = Data.MaxTime
 	
 	OnNewRound.emit()
 	pass

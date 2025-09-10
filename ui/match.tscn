@@ -40,12 +40,12 @@ offset_bottom = 48.0
 text = "..."
 horizontal_alignment = 2
 
-[node name="PlayerPosLabel" type="Label" parent="."]
+[node name="RoundTimeLabel" type="Label" parent="."]
 offset_left = 16.0
 offset_top = 25.0
 offset_right = 56.0
 offset_bottom = 48.0
-text = "(0,0)"
+text = "..."
 
 [node name="Tiles" type="Node2D" parent="."]
 
@@ -152,6 +152,9 @@ offset_bottom = 48.0
 text = "Round #"
 horizontal_alignment = 1
 
+[node name="RoundTimeTimer" type="Timer" parent="."]
+wait_time = 0.5
+
 [connection signal="CollidedWithBomb" from="Players/Player0" to="." method="_on_player_collided_with_bomb"]
 [connection signal="OnDirectionChanged" from="Players/Player0" to="." method="_on_player_direction_changed"]
 [connection signal="CollidedWithBomb" from="Players/Player1" to="." method="_on_player_collided_with_bomb"]
@@ -173,3 +176,4 @@ horizontal_alignment = 1
 [connection signal="CollidedWithBomb" from="Players/Player9" to="." method="_on_player_collided_with_bomb"]
 [connection signal="OnDirectionChanged" from="Players/Player9" to="." method="_on_player_direction_changed"]
 [connection signal="timeout" from="CountDownTimer" to="." method="_on_count_down_timer_timeout"]
+[connection signal="timeout" from="RoundTimeTimer" to="." method="_on_round_time_timer_timeout"]

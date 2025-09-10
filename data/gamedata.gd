@@ -16,6 +16,8 @@ var MaxTime: int = 3*60 # in seconds, default to 3 minutes
 var CountingDown: bool = false
 var CountDownTime: float = 0
 
+var CurrentRoundTime: float # in seconds
+
 
 func InitSlots() -> void:
 	Slots.resize(Network.MAX_CLIENTS)
