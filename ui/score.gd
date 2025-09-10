@@ -21,6 +21,7 @@ func _on_visibility_changed() -> void:
 	if visible:
 		_UpdateMessageLabel()
 		_UpdateScoresLabel()
+		_UpdateWinConditionLabel()
 	pass
 
 
@@ -92,4 +93,13 @@ func _UpdateScoresLabel() -> void:
 
 func _on_continue_btn_pressed() -> void:
 	_ContinueToMatchOrLobby()
+	pass
+
+
+func _UpdateWinConditionLabel() -> void:
+	var s: String
+	match Client.Data.WinCondition:
+		Constants.WinCondition.NUM_ROUNDS: s = "Round " + str(Client.Data.CurrentRound + 1) + " of " + str(Client.Data.NumRounds)
+		Constants.WinCondition.SCORE: s = "First to " + str(Client.Data.ScoreToWin) + " wins"
+	$WinConditionLabel.text = s
 	pass

@@ -46,5 +46,13 @@ theme_override_font_sizes/font_size = 32
 shortcut = SubResource("Shortcut_07mix")
 text = "CONTINUE"
 
+[node name="WinConditionLabel" type="Label" parent="."]
+offset_left = 325.0
+offset_top = 25.0
+offset_right = 475.0
+offset_bottom = 48.0
+text = "Round #"
+horizontal_alignment = 1
+
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="pressed" from="ContinueBtn" to="." method="_on_continue_btn_pressed"]
