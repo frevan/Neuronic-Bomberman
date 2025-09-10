@@ -30,6 +30,7 @@ signal OnPlayerScoreChanged # params: id (int), score (int)
 signal OnPlayerBecameReady # params: id (int), ready (bool)
 signal OnCountDownStarted # params: time (float)
 signal OnWinConditionChanged(Condition: Constants.WinCondition, Value: int)
+signal OnMaxTimeChanged(Value: int)
 signal OnPlayerDisconnected # params: id (int)
 signal OnPlayerNameChanged # params: id (int), name (string)
 
@@ -288,6 +289,13 @@ func _network_win_condition_changed(Condition: Constants.WinCondition, Value: in
 	pass
 
 
+func _network_max_time_changed(Value: int) -> void:
+	_log("Max time changed to " + str(Value))
+	Data.MaxTime = Value
+	OnMaxTimeChanged.emit(Value)
+	pass
+
+
 func _network_player_name_changed(PlayerID: int, Name: String) -> void:
 	_log("Player " + str(PlayerID) + " is now called " + Name)
 	var idx = Data.FindSlotForPlayer(PlayerID)
@@ -332,6 +340,7 @@ func _ConnectToSignals() -> void:
 	Network.OnUpdatePlayerScore.connect(_network_update_player_score)
 	Network.OnCountDownStarted.connect(_network_countdown_started)
 	Network.OnWinConditionChanged.connect(_network_win_condition_changed)
+	Network.OnMaxTimeChanged.connect(_network_max_time_changed)
 	Network.OnPlayerNameChanged.connect(_network_player_name_changed)
 	Network.OnPlayingStateUpdate.connect(_network_playing_state_update)
 	pass
@@ -364,6 +373,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnUpdatePlayerScore.disconnect(_network_update_player_score)
 	Network.OnCountDownStarted.disconnect(_network_countdown_started)
 	Network.OnWinConditionChanged.disconnect(_network_win_condition_changed)
+	Network.OnMaxTimeChanged.disconnect(_network_max_time_changed)
 	Network.OnPlayerNameChanged.disconnect(_network_player_name_changed)
 	Network.OnPlayingStateUpdate.disconnect(_network_playing_state_update)
 	pass
@@ -483,6 +493,10 @@ func RequestPlayerReady(Ready: bool) -> void:
 
 func RequestWinCondition(Condition: Constants.WinCondition, Value: int) -> void:
 	Network.SendRequestWinCondition.rpc_id(1, Condition, Value)
+	pass
+
+func RequestMaxTime(Value: int) -> void:
+	Network.SendRequestMaxTime.rpc_id(1, Value)
 	pass
 
 

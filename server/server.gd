@@ -396,6 +396,7 @@ func _ConnectToSignalsOnStart() -> void:
 	Network.OnPlayerReady.connect(Comms._network_player_ready)
 	Network.OnPlayerHoldingKey.connect(Comms._network_player_is_holding_key)
 	Network.OnRequestWinCondition.connect(Comms._network_request_win_condition)
+	Network.OnRequestMaxTime.connect(Comms._network_request_max_time)
 	Network.OnPlayerNameReceived.connect(Comms._network_player_name_received)
 	Network.OnPlayerDirectionChange.connect(Comms._network_player_direction_change)
 	Network.OnBombIsMoving.connect(Comms._network_bomb_is_moving)
@@ -412,6 +413,7 @@ func _DisconnectFromSignalsOnStop() -> void:
 	Network.OnPlayerReady.disconnect(Comms._network_player_ready)
 	Network.OnPlayerHoldingKey.disconnect(Comms._network_player_is_holding_key)
 	Network.OnRequestWinCondition.disconnect(Comms._network_request_win_condition)
+	Network.OnRequestMaxTime.disconnect(Comms._network_request_max_time)
 	Network.OnPlayerNameReceived.disconnect(Comms._network_player_name_received)
 	Network.OnPlayerDirectionChange.disconnect(Comms._network_player_direction_change)
 	Network.OnBombIsMoving.disconnect(Comms._network_bomb_is_moving)
@@ -434,6 +436,7 @@ func _SendLobbyInfoToPlayer(PlayerID: int) -> void:
 				Network.SendPlayerNameChanged.rpc_id(PlayerID, other_peerid, slot.PlayerName)
 		Network.SendMapName.rpc_id(PlayerID, CurrentMapName)
 		Network.SendWinConditionChanged.rpc(Data.WinCondition, Data.NumRounds)
+		Network.SendMaxTimeChanged.rpc(Data.MaxTime)
 	pass
 
 

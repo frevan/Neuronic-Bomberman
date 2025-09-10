@@ -16,6 +16,7 @@ func BeforeShow() -> void:
 	Client.OnMapNameChanged.connect(_client_map_name_changed)
 	Client.OnPlayerBecameReady.connect(_client_player_became_ready)
 	Client.OnWinConditionChanged.connect(_client_win_condition_changed)
+	Client.OnMaxTimeChanged.connect(_client_max_time_changed)
 	Client.OnPlayerNameChanged.connect(_client_player_name_changed)
 	_AdjustControls()
 	pass
@@ -28,6 +29,7 @@ func AfterHide() -> void:
 	Client.OnMapNameChanged.disconnect(_client_map_name_changed)
 	Client.OnPlayerBecameReady.disconnect(_client_player_became_ready)
 	Client.OnWinConditionChanged.disconnect(_client_win_condition_changed)
+	Client.OnMaxTimeChanged.disconnect(_client_max_time_changed)
 	Client.OnPlayerNameChanged.disconnect(_client_player_name_changed)
 	pass
 
@@ -74,6 +76,10 @@ func _client_player_became_ready(_PlayerID: int, _Ready: bool) -> void:
 
 func _client_win_condition_changed(_Condition: Constants.WinCondition, _Value: int) -> void:
 	_AdjustWinConditionControls()
+	pass
+
+func _client_max_time_changed(_Value: int) -> void:
+	_AdjustMaxTimeSelector()
 	pass
 
 func _client_player_name_changed(_PlayerID: int, _Name: String) -> void:
@@ -212,6 +218,7 @@ func _on_ready_box_toggled(toggled_on: bool) -> void:
 func _AdjustControls() -> void:
 	$%WinConditionSelector.visible = Network.IsServer()
 	$%WinConditionLabel.visible = !Network.IsServer()
+	$%TimeSelector.visible = Network.IsServer()
 	_AdjustWinConditionControls()
 	pass
 
@@ -233,6 +240,27 @@ func _AdjustWinConditionControls() -> void:
 		$%WinConditionSpin.set_value_no_signal(v)
 	else:
 		$%WinConditionLabel.text = s + ": " + str(v)
+	pass
+
+
+func _AdjustMaxTimeSelector() -> void:
+	var idx: int = 10
+	match Client.Data.MaxTime:
+		30: idx = 0
+		60: idx = 1
+		2*60: idx = 2
+		3*60: idx = 3
+		4*60: idx = 4
+		5*60: idx = 5
+		6*60: idx = 6
+		7*60+30: idx = 7
+		10*60: idx = 8
+		15*60: idx = 9
+		0: idx = 10
+	if Network.IsServer():
+		$%TimeSelector.select(idx)
+	else:
+		$%TimeSelectorLabel.text = "Time: " + $%TimeSelector.get_item_text(idx)
 	pass
 
 
@@ -260,4 +288,22 @@ func _on_win_condition_selector_item_selected(index: int) -> void:
 func _on_win_condition_spin_value_changed(value: float) -> void:
 	var v: int = floor(value)
 	Client.RequestWinCondition(Client.Data.WinCondition, v)
+	pass
+
+
+func _on_time_selector_item_selected(index: int) -> void:
+	var seconds: int = 0
+	match index:
+		0: seconds = 30
+		1: seconds = 60
+		2: seconds = 2*60
+		3: seconds = 3*60
+		4: seconds = 4*60
+		5: seconds = 5*60
+		6: seconds = 6*60
+		7: seconds = 7*60+30
+		8: seconds = 10*60
+		9: seconds = 15*60
+		10: seconds = 0 # infinite
+	Client.RequestMaxTime(seconds)
 	pass

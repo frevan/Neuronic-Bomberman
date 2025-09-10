@@ -11,6 +11,7 @@ var NumRounds: int = 3
 var ScoreToWin: int = 3
 var CurrentRound: int = -1
 var AvailablePowerups: Array # Types.TMapPowerUp
+var MaxTime: int = 3*60 # in seconds, default to 3 minutes
 
 var CountingDown: bool = false
 var CountDownTime: float = 0

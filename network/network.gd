@@ -12,6 +12,7 @@ signal OnRequestStartMatch # params: sender_id (int)
 signal OnPlayerReady # params: sender_id (int), ready (bool)
 signal OnPlayerHoldingKey # params: sender_id (int), key_index (int), value (bool)
 signal OnRequestWinCondition(Condition: Constants.WinCondition, Value: int)
+signal OnRequestMaxTime(Value: int)
 signal OnPlayerNameReceived # params: id (int), name (string)
 signal OnPlayerDirectionChange # params: id (int), direction (int)
 signal OnBombIsMoving(BombID: int, Value: bool)
@@ -38,6 +39,7 @@ signal OnPlayerDied # params: id (int)
 signal OnUpdatePlayerScore # params: id (int), score (int)
 signal OnCountDownStarted # params: time (float)
 signal OnWinConditionChanged(Condition: Constants.WinCondition, Value: int)
+signal OnMaxTimeChanged(Value: int)
 signal OnPlayerNameChanged # params: id (int), value (string)
 signal OnPlayingStateUpdate # params: id (int), state (JSON string)
 
@@ -133,6 +135,10 @@ func SendHoldingKey(KeyIndex: int, Value: bool) -> void:
 @rpc("reliable", "call_local", "authority")
 func SendRequestWinCondition(Condition: Constants.WinCondition, Value: int) -> void:
 	OnRequestWinCondition.emit(Condition, Value)
+
+@rpc("reliable", "call_local", "authority")
+func SendRequestMaxTime(Value: int) -> void:
+	OnRequestMaxTime.emit(Value)
 
 @rpc("reliable", "call_local", "any_peer")
 func SendPlayerName(Value: String) -> void:
@@ -237,6 +243,10 @@ func SendCountDownStarted(CountDownTime: float) -> void:
 @rpc("reliable", "call_local", "authority")
 func SendWinConditionChanged(Condition: Constants.WinCondition, Value: int) -> void:
 	OnWinConditionChanged.emit(Condition, Value)
+
+@rpc("reliable", "call_local", "authority")
+func SendMaxTimeChanged(Value: int) -> void:
+	OnMaxTimeChanged.emit(Value)
 
 @rpc("reliable", "call_local", "authority")
 func SendPlayerNameChanged(ID: int, Value: String) -> void:

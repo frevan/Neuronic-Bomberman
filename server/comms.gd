@@ -111,6 +111,13 @@ func _network_request_win_condition(Condition: Constants.WinCondition, Value: in
 	pass
 
 
+func _network_request_max_time(Value: int) -> void:
+	_log("max time request: " + str(Value))
+	Server.Data.MaxTime = clamp(Value, 0, 3600)
+	Network.SendMaxTimeChanged.rpc(Server.Data.MaxTime)
+	pass
+
+
 func _network_player_name_received(PlayerID: int, Name: String) -> void:
 	_log("player name received for " + str(PlayerID) + ": " + Name)
 	var idx = Server.Data.FindSlotForPlayer(PlayerID)
