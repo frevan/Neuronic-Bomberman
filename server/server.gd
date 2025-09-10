@@ -373,7 +373,12 @@ func _ProcessDiseases(delta: float) -> void:
 
 func _CheckIfRoundEnded() -> void:
 	if Data.CountAlivePlayers() <= 1:
-		if Data.CurrentRound == Data.NumRounds - 1:
+		var highest_score: int = _IncreasePlayerScores()
+		var can_end_match: bool = false
+		match Data.WinCondition:
+			Constants.WinCondition.NUM_ROUNDS: can_end_match = Data.CurrentRound == Data.NumRounds - 1
+			Constants.WinCondition.SCORE: can_end_match = highest_score >= Data.ScoreToWin
+		if can_end_match:
 			_EndMatch()
 		else:
 			_EndRound()
@@ -493,7 +498,6 @@ func _StartRoundNow() -> void:
 
 
 func _EndRound() -> void:
-	_IncreasePlayerScores()
 	_SetAllPlayersUnready()
 	State = TState.MATCH
 	Network.SendRoundEnded.rpc()
@@ -502,7 +506,6 @@ func _EndRound() -> void:
 
 
 func _EndMatch() -> void:
-	_IncreasePlayerScores()
 	_SetAllPlayersUnready()
 	State = TState.LOBBY
 	Network.SendMatchEnded.rpc()
@@ -517,12 +520,15 @@ func _SetAllPlayersUnready() -> void:
 	pass
 
 
-func _IncreasePlayerScores() -> void:
+func _IncreasePlayerScores() -> int: # returns highest player score
+	var highest_score = 0
 	for slot: TSlot in Data.Slots:
 		if slot.Player.Alive:
 			slot.Score += 1
+			if slot.Score > highest_score:
+				highest_score = slot.Score
 			Network.SendPlayerScore.rpc(slot.PlayerID, slot.Score)
-	pass
+	return highest_score
 
 
 
