@@ -348,7 +348,7 @@ func _MoveGrabbedBombNodes() -> void:
 			if bomb.IsGrabbedBy != Constants.INVALID_SLOT:
 				var playerscene: Node2D = PlayerScenes[bomb.IsGrabbedBy]
 				if playerscene:
-					b.position = playerscene.position
+					b.position = playerscene.position + Vector2(0, -Tools.FIELD_SIZE.y)
 	pass
 
 
