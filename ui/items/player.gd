@@ -7,6 +7,8 @@ signal OnDirectionChanged(Sender: Node2D, NewDirection: Vector2)
 signal CollidedWithBomb(Sender: Node2D, Bomb: Node2D, Collision: KinematicCollision2D)
 
 
+const ColorShader = "res://ui/items/player.gdshader"
+
 @export var animation = ""
 
 var Data: TGameData
@@ -49,12 +51,30 @@ func _physics_process(delta: float) -> void:
 	pass
 
 
-func _InitializeSprite(id: int) -> void:
-	if id == 1:
-		$AnimatedSprite.modulate = Color(1, 0.5, 0)
-	else:
-		$AnimatedSprite.modulate = Color(0, 0.5, 1)
+func _InitializeSprite(_id: int) -> void:
 	$AnimatedSprite.animation = "down"
+	pass
+
+func CreateSpriteShader() -> void:
+	if SlotIndex == 0:
+		return
+	var _material: ShaderMaterial = ShaderMaterial.new()
+	$AnimatedSprite.material = _material
+	$AnimatedSprite.material.shader = load(ColorShader)
+	$AnimatedSprite.material.set_shader_parameter("tolerance", 1.0)
+	$AnimatedSprite.material.set_shader_parameter("prev_color", Color(0x23f723ff))
+	var c: Color
+	match SlotIndex:
+		1: c = Color(0xff0000ff) # red
+		2: c = Color(0xff00ffff) # pink
+		3: c = Color(0x00ffffff) # cyan
+		4: c = Color(0x0000ffff) # blue
+		5: c = Color(0x000000ff) # black
+		6: c = Color(0xffff00ff) # yellow
+		7: c = Color(0xff8000ff) # orange
+		8: c = Color(0x9900a5ff) # purple
+		9: c = Color(0xffffffff) # white
+	$AnimatedSprite.material.set_shader_parameter("new_color", c)
 	pass
 
 

@@ -1,8 +1,10 @@
-[gd_scene load_steps=68 format=3 uid="uid://3gxr7c32joun"]
+[gd_scene load_steps=69 format=3 uid="uid://3gxr7c32joun"]
 
 [ext_resource type="Script" uid="uid://bjrjmtcc3yqcj" path="res://ui/items/player.gd" id="1_qxu1h"]
 [ext_resource type="Texture2D" uid="uid://dfl60gv3c08jf" path="res://assets/player_walking.png" id="2_y8d7p"]
 [ext_resource type="Script" uid="uid://ct3he1a4cl6uw" path="res://ui/items/player_input.gd" id="3_506kp"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_h213p"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_87lnf"]
 atlas = ExtResource("2_y8d7p")
@@ -479,8 +481,9 @@ collision_mask = 2
 script = ExtResource("1_qxu1h")
 
 [node name="AnimatedSprite" type="AnimatedSprite2D" parent="."]
+material = SubResource("ShaderMaterial_h213p")
 sprite_frames = SubResource("SpriteFrames_8wqke")
-animation = &"up"
+animation = &"down"
 centered = false
 offset = Vector2(-55, -102)
 

@@ -286,6 +286,7 @@ func _ShowPlayers(CanShow: bool = true) -> void:
 		scene.visible = CanShow && (slot.PlayerID != 0) && slot.Player.Alive
 		scene.Data = Client.Data
 		scene.SlotIndex = i
+		scene.CreateSpriteShader()
 		PlayerScenes[slot.PlayerID] = scene
 	pass
 
