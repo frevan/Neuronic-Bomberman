@@ -139,8 +139,10 @@ func _client_player_position_changed(_PlayerID: int) -> void:
 	_SetPlayerPositions()
 	pass
 
-func _client_map_tile_changed(_Field: Vector2i, _Type: int) -> void:
+func _client_map_tile_changed(_Field: Vector2i, Type: int) -> void:
 	_CreateTiles()
+	if Type == Types.FIELD_SOLID:
+		$NewSolidBlockAudioPlayer.play()
 	pass
 
 func _client_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vector2) -> void:
