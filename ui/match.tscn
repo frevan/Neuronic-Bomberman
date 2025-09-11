@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://4nnysadoodsc"]
+[gd_scene load_steps=10 format=3 uid="uid://4nnysadoodsc"]
 
 [ext_resource type="Script" uid="uid://bdb75rw33pcmy" path="res://ui/match.gd" id="1_gh88m"]
 [ext_resource type="Texture2D" uid="uid://cdqrwtfiee0uw" path="res://assets/back.png" id="2_gavrd"]
 [ext_resource type="Texture2D" uid="uid://blhq3dbcvb8qf" path="res://assets/field.png" id="3_mbs0m"]
 [ext_resource type="PackedScene" uid="uid://3gxr7c32joun" path="res://ui/items/player.tscn" id="4_hudsj"]
+[ext_resource type="AudioStream" uid="uid://bjcug1b7wsfxn" path="res://assets/fx/explosion.wav" id="5_b084t"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jcqty"]
 size = Vector2(20, 517)
@@ -154,6 +155,10 @@ horizontal_alignment = 1
 
 [node name="RoundTimeTimer" type="Timer" parent="."]
 wait_time = 0.5
+
+[node name="ExplosionAudioPlayer" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("5_b084t")
+max_polyphony = 5
 
 [connection signal="CollidedWithBomb" from="Players/Player0" to="." method="_on_player_collided_with_bomb"]
 [connection signal="OnDirectionChanged" from="Players/Player0" to="." method="_on_player_direction_changed"]

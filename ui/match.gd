@@ -192,6 +192,7 @@ func _client_explosion(Field: Vector2i) -> void:
 	e.Field = Field
 	Explosions[Field] = e
 	$ExplosionLayer.add_child.call_deferred(e)
+	$ExplosionAudioPlayer.play()
 	pass
 	
 func _client_remove_explosion(Field: Vector2i) -> void:
