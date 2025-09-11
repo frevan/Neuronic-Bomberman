@@ -575,7 +575,7 @@ func Start() -> bool:
 	
 	Maps = TMaps.new()
 	Maps.FindMapFiles()
-	if Maps.MapNames.size() > 0:
+	if !Maps.MapExists(CurrentMapName) && Maps.MapNames.size() > 0:
 		CurrentMapName = Maps.MapNames[0]
 	
 	Comms = TServerComms.new()
@@ -609,7 +609,6 @@ func Stop() -> bool:
 	Data = null
 	Maps.queue_free()
 	Maps = null
-	CurrentMapName = ""
 	Comms.queue_free()
 	Comms = null
 	
