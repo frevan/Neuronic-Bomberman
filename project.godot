@@ -38,6 +38,10 @@ window/stretch/mode="canvas_items"
 
 enabled=PackedStringArray("res://addons/gut/plugin.cfg")
 
+[gui]
+
+theme/custom_font="uid://c288y417dj1eb"
+
 [input]
 
 ui_accept={

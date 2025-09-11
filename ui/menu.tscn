@@ -46,9 +46,9 @@ text = "JOIN"
 
 [node name="NameEdit" type="LineEdit" parent="."]
 offset_left = 300.0
-offset_top = 520.0
+offset_top = 530.0
 offset_right = 500.0
-offset_bottom = 562.0
+offset_bottom = 572.0
 theme_override_font_sizes/font_size = 24
 placeholder_text = "name"
 
@@ -60,6 +60,21 @@ offset_bottom = 583.0
 theme_override_font_sizes/font_size = 32
 shortcut = SubResource("Shortcut_bwjgb")
 text = "QUIT"
+
+[node name="Label" type="Label" parent="."]
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 85.0
+offset_top = 56.0
+offset_right = 735.0
+offset_bottom = 134.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 64
+text = "neuronic bomberman"
 
 [connection signal="pressed" from="HostBtn" to="." method="_on_host_btn_pressed"]
 [connection signal="pressed" from="JoinBtn" to="." method="_on_join_btn_pressed"]
