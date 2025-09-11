@@ -42,6 +42,7 @@ signal OnWinConditionChanged(Condition: Constants.WinCondition, Value: int)
 signal OnMaxTimeChanged(Value: int)
 signal OnPlayerNameChanged # params: id (int), value (string)
 signal OnPlayingStateUpdate # params: id (int), state (JSON string)
+signal OnPlayerGrabbedPowerup(PlayerID: int, PowerupType: int)
 
 
 const PORT = 15063
@@ -255,3 +256,7 @@ func SendPlayerNameChanged(ID: int, Value: String) -> void:
 @rpc("reliable", "call_local", "authority")
 func SendPlayingState(ID: int, State: String) -> void:
 	OnPlayingStateUpdate.emit(ID, State)
+
+@rpc("reliable", "call_local", "authority")
+func SendPlayerGrabbedPowerup(ID: int, PowerupType: int) -> void:
+	OnPlayerGrabbedPowerup.emit(ID, PowerupType)

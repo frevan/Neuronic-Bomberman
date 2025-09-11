@@ -370,6 +370,7 @@ func _PickUpPowerups() -> void:
 			Network.SendMapTileChanged.rpc(slot.Player.Position, Types.FIELD_EMPTY)
 			Rules.ApplyPowerupToPlayer(Data, i, type - Types.FIELD_PU_FIRST)
 			Network.SendPlayingState.rpc(slot.PlayerID, slot.Player.ToJSONString())
+			Network.SendPlayerGrabbedPowerup.rpc_id(slot.PlayerID, slot.PlayerID, type - Types.FIELD_PU_FIRST)
 	pass
 
 

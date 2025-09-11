@@ -15,7 +15,7 @@ const COLLISIONLAYER_BLOCK = 0b00000100_00000000
 const COLLISIONLAYER_BOMB = 0b0001000_00000000
 
 const COLLISIONMASK_ALL = 0xffffffff
-const COLLISIONMASK_BLOCK = 0#0b00011111_11111111
+const COLLISIONMASK_BLOCK = 0
 const COLLISIONMASK_BOMB = 0b00011111_11111111
 
 
@@ -49,6 +49,7 @@ func BeforeShow() -> void:
 	Client.OnPlayerDied.connect(_client_player_died)
 	Client.OnCountDownStarted.connect(_client_countdown_started)
 	Client.OnPlayerDisconnected.connect(_client_player_disconnected)
+	Client.OnPlayerGrabbedPowerup.connect(_client_player_grabbed_powerup)
 	pass
 
 func AfterHide() -> void:
@@ -67,6 +68,7 @@ func AfterHide() -> void:
 	Client.OnPlayerDied.disconnect(_client_player_died)
 	Client.OnCountDownStarted.disconnect(_client_countdown_started)
 	Client.OnPlayerDisconnected.disconnect(_client_player_disconnected)
+	Client.OnPlayerGrabbedPowerup.disconnect(_client_player_grabbed_powerup)
 	_CleanUpAfterMatch()
 	$CountDownTimer.stop()
 	$RoundTimeTimer.stop()
@@ -214,6 +216,11 @@ func _client_countdown_started(_CountDownTime: float) -> void:
 
 func _client_player_disconnected(PlayerID: int) -> void:
 	_RemovePlayerScene(PlayerID)
+	pass
+
+func _client_player_grabbed_powerup(PlayerID: int, _PowerupType: int) -> void:
+	if PlayerID == Network.PeerID:
+		$PowerupAudioPlayer.play()
 	pass
 
 

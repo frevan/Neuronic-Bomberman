@@ -33,6 +33,7 @@ signal OnWinConditionChanged(Condition: Constants.WinCondition, Value: int)
 signal OnMaxTimeChanged(Value: int)
 signal OnPlayerDisconnected # params: id (int)
 signal OnPlayerNameChanged # params: id (int), name (string)
+signal OnPlayerGrabbedPowerup(PlayerID: int, PowerupType: int)
 
 signal OnPlayerPositionUpdated(ID: int, Position: Vector2) # [for the server object] param: id (int), position (vector2)
 signal OnBombPositionUpdated(BombID: int, Position: Vector2) # [for the server object] param: id (int), position (vector2)
@@ -316,6 +317,10 @@ func _network_playing_state_update(PlayerID: int, PlayingState: String) -> void:
 		slot.Player.FromJSONString(PlayingState)
 	pass
 
+func _network_player_grabbed_powerup(PlayerID: int, PowerupType: int) -> void:
+	OnPlayerGrabbedPowerup.emit(PlayerID, PowerupType)
+	pass
+
 
 func _ConnectToSignals() -> void:
 	multiplayer.connected_to_server.connect(_connected_to_server)
@@ -347,6 +352,7 @@ func _ConnectToSignals() -> void:
 	Network.OnMaxTimeChanged.connect(_network_max_time_changed)
 	Network.OnPlayerNameChanged.connect(_network_player_name_changed)
 	Network.OnPlayingStateUpdate.connect(_network_playing_state_update)
+	Network.OnPlayerGrabbedPowerup.connect(_network_player_grabbed_powerup)
 	pass
 
 
@@ -380,6 +386,7 @@ func _DisconnectFromSignals() -> void:
 	Network.OnMaxTimeChanged.disconnect(_network_max_time_changed)
 	Network.OnPlayerNameChanged.disconnect(_network_player_name_changed)
 	Network.OnPlayingStateUpdate.disconnect(_network_playing_state_update)
+	Network.OnPlayerGrabbedPowerup.disconnect(_network_player_grabbed_powerup)
 	pass
 
 
