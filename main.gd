@@ -25,6 +25,15 @@ func _ready() -> void:
 	pass
 
 
+func _enter_tree() -> void:
+	Settings.LoadSettings()
+	pass
+
+func _exit_tree() -> void:
+	Settings.SaveSettings()
+	pass
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey:
 		if event.pressed and event.keycode == KEY_ENTER and event.alt_pressed:
@@ -75,6 +84,7 @@ func _InitializeMenuScene() -> void:
 	$Menu.Initialize(Client)
 	$Menu.Server = Server
 	$Menu.OnJoinServer.connect(_menu_join_server)
+	$Menu.OnShowOptions.connect(_menu_show_options)
 	pass
 
 func _InitializeLobbyScene() -> void:
@@ -147,6 +157,10 @@ func _menu_join_server() -> void:
 	Tools.SwitchToScene($ServerSelection)
 	pass
 
+func _menu_show_options() -> void:
+	Tools.SwitchToScene($Options)
+	pass
+
 
 func _lobby_disconnect_and_stop() -> void:
 	_DisconnectAndStop()
@@ -186,4 +200,9 @@ func _DisconnectAndStop() -> void:
 		Client.Disconnect()
 		if Network.IsServer():
 			Server.Stop()
+	pass
+
+
+func _on_options_on_leave() -> void:
+	Tools.SwitchToScene($Menu)
 	pass

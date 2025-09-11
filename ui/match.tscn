@@ -162,18 +162,22 @@ wait_time = 0.5
 [node name="ExplosionAudioPlayer" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("5_b084t")
 max_polyphony = 5
+bus = &"FX"
 
 [node name="DeathAudioPlayer" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("6_wby7m")
 max_polyphony = 5
+bus = &"FX"
 
 [node name="PowerupAudioPlayer" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("7_n8b8b")
 max_polyphony = 5
+bus = &"FX"
 
 [node name="NewSolidBlockAudioPlayer" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("8_tb876")
 max_polyphony = 5
+bus = &"FX"
 
 [connection signal="CollidedWithBomb" from="Players/Player0" to="." method="_on_player_collided_with_bomb"]
 [connection signal="OnDirectionChanged" from="Players/Player0" to="." method="_on_player_direction_changed"]

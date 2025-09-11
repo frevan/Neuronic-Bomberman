@@ -25,6 +25,7 @@ Network="*res://network/network.gd"
 Types="*res://data/types.gd"
 Constants="*res://data/constants.gd"
 Colors="*res://data/colors.gd"
+Settings="*res://data/settings.gd"
 
 [display]
 

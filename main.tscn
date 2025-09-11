@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://bx32n2ieoxv6a"]
+[gd_scene load_steps=9 format=3 uid="uid://bx32n2ieoxv6a"]
 
 [ext_resource type="Script" uid="uid://nfs7o0pa1bav" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://c0pu41tigjecp" path="res://ui/menu.tscn" id="2_0xm2m"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://4nnysadoodsc" path="res://ui/match.tscn" id="5_lquwl"]
 [ext_resource type="PackedScene" uid="uid://bmpqw6rtdaxnr" path="res://ui/score.tscn" id="6_7mycd"]
 [ext_resource type="PackedScene" uid="uid://btkoy6r8d4giw" path="res://ui/server_selection.tscn" id="7_272bh"]
+[ext_resource type="PackedScene" uid="uid://b5dljecyqlu8p" path="res://ui/options.tscn" id="8_5vw27"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_ig7tw")
@@ -28,3 +29,8 @@ visible = false
 
 [node name="ServerSelection" parent="." instance=ExtResource("7_272bh")]
 visible = false
+
+[node name="Options" parent="." instance=ExtResource("8_5vw27")]
+visible = false
+
+[connection signal="OnLeave" from="Options" to="." method="_on_options_on_leave"]

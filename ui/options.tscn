@@ -1,0 +1,47 @@
+[gd_scene load_steps=4 format=3 uid="uid://b5dljecyqlu8p"]
+
+[ext_resource type="Script" uid="uid://doxypt0mp1nmd" path="res://ui/options.gd" id="1_ymcv4"]
+
+[sub_resource type="InputEventAction" id="InputEventAction_nmq56"]
+action = &"ui_cancel"
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_ymcv4"]
+events = [SubResource("InputEventAction_nmq56")]
+
+[node name="Options" type="Node2D"]
+script = ExtResource("1_ymcv4")
+
+[node name="CaptionLabel" type="Label" parent="."]
+offset_left = 20.0
+offset_right = 205.0
+offset_bottom = 67.0
+theme_override_font_sizes/font_size = 48
+text = "OPTIONS"
+
+[node name="BackButton" type="Button" parent="."]
+offset_left = 20.0
+offset_top = 530.0
+offset_right = 122.0
+offset_bottom = 583.0
+theme_override_font_sizes/font_size = 32
+shortcut = SubResource("Shortcut_ymcv4")
+text = "BACK	"
+
+[node name="FXVolumeSlider" type="HSlider" parent="."]
+offset_left = 120.0
+offset_top = 71.0
+offset_right = 320.0
+offset_bottom = 87.0
+size_flags_stretch_ratio = 5.0
+max_value = 1.0
+step = 0.0
+
+[node name="Label" type="Label" parent="FXVolumeSlider"]
+offset_left = -97.0
+offset_right = -20.0
+offset_bottom = 20.0
+text = "FX volume"
+
+[connection signal="pressed" from="BackButton" to="." method="_on_leave_button_pressed"]
+[connection signal="drag_ended" from="FXVolumeSlider" to="." method="_on_fx_volume_slider_drag_ended"]

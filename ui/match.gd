@@ -50,6 +50,7 @@ func BeforeShow() -> void:
 	Client.OnCountDownStarted.connect(_client_countdown_started)
 	Client.OnPlayerDisconnected.connect(_client_player_disconnected)
 	Client.OnPlayerGrabbedPowerup.connect(_client_player_grabbed_powerup)
+	_UpdateAudioVolume()
 	pass
 
 func AfterHide() -> void:
@@ -524,4 +525,12 @@ func _on_round_time_timer_timeout() -> void:
 		var minutes: int = maxi(0, int(Client.Data.CurrentRoundTime / 60.0))
 		s = "%02d:%02d" % [minutes, seconds]
 	$RoundTimeLabel.text = s
+	pass
+
+
+func _UpdateAudioVolume() -> void:
+	_log("FXVolume = " + str(Settings.FXVolume))
+	var v: float = Settings.FXVolume
+	var _bus = AudioServer.get_bus_index("FX")
+	AudioServer.set_bus_volume_linear(_bus, v)
 	pass

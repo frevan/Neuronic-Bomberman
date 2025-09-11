@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://c0pu41tigjecp"]
+[gd_scene load_steps=10 format=3 uid="uid://c0pu41tigjecp"]
 
 [ext_resource type="Script" uid="uid://bktw17vb5yvs1" path="res://ui/menu.gd" id="1_bwjgb"]
 
@@ -23,6 +23,12 @@ pressed = true
 [sub_resource type="Shortcut" id="Shortcut_bwjgb"]
 events = [SubResource("InputEventAction_rvb8m")]
 
+[sub_resource type="InputEventAction" id="InputEventAction_4c782"]
+action = &"ui_end"
+
+[sub_resource type="Shortcut" id="Shortcut_2ot4n"]
+events = [SubResource("InputEventAction_4c782")]
+
 [node name="Menu" type="Node2D"]
 script = ExtResource("1_bwjgb")
 
@@ -46,11 +52,18 @@ text = "JOIN"
 
 [node name="NameEdit" type="LineEdit" parent="."]
 offset_left = 300.0
-offset_top = 530.0
+offset_top = 534.0
 offset_right = 500.0
-offset_bottom = 572.0
+offset_bottom = 576.0
 theme_override_font_sizes/font_size = 24
-placeholder_text = "name"
+
+[node name="Label" type="Label" parent="NameEdit"]
+layout_mode = 0
+offset_left = -50.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 30.0
+text = "NAME"
 
 [node name="QuitBtn" type="Button" parent="."]
 offset_left = 20.0
@@ -60,6 +73,15 @@ offset_bottom = 583.0
 theme_override_font_sizes/font_size = 32
 shortcut = SubResource("Shortcut_bwjgb")
 text = "QUIT"
+
+[node name="OptionsBtn" type="Button" parent="."]
+offset_left = 648.0
+offset_top = 530.0
+offset_right = 780.0
+offset_bottom = 583.0
+theme_override_font_sizes/font_size = 32
+shortcut = SubResource("Shortcut_2ot4n")
+text = "OPTIONS"
 
 [node name="Label" type="Label" parent="."]
 anchors_preset = 13
@@ -79,4 +101,6 @@ horizontal_alignment = 1
 
 [connection signal="pressed" from="HostBtn" to="." method="_on_host_btn_pressed"]
 [connection signal="pressed" from="JoinBtn" to="." method="_on_join_btn_pressed"]
+[connection signal="text_changed" from="NameEdit" to="." method="_on_name_edit_text_changed"]
 [connection signal="pressed" from="QuitBtn" to="." method="_on_quit_btn_pressed"]
+[connection signal="pressed" from="OptionsBtn" to="." method="_on_options_btn_pressed"]
