@@ -9,5 +9,5 @@ const SPRITE_COLORS = [Color(0x23f723ff), # green
 						Color(0x000000ff), # black
 						Color(0xffff00ff), # yellow
 						Color(0xff8000ff), # orange
-						Color(0x9900a5ff), # purple
+						Color(0x8371ffff), # purple
 						Color(0xffffffff)] # white
