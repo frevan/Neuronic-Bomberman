@@ -204,6 +204,7 @@ func _client_remove_explosion(Field: Vector2i) -> void:
 
 func _client_player_died(PlayerID: int) -> void:
 	_RemovePlayerScene(PlayerID)
+	$DeathAudioPlayer.play()
 	pass
 
 func _client_countdown_started(_CountDownTime: float) -> void:
