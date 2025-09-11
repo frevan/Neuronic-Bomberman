@@ -52,6 +52,7 @@ theme_override_font_sizes/font_size = 48
 text = "LOBBY"
 
 [node name="ClientInfoLabel" type="Label" parent="."]
+visible = false
 offset_left = 415.0
 offset_top = 548.0
 offset_right = 774.0
