@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dig7ynex303ip"
-path="res://.godot/imported/death-1.wav-01843f9d0edfe7b5510d7fa5369062d2.sample"
+path="res://.godot/imported/death-beepbeep.wav-0b2ff93e751987f7e30f7808f72ec0f4.sample"
 
 [deps]
 
-source_file="res://assets/fx/death-1.wav"
-dest_files=["res://.godot/imported/death-1.wav-01843f9d0edfe7b5510d7fa5369062d2.sample"]
+source_file="res://assets/fx/death-beepbeep.wav"
+dest_files=["res://.godot/imported/death-beepbeep.wav-0b2ff93e751987f7e30f7808f72ec0f4.sample"]
 
 [params]
 
