@@ -7,6 +7,7 @@ signal Collided(Sender: TBombScene)
 
 
 var PlayerID: int
+var PlayerSlotIndex: int
 var Type: int
 var BombID: int
 
@@ -15,6 +16,8 @@ var BombID: int
 
 func LoadSpriteFromFile(FileName: String) -> void:
 	$Sprite2D.texture = load(FileName)
+	if PlayerSlotIndex >= 0 && PlayerSlotIndex < Colors.SPRITE_COLOR_COUNT:
+		$Sprite2D.material.set_shader_parameter("new_color", Colors.SPRITE_COLORS[PlayerSlotIndex])
 	pass
 
 

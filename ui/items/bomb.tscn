@@ -1,7 +1,15 @@
-[gd_scene load_steps=5 format=3 uid="uid://b353uydlsycm3"]
+[gd_scene load_steps=7 format=3 uid="uid://b353uydlsycm3"]
 
 [ext_resource type="Texture2D" uid="uid://d0xyifj7nnf1x" path="res://assets/bomb.png" id="1_amjlg"]
 [ext_resource type="Script" uid="uid://d2a7s46cos1mu" path="res://ui/items/bomb.gd" id="1_lnnoo"]
+[ext_resource type="Shader" uid="uid://b876ktmvi3odw" path="res://ui/items/player.gdshader" id="2_igal6"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_iqs2r"]
+resource_local_to_scene = true
+shader = ExtResource("2_igal6")
+shader_parameter/tolerance = 1.0
+shader_parameter/prev_color = Color(0.231373, 0.831373, 0.811765, 1)
+shader_parameter/new_color = Color(1, 0, 1, 1)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_amjlg"]
 radius = 21.0
@@ -24,6 +32,7 @@ collision_mask = 0
 script = ExtResource("1_lnnoo")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_iqs2r")
 texture = ExtResource("1_amjlg")
 offset = Vector2(0, -22.5)
 

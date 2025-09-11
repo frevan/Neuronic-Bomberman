@@ -145,6 +145,7 @@ func _client_bomb_dropped(PlayerID: int, BombID: int, Type: int, Position: Vecto
 	var scene = bombscene.instantiate()
 	scene.name = str(BombID)
 	scene.PlayerID = PlayerID
+	scene.PlayerSlotIndex = Client.Data.FindSlotForPlayer(PlayerID)
 	scene.BombID = BombID
 	scene.Type = Type
 	scene.position = Tools.FieldPositionToScreen(Position) + Tools.BOMB_POS_OFFSET
