@@ -7,6 +7,10 @@ signal OnDisconnectAndStop
 var Map: Types.TMap
 @onready var Maps: TMaps = TMaps.new()
 
+var EmptySlotColor: Color = Color(0x171717ff)
+var OccupiedColor: Color = Color(0x272727ff)
+var OwnSlotColor: Color = Color(0x474747ff)
+
 
 func BeforeShow() -> void:
 	super()
@@ -116,6 +120,7 @@ func _UpdatePlayerInfo() -> void:
 		
 		label.text = "..."
 		var slot: TSlot = Client.Data.Slots[i]
+		var slot_node = $PlayerInfo.find_child(str(i + 1))
 		if slot.PlayerID != 0:
 			var s: String = slot.PlayerName
 			if s == "":
@@ -125,6 +130,16 @@ func _UpdatePlayerInfo() -> void:
 			label.text = s
 			if slot.PlayerID == Network.PeerID:
 				$ReadyBox.set_pressed_no_signal(slot.Ready)
+			if slot_node:
+				if slot.PlayerID == Network.PeerID:
+					slot_node.color = OwnSlotColor
+				else:
+					slot_node.color = OccupiedColor
+				slot_node.visible = true
+		else:
+			if slot_node:
+				slot_node.visible = false
+				slot_node.color = EmptySlotColor
 	pass
 
 
