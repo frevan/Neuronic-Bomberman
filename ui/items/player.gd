@@ -40,6 +40,7 @@ func _physics_process(delta: float) -> void:
 	if !visible:
 		return
 	_UpdateSpriteAnimation()
+	_ForcePlayerIntoFieldWhenMoving()
 	velocity = $PlayerInput.direction * _CalculatePlayerSpeed(delta)
 	if velocity != Vector2.ZERO:
 		var collided: bool = move_and_slide()
@@ -139,3 +140,11 @@ func _ApplyDiseasesToSpeed(Delta: float, Speed: float) -> float:
 
 func _on_player_input_on_direction_changed(NewDirection: Vector2) -> void:
 	OnDirectionChanged.emit(self, NewDirection)
+
+
+func _ForcePlayerIntoFieldWhenMoving() -> void:
+	if $PlayerInput.direction.x != 0:
+		position.y = Tools.FieldPositionToScreen(Tools.ScreenPositionToField(position)).y
+	elif $PlayerInput.direction.y != 0:
+		position.x = Tools.FieldPositionToScreen(Tools.ScreenPositionToField(position)).x
+	pass
