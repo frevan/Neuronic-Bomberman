@@ -3,7 +3,7 @@ extends Node
 class_name TServer
 
 
-const COUNTDOWN_TIME = 5
+const COUNTDOWN_TIME = 2
 
 const NUM_ROUNDS_MIN = 1
 const NUM_ROUNDS_MAX = 100
