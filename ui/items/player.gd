@@ -13,6 +13,23 @@ const ColorShader = "res://ui/items/player.gdshader"
 
 var Data: TGameData
 var SlotIndex: int = Constants.INVALID_SLOT
+var SpriteColor: Color
+
+var CurrentSpriteColorIndex: int
+var TimeSinceLastSpriteColorChange: float
+var IsShowingDiseaseColors: bool = false
+const TIME_BETWEEN_DISEASE_COLORS = 0.25 # in seconds
+const SPRITE_COLOR_COUNT = 10
+const SPRITE_COLORS = [Color(0x23f723ff), # green
+						Color(0xff0000ff), # red
+						Color(0xff00ffff), # pink
+						Color(0x00ffffff), # cyan
+						Color(0x0000ffff), # blue
+						Color(0x000000ff), # black
+						Color(0xffff00ff), # yellow
+						Color(0xff8000ff), # orange
+						Color(0x9900a5ff), # purple
+						Color(0xffffffff)] # white
 
 @onready var Rules: TRules = TRules.new()
 
@@ -30,10 +47,11 @@ func _enter_tree() -> void:
 	_InitializeSprite(id)
 	pass
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if !visible:
 		return
 	_StartOrStopAnimation()
+	_UpdateSpriteColorForDisease(delta)
 	pass
 
 func _physics_process(delta: float) -> void:
@@ -57,25 +75,41 @@ func _InitializeSprite(_id: int) -> void:
 	pass
 
 func CreateSpriteShader() -> void:
-	if SlotIndex == 0:
-		return
 	var _material: ShaderMaterial = ShaderMaterial.new()
 	$AnimatedSprite.material = _material
 	$AnimatedSprite.material.shader = load(ColorShader)
 	$AnimatedSprite.material.set_shader_parameter("tolerance", 1.0)
 	$AnimatedSprite.material.set_shader_parameter("prev_color", Color(0x23f723ff))
-	var c: Color
-	match SlotIndex:
-		1: c = Color(0xff0000ff) # red
-		2: c = Color(0xff00ffff) # pink
-		3: c = Color(0x00ffffff) # cyan
-		4: c = Color(0x0000ffff) # blue
-		5: c = Color(0x000000ff) # black
-		6: c = Color(0xffff00ff) # yellow
-		7: c = Color(0xff8000ff) # orange
-		8: c = Color(0x9900a5ff) # purple
-		9: c = Color(0xffffffff) # white
-	$AnimatedSprite.material.set_shader_parameter("new_color", c)
+	SpriteColor = SPRITE_COLORS[SlotIndex]
+	_SetSpriteColor(SpriteColor)
+	pass
+
+func _UpdateSpriteColorForDisease(Delta: float) -> void:
+	if SlotIndex == Constants.INVALID_SLOT:
+		return
+	var slot: TSlot = Data.Slots[SlotIndex]
+	var has_disease: bool = slot.Player.HasDisease()
+	if has_disease != IsShowingDiseaseColors:
+		IsShowingDiseaseColors = has_disease
+		if !has_disease:
+			_SetSpriteColor(SpriteColor)
+		else:
+			TimeSinceLastSpriteColorChange = TIME_BETWEEN_DISEASE_COLORS
+			CurrentSpriteColorIndex = SlotIndex
+	if IsShowingDiseaseColors:
+		if TimeSinceLastSpriteColorChange >= TIME_BETWEEN_DISEASE_COLORS:
+			TimeSinceLastSpriteColorChange = 0
+			CurrentSpriteColorIndex += 1
+			if CurrentSpriteColorIndex >= SPRITE_COLOR_COUNT:
+				CurrentSpriteColorIndex = 0
+			_SetSpriteColor(SPRITE_COLORS[CurrentSpriteColorIndex])
+		else:
+			TimeSinceLastSpriteColorChange += Delta
+	pass
+
+func _SetSpriteColor(C: Color) -> void:
+	$AnimatedSprite.material.set_shader_parameter("new_color", C)
+	queue_redraw()
 	pass
 
 

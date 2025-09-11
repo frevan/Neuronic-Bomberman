@@ -141,3 +141,10 @@ func ClearDiseases() -> void:
 	for i in Constants.NUM_DISEASES:
 		Diseases[i] = 0
 	pass
+
+
+func HasDisease() -> bool:
+	for i in Constants.NUM_DISEASES:
+		if Diseases[i] > 0:
+			return true
+	return false
