@@ -138,6 +138,9 @@ func _UpdateClientInfo() -> void:
 
 func _UpdateMapInfo() -> void:
 	$MapNameLabel.text = Client.CurrentMapName
+	if $MapsList.item_count > 0:
+		var idx: int = max(0, _IndexOfMapInList(Client.CurrentMapName))
+		$MapsList.select(idx)
 	pass
 
 
